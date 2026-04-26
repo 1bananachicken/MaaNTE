@@ -1,0 +1,13 @@
+# 构建产物
+install/
+node_modules/
+
+# 子模块
+assets/MaaCommonAssets
+
+# 跳过 schema 目录，避免与 sync_schema_files 冲突
+deps/tools/
+
+# 锁文件
+pnpm-lock.yaml
+package-lock.json
