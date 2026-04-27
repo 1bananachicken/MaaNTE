@@ -42,7 +42,8 @@ def match_template_in_region(img, region, template, min_similarity=0.8):
 
 @AgentServer.custom_action("auto_fish")
 class Autofish(CustomAction):
-    image_dir = Path("../assets/resource/image/auto_fish")
+    abs_path = Path(__file__).parents[3]
+    image_dir = abs_path / "assets/resource/image/auto_fish"
     continue_img = image_dir / "continue.png"
     valid_region_img = image_dir / "valid_region.png"
     slider_img = image_dir / "slider.png"
@@ -148,7 +149,7 @@ class Autofish(CustomAction):
             controller.post_key_up(KEY_D)
             controller.post_key_up(KEY_A)
             controller.post_key_up(KEY_F)
-            print("Current iteration finished.\\n")
+            print("Current iteration finished.")
             
         print("All fishing tasks complete.")
         return CustomAction.RunResult(success=True)
