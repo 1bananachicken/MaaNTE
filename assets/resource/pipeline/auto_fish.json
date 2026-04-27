@@ -1,5 +1,5 @@
 {
-    "AutofishTask": {
+    "AutoFish": {
         "action": "Custom",
         "custom_action": "auto_fish",
         "custom_action_param": {

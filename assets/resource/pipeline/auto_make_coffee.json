@@ -4,7 +4,7 @@
         "custom_action": "auto_make_coffee",
         "custom_action_param": {
             "count": 1,
-            "freq": 1
+            "freq": 2
         }
     }
 }
