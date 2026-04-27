@@ -452,3 +452,4 @@ tools/ImageCropper/**/*.png
 
 config
 debug
+.maa/Debugger/store.json

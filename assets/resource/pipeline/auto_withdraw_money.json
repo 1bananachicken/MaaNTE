@@ -1,0 +1,124 @@
+{
+    "领取一咖舍收益": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    116
+                ]
+            }
+        },
+        "next": [
+            "点击一咖舍"
+        ],
+        "post_delay": 500
+    },
+    "点击一咖舍": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    490,
+                    457,
+                    93,
+                    46
+                ],
+                "template": [
+                    "auto_withdraw_money/coffee.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    515,
+                    461,
+                    44,
+                    43
+                ],
+            }
+        },
+        "next": [
+            "提取收益"
+        ]
+    },
+    "提取收益": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    151,
+                    608,
+                    174,
+                    43
+                ],
+                "template": [
+                    "auto_withdraw_money/withdraw.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "确认收益"
+        ]
+    },
+    "确认收益": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    540,
+                    589,
+                    198,
+                    44
+                ],
+                "template": [
+                    "auto_withdraw_money/confirm.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "点击空白区域关闭"
+        ]
+    },
+    "点击空白区域关闭": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    568,
+                    628,
+                    145,
+                    20
+                ],
+                "template": [
+                    "auto_withdraw_money/close.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "Esc"
+        ]
+    },
+    "Esc": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "repeat": 2,
+        "repeat_delay": 100
+    },
+}
