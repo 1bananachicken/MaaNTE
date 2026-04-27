@@ -9,11 +9,6 @@
     "version": "0.0.1",
     "controller": [
         {
-            "name": "安卓端",
-            "type": "Adb",
-            "display_short_side": 720
-        },
-        {
             "name": "桌面端",
             "type": "Win32",
             "win32": {
