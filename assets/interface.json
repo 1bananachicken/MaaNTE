@@ -2,10 +2,10 @@
     "interface_version": 2,
     "name": "MaaNTE",
     "description": "异环小助手，由MAAFramework强力驱动！",
-    "contact": "QQ群: 123456789",
+    "contact": "QQ群: 暂无",
     "license": "MIT",
     "welcome": "首次使用！欢迎使用 MAANTE!",
-    "github": "https://github.com/MaaXYZ/MaaPracticeBoilerplate",
+    "github": "https://github.com/1bananachicken/MaaNTE",
     "version": "0.0.1",
     "controller": [
         {
@@ -42,7 +42,7 @@
     "task": [
         {
             "name": "钓鱼",
-            "entry": "AutofishTask",
+            "entry": "AutoFish",
             "option": [
                 "钓鱼次数"
             ],
@@ -54,7 +54,10 @@
         },
         {
             "name": "自动做咖啡",
-            "entry": "AutoMakeCoffee"
+            "entry": "AutoMakeCoffee",
+            "option": [
+                "循环次数"
+            ],
         }
     ],
     "option": {
@@ -68,9 +71,26 @@
                 }
             ],
             "pipeline_override": {
-                "AutofishTask": {
+                "AutoFish": {
                     "custom_action_param": {
                         "count": "{钓鱼次数}"
+                    }
+                }
+            }
+        },
+        "循环次数": {
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "循环次数",
+                    "default": "10",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AutoMakeCoffee": {
+                    "custom_action_param": {
+                        "count": "{循环次数}"
                     }
                 }
             }
