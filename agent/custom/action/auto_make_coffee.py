@@ -52,10 +52,10 @@ class AutoMakeCoffee(CustomAction):
     def __init__(self):
         super().__init__()
         abs_path = Path(__file__).parents[3]
-        if Path.exists(abs_path.parent / "assets"):
-            image_dir = abs_path / "assets/resource/image/auto_make_coffee"
+        if Path.exists(abs_path / "assets"):
+            image_dir = abs_path / "assets/resource/base/image/auto_make_coffee"
         else:
-            image_dir = abs_path / "resource/image/auto_make_coffee"
+            image_dir = abs_path / "resource/base/image/auto_make_coffee"
         start_img = image_dir / "start.png"
         star_img = image_dir / "star.png"
         claim_img = image_dir / "claim.png" 

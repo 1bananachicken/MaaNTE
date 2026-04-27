@@ -15,8 +15,8 @@
                 "class_regex": ".*",
                 "window_regex": "异环",
                 "screencap": "FramePool",
-                "mouse": "Seize",
-                "keyboard": "Seize"
+                "mouse": "SendMessageWithWindowPos",
+                "keyboard": "SendMessageWithWindowPos"
             }
         }
     ],
@@ -24,7 +24,7 @@
         {
             "name": "官服",
             "path": [
-                "./resource"
+                "resource/base"
             ]
         }
     ],
