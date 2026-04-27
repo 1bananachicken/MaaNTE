@@ -203,11 +203,6 @@ jobs:
             echo "Copied custom icon to install/logo.ico"
           fi
 
-          # MXU 版本的图标
-          if [ -f "maante.ico" ]; then
-            cp maante.ico install-mxu/logo.ico
-          fi
-
       - uses: actions/upload-artifact@v4
         with:
           name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MFAA
@@ -331,11 +326,6 @@ jobs:
           if [ -f "maante.ico" ]; then
             cp maante.ico install/logo.ico
             echo "Copied custom icon to install/logo.ico"
-          fi
-
-          # MXU 版本的图标
-          if [ -d "install-mxu" ] && [ -f "maante.ico" ]; then
-            cp maante.ico install-mxu/logo.ico
           fi
 
       - uses: actions/upload-artifact@v4
@@ -474,11 +464,6 @@ jobs:
             echo "Copied custom icon to install/logo.ico"
           fi
 
-          # MXU 版本的图标
-          if [ -f "maante.ico" ]; then
-            cp maante.ico install-mxu/logo.ico
-          fi
-
       - uses: actions/upload-artifact@v4
         with:
           name: MaaNTE-macos-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MFAA
@@ -569,11 +554,3 @@ jobs:
           body: ${{ needs.changelog.outputs.release_body }}
           draft: false
           prerelease: ${{ needs.meta.outputs.is_prerelease == 'true' }}
-
-      - name: Trigger MirrorChyanUploading
-        shell: bash
-        run: |
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan.yml -f tag=${{ needs.meta.outputs.tag }}
-          gh workflow run --repo $GITHUB_REPOSITORY mirrorchyan_release_note.yml -f tag=${{ needs.meta.outputs.tag }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
