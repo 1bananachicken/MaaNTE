@@ -51,8 +51,8 @@ def click_rect(controller, rect):
 class AutoMakeCoffee(CustomAction):
     def __init__(self):
         super().__init__()
-        # Use maa's path logic matching autofish_action.py
-        image_dir = Path("../assets/resource/image/auto_make_coffee")
+        abs_path = Path(__file__).parents[3]
+        image_dir = abs_path / "assets/resource/image/auto_make_coffee"
         start_img = image_dir / "start.png"
         star_img = image_dir / "star.png"
         claim_img = image_dir / "claim.png" 
@@ -86,6 +86,8 @@ class AutoMakeCoffee(CustomAction):
         claim_roi = [681, 539, 187, 38]
         
         for count in range(make_count):
+            if context.tasker.stopping:  
+                return CustomAction.RunResult(success=False)
             print(f"=== Making Coffee {count + 1}/{make_count} ===")
             
             # Step 1: 选择关卡
@@ -96,6 +98,8 @@ class AutoMakeCoffee(CustomAction):
             # Step 2: 开始营业
             print("Waiting for start business button...")
             while True:
+                if context.tasker.stopping:  
+                    return CustomAction.RunResult(success=False)
                 img = get_image(controller)
                 match_start, _, match_x, match_y = match_template_in_region(img, start_roi, self.start_template, 0.8)
                 if match_start:
@@ -108,6 +112,8 @@ class AutoMakeCoffee(CustomAction):
             # Step 3: 达成营业额
             print("Waiting for star to reach sales goal...")
             while True:
+                if context.tasker.stopping:  
+                    return CustomAction.RunResult(success=False)
                 click_rect(controller, click_roi)
                 img = get_image(controller)
                 match_star, _, _, _ = match_template_in_region(img, star_roi, self.star_template, 0.9)
@@ -116,11 +122,13 @@ class AutoMakeCoffee(CustomAction):
                     click_rect(controller, star_target)
                     time.sleep(1)
                     break
-                time.sleep(check_freq)
+                time.sleep(2)
 
             # Step 4: 点击领取
             print("Waiting to claim reward...")
             while True:
+                if context.tasker.stopping:  
+                    return CustomAction.RunResult(success=False)
                 img = get_image(controller)
                 match_claim, _, match_x, match_y = match_template_in_region(img, claim_roi, self.claim_template, 0.8)
                 if match_claim:
