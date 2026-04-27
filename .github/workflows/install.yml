@@ -171,20 +171,6 @@ jobs:
         run: |
           PLATFORM_TAG="win-${{ steps.platform.outputs.tag }}"
           ./install/python/python.exe ./tools/ci/install.py ${{ needs.meta.outputs.tag }} $PLATFORM_TAG
-          cp -rpvn tools/registry/. install/
-
-      - name: Create CLI version
-        shell: bash
-        run: |
-          ./install/python/python.exe ./tools/ci/install_cli.py ${{ needs.meta.outputs.tag }}
-          cp -rpvn tools/registry/. install-cli/
-          cp -rpvn install/python/. install-cli/python/
-          rm -rf install-cli/deps 2>/dev/null || true
-          if [ -f "install-cli/MaaPiCli.exe" ]; then
-            mv -f install-cli/MaaPiCli.exe install-cli/MaaNTE.exe
-          elif [ -f "install-cli/MaaPiCli" ]; then
-            mv -f install-cli/MaaPiCli install-cli/MaaNTE
-          fi
 
       - name: Copy MFA files to main version
         shell: bash
@@ -226,16 +212,6 @@ jobs:
         with:
           name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MFAA
           path: "install"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-PiCLI
-          path: "install-cli"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
-          path: "install-mxu"
 
   linux:
     needs: meta
@@ -326,20 +302,6 @@ jobs:
           echo "Using Python executable: $PYTHON_EXECUTABLE for Linux"
           $PYTHON_EXECUTABLE ./tools/ci/install.py ${{ needs.meta.outputs.tag }} $PLATFORM_TAG
 
-      - name: Create CLI version
-        shell: bash
-        run: |
-          python ./tools/ci/install_cli.py ${{ needs.meta.outputs.tag }}
-          if [ -d "install/python" ]; then
-            cp -rpvn install/python/. install-cli/python/
-          fi
-          rm -rf install-cli/deps 2>/dev/null || true
-          if [ -f "install-cli/MaaPiCli" ]; then
-            mv -f install-cli/MaaPiCli install-cli/MaaNTE
-          elif [ -f "install-cli/MaaPiCli.exe" ]; then
-            mv -f install-cli/MaaPiCli.exe install-cli/MaaNTE.exe
-          fi
-
       - name: Copy MFA files to main version
         shell: bash
         run: |
@@ -380,17 +342,6 @@ jobs:
         with:
           name: MaaNTE-linux-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MFAA
           path: "install"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MaaNTE-linux-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-PiCLI
-          path: "install-cli"
-
-      - uses: actions/upload-artifact@v4
-        if: matrix.arch == 'x86_64'
-        with:
-          name: MaaNTE-linux-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
-          path: "install-mxu"
 
   macos:
     needs: meta
@@ -492,18 +443,6 @@ jobs:
           echo "Using Python executable: $PYTHON_EXECUTABLE for macOS"
           $PYTHON_EXECUTABLE ./tools/ci/install.py ${{ needs.meta.outputs.tag }} $PLATFORM_TAG
 
-      - name: Create CLI version
-        shell: bash
-        run: |
-          ./install/python/bin/python3 ./tools/ci/install_cli.py ${{ needs.meta.outputs.tag }}
-          cp -rpvn install/python/. install-cli/python/
-          rm -rf install-cli/deps 2>/dev/null || true
-          if [ -f "install-cli/MaaPiCli" ]; then
-            mv -f install-cli/MaaPiCli install-cli/MaaNTE
-          elif [ -f "install-cli/MaaPiCli.exe" ]; then
-            mv -f install-cli/MaaPiCli.exe install-cli/MaaNTE.exe
-          fi
-
       - name: Copy MFA files to main version
         shell: bash
         run: |
@@ -544,16 +483,6 @@ jobs:
         with:
           name: MaaNTE-macos-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MFAA
           path: "install"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MaaNTE-macos-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-PiCLI
-          path: "install-cli"
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MaaNTE-macos-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
-          path: "install-mxu"
 
   changelog:
     name: Generate changelog
