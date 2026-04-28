@@ -394,8 +394,20 @@ def check_and_install_dependencies():
 
 
 # -----
-# region 权限检测
+# region 环境检测
 # -----
+
+
+def _check_chinese_path():
+    """检测当前程序是否运行在含中文字符的目录下"""
+    import re
+
+    cwd = os.getcwd()
+    if re.search(r"[一-鿿]", cwd):
+        logger.warning(
+            f"当前运行目录含中文字符: {cwd}\n"
+            "部分组件对中文路径兼容性较差，请将程序移动至纯英文路径下运行。"
+        )
 
 
 def _check_admin_privilege():
@@ -505,6 +517,8 @@ def agent(is_dev_mode=False):
 def main():
     current_version = read_interface_version()
     is_dev_mode = current_version == "DEBUG"
+
+    _check_chinese_path()
 
     if sys.platform.startswith("win"):
         _check_admin_privilege()
