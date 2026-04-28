@@ -8,7 +8,6 @@ import random
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
-from utils.logger import logger
 
 def get_image(controller):
     job = controller.post_screencap()
@@ -68,14 +67,6 @@ class AutoMakeCoffee(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         print("=== Auto Make Coffee Action Started ===")
         controller = context.tasker.controller
-        # 分辨率检测
-        try:
-            controller.post_screencap().wait()
-            w, h = controller.resolution
-            logger.warning(f"[分辨率检测] 获取到的分辨率: {w}x{h}")
-        except Exception as e:
-            logger.error(f"[分辨率检测] 异常: {e}")
-        
         make_count = 10
         check_freq = 0.5
         if argv.custom_action_param:

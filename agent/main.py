@@ -411,6 +411,31 @@ def _check_admin_privilege():
     )
 
 
+def _check_game_resolution():
+    """连接控制器后检测游戏窗口分辨率"""
+    from utils.win32_process import find_window_by_process, get_window_rect
+
+    hwnd = find_window_by_process("HTGame.exe")
+    if hwnd is None:
+        logger.warning("分辨率检测: 未找到游戏窗口 (HTGame.exe)")
+        return
+
+    rect = get_window_rect(hwnd)
+    if rect is None:
+        logger.warning("分辨率检测: 无法获取窗口尺寸")
+        return
+
+    w = rect[2] - rect[0]
+    h = rect[3] - rect[1]
+    if (w, h) == (1280, 720):
+        logger.info(f"当前窗口分辨率: {w}x{h} [正常]")
+    else:
+        logger.warning(
+            f"当前窗口分辨率: {w}x{h}，请使用 1280x720 分辨率。"
+            "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。"
+        )
+
+
 # -----
 # region 核心业务
 # -----
@@ -460,6 +485,7 @@ def agent(is_dev_mode=False):
         log_pi_environment()
         AgentServer.start_up(socket_id)
         logger.info("AgentServer启动")
+        _check_game_resolution()
         AgentServer.join()
         AgentServer.shut_down()
         logger.info("AgentServer关闭")
