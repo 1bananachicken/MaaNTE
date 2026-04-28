@@ -33,7 +33,6 @@ class AutoBuyFishBait(CustomAction):
     buy_success_template = cv2.imread(str(buy_success_img), cv2.IMREAD_COLOR)
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
-        bait_region = [208, 209, 59, 27]
         fish_shop_region = [35, 88, 410, 475]
         find_bait_success_region = [1044, 131, 68, 23]
         select_max_region = [1202, 620, 33, 32]
@@ -49,10 +48,11 @@ class AutoBuyFishBait(CustomAction):
 
         while True:
             img = get_image(controller)
-            found_bait, _, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, 0.8)
+            found_bait, prob, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, 0.8)
+            print(f"Clicked on bait at ({x+15}, {y+5}), probability: {prob:.2f}")
             if found_bait:
                 for _ in range(3):
-                    click_rect(controller, [x, y, bait_region[2], bait_region[3]])
+                    click_rect(controller, [x, y, 30, 10])
                     time.sleep(0.1)
                 
                 img = get_image(controller)
