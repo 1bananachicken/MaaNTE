@@ -4,6 +4,10 @@ from ctypes import wintypes
 user32 = ctypes.windll.user32
 kernel32 = ctypes.windll.kernel32
 
+# 使进程感知 DPI，避免 GetClientRect 返回缩放后的虚拟坐标
+# 150% 缩放时未设置此项会导致返回值只有实际分辨率的 2/3
+user32.SetProcessDPIAware()
+
 WNDENUMPROC = ctypes.WINFUNCTYPE(wintypes.BOOL, wintypes.HWND, wintypes.LPARAM)
 
 TH32CS_SNAPPROCESS = 0x00000002
