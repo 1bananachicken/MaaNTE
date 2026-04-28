@@ -7,6 +7,7 @@ import numpy as np
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+from utils.logger import logger
 
 
 def get_image(controller):
@@ -68,15 +69,9 @@ class Autofish(CustomAction):
         try:
             controller.post_screencap().wait()
             w, h = controller.resolution
-            import sys
-
-            sys.stderr.write(f"[分辨率检测] 获取到的分辨率: {w}x{h}\n")
-            sys.stderr.flush()
+            logger.warning(f"[分辨率检测] 获取到的分辨率: {w}x{h}")
         except Exception as e:
-            import sys
-
-            sys.stderr.write(f"[分辨率检测] 异常: {e}\n")
-            sys.stderr.flush()
+            logger.error(f"[分辨率检测] 异常: {e}")
 
         fishing_count = 10
         check_freq = 0.001
