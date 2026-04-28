@@ -8,7 +8,6 @@ import random
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
-from utils.win32_window import ensure_game_window_foreground, is_game_window_foreground
 
 def get_image(controller):
     job = controller.post_screencap()
@@ -68,7 +67,6 @@ class AutoMakeCoffee(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         print("=== Auto Make Coffee Action Started ===")
         controller = context.tasker.controller
-        ensure_game_window_foreground()
         
         make_count = 10
         check_freq = 0.5
@@ -94,9 +92,6 @@ class AutoMakeCoffee(CustomAction):
             if context.tasker.stopping:  
                 return CustomAction.RunResult(success=False)
             print(f"=== Making Coffee {count + 1}/{make_count} ===")
-            if not is_game_window_foreground():
-                print("  Game window lost focus, re-focusing...")
-                ensure_game_window_foreground()
 
             # Step 1: 选择关卡
             print("Tapping on select level...")
@@ -112,8 +107,6 @@ class AutoMakeCoffee(CustomAction):
                 match_start, _, match_x, match_y = match_template_in_region(img, start_roi, self.start_template, 0.8)
                 if match_start:
                     print("Found 'start.png', clicking...")
-                    if not is_game_window_foreground():
-                        ensure_game_window_foreground()
                     click_rect(controller, [match_x, match_y, self.start_template.shape[1], self.start_template.shape[0]])
                     time.sleep(3) # Post delay from JSON: 3000ms
                     break
@@ -129,8 +122,6 @@ class AutoMakeCoffee(CustomAction):
                 match_star, _, _, _ = match_template_in_region(img, star_roi, self.star_template, 0.9)
                 if match_star:
                     print("Found 'star.png', clicking target...")
-                    if not is_game_window_foreground():
-                        ensure_game_window_foreground()
                     click_rect(controller, star_target)
                     time.sleep(1)
                     break
@@ -145,16 +136,12 @@ class AutoMakeCoffee(CustomAction):
                 match_claim, _, match_x, match_y = match_template_in_region(img, claim_roi, self.claim_template, 0.8)
                 if match_claim:
                     print("Found 'claim.png', clicking...")
-                    if not is_game_window_foreground():
-                        ensure_game_window_foreground()
                     click_rect(controller, [match_x, match_y, self.claim_template.shape[1], self.claim_template.shape[0]])
                     time.sleep(1)
                     break
                 time.sleep(check_freq)
             
             print("Round finished. Pressing 'F' to continue...")
-            if not is_game_window_foreground():
-                ensure_game_window_foreground()
             controller.post_key_down(KEY_F)
             time.sleep(0.1)
             controller.post_key_up(KEY_F)

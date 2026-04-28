@@ -7,7 +7,6 @@ import numpy as np
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
-from utils.win32_window import ensure_game_window_foreground, is_game_window_foreground
 
 
 def get_image(controller):
@@ -65,7 +64,6 @@ class Autofish(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         print("=== Autofish Action Started ===")
         controller = context.tasker.controller
-        ensure_game_window_foreground()
 
         fishing_count = 10
         check_freq = 0.001
@@ -93,18 +91,12 @@ class Autofish(CustomAction):
             if context.tasker.stopping:
                 return CustomAction.RunResult(success=False)
             print(f"=== Fishing {i + 1}/{fishing_count} ===")
-            if not is_game_window_foreground():
-                print("  Game window lost focus, re-focusing...")
-                ensure_game_window_foreground()
 
             # 1. Clear settlement screen
             img = get_image(controller)
             match_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
             if match_settle:
                 print("  Closing settlement screen...")
-                if not is_game_window_foreground():
-                    print("  Game window lost focus, re-focusing...")
-                    ensure_game_window_foreground()
                 for _ in range(5):
                     controller.post_key_down(KEY_ESC)
                     time.sleep(0.1)
@@ -120,9 +112,6 @@ class Autofish(CustomAction):
             # 2+3. Fish-and-reel loop (retry on escape)
             while True:
                 # 2. Cast and wait for fish to bite
-                if not is_game_window_foreground():
-                    print("  Game window lost focus, re-focusing...")
-                    ensure_game_window_foreground()
                 controller.post_key_down(KEY_F)
                 time.sleep(0.1)
                 controller.post_key_up(KEY_F)
@@ -148,10 +137,6 @@ class Autofish(CustomAction):
                     time.sleep(check_freq)
                     img = get_image(controller)
                     frame += 1
-
-                    if frame % 200 == 0 and not is_game_window_foreground():
-                        print("  Game window lost focus during minigame, re-focusing...")
-                        ensure_game_window_foreground()
 
                     if frame % 10 == 0:
                         m_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
