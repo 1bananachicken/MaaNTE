@@ -67,12 +67,19 @@ class AutoMakeCoffee(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         print("=== Auto Make Coffee Action Started ===")
         controller = context.tasker.controller
+        # 分辨率检测
         try:
-            from utils.check_resolution import check_resolution
+            controller.post_screencap().wait()
+            w, h = controller.resolution
+            import sys
 
-            check_resolution(controller)
-        except Exception:
-            pass
+            sys.stderr.write(f"[分辨率检测] 获取到的分辨率: {w}x{h}\n")
+            sys.stderr.flush()
+        except Exception as e:
+            import sys
+
+            sys.stderr.write(f"[分辨率检测] 异常: {e}\n")
+            sys.stderr.flush()
         
         make_count = 10
         check_freq = 0.5
