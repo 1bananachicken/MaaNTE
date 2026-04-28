@@ -61,8 +61,8 @@ def find_window_by_process(process_name):
     return results[0] if results else None
 
 
-def get_window_rect(hwnd):
+def get_client_size(hwnd):
     rect = wintypes.RECT()
-    if not user32.GetWindowRect(hwnd, ctypes.byref(rect)):
+    if not user32.GetClientRect(hwnd, ctypes.byref(rect)):
         return None
-    return rect.left, rect.top, rect.right, rect.bottom
+    return rect.right - rect.left, rect.bottom - rect.top

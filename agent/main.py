@@ -413,20 +413,19 @@ def _check_admin_privilege():
 
 def _check_game_resolution():
     """连接控制器后检测游戏窗口分辨率"""
-    from utils.win32_process import find_window_by_process, get_window_rect
+    from utils.win32_process import find_window_by_process, get_client_size
 
     hwnd = find_window_by_process("HTGame.exe")
     if hwnd is None:
         logger.warning("分辨率检测: 未找到游戏窗口 (HTGame.exe)")
         return
 
-    rect = get_window_rect(hwnd)
-    if rect is None:
+    size = get_client_size(hwnd)
+    if size is None:
         logger.warning("分辨率检测: 无法获取窗口尺寸")
         return
 
-    w = rect[2] - rect[0]
-    h = rect[3] - rect[1]
+    w, h = size
     if (w, h) == (1280, 720):
         logger.info(f"当前窗口分辨率: {w}x{h} [正常]")
     else:
