@@ -25,6 +25,15 @@ if current_script_dir not in sys.path:
 
 from utils import logger
 
+# 路径兼容性检测 —— 最早执行，检测含中文/全角字符/中文符号的路径
+import re
+_cwd = os.getcwd()
+if re.search(r"[一-鿿　-〿＀-￯]", _cwd):
+    logger.warning(
+        f"当前运行目录含中文或全角字符: {_cwd}\n"
+        "部分组件对此类路径兼容性较差，建议将程序移动至纯英文路径下运行。"
+    )
+
 VENV_NAME = ".venv"  # 虚拟环境目录的名称
 VENV_DIR = Path(project_root_dir) / VENV_NAME
 
@@ -396,17 +405,6 @@ def check_and_install_dependencies():
 # -----
 # region 环境检测
 # -----
-
-
-def _check_chinese_path():
-    """检测当前程序是否运行在含中文字符的目录下"""
-    import re
-
-    cwd = os.getcwd()
-    if re.search(r"[一-鿿]", cwd):
-        logger.warning(
-            f"当前运行目录含中文字符: {cwd}\n请将程序移动至纯英文路径下运行。"
-        )
 
 
 def _check_admin_privilege():
