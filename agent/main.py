@@ -25,6 +25,15 @@ if current_script_dir not in sys.path:
 
 from utils import logger
 
+# 路径兼容性检测 —— 最早执行，检测含中文/全角字符/中文符号的路径
+import re
+_cwd = os.getcwd()
+if re.search(r"[一-鿿　-〿＀-￯]", _cwd):
+    logger.warning(
+        f"当前运行目录含中文或全角字符: {_cwd}\n"
+        "部分组件对此类路径兼容性较差，建议将程序移动至纯英文路径下运行。"
+    )
+
 VENV_NAME = ".venv"  # 虚拟环境目录的名称
 VENV_DIR = Path(project_root_dir) / VENV_NAME
 
@@ -394,6 +403,48 @@ def check_and_install_dependencies():
 
 
 # -----
+# region 环境检测
+# -----
+
+
+def _check_admin_privilege():
+    """检查是否以管理员权限运行，若否则输出警告"""
+    import ctypes
+
+    if ctypes.windll.shell32.IsUserAnAdmin():
+        return
+
+    logger.warning(
+        "未以管理员权限运行，部分输入功能可能无法正常使用。"
+        "请右键 MaaNTE.exe → 以管理员身份运行。"
+    )
+
+
+def _check_game_resolution():
+    """连接控制器后检测游戏窗口分辨率"""
+    from utils.win32_process import find_window_by_process, get_client_size
+
+    hwnd = find_window_by_process("HTGame.exe")
+    if hwnd is None:
+        logger.warning("分辨率检测: 未找到游戏窗口 (HTGame.exe)")
+        return
+
+    size = get_client_size(hwnd)
+    if size is None:
+        logger.warning("分辨率检测: 无法获取窗口尺寸")
+        return
+
+    w, h = size
+    if (w, h) == (1280, 720):
+        logger.info(f"当前窗口分辨率: {w}x{h} [正常]")
+    else:
+        logger.warning(
+            f"当前窗口分辨率: {w}x{h}，请使用 1280x720 分辨率。"
+            "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。"
+        )
+
+
+# -----
 # region 核心业务
 # -----
 
@@ -442,6 +493,7 @@ def agent(is_dev_mode=False):
         log_pi_environment()
         AgentServer.start_up(socket_id)
         logger.info("AgentServer启动")
+        _check_game_resolution()
         AgentServer.join()
         AgentServer.shut_down()
         logger.info("AgentServer关闭")
@@ -462,6 +514,9 @@ def agent(is_dev_mode=False):
 def main():
     current_version = read_interface_version()
     is_dev_mode = current_version == "DEBUG"
+
+    if sys.platform.startswith("win"):
+        _check_admin_privilege()
 
     # 如果是Linux系统或开发模式，启动虚拟环境
     if sys.platform.startswith("linux") or is_dev_mode:

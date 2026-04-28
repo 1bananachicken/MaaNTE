@@ -41,7 +41,7 @@ def match_template_in_region(img, region, template, min_similarity=0.8):
     return False, max_val, 0, 0
 
 @AgentServer.custom_action("auto_fish")
-class Autofish(CustomAction):
+class AutoFish(CustomAction):
     abs_path = Path(__file__).parents[3]
     if Path.exists(abs_path / "assets"):
             image_dir = abs_path / "assets/resource/base/image/auto_fish"
@@ -66,22 +66,20 @@ class Autofish(CustomAction):
         controller = context.tasker.controller
 
         fishing_count = 10
-        check_freq = 0.001
+        check_freq = 0.01
         if argv.custom_action_param:
             try:
                 params = json.loads(argv.custom_action_param)
                 fishing_count = params.get("count", 10)
-                check_freq = params.get("freq", 0.1)
+                check_freq = params.get("freq", 0.01)
             except:
                 pass
-
-        # Key codes for A, D, F, ESC
+   
         KEY_A = 65
         KEY_D = 68
         KEY_F = 70
         KEY_ESC = 27
 
-        # Original coordinates from autofish.py
         success_region = (520, 160, 785, 190)
         settlement_region = (564, 642, 1206, 664)
         game_region = (400, 33, 882, 63)
@@ -92,26 +90,8 @@ class Autofish(CustomAction):
                 return CustomAction.RunResult(success=False)
             print(f"=== Fishing {i + 1}/{fishing_count} ===")
 
-            # 1. Clear settlement screen
-            img = get_image(controller)
-            match_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
-            if match_settle:
-                print("  Closing settlement screen...")
-                for _ in range(5):
-                    controller.post_key_down(KEY_ESC)
-                    time.sleep(0.1)
-                    controller.post_key_up(KEY_ESC)
-                    time.sleep(1)
-
-                    img = get_image(controller)
-                    m, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
-                    if not m:
-                        print("  Settlement closed.")
-                        break
-
-            # 2+3. Fish-and-reel loop (retry on escape)
             while True:
-                # 2. Cast and wait for fish to bite
+                
                 controller.post_key_down(KEY_F)
                 time.sleep(0.1)
                 controller.post_key_up(KEY_F)
@@ -127,8 +107,7 @@ class Autofish(CustomAction):
                         controller.post_key_up(KEY_F)
                         print("  Fish hooked!")
                         break
-
-                # 3. Minigame: reel in and balance slider
+      
                 start_time = time.time()
                 frame = 0
                 deadzone = 15
@@ -152,14 +131,12 @@ class Autofish(CustomAction):
                     m_right, _, x_right, _ = match_template_in_region(img, game_region, self.valid_region_right_template, 0.7)
                     m_slider, _, x_slider, _ = match_template_in_region(img, game_region, self.slider_template, 0.7)
 
-                    if m_slider:
-                        # Reel in (throttled)
+                    if m_slider:                      
                         if frame % 10 == 0:
                             controller.post_key_down(KEY_F)
                             time.sleep(0.05)
                             controller.post_key_up(KEY_F)
-
-                        # Balance slider
+            
                         if m_left and m_right:
                             target = (x_left + x_right) / 2
                             offset = x_slider - target
@@ -182,21 +159,35 @@ class Autofish(CustomAction):
                             else:
                                 controller.post_key_up(KEY_A)
                                 controller.post_key_up(KEY_D)
-
-                # Release all keys
+                
                 controller.post_key_up(KEY_D)
                 controller.post_key_up(KEY_A)
                 controller.post_key_up(KEY_F)
-
-                # Check why the minigame loop ended
+                
                 img = get_image(controller)
                 time.sleep(0.3)
                 m_escape, _, _, _ = match_template_in_region(img, escape_region, self.escape_template, 0.8)
                 if m_escape:
-                    continue  # Retry: go back to Stage 2 (cast again)
-                break  # Fish caught or timeout: move to next fish
+                    continue  
+                break  
 
             print("  Finished.")
+
+            img = get_image(controller)
+            match_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
+            if match_settle:
+                print("  Closing settlement screen...")
+                for _ in range(5):
+                    controller.post_key_down(KEY_ESC)
+                    time.sleep(0.1)
+                    controller.post_key_up(KEY_ESC)
+                    time.sleep(1)
+
+                    img = get_image(controller)
+                    m, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
+                    if not m:
+                        print("  Settlement closed.")
+                        break
 
         print("All fishing tasks complete.")
         return CustomAction.RunResult(success=True)
