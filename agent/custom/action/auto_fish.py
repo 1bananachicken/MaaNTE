@@ -64,6 +64,8 @@ class Autofish(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         print("=== Autofish Action Started ===")
         controller = context.tasker.controller
+        from utils.check_resolution import check_resolution
+        check_resolution(controller)
 
         fishing_count = 10
         check_freq = 0.001

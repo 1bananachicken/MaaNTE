@@ -405,29 +405,10 @@ def _check_admin_privilege():
     if ctypes.windll.shell32.IsUserAnAdmin():
         return
 
-    from utils.alert import print_alert
-
-    print_alert(
-        "未以管理员权限运行，部分输入功能可能无法正常使用。\n"
+    logger.warning(
+        "未以管理员权限运行，部分输入功能可能无法正常使用。"
         "请右键 MaaNTE.exe → 以管理员身份运行。"
     )
-
-
-def _check_game_resolution():
-    """检查游戏窗口分辨率是否为 1280x720"""
-    from utils.win32_process import check_game_resolution
-    from utils.alert import print_alert
-
-    result = check_game_resolution()
-    if result is None:
-        logger.warning("未检测到游戏窗口 (HTGame.exe)，跳过分辨率检查")
-        return
-    w, h = result
-    if (w, h) != (1280, 720):
-        print_alert(
-            f"当前窗口分辨率 {w}x{h}，请使用 1280x720 分辨率。\n"
-            "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。"
-        )
 
 
 # -----
@@ -508,9 +489,6 @@ def main():
         ensure_venv_and_relaunch_if_needed()
 
     check_and_install_dependencies()
-
-    if sys.platform.startswith("win"):
-        _check_game_resolution()
 
     if is_dev_mode:
         os.chdir(Path("./assets"))
