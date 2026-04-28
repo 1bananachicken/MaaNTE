@@ -67,7 +67,6 @@ class AutoMakeCoffee(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         print("=== Auto Make Coffee Action Started ===")
         controller = context.tasker.controller
-        
         make_count = 10
         check_freq = 0.5
         if argv.custom_action_param:
@@ -92,7 +91,7 @@ class AutoMakeCoffee(CustomAction):
             if context.tasker.stopping:  
                 return CustomAction.RunResult(success=False)
             print(f"=== Making Coffee {count + 1}/{make_count} ===")
-            
+
             # Step 1: 选择关卡
             print("Tapping on select level...")
             click_rect(controller, select_level_target)
