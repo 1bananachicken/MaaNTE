@@ -394,6 +394,24 @@ def check_and_install_dependencies():
 
 
 # -----
+# region 权限检测
+# -----
+
+
+def _check_admin_privilege():
+    """检查是否以管理员权限运行，若否则输出警告日志"""
+    import ctypes
+
+    if ctypes.windll.shell32.IsUserAnAdmin():
+        return
+
+    logger.warning(
+        "未以管理员权限运行，部分输入功能可能无法正常使用。"
+        "请右键 MaaNTE.exe → 以管理员身份运行。"
+    )
+
+
+# -----
 # region 核心业务
 # -----
 
@@ -462,6 +480,9 @@ def agent(is_dev_mode=False):
 def main():
     current_version = read_interface_version()
     is_dev_mode = current_version == "DEBUG"
+
+    if sys.platform.startswith("win"):
+        _check_admin_privilege()
 
     # 如果是Linux系统或开发模式，启动虚拟环境
     if sys.platform.startswith("linux") or is_dev_mode:
