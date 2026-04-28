@@ -49,10 +49,10 @@ class AutoBuyFishBait(CustomAction):
 
         while True:
             img = get_image(controller)
-            found_bait, _, _, _ = match_template_in_region(img, fish_shop_region, self.bait_template, 0.8)
+            found_bait, _, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, 0.8)
             if found_bait:
                 for _ in range(3):
-                    click_rect(controller, bait_region)
+                    click_rect(controller, [x, y, bait_region[2], bait_region[3]])
                     time.sleep(0.1)
                 
                 img = get_image(controller)
