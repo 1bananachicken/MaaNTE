@@ -15,8 +15,8 @@
                 "class_regex": ".*",
                 "window_regex": "异环",
                 "screencap": "FramePool",
-                "mouse": "SendMessageWithWindowPos",
-                "keyboard": "SendMessageWithWindowPos"
+                "mouse": "Seize",
+                "keyboard": "PostMessageWithWindowPos"
             }
         }
     ],
@@ -36,12 +36,14 @@
     },
     "task": [
         {
-            "name": "钓鱼",
-            "entry": "AutoFish",
+            "name": "钓鱼任务",
+            "entry": "StartFishing",
             "option": [
-                "钓鱼次数"
-            ],
-            "description": "异环自动钓鱼"
+                "钓鱼循环次数",
+                "钓鱼数量",
+                "自动卖鱼",
+                "自动买鱼饵"
+            ]
         },
         {
             "name": "领取一咖舍收益",
@@ -56,22 +58,95 @@
         }
     ],
     "option": {
-        "钓鱼次数": {
+        "钓鱼循环次数": {
             "type": "input",
+            "label": "最大循环次数",
+            "description": "限制整个钓鱼循环最多执行多少次",
             "inputs": [
                 {
-                    "name": "钓鱼次数",
-                    "default": "100",
-                    "pipeline_type": "int"
+                    "name": "max_hit",
+                    "label": "循环次数",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "StartFishing": {
+                    "max_hit": "{max_hit}"
+                }
+            }
+        },
+        "钓鱼数量": {
+            "type": "input",
+            "label": "每次钓鱼数量",
+            "description": "设置每次自动钓鱼的数量",
+            "inputs": [
+                {
+                    "name": "count",
+                    "label": "数量",
+                    "default": "10",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
                 }
             ],
             "pipeline_override": {
                 "AutoFish": {
                     "custom_action_param": {
-                        "count": "{钓鱼次数}"
+                        "count": "{count}"
                     }
                 }
             }
+        },
+        "自动卖鱼": {
+            "type": "switch",
+            "label": "自动卖鱼",
+            "description": "是否启用自动卖鱼功能",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "AutoSellFish": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "AutoSellFish": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "自动买鱼饵": {
+            "type": "switch",
+            "label": "自动买鱼饵",
+            "description": "是否启用自动买鱼饵功能",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
         },
         "循环次数": {
             "type": "input",
