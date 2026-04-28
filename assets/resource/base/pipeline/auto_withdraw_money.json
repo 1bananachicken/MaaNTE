@@ -24,22 +24,16 @@
                     46
                 ],
                 "template": [
-                    "auto_withdraw_money/coffee.png"
-                ]
+                    "auto_withdraw_money/cafe.png"
+                ],
+                "threshold": 0.8
             }
         },
         "action": {
-            "type": "Click",
-            "param": {
-                "target": [
-                    515,
-                    461,
-                    44,
-                    43
-                ],
-            }
+            "type": "Click"
         },
         "next": [
+            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "提取收益"
         ]
     },
@@ -55,13 +49,15 @@
                 ],
                 "template": [
                     "auto_withdraw_money/withdraw.png"
-                ]
+                ],
+                "threshold": 0.8
             }
         },
         "action": {
             "type": "Click"
         },
         "next": [
+            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "确认收益"
         ]
     },
@@ -76,14 +72,16 @@
                     44
                 ],
                 "template": [
-                    "auto_withdraw_money/confirm.png"
-                ]
+                    "auto_withdraw_money/confirm_pinkwithblack.png"
+                ],
+                "threshold": 0.8
             }
         },
         "action": {
             "type": "Click"
         },
         "next": [
+            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "点击空白区域关闭"
         ]
     },
@@ -99,13 +97,137 @@
                 ],
                 "template": [
                     "auto_withdraw_money/close.png"
-                ]
+                ],
+                "threshold": 0.8
             }
         },
         "action": {
             "type": "Click"
         },
         "next": [
+            "[JumpBack][Anchor]MouseMoveResetAnchor",
+            "点击补货"
+        ],
+        "post_delay": 50
+    },
+    "点击补货":{
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    177,
+                    393,
+                    42,
+                    22
+                ],
+                "template": [
+                    "auto_withdraw_money/replenish_cafe.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "[JumpBack][Anchor]MouseMoveResetAnchor",
+            "选择24小时"
+        ]
+    },
+    "选择24小时":{
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    404,
+                    553,
+                    59,
+                    20
+                ],
+                "template": [
+                    "auto_withdraw_money/24h_black.png",
+                    "auto_withdraw_money/24h_white.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+         "next": [
+            "[JumpBack][Anchor]MouseMoveResetAnchor",
+            "确认补货"
+        ]
+    },
+    "确认补货":{
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    813,
+                    544,
+                    201,
+                    44
+                ],
+                "template": [
+                    "auto_withdraw_money/replenish_list.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "[JumpBack][Anchor]MouseMoveResetAnchor",
+            "送货上门"
+        ]
+    },
+    "送货上门": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    657, 
+                    534, 
+                    203, 
+                    45
+                ],
+                "template": [
+                    "auto_withdraw_money/delivery.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "[JumpBack][Anchor]MouseMoveResetAnchor",
+            "确认送货"
+        ]
+    },
+    "确认送货": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    655, 
+                    450, 
+                    238, 
+                    49
+                ],
+                "template": [
+                    "auto_withdraw_money/confirm_white.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "Esc"
         ]
     },
@@ -120,5 +242,5 @@
         },
         "repeat": 2,
         "repeat_delay": 100
-    },
+    }
 }
