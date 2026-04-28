@@ -4,7 +4,7 @@
     "description": "异环小助手，由MAAFramework强力驱动！",
     "contact": "QQ群: 1103323319",
     "license": "MIT",
-    "welcome": "首次使用！欢迎使用 MAANTE!",
+    "welcome": "首次使用！欢迎使用 MaaNTE!",
     "github": "https://github.com/1bananachicken/MaaNTE",
     "version": "0.0.1",
     "controller": [
@@ -13,7 +13,7 @@
             "type": "Win32",
             "win32": {
                 "class_regex": ".*",
-                "window_regex": "异环",
+                "window_regex": "^异环$",
                 "screencap": "FramePool",
                 "mouse": "SendMessageWithWindowPos",
                 "keyboard": "SendMessageWithWindowPos"
