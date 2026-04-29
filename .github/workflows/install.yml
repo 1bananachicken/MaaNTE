@@ -109,7 +109,7 @@ jobs:
         id: download_mfa
         uses: robinraju/release-downloader@v1
         with:
-          repository: MaaXYZ/MFAAvalonia
+          repository: sudoriaa/MFAAvalonia
           fileName: "MFAAvalonia-*-win-${{ steps.platform.outputs.tag }}*"
           tag: ${{ env.MFAA_VERSION }}
           out-file-path: "MFA"
