@@ -15,7 +15,7 @@
                 "class_regex": ".*",
                 "window_regex": "^\\s*(异环|NTE)\\s*$",
                 "screencap": "FramePool",
-                "mouse": "SendMessageWithWindowPos",
+                "mouse": "Seize",
                 "keyboard": "PostMessageWithWindowPos"
             }
         }
@@ -65,6 +65,9 @@
                 "RealTimeAutoTeleport"
             ]
         }
+    ],
+    "import": [
+        "tasks/ClaimRewards.json",
     ],
     "option": {
         "钓鱼循环次数": {
