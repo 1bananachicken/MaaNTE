@@ -33,7 +33,6 @@
             "type": "Click"
         },
         "next": [
-            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "提取收益"
         ]
     },
@@ -57,7 +56,6 @@
             "type": "Click"
         },
         "next": [
-            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "确认收益"
         ]
     },
@@ -81,7 +79,6 @@
             "type": "Click"
         },
         "next": [
-            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "点击空白区域关闭"
         ]
     },
@@ -105,7 +102,6 @@
             "type": "Click"
         },
         "next": [
-            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "点击补货"
         ],
         "post_delay": 50
@@ -130,7 +126,6 @@
             "type": "Click"
         },
         "next": [
-            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "选择24小时"
         ]
     },
@@ -154,8 +149,8 @@
         "action": {
             "type": "Click"
         },
+        "post_delay": 500,
          "next": [
-            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "确认补货"
         ]
     },
@@ -179,8 +174,23 @@
             "type": "Click"
         },
         "next": [
-            "[JumpBack][Anchor]MouseMoveResetAnchor",
+            "库存已满",
             "送货上门"
+        ]
+    },
+    "库存已满":{
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [506,344,265,34],
+                "template": [
+                    "auto_withdraw_money/InventoryFull.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "next": [
+            "Esc"
         ]
     },
     "送货上门": {
@@ -203,7 +213,6 @@
             "type": "Click"
         },
         "next": [
-            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "确认送货"
         ]
     },
@@ -227,7 +236,6 @@
             "type": "Click"
         },
         "next": [
-            "[JumpBack][Anchor]MouseMoveResetAnchor",
             "Esc"
         ]
     },
@@ -242,5 +250,14 @@
         },
         "repeat": 2,
         "repeat_delay": 100
+    },
+    "WithdrawMoneyExit": {
+        "desc": "提取收益任务出口",
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "next": [
+            "__ScenePrivateBackToWorldAny"
+        ]
     }
 }

@@ -2,21 +2,22 @@
     "__ScenePrivateMenuListEnterWorld": {
         "desc": "从菜单总列表退出到大世界，避免电脑反复在菜单总列表和大世界之间切换",
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "roi": [
-                    1052,
-                    161,
-                    59,
-                    18
-                ],
-                "expected": [
-                    "鉴别等级"
-                ],
-                "threshold": 0.8
+                "all_of": [
+                    "InEscMenu"
+                ]
             }
+        },  
+        "pre_wait_freezes": {
+            "time": 80,
+            "target": [
+                901, 
+                64,
+                342,
+                615
+            ]
         },
-        "pre_delay": 2000,
         "action": {
             "type": "ClickKey",
             "param": {
@@ -25,7 +26,6 @@
                 ]
             }
         },
-        "post_delay": 1500, // 3D动画菜单会一直动无法用wait_freeze
         "rate_limit": 0,
         "next": [
             "__ScenePrivateAnyEnterWorldSuccess"
