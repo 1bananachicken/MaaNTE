@@ -2,9 +2,13 @@
 <p align="center">
   <img alt="LOGO" src="../assets/logo.png" width="256" height="256" />
 </p>
+
 <div align="center">
 
+[中文](../README.md)
+
 # MaaNTE
+
 😊 MAA Assistant for NTE 😊
 
 Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework)!
