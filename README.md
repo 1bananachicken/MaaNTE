@@ -3,6 +3,8 @@
   <img alt="LOGO" src="./assets/logo.png" width="256" height="256" />
 </p>
 
+<div align="center">
+
 # MaaNTE
 
 <div align="center">
