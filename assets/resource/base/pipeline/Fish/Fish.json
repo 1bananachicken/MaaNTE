@@ -1,0 +1,8 @@
+{
+    "FishEntrance": {
+        "desc":"钓鱼功能入口",
+        "action": "DoNothing",
+        "next": [
+        ]
+    },
+}

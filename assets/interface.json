@@ -16,7 +16,7 @@
                 "window_regex": "^\\s*异环\\s*$",
                 "screencap": "FramePool",
                 "mouse": "Seize",
-                "keyboard": "PostMessageWithWindowPos"
+                "keyboard": "SendMessage"
             }
         }
     ],

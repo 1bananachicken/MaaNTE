@@ -1,0 +1,66 @@
+{
+    "FishSceneWorldToPrepare": {
+        "desc": "从大世界进入钓鱼准备界面",
+        "recognition":  "And",
+        "all_of": [
+            "FishSceneInWorldNextToFish"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "FishSceneOnFishPrepare",
+            "[JumpBack]__ScenePrivateBackToWorldAny"
+        ]
+    },
+    "FishSceneOnFishPrepare": {
+        "desc": "判断正在钓鱼准备界面，继续业务流程",
+        "recognition": "And",
+        "all_of": [
+            {
+                "recognition": {
+                    "type": "OCR",
+                    "roi": [833,51,100,30],
+                    "expected": [
+                        "钓鱼准备"
+                    ],
+                    "threshold": 0.8
+                }
+            },
+            {
+                "recognition": {
+                    "type": "OCR",
+                    "roi": [1028,611,103,29],
+                    "expected": [
+                        "开始钓鱼"
+                    ],
+                    "threshold": 0.8
+                }
+            }
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    },
+    "FishSceneInWorldNextToFish": {
+        "desc": "判断正在大世界钓鱼台边，继续业务流程",
+        "recognition": "And",
+        "all_of": [
+            "InWorld",
+            {
+                "recognition": {
+                    "type": "TemplateMatch",
+                    "param": {
+                        "roi": [733,372,109,42],
+                        "template": [
+                            "auto_fish/FishInteractButton.png"
+                        ],
+                        "threshold": 0.8
+                    }
+                }
+            }
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    }
+}
