@@ -51,6 +51,8 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 - 安装 python>=3.11
 - 建议使用vscode作为IDE进行开发
 - 强烈建议安装 [vscode插件](https://marketplace.visualstudio.com/items?itemName=nekosu.maa-support) 进行调试
+5. 提交PR
+  - 新功能开发请提交到dev分支
 
 更多开发文档可以参考 [M9A文档站](https://1999.fan/zh_cn/develop/development.html)
 

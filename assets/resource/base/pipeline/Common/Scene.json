@@ -1,0 +1,26 @@
+{
+    "SceneExampleNormalTask": {
+        "desc": "普通接口使用示例",
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "SceneExampleNormalTaskContinue",
+            "[JumpBack]__ScenePrivateBackToWorldAny"
+        ]
+    },
+    "SceneExampleNormalTaskContinue": {
+        "desc": "判断成功进入目标菜单，继续业务流程",
+        "recognition": "And",
+        "all_of": [
+            "InWorld"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    },
+    "SceneExampleRewardNext": {
+        "desc": "后续业务流程",
+        "pre_delay": 0,
+        "post_delay": 0
+    }
+}
