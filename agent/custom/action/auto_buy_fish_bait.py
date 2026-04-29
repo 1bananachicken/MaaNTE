@@ -33,7 +33,6 @@ class AutoBuyFishBait(CustomAction):
     buy_success_template = cv2.imread(str(buy_success_img), cv2.IMREAD_COLOR)
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
-        bait_region = [208, 209, 59, 27]
         fish_shop_region = [35, 88, 410, 475]
         find_bait_success_region = [1044, 131, 68, 23]
         select_max_region = [1202, 620, 33, 32]
@@ -47,16 +46,18 @@ class AutoBuyFishBait(CustomAction):
         controller = context.tasker.controller  
         print("=== AutoBuyFishBait Action Started ===")
 
+        match_threshold = 0.7
         while True:
             img = get_image(controller)
-            found_bait, _, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, 0.8)
+            found_bait, prob, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, match_threshold)
+            print(f"Clicked on bait at ({x+15}, {y+5}), probability: {prob:.2f}")
             if found_bait:
                 for _ in range(3):
-                    click_rect(controller, [x, y, bait_region[2], bait_region[3]])
+                    click_rect(controller, [x, y, 30, 10])
                     time.sleep(0.1)
                 
                 img = get_image(controller)
-                found_bait_success, _, _, _ = match_template_in_region(img, find_bait_success_region, self.find_bait_success_template, 0.8)
+                found_bait_success, _, _, _ = match_template_in_region(img, find_bait_success_region, self.find_bait_success_template, match_threshold)
                 if found_bait_success:
                     img = get_image(controller)
                     time.sleep(0.5)
@@ -69,7 +70,7 @@ class AutoBuyFishBait(CustomAction):
 
         while True:
             img = get_image(controller)
-            found_select_max, _, _, _ = match_template_in_region(img, select_max_region, self.select_max_template, 0.8)
+            found_select_max, _, _, _ = match_template_in_region(img, select_max_region, self.select_max_template, match_threshold)
             if found_select_max:
                 for _ in range(3):
                     click_rect(controller, select_max_region)
@@ -82,7 +83,7 @@ class AutoBuyFishBait(CustomAction):
         
         while True:
             img = get_image(controller)
-            found_buy, _, _, _ = match_template_in_region(img, buy_region, self.buy_template, 0.8)
+            found_buy, _, _, _ = match_template_in_region(img, buy_region, self.buy_template, match_threshold)
             if found_buy:
                 for _ in range(3):
                     click_rect(controller, buy_region)
@@ -95,7 +96,7 @@ class AutoBuyFishBait(CustomAction):
 
         for _ in range(5):
             img = get_image(controller)
-            found_buy_confirm, _, _, _ = match_template_in_region(img, buy_confirm_region, self.buy_confirm_template, 0.8)
+            found_buy_confirm, _, _, _ = match_template_in_region(img, buy_confirm_region, self.buy_confirm_template, match_threshold)
             if found_buy_confirm:
                 for _ in range(3):
                     click_rect(controller, buy_confirm_region)
@@ -108,7 +109,7 @@ class AutoBuyFishBait(CustomAction):
 
         while True:
             img = get_image(controller)
-            found_buy_success, _, _, _ = match_template_in_region(img, buy_success_region, self.buy_success_template, 0.8)
+            found_buy_success, _, _, _ = match_template_in_region(img, buy_success_region, self.buy_success_template, match_threshold)
             if found_buy_success:
                 controller.post_click_key(KEY_ESC).wait()
                 time.sleep(0.5)

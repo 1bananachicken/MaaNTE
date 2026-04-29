@@ -23,12 +23,14 @@ class AutoSellFish(CustomAction):
     sell_button_img = image_dir / "sell_button.png"
     confirm_sell_img = image_dir / "confirm_sell.png"
     sell_success_img = image_dir / "sell_success.png"
+    sell_fail_img = image_dir / "sell_fail.png"
     sell_option_template = cv2.imread(str(sell_option_img), cv2.IMREAD_COLOR)
     sell_option_selected_template = cv2.imread(str(sell_option_selected_img), cv2.IMREAD_COLOR)
     no_fish_to_sell_template = cv2.imread(str(no_fish_to_sell_img), cv2.IMREAD_COLOR)
     sell_button_template = cv2.imread(str(sell_button_img), cv2.IMREAD_COLOR)
     confirm_sell_template = cv2.imread(str(confirm_sell_img), cv2.IMREAD_COLOR)
     sell_success_template = cv2.imread(str(sell_success_img), cv2.IMREAD_COLOR)
+    sell_fail_template = cv2.imread(str(sell_fail_img), cv2.IMREAD_COLOR)
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         print("=== Autofish Action Started ===")
@@ -43,6 +45,8 @@ class AutoSellFish(CustomAction):
         sell_button_region = [665, 635, 92, 23]
         confirm_sell_region = [756, 461, 48, 21]
         sell_success_region = [565, 628, 149, 21]
+        sell_fail_region = [739, 349, 202, 24]
+        no_valid_fish_region = [509, 350, 261, 22]
         
         while True:
             img = get_image(controller)
@@ -84,6 +88,7 @@ class AutoSellFish(CustomAction):
                         
                     img = get_image(controller)
                     found_confirm_sell, _, _, _ = match_template_in_region(img, confirm_sell_region, self.confirm_sell_template, 0.8)
+                    sell_fail, _, _, _ = match_template_in_region(img, sell_fail_region, self.sell_fail_template, 0.8)
                     if found_confirm_sell:
                         print("Confirm sell button detected. Clicking to confirm selling fish.")
                         for _ in range(3):
@@ -91,6 +96,10 @@ class AutoSellFish(CustomAction):
                             time.sleep(0.1)
                         time.sleep(1)  
                         break
+                    elif sell_fail:
+                        print("no fish to sell, closing fish shop.")
+                        controller.post_click_key(KEY_ESC).wait()
+                        return CustomAction.RunResult(success=True)
                     else:
                         time.sleep(0.1)
                 break

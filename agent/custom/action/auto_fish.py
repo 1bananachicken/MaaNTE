@@ -91,13 +91,16 @@ class AutoFish(CustomAction):
             print(f"=== Fishing {i + 1}/{fishing_count} ===")
 
             while True:
-                
+                if context.tasker.stopping:
+                    return CustomAction.RunResult(success=False)
                 controller.post_key_down(KEY_F)
                 time.sleep(0.1)
                 controller.post_key_up(KEY_F)
                 print("  Casting...")
 
                 while True:
+                    if context.tasker.stopping:
+                        return CustomAction.RunResult(success=False)
                     time.sleep(check_freq)
                     img = get_image(controller)
                     m_catch, _, _, _ = match_template_in_region(img, success_region, self.success_catch_template, 0.8)
@@ -113,6 +116,8 @@ class AutoFish(CustomAction):
                 deadzone = 15
 
                 while time.time() - start_time < 100:
+                    if context.tasker.stopping:
+                        return CustomAction.RunResult(success=False)
                     time.sleep(check_freq)
                     img = get_image(controller)
                     frame += 1
