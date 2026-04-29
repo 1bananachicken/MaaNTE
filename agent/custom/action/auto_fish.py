@@ -69,12 +69,12 @@ class AutoFish(CustomAction):
         print("=== Autofish Action Started ===")
         controller = context.tasker.controller
 
-        fishing_count = 10
+        fishing_count = 1
         check_freq = 0.001
         if argv.custom_action_param:
             try:
                 params = json.loads(argv.custom_action_param)
-                fishing_count = params.get("count", 10)
+                fishing_count = params.get("count", 1)
                 check_freq = params.get("freq", 0.001)
             except:
                 pass
@@ -86,7 +86,7 @@ class AutoFish(CustomAction):
 
         success_region = (520, 160, 785, 190)
         settlement_region = (564, 642, 1206, 664)
-        game_region = (400, 33, 882, 63)
+        game_region = (401, 39, 484, 23)  # (400, 33, 882, 63) before
         escape_region = (590, 349, 689, 371)
         prepare_region = (908, 602, 1247, 654)
         fish_game_sign_region = (1176, 365, 1270, 413)
@@ -101,7 +101,7 @@ class AutoFish(CustomAction):
             if m_prepare:
                 print("  On FishPrepare screen, pressing start...")
                 controller.post_click(x + 15, y + 15)
-                time.sleep(0.3)
+                time.sleep(1)
                 return True
 
             print("  ERROR: Not in FishGame or FishPrepare, exiting fishing.")
@@ -166,7 +166,6 @@ class AutoFish(CustomAction):
                             controller.post_key_down(KEY_F)
                             time.sleep(0.05)
                             controller.post_key_up(KEY_F)
-            
                         if m_left and m_right:
                             target = (x_left + x_right) / 2
                             offset = x_slider - target
