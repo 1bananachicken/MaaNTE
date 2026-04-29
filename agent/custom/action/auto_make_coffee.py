@@ -45,7 +45,10 @@ def click_rect(controller, rect):
     x, y, w, h = rect
     cx = x + w // 2
     cy = y + h // 2
-    controller.post_click(cx, cy).wait()
+    for _ in range(3):
+        controller.post_touch_down(cx, cy).wait()
+        time.sleep(0.001)
+        controller.post_touch_up().wait()
 
 @AgentServer.custom_action("auto_make_coffee")
 class AutoMakeCoffee(CustomAction):
@@ -84,7 +87,7 @@ class AutoMakeCoffee(CustomAction):
         click_roi = [28, 272, 65, 56]
         start_roi = [1057, 648, 178, 44]
         star_roi = [1204, 109, 29, 27]
-        star_target = [11, 12, 38, 37]
+        exit_roi = [11, 12, 38, 37]
         claim_roi = [681, 539, 187, 38]
         
         for count in range(make_count):
@@ -121,7 +124,7 @@ class AutoMakeCoffee(CustomAction):
                 match_star, _, _, _ = match_template_in_region(img, star_roi, self.star_template, 0.9)
                 if match_star:
                     print("Found 'star.png', clicking target...")
-                    click_rect(controller, star_target)
+                    click_rect(controller, exit_roi)
                     time.sleep(1)
                     break
                 time.sleep(2)
