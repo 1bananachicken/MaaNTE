@@ -55,6 +55,15 @@
             "option": [
                 "循环次数"
             ]
+        },
+        {
+            "name": "实时辅助",
+            "entry": "RealTimeTaskMain",
+            "option": [
+                "RealTimeCheckInterval",
+                "RealTimeAutoSkip",
+                "RealTimeAutoTeleport"
+            ]
         }
     ],
     "option": {
@@ -164,6 +173,155 @@
                     }
                 }
             }
+        },
+        "RealTimeCheckInterval": {
+            "type": "input",
+            "label": "检测间隔 (ms)",
+            "description": "两次检测之间的间隔，单位毫秒",
+            "inputs": [
+                {
+                    "name": "interval",
+                    "default": "500",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "RealTimeSleep": {
+                    "post_delay": "{interval}"
+                }
+            }
+        },
+        "RealTimeAutoSkip": {
+            "type": "switch",
+            "label": "自动剧情",
+            "description": "是否自动跳过剧情",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "option": ["RealTimeAutoSkipAll"]
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "RealTimeSkipPlot": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoSkipAll": {
+            "type": "switch",
+            "label": "自动跳过全部剧情",
+            "description": "检测到跳过按钮时自动点击",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "RealTimeSkipPlot": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "RealTimeSkipPlot": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoTeleport": {
+            "type": "switch",
+            "label": "自动传送",
+            "description": "检测到特定传送点时自动点击传送",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "option": ["RealTimeAutoTeleportWitte", "RealTimeAutoTeleportPhone"]
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "RealTimeTeleportWitte": {
+                            "enabled": false
+                        },
+                        "RealTimeTeleportPhone": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
+        },
+        "RealTimeAutoTeleportWitte": {
+            "type": "switch",
+            "label": "维特海默塔",
+            "description": "是否检测维特海默塔的传送点",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "RealTimeTeleportWitte": {
+                            "enabled": true
+                        },
+                        "RealTimeConfirmTeleportWitte": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "RealTimeTeleportWitte": {
+                            "enabled": false
+                        },
+                        "RealTimeConfirmTeleportWitte": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoTeleportPhone": {
+            "type": "switch",
+            "label": "ReroRero电话亭",
+            "description": "是否检测ReroRero电话亭的传送点",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "RealTimeTeleportPhone": {
+                            "enabled": true
+                        },
+                        "RealTimeConfirmTeleportPhone": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "RealTimeTeleportPhone": {
+                            "enabled": false
+                        },
+                        "RealTimeConfirmTeleportPhone": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
         }
     }
 }
