@@ -7,6 +7,8 @@
     "welcome": "首次使用！欢迎使用 MaaNTE!",
     "github": "https://github.com/1bananachicken/MaaNTE",
     "version": "0.0.1",
+    "mirrorchyan_rid": "MaaNTE",
+    "mirrorchyan_multiplatform": true,
     "controller": [
         {
             "name": "桌面端",
@@ -14,9 +16,9 @@
             "win32": {
                 "class_regex": ".*",
                 "window_regex": "^\\s*(异环|NTE)\\s*$",
-                "screencap": "FramePool",
-                "mouse": "Seize",
-                "keyboard": "PostMessageWithWindowPos"
+                "screencap": "PrintWindow",
+                "mouse": "SendMessageWithWindowPos",
+                "keyboard": "PostMessage"
             }
         }
     ],
@@ -42,7 +44,8 @@
                 "钓鱼循环次数",
                 "钓鱼数量",
                 "自动卖鱼",
-                "自动买鱼饵"
+                "自动买鱼饵",
+                "鱼饵识别阈值"
             ]
         },
         {
@@ -92,12 +95,12 @@
         "钓鱼数量": {
             "type": "input",
             "label": "每次钓鱼数量",
-            "description": "设置每次自动钓鱼的数量",
+            "description": "设置每次自动钓鱼的数量，建议小于等于99",
             "inputs": [
                 {
                     "name": "count",
                     "label": "数量",
-                    "default": "10",
+                    "default": "99",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
                 }
@@ -155,6 +158,43 @@
                     "pipeline_override": {
                         "AutoBuyFishBait": {
                             "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "鱼饵识别阈值": {
+            "type": "select",
+            "label": "鱼饵识别阈值",
+            "description": "如果无法识别点击鱼饵位置，请调低该数值",
+            "cases": [
+                {
+                    "name": "0.8",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "0.7",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "0.6",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.6
+                            }
                         }
                     }
                 }
