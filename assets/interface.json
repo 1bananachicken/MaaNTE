@@ -15,7 +15,7 @@
                 "class_regex": ".*",
                 "window_regex": "^\\s*异环\\s*$",
                 "screencap": "FramePool",
-                "mouse": "Seize",
+                "mouse": "SendMessageWithWindowPos",
                 "keyboard": "PostMessageWithWindowPos"
             }
         }
