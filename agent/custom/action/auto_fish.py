@@ -88,7 +88,7 @@ class AutoFish(CustomAction):
 
         success_region = (520, 160, 785, 190)
         settlement_region = (564, 642, 1206, 664)
-        game_region = (401, 39, 882, 63)  # (400, 33, 882, 63) before
+        game_region = (401, 39, 882, 63)
         escape_region = (590, 349, 689, 371)
         prepare_region = (908, 602, 1247, 654)
         fish_game_sign_region = (1176, 365, 1270, 413)
