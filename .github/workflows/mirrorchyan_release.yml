@@ -1,0 +1,33 @@
+name: mirrorchyan_release
+
+on:
+  workflow_dispatch:
+    inputs:
+        tag:
+            default: ''
+            required: false
+
+jobs:
+  mirrorchyan:
+    if: ${{ github.repository_owner == '1bananachicken' }}
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [win]
+        arch: [x86_64]
+    steps:
+      - uses: MirrorChyan/uploading-action@v1
+        with:
+          filetype: latest-release
+          filename: ${{ format('MaaNTE-{0}-{1}-*', matrix.os, matrix.arch) }}
+          mirrorchyan_rid: MaaNTE
+          tag: ${{ inputs.tag }}
+
+          os: ${{ matrix.os }}
+          arch: ${{ matrix.arch }}
+
+          owner: 1bananachicken
+          repo: MaaNTE
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          upload_token: ${{ secrets.MirrorChyanUploadToken }}
