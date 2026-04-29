@@ -1,21 +1,10 @@
 {
     "__ScenePrivateMenuListEnterWorld": {
         "desc": "从菜单总列表退出到大世界，避免电脑反复在菜单总列表和大世界之间切换",
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    1052,
-                    161,
-                    59,
-                    18
-                ],
-                "expected": [
-                    "鉴别等级"
-                ],
-                "threshold": 0.8
-            }
-        },
+        "recognition": "And",
+        "all_of": [
+            "InEscMenu"
+        ],
         "pre_delay": 2000,
         "action": {
             "type": "ClickKey",
