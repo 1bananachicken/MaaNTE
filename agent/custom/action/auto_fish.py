@@ -69,12 +69,12 @@ class AutoFish(CustomAction):
         print("=== Autofish Action Started ===")
         controller = context.tasker.controller
 
-        fishing_count = 1
+        fishing_count = 10
         check_freq = 0.001
         if argv.custom_action_param:
             try:
                 params = json.loads(argv.custom_action_param)
-                fishing_count = params.get("count", 1)
+                fishing_count = params.get("count", 10)
                 check_freq = params.get("freq", 0.001)
             except:
                 pass
