@@ -1,22 +1,22 @@
 {
     "FishEntrance": {
-        "desc":"钓鱼功能入口",
+        "desc": "钓鱼功能入口",
         "action": "DoNothing",
         "next": [
             "FishStart"
         ]
     },
     "FishStart": {
-        "desc":"钓鱼功能主流程",
+        "desc": "钓鱼功能主流程",
         "max_hit": 5,
         "next": [
             "FishGameStart",
-            "[JumpBack]FishScenePrepareToFishGame",
-            "[JumpBack]FishSceneWorldToPrepare"
+            "[JumpBack]FishSceneWorldToPrepare",
+            "[JumpBack]FishScenePrepareToFishGame"
         ]
     },
     "FishGameStart": {
-        "desc":"正在钓鱼游戏界面，执行钓鱼逻辑",
+        "desc": "正在钓鱼游戏界面，执行钓鱼逻辑",
         "recognition": "And",
         "all_of": [
             "FishSceneOnFishGame"
@@ -25,24 +25,42 @@
         "custom_action": "auto_fish",
         "custom_action_param": {},
         "next": [
-            "[JumpBack]AutoSellFish",
-            "[JumpBack]AutoBuyFishBait",
+            "AutoSellFish",
+            "AutoBuyFishBait",
             "FishStart",
             "FishTaskExit"
+        ],
+        "on_error": [
+            "FishTaskExitWithError"
         ]
     },
     "AutoSellFish": {
         "desc": "自动卖鱼",
         "action": "Custom",
-        "custom_action": "auto_sell_fish"
+        "custom_action": "auto_sell_fish",
+        "next": [
+            "AutoBuyFishBait",
+            "FishStart",
+            "FishTaskExit"
+        ]
     },
     "AutoBuyFishBait": {
         "desc": "自动购买鱼饵",
         "action": "Custom",
-        "custom_action": "auto_buy_fish_bait"
+        "custom_action": "auto_buy_fish_bait",
+        "next": [
+            "FishStart",
+            "FishTaskExit"
+        ]
     },
     "FishTaskExit": {
         "desc": "钓鱼任务完成",
+        "next": [
+            "__ScenePrivateBackToWorldAny"
+        ]
+    },
+    "FishTaskExitWithError": {
+        "desc": "钓鱼任务异常退出",
         "next": [
             "__ScenePrivateBackToWorldAny"
         ]
