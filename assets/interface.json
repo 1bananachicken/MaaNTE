@@ -7,6 +7,8 @@
     "welcome": "首次使用！欢迎使用 MaaNTE!",
     "github": "https://github.com/1bananachicken/MaaNTE",
     "version": "0.0.1",
+    "mirrorchyan_rid": "MaaNTE",
+    "mirrorchyan_multiplatform": true,
     "controller": [
         {
             "name": "桌面端",
