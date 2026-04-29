@@ -13,7 +13,7 @@
             "type": "Win32",
             "win32": {
                 "class_regex": ".*",
-                "window_regex": "^\\s*异环\\s*$",
+                "window_regex": "^\\s*(异环|NTE)\\s*$",
                 "screencap": "FramePool",
                 "mouse": "Seize",
                 "keyboard": "SendMessage"
