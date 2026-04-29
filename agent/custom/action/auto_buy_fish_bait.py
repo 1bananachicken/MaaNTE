@@ -44,13 +44,22 @@ class AutoBuyFishBait(CustomAction):
         KEY_R = 82
         KEY_ESC = 27
         controller = context.tasker.controller  
+        
+        found_bait_threshold = 0.8
+        if argv.custom_action_param:
+            try:
+                params = json.loads(argv.custom_action_param)
+                found_bait_threshold = params.get("found_bait_threshold", 0.8)
+            except:
+                pass
+        
         print("=== AutoBuyFishBait Action Started ===")
 
         match_threshold = 0.7
         while True:
             img = get_image(controller)
-            found_bait, prob, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, match_threshold)
-            print(f"Clicked on bait at ({x+15}, {y+5}), probability: {prob:.2f}")
+            found_bait, prob, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, found_bait_threshold)
+            print(f"Current found bait threshold: {found_bait_threshold}, match probability: {prob:.2f}, clicked on bait at ({x+15}, {y+5})")
             if found_bait:
                 for _ in range(3):
                     click_rect(controller, [x, y, 30, 10])

@@ -48,6 +48,7 @@
         "desc": "自动购买鱼饵",
         "action": "Custom",
         "custom_action": "auto_buy_fish_bait",
+        "custom_action_param": {},
         "next": [
             "FishStart",
             "FishTaskExit"

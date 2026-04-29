@@ -44,7 +44,8 @@
                 "钓鱼循环次数",
                 "钓鱼数量",
                 "自动卖鱼",
-                "自动买鱼饵"
+                "自动买鱼饵",
+                "鱼饵识别阈值"
             ]
         },
         {
@@ -157,6 +158,43 @@
                         }
                     }
                 }
+            ]
+        },
+        "鱼饵识别阈值": {
+            "type": "select",
+            "label": "鱼饵识别阈值",
+            "description": "如果无法识别点击鱼饵位置，请调低该数值",
+            "cases": [
+                {
+                    "name": "0.8",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "0.7",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "0.6",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.6
+                            }
+                        }
+                    }
+                },
             ]
         },
         "循环次数": {
