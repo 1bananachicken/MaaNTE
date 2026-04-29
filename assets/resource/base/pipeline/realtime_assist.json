@@ -14,7 +14,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": "realtime_assist/skip_story_btn.png",
-                "roi": [1000, 600, 200, 80],
+                "roi": [1000, 0, 1280, 100],
                 "threshold": 0.8
             }
         },
@@ -29,12 +29,9 @@
             "type": "TemplateMatch",
             "param": {
                 "template": "realtime_assist/teleport_target_witte.png",
-                "roi": [0, 0, 1280, 720],
+                "roi": [920, 0, 1280, 140],
                 "threshold": 0.8
             }
-        },
-        "action": {
-            "type": "Click"
         },
         "post_delay": 500,
         "next": ["RealTimeConfirmTeleportWitte"]
@@ -44,7 +41,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": "realtime_assist/teleport_btn_witte.png",
-                "roi": [0, 0, 1280, 720],
+                "roi": [920, 600, 1280, 660],
                 "threshold": 0.8
             }
         },
@@ -59,12 +56,9 @@
             "type": "TemplateMatch",
             "param": {
                 "template": "realtime_assist/teleport_target_phone.png",
-                "roi": [0, 0, 1280, 720],
+                "roi": [920, 0, 1280, 140],
                 "threshold": 0.8
             }
-        },
-        "action": {
-            "type": "Click"
         },
         "post_delay": 500,
         "next": ["RealTimeConfirmTeleportPhone"]
@@ -74,7 +68,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": "realtime_assist/teleport_btn_phone.png",
-                "roi": [0, 0, 1280, 720],
+                "roi": [920, 600, 1280, 660],
                 "threshold": 0.8
             }
         },
