@@ -16,9 +16,9 @@
             "win32": {
                 "class_regex": ".*",
                 "window_regex": "^\\s*(异环|NTE)\\s*$",
-                "screencap": "FramePool",
+                "screencap": "PrintWindow",
                 "mouse": "SendMessageWithWindowPos",
-                "keyboard": "PostMessageWithWindowPos"
+                "keyboard": "PostMessage"
             }
         }
     ],
@@ -91,12 +91,12 @@
         "钓鱼数量": {
             "type": "input",
             "label": "每次钓鱼数量",
-            "description": "设置每次自动钓鱼的数量",
+            "description": "设置每次自动钓鱼的数量，建议小于等于99",
             "inputs": [
                 {
                     "name": "count",
                     "label": "数量",
-                    "default": "10",
+                    "default": "99",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
                 }
