@@ -1,9 +1,6 @@
 {
     "__ScenePrivateBackToWorldAny": {
         "desc": "从任意界面返回大世界界面",
-        "pre_delay": 0,
-        "post_delay": 0,
-        "rate_limit": 1000,
         "next": [
             "__ScenePrivateMenuListEnterWorld",
             "__ScenePrivateAnyEnterWorldSuccess",
@@ -15,9 +12,6 @@
         "recognition": "And",
             "all_of": [
                 "InWorld"
-            ],
-        "pre_wait_freezes": 0,
-        "pre_delay": 200,
-        "post_delay": 0
+            ]
     }
 }

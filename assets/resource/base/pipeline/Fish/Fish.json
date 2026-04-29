@@ -25,8 +25,8 @@
         "custom_action": "auto_fish",
         "custom_action_param": {},
         "next": [
-            "[JumpBack]AutoSellFish",
-            "[JumpBack]AutoBuyFishBait",
+            "AutoSellFish",
+            "AutoBuyFishBait",
             "FishStart",
             "FishTaskExit"
         ]
