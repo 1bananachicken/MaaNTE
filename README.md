@@ -10,9 +10,11 @@
 # MaaNTE
 
 😊MAA异环小助手😊
+
 由 [MaaFramework](https://github.com/MaaXYZ/MaaFramework) 强力驱动！
 
 本项目还处于早期开发阶段，欢迎提交PR和Issue
+
 </div>
 
 ## ✨ 功能一览
