@@ -37,7 +37,7 @@
     "task": [
         {
             "name": "钓鱼任务",
-            "entry": "StartFishing",
+            "entry": "FishEntrance",
             "option": [
                 "钓鱼循环次数",
                 "钓鱼数量",
@@ -72,7 +72,7 @@
                 }
             ],
             "pipeline_override": {
-                "StartFishing": {
+                "FishStart": {
                     "max_hit": "{max_hit}"
                 }
             }
@@ -91,7 +91,7 @@
                 }
             ],
             "pipeline_override": {
-                "AutoFish": {
+                "FishGameStart": {
                     "custom_action_param": {
                         "count": "{count}"
                     }
@@ -107,7 +107,7 @@
                     "name": "Yes",
                     "label": "启用",
                     "pipeline_override": {
-                        "AutoSellFish": {
+                        "FishStart": {
                             "enabled": true
                         }
                     }

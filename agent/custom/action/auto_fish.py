@@ -66,12 +66,12 @@ class AutoFish(CustomAction):
         controller = context.tasker.controller
 
         fishing_count = 10
-        check_freq = 0.01
+        check_freq = 0.001
         if argv.custom_action_param:
             try:
                 params = json.loads(argv.custom_action_param)
                 fishing_count = params.get("count", 10)
-                check_freq = params.get("freq", 0.01)
+                check_freq = params.get("freq", 0.001)
             except:
                 pass
    
@@ -145,16 +145,6 @@ class AutoFish(CustomAction):
                         if m_left and m_right:
                             target = (x_left + x_right) / 2
                             offset = x_slider - target
-                        elif not m_left and m_right:
-                            target = x_right
-                            offset = x_slider - target
-                        elif m_left and not m_right:
-                            target = x_left
-                            offset = x_slider - target
-                        else:
-                            offset = 0
-
-                        if m_left or m_right:
                             if offset > deadzone:
                                 controller.post_key_up(KEY_D)
                                 controller.post_key_down(KEY_A)
@@ -164,6 +154,20 @@ class AutoFish(CustomAction):
                             else:
                                 controller.post_key_up(KEY_A)
                                 controller.post_key_up(KEY_D)
+                        elif not m_left and m_right:
+                            if x_slider > x_right:
+                                controller.post_key_up(KEY_D)
+                                controller.post_key_down(KEY_A)
+                            else:
+                                controller.post_key_up(KEY_A)
+                                controller.post_key_down(KEY_D)
+                        elif m_left and not m_right:
+                            if x_slider > x_left:
+                                controller.post_key_up(KEY_D)
+                                controller.post_key_down(KEY_A)
+                            else:
+                                controller.post_key_up(KEY_A)
+                                controller.post_key_down(KEY_D)
                 
                 controller.post_key_up(KEY_D)
                 controller.post_key_up(KEY_A)

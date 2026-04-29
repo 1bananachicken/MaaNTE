@@ -5,38 +5,65 @@
         "all_of": [
             "FishSceneInWorldNextToFish"
         ],
+        "pre_delay": 500,
+        "post_delay": 500,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    70
+                ]
+            }
+        }
+    },
+    "FishScenePrepareToFishGame":{
+        "desc": "从钓鱼准备界面进入钓鱼游戏界面",
+        "recognition":  "And",
+        "all_of": [
+            "FishSceneOnFishPrepare"
+        ],
+        "pre_delay": 500,
+        "post_delay": 500,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1038,
+                    616,
+                    78,
+                    23
+                ]
+            }
+        }
+    },
+    "FishSceneOnFishGame":{
+        "desc": "判断正在钓鱼游戏界面，继续业务流程",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [1170,359,106,58],
+                "template": [
+                    "auto_fish/FishGameSign.png"
+                ],
+                "threshold": 0.8
+            }
+        },
         "pre_delay": 0,
         "post_delay": 0,
-        "next": [
-            "FishSceneOnFishPrepare",
-            "[JumpBack]__ScenePrivateBackToWorldAny"
-        ]
+        "next": []
     },
     "FishSceneOnFishPrepare": {
         "desc": "判断正在钓鱼准备界面，继续业务流程",
-        "recognition": "And",
-        "all_of": [
-            {
-                "recognition": {
-                    "type": "OCR",
-                    "roi": [833,51,100,30],
-                    "expected": [
-                        "钓鱼准备"
-                    ],
-                    "threshold": 0.8
-                }
-            },
-            {
-                "recognition": {
-                    "type": "OCR",
-                    "roi": [1028,611,103,29],
-                    "expected": [
-                        "开始钓鱼"
-                    ],
-                    "threshold": 0.8
-                }
+        "recognition":{
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [823,43,117,42],
+                "template": [
+                    "auto_fish/FishPrepareTitle.png"
+                ],
+                "threshold": 0.8
             }
-        ],
+        },
         "pre_delay": 0,
         "post_delay": 0,
         "next": []
@@ -50,7 +77,7 @@
                 "recognition": {
                     "type": "TemplateMatch",
                     "param": {
-                        "roi": [733,372,109,42],
+                        "roi": [727,365,126,54],
                         "template": [
                             "auto_fish/FishInteractButton.png"
                         ],
@@ -60,7 +87,6 @@
             }
         ],
         "pre_delay": 0,
-        "post_delay": 0,
-        "next": []
+        "post_delay": 0
     }
 }
