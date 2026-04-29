@@ -53,6 +53,7 @@ class AutoFish(CustomAction):
     slider_img = image_dir / "slider.png"
     success_catch_img = image_dir / "success_catch.png"
     escape_img = image_dir / "escape.png"
+    need_bait_img = image_dir / "need_bait.png"
 
     slider_template = cv2.imread(str(slider_img), cv2.IMREAD_COLOR)
     valid_region_left_template = cv2.imread(str(valid_region_left_img), cv2.IMREAD_COLOR)
@@ -60,6 +61,7 @@ class AutoFish(CustomAction):
     continue_template = cv2.imread(str(continue_img), cv2.IMREAD_COLOR)
     success_catch_template = cv2.imread(str(success_catch_img), cv2.IMREAD_COLOR)
     escape_template = cv2.imread(str(escape_img), cv2.IMREAD_COLOR)
+    need_bait_template = cv2.imread(str(need_bait_img), cv2.IMREAD_COLOR)
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         print("=== Autofish Action Started ===")
@@ -80,22 +82,34 @@ class AutoFish(CustomAction):
         KEY_F = 70
         KEY_ESC = 27
 
-        success_region = (520, 160, 785, 190)
-        settlement_region = (564, 642, 1206, 664)
-        game_region = (400, 33, 882, 63)
-        escape_region = (590, 349, 689, 371)
+        success_region = [520, 160, 785, 190]
+        settlement_region = [564, 642, 1206, 664]
+        game_region = [400, 33, 882, 63]
+        escape_region = [590, 349, 689, 371]
+        need_bait_region = [610, 350, 751, 371]
 
         for i in range(fishing_count):
             if context.tasker.stopping:
                 return CustomAction.RunResult(success=False)
             print(f"=== Fishing {i + 1}/{fishing_count} ===")
-
+            
             while True:
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
                 controller.post_key_down(KEY_F)
                 time.sleep(0.1)
                 controller.post_key_up(KEY_F)
+
+                for _ in range(5):
+                    img = get_image(controller)
+                    m_need_bait, prob, _, _ = match_template_in_region(img, need_bait_region, self.need_bait_template, 0.7)
+                    print(f"  Checking for bait, probability: {prob:.2f}")
+                    if m_need_bait:
+                        print("  Need bait! Stopping fishing.")
+                        return CustomAction.RunResult(success=False)
+                    
+                    time.sleep(0.1)
+                
                 print("  Casting...")
 
                 while True:
