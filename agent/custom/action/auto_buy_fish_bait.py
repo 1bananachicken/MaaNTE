@@ -62,6 +62,9 @@ class AutoBuyFishBait(CustomAction):
                     img = get_image(controller)
                     time.sleep(0.5)
                     break
+                else:
+                    print("Bait found but not click correctly, retrying...")
+                    time.sleep(1)
             else:
                 print("Bait not found in fish shop, retrying...")
                 controller.post_click_key(KEY_R).wait()  

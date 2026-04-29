@@ -103,7 +103,7 @@ class AutoFish(CustomAction):
                         return CustomAction.RunResult(success=False)
                     time.sleep(check_freq)
                     img = get_image(controller)
-                    m_catch, _, _, _ = match_template_in_region(img, success_region, self.success_catch_template, 0.8)
+                    m_catch, _, _, _ = match_template_in_region(img, success_region, self.success_catch_template, 0.7)
                     if m_catch:
                         controller.post_key_down(KEY_F)
                         time.sleep(0.1)
