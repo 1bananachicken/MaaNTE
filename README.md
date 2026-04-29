@@ -5,6 +5,8 @@
 
 <div align="center">
 
+[English](docs/README_en.md)
+
 # MaaNTE
 
 😊MAA异环小助手😊
