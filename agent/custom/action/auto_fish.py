@@ -53,6 +53,8 @@ class AutoFish(CustomAction):
     slider_img = image_dir / "slider.png"
     success_catch_img = image_dir / "success_catch.png"
     escape_img = image_dir / "escape.png"
+    prepare_start_img = image_dir / "FishPrepareStartButton.png"
+    fish_game_sign_img = image_dir / "FishGameSign.png"
 
     slider_template = cv2.imread(str(slider_img), cv2.IMREAD_COLOR)
     valid_region_left_template = cv2.imread(str(valid_region_left_img), cv2.IMREAD_COLOR)
@@ -60,6 +62,8 @@ class AutoFish(CustomAction):
     continue_template = cv2.imread(str(continue_img), cv2.IMREAD_COLOR)
     success_catch_template = cv2.imread(str(success_catch_img), cv2.IMREAD_COLOR)
     escape_template = cv2.imread(str(escape_img), cv2.IMREAD_COLOR)
+    prepare_start_template = cv2.imread(str(prepare_start_img), cv2.IMREAD_COLOR)
+    fish_game_sign_template = cv2.imread(str(fish_game_sign_img), cv2.IMREAD_COLOR)
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         print("=== Autofish Action Started ===")
@@ -84,11 +88,32 @@ class AutoFish(CustomAction):
         settlement_region = (564, 642, 1206, 664)
         game_region = (400, 33, 882, 63)
         escape_region = (590, 349, 689, 371)
+        prepare_region = (908, 602, 1247, 654)
+        fish_game_sign_region = (1176, 365, 1270, 413)
+
+        def ensure_fish_game():
+            img = get_image(controller)
+            m_game, _, _, _ = match_template_in_region(img, fish_game_sign_region, self.fish_game_sign_template, 0.8)
+            if m_game:
+                return True
+
+            m_prepare, _, x, y = match_template_in_region(img, prepare_region, self.prepare_start_template, 0.8)
+            if m_prepare:
+                print("  On FishPrepare screen, pressing start...")
+                controller.post_click(x + 15, y + 15)
+                time.sleep(0.3)
+                return True
+
+            print("  ERROR: Not in FishGame or FishPrepare, exiting fishing.")
+            return False
 
         for i in range(fishing_count):
             if context.tasker.stopping:
                 return CustomAction.RunResult(success=False)
             print(f"=== Fishing {i + 1}/{fishing_count} ===")
+
+            if not ensure_fish_game():
+                return CustomAction.RunResult(success=False)
 
             while True:
                 if context.tasker.stopping:
@@ -196,6 +221,8 @@ class AutoFish(CustomAction):
                     m, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
                     if not m:
                         print("  Settlement closed.")
+                        if not ensure_fish_game():
+                            return CustomAction.RunResult(success=False)
                         break
 
         print("All fishing tasks complete.")
