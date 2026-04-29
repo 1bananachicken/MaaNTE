@@ -88,10 +88,11 @@ class AutoFish(CustomAction):
 
         success_region = (520, 160, 785, 190)
         settlement_region = (564, 642, 1206, 664)
-        game_region = (401, 39, 484, 23)  # (400, 33, 882, 63) before
+        game_region = (401, 39, 882, 63)  # (400, 33, 882, 63) before
         escape_region = (590, 349, 689, 371)
         prepare_region = (908, 602, 1247, 654)
         fish_game_sign_region = (1176, 365, 1270, 413)
+        need_bait_region = (610, 350, 751, 371)
 
         def ensure_fish_game():
             img = get_image(controller)
@@ -107,12 +108,7 @@ class AutoFish(CustomAction):
                 return True
 
             print("  ERROR: Not in FishGame or FishPrepare, exiting fishing.")
-            return False
-        success_region = [520, 160, 785, 190]
-        settlement_region = [564, 642, 1206, 664]
-        game_region = [400, 33, 882, 63]
-        escape_region = [590, 349, 689, 371]
-        need_bait_region = [610, 350, 751, 371]
+            return False  
 
         for i in range(fishing_count):
             if context.tasker.stopping:
@@ -122,7 +118,6 @@ class AutoFish(CustomAction):
             if not ensure_fish_game():
                 return CustomAction.RunResult(success=False)
 
-            
             while True:
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
