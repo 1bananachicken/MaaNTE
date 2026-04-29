@@ -2,18 +2,12 @@
     "InWorld":{
         "desc":"在大世界界面",
         "recognition":{
-            "type": "TemplateMatch",
+            "type": "And",
             "param": {
-                "roi": [
-                    1222, 
-                    14, 
-                    33, 
-                    57
-                ],
-                "template": [
-                    "Common/EscPhone.png"
-                ],
-                "threshold": 0.8
+                "all_of":[
+                    "EscMenuButton",
+                    "TasksMenuButton"
+                ]
             }
         },
         "pre_delay": 0,

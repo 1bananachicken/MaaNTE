@@ -16,7 +16,9 @@
         ],
         "pre_delay": 0,
         "post_delay": 0,
-        "next": []
+        "next": [
+            "SceneExampleRewardNext"
+        ]
     },
     "SceneExampleRewardNext": {
         "desc": "后续业务流程",
