@@ -70,7 +70,7 @@
         }
     ],
     "import": [
-        "tasks/ClaimRewards.json",
+        "tasks/ClaimRewards.json"
     ],
     "option": {
         "钓鱼循环次数": {
