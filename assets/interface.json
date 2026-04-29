@@ -13,7 +13,7 @@
             "type": "Win32",
             "win32": {
                 "class_regex": ".*",
-                "window_regex": "^\\s*异环\\s*$",
+                "window_regex": "^\\s*(异环|NTE)\\s*$",
                 "screencap": "FramePool",
                 "mouse": "SendMessageWithWindowPos",
                 "keyboard": "PostMessageWithWindowPos"
@@ -200,7 +200,9 @@
                 {
                     "name": "Yes",
                     "label": "开启",
-                    "option": ["RealTimeAutoSkipAll"]
+                    "option": [
+                        "RealTimeAutoSkipAll"
+                    ]
                 },
                 {
                     "name": "No",
@@ -246,7 +248,10 @@
                 {
                     "name": "Yes",
                     "label": "开启",
-                    "option": ["RealTimeAutoTeleportWitte", "RealTimeAutoTeleportPhone"]
+                    "option": [
+                        "RealTimeAutoTeleportWitte",
+                        "RealTimeAutoTeleportPhone"
+                    ]
                 },
                 {
                     "name": "No",
