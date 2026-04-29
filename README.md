@@ -5,11 +5,9 @@
 
 <div align="center">
 
-# MaaNTE
-
-<div align="center">
-
 [English](docs/README_en.md)
+
+# MaaNTE
 
 😊MAA异环小助手😊
 由 [MaaFramework](https://github.com/MaaXYZ/MaaFramework) 强力驱动！
