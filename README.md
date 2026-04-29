@@ -3,8 +3,9 @@
   <img alt="LOGO" src="./assets/logo.png" width="256" height="256" />
 </p>
 
-[English](docs/README_en.md)
 <div align="center">
+
+[English](docs/README_en.md)
 
 # MaaNTE
 
