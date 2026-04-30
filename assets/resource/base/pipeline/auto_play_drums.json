@@ -1,0 +1,6 @@
+{
+    "AutoPlayDrums": {
+        "action": "Custom",
+        "custom_action": "auto_play_drums"
+    }
+}

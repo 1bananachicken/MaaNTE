@@ -57,6 +57,10 @@
             "option": [
                 "循环次数"
             ]
+        },
+        {
+            "name": "自动打架子鼓",
+            "entry": "AutoPlayDrums"
         }
     ],
     "option": {
