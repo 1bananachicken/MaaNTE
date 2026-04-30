@@ -1,4 +1,5 @@
 import cv2
+import time
 import numpy as np
 
 
@@ -12,7 +13,9 @@ def click_rect(controller, rect):
     x, y, w, h = rect
     cx = x + w // 2
     cy = y + h // 2
-    controller.post_click(cx, cy).wait()
+    controller.post_touch_down(cx, cy).wait()
+    time.sleep(0.001)
+    controller.post_touch_up().wait()
 
 def match_template_in_region(img, region, template, min_similarity=0.8):
     if img is None or not isinstance(img, np.ndarray):

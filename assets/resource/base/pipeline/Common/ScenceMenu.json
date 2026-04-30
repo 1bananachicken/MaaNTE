@@ -1,0 +1,34 @@
+{
+    "__ScenePrivateMenuListEnterWorld": {
+        "desc": "从菜单总列表退出到大世界，避免电脑反复在菜单总列表和大世界之间切换",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InEscMenu"
+                ]
+            }
+        },  
+        "pre_wait_freezes": {
+            "time": 80,
+            "target": [
+                901, 
+                64,
+                342,
+                615
+            ]
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "rate_limit": 0,
+        "next": [
+            "__ScenePrivateAnyEnterWorldSuccess"
+        ]
+    },
+}

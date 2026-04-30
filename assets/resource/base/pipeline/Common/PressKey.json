@@ -1,0 +1,15 @@
+{
+    "__PressEsc": {
+        "desc": "按下Esc键",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 2000
+    }
+}
