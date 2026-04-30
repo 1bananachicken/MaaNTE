@@ -70,11 +70,11 @@
         },
         {
             "name": "自动演奏",
-            "entry": "RhythmStart",
+            "entry": "RhythmEntrance",
             "option": [
                 "演奏目标歌曲",
-                "自动连打次数",
-                "演奏目标帧率"
+                "连打次数",
+                "目标帧率"
             ]
         }
     ],
@@ -378,32 +378,86 @@
             "default_case": "Yes"
         },
         "演奏目标歌曲": {
-            "type": "input",
-            "label": "目标歌曲名称",
-            "description": "在选歌界面自动搜索并选择的目标歌曲名称（对应song_templates目录下模板图片的文件名），留空则禁用自动选歌",
-            "inputs": [
+            "type": "select",
+            "label": "目标歌曲",
+            "description": "选择要演奏的歌曲，选「禁用」则不自动选歌",
+            "cases": [
                 {
-                    "name": "song_name",
-                    "label": "歌曲名",
-                    "default": "",
-                    "pipeline_type": "string"
-                }
-            ],
-            "pipeline_override": {
-                "RhythmStart": {
-                    "custom_action_param": {
-                        "song_name": "{song_name}"
+                    "name": "Disabled",
+                    "label": "禁用自动选歌",
+                    "pipeline_override": {
+                        "RhythmStart": {
+                            "custom_action_param": {
+                                "song_name": ""
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Destiny",
+                    "label": "Destiny",
+                    "pipeline_override": {
+                        "RhythmStart": {
+                            "custom_action_param": {
+                                "song_name": "Destiny"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Everlasting_Dazing_Summer_Short",
+                    "label": "Everlasting_Dazing_Summer(Short_Ver.)",
+                    "pipeline_override": {
+                        "RhythmStart": {
+                            "custom_action_param": {
+                                "song_name": "Everlasting_Dazing_Summer(Short_Ver.)"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Everlasting_Dazing_Summer",
+                    "label": "Everlasting_Dazing_Summer",
+                    "pipeline_override": {
+                        "RhythmStart": {
+                            "custom_action_param": {
+                                "song_name": "Everlasting_Dazing_Summer"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Heroic_Appearance",
+                    "label": "Heroic_Appearance",
+                    "pipeline_override": {
+                        "RhythmStart": {
+                            "custom_action_param": {
+                                "song_name": "Heroic_Appearance"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迷星叫",
+                    "label": "迷星叫",
+                    "pipeline_override": {
+                        "RhythmStart": {
+                            "custom_action_param": {
+                                "song_name": "迷星叫"
+                            }
+                        }
                     }
                 }
-            }
+            ],
+            "default_case": "Disabled"
         },
-        "自动连打次数": {
+        "连打次数": {
             "type": "input",
-            "label": "自动连打次数",
-            "description": "结算后自动ESC返回并重复演奏的次数（需启用选歌），0表示不连打",
+            "label": "连打次数",
+            "description": "连续演奏的次数，设置为0则不连打",
             "inputs": [
                 {
-                    "name": "count",
+                    "name": "auto_repeat_count",
                     "label": "次数",
                     "default": "0",
                     "pipeline_type": "int",
@@ -413,18 +467,18 @@
             "pipeline_override": {
                 "RhythmStart": {
                     "custom_action_param": {
-                        "auto_repeat_count": "{count}"
+                        "auto_repeat_count": "{auto_repeat_count}"
                     }
                 }
             }
         },
-        "演奏目标帧率": {
+        "目标帧率": {
             "type": "input",
-            "label": "目标帧率 (FPS)",
-            "description": "检测循环的目标帧率，越高检测越灵敏但CPU占用越大",
+            "label": "目标帧率",
+            "description": "演奏循环的每秒帧率，建议30~120",
             "inputs": [
                 {
-                    "name": "fps",
+                    "name": "target_fps",
                     "label": "FPS",
                     "default": "60",
                     "pipeline_type": "int",
@@ -434,7 +488,7 @@
             "pipeline_override": {
                 "RhythmStart": {
                     "custom_action_param": {
-                        "target_fps": "{fps}"
+                        "target_fps": "{target_fps}"
                     }
                 }
             }
