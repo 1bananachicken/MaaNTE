@@ -14,7 +14,6 @@ from .assets import list_scene_templates, list_song_templates
 logger = logging.getLogger(__name__)
 
 _SEL_IDLE = "idle"
-_SEL_CLICKING_DEFAULT = "clicking_default"
 _SEL_CLICKING_START = "clicking_start"
 _SEL_SEARCHING = "searching"
 _SEL_SCROLLING = "scrolling"
@@ -77,6 +76,9 @@ def _read_image(p: Path) -> NDArray[np.uint8] | None:
     return img
 
 
+_DEFAULT_SONG = "Heroic_Appearance"
+
+
 class SongSelector:
     def __init__(self, cfg: dict[str, Any]) -> None:
         sc = cfg.get("song_select") or {}
@@ -102,10 +104,13 @@ class SongSelector:
 
         self._start_template = _load_start_template_once()
 
-        if self._song_select_enabled and self._song_name:
-            self._template = _load_song_template_once(self._song_name)
-        elif self._song_select_enabled and not self._song_name:
-            logger.warning("自动选歌已启用但未指定歌曲名称")
+        if not self._song_name:
+            self._song_name = _DEFAULT_SONG
+            logger.info("未指定歌曲，默认选择: %s", self._song_name)
+
+        self._template = _load_song_template_once(self._song_name)
+        if self._template is not None:
+            self._song_select_enabled = True
 
     @property
     def enabled(self) -> bool:
@@ -148,23 +153,8 @@ class SongSelector:
         if self._state == _SEL_IDLE:
             self._start_retry_count = 0
             self._last_action_time = time.perf_counter()
-            if self._song_select_enabled and self._template is not None:
-                self._state = _SEL_SEARCHING
-                self._scroll_attempts = 0
-            else:
-                self._state = _SEL_CLICKING_DEFAULT
-                logger.info("无自动选歌要求，先点击歌曲列表选中默认歌曲")
-
-        if self._state == _SEL_CLICKING_DEFAULT:
-            if now - self._last_action_time < self._click_delay:
-                return {"state": self._state, "action": "waiting"}
-            click_x = int(self._scroll_area_x_frac * w)
-            click_y = int(self._scroll_area_y_frac * h)
-            controller.post_click(click_x, click_y).wait()
-            self._last_action_time = now
-            self._state = _SEL_CLICKING_START
-            logger.info("已点击歌曲列表默认位置 (%d,%d)，准备点击开始演奏", click_x, click_y)
-            return {"state": self._state, "action": "click_default"}
+            self._state = _SEL_SEARCHING
+            self._scroll_attempts = 0
 
         if self._state == _SEL_SEARCHING:
             match = self._find_template(frame_bgr, self._template, self._match_threshold)
