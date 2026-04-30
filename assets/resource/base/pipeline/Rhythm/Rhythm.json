@@ -1,0 +1,27 @@
+{
+    "RhythmEntrance": {
+        "desc": "演奏功能入口",
+        "action": "DoNothing",
+        "next": [
+            "RhythmStart"
+        ]
+    },
+    "RhythmStart": {
+        "desc": "演奏主流程",
+        "action": "Custom",
+        "custom_action": "auto_rhythm",
+        "custom_action_param": {},
+        "next": [
+            "RhythmExit"
+        ],
+        "on_error": [
+            "RhythmExit"
+        ]
+    },
+    "RhythmExit": {
+        "desc": "演奏任务完成",
+        "next": [
+            "__ScenePrivateBackToWorldAny"
+        ]
+    }
+}
