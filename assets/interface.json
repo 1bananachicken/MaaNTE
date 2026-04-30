@@ -74,11 +74,26 @@
                 "RealTimeAutoSkip",
                 "RealTimeAutoTeleport"
             ]
+        },
+        {
+            "name": "领取奖励",
+            "entry": "ClaimRewardsEntrance",
+            "description": "自动领取活跃度奖励以及环期赏令的奖励, 目前仅支持桌面端-前台，若使用时请在上方控制器类型配置。",
+            "controller": [
+                "桌面端-前台"
+            ]
+        },
+        {
+            "name": "领取一咖舍收益",
+            "entry": "领取一咖舍收益",
+            "description": "自动领取一咖舍收益，暂时需要任务开始时在大世界界面，且仅支持Seize的鼠标输入方式（必须前台），使用时请前往左下角设置-连接设置自行配置。暂不支持根据风向标替换商品，若在意收益，建议关闭",
+            "controller": [
+                "桌面端-前台"
+            ],
+            "option": [
+                "Restock"
+            ]
         }
-    ],
-    "import": [
-        "tasks/ClaimRewards.json",
-        "tasks/WithdrawMoney.json"
     ],
     "option": {
         "钓鱼循环次数": {
@@ -378,6 +393,32 @@
                 }
             ],
             "default_case": "Yes"
+        },
+        "Restock": {
+            "type": "switch",
+            "label": "自动补货",
+            "description": "是否启用自动补货功能",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "点击补货": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "点击补货": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
         }
     }
 }

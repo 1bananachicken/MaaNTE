@@ -9,37 +9,13 @@
                     "<color=red>暂不支持根据风向标替换商品，若在意收益，建议关闭</color>"
                 ]
             },
-            "controller": "桌面端-前台",
+            "controller": ["桌面端-前台"],
             "option": [
                 "Restock"
             ]
         }
     ],
     "option":{
-        "Restock": {
-            "type": "switch",
-            "label": "自动补货",
-            "description": "是否启用自动补货功能",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "启用",
-                    "pipeline_override": {
-                        "FishStart": {
-                            "enabled": true
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "禁用",
-                    "pipeline_override": {
-                        "AutoSellFish": {
-                            "enabled": false
-                        }
-                    }
-                }
-            ]
-        }
+        
     }
 }
