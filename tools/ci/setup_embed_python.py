@@ -104,8 +104,13 @@ def ensure_pip(python_executable, python_install_dir):
 
     print("正在使用 get-pip.py 安装 pip...")
     try:
-        # 在 Python 安装目录下执行 get-pip.py
-        subprocess.run([python_executable, get_pip_script_path], check=True)
+        subprocess.run(
+            [python_executable, get_pip_script_path,
+             "--timeout", "120",
+             "--index-url", "https://mirrors.aliyun.com/pypi/simple/",
+             "--trusted-host", "mirrors.aliyun.com"],
+            check=True,
+        )
         print("pip 安装成功。")
         return True
     except (subprocess.CalledProcessError, OSError) as e:
