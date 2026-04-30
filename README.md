@@ -15,6 +15,8 @@
 
 本项目还处于早期开发阶段，欢迎提交PR和Issue
 
+官方B站账号: [MaaNTE-Official](https://space.bilibili.com/3546893080594665)
+
 QQ交流1群: 1103323319
 
 若1群已满请加2群: 1101147419
