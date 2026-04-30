@@ -112,7 +112,7 @@ class DrumDetector:
         th, tw = tpl.shape[:2]
 
         cx = layout.center_x[lane_idx]
-        half_w = max(tw, int(layout.half_width_px * self._region_width_multiplier))
+        half_w = tw // 2 + 5
         jy0 = layout.judge_y0_by_lane[lane_idx]
         jy1 = layout.judge_y1_by_lane[lane_idx]
         extend_up = max(th, int(self._region_extend_up_frac * layout.frame_h))
