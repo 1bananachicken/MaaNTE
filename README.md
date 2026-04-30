@@ -32,6 +32,7 @@
 > 官方 B 站账号: [MaaNTE-Official](https://space.bilibili.com/3546893080594665)
 >
 > QQ交流1群: 1103323319
+>
 > 若1群已满请加2群: 1101147419
 
 > [!Caution]
