@@ -68,7 +68,6 @@ class AutoBuyFishBait(CustomAction):
                 img = get_image(controller)
                 found_bait_success, _, _, _ = match_template_in_region(img, find_bait_success_region, self.find_bait_success_template, match_threshold)
                 if found_bait_success:
-                    img = get_image(controller)
                     time.sleep(0.5)
                     break
                 else:
@@ -82,12 +81,14 @@ class AutoBuyFishBait(CustomAction):
 
         while True:
             img = get_image(controller)
-            found_select_max, _, _, _ = match_template_in_region(img, select_max_region, self.select_max_template, match_threshold)
+            found_select_max, prob, _, _ = match_template_in_region(img, select_max_region, self.select_max_template, match_threshold)
+            print(f"Looking for select max option, match probability: {prob:.2f}")
             if found_select_max:
-                for _ in range(3):
+                print("Select max option found, clicking...")
+                for _ in range(5):
                     click_rect(controller, select_max_region)
                     time.sleep(0.1)
-                time.sleep(0.5)
+                time.sleep(1)
                 break
             else:
                 print("Select max option not found, retrying...")
@@ -97,6 +98,7 @@ class AutoBuyFishBait(CustomAction):
             img = get_image(controller)
             found_buy, _, _, _ = match_template_in_region(img, buy_region, self.buy_template, match_threshold)
             if found_buy:
+                print("Buy button found, clicking...")
                 for _ in range(3):
                     click_rect(controller, buy_region)
                     time.sleep(0.1)
@@ -110,6 +112,7 @@ class AutoBuyFishBait(CustomAction):
             img = get_image(controller)
             found_buy_confirm, _, _, _ = match_template_in_region(img, buy_confirm_region, self.buy_confirm_template, match_threshold)
             if found_buy_confirm:
+                print("Buy confirm button found, clicking...")
                 for _ in range(3):
                     click_rect(controller, buy_confirm_region)
                     time.sleep(0.1)
@@ -123,6 +126,7 @@ class AutoBuyFishBait(CustomAction):
             img = get_image(controller)
             found_buy_success, _, _, _ = match_template_in_region(img, buy_success_region, self.buy_success_template, match_threshold)
             if found_buy_success:
+                print("Buy success.")
                 controller.post_click_key(KEY_ESC).wait()
                 time.sleep(0.5)
                 controller.post_click_key(KEY_ESC).wait()
