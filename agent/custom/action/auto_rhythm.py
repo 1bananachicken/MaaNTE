@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import cv2
+import numpy as np
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -15,6 +16,7 @@ from .rhythm.lanes import build_lane_layout
 from .rhythm.detector import DrumDetector
 from .rhythm.presence import STATE_OTHER, STATE_PLAYING, STATE_RESULTS, STATE_SONG_SELECT, SceneGate
 from .rhythm.song_selector import SongSelector
+from .rhythm.assets import list_scene_templates
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +25,9 @@ _VK = {"d": 0x44, "f": 0x46, "j": 0x4A, "k": 0x4B}
 _VK_ESCAPE = 0x1B
 
 _RHYTHM_ENV_KEYS = ("RHYTHM_SONG_NAME", "RHYTHM_AUTO_REPEAT_COUNT", "RHYTHM_TARGET_FPS")
+
+_QUICK_RESULTS_CHECK_INTERVAL = 30
+_FULL_SCENE_CHECK_INTERVAL = 120
 
 _DEFAULT_CONFIG = {
     "lanes": {
@@ -48,7 +53,7 @@ _DEFAULT_CONFIG = {
         "results_match_threshold": 0.75,
         "playing_match_threshold": 0.75,
         "match_vote_min": 1,
-        "playing_check_interval": 30,
+        "playing_check_interval": 1,
     },
     "song_select": {
         "enabled": False,
@@ -105,13 +110,8 @@ def _get_image(controller):
 
 
 def _do_scroll_via_maa(controller, x: int, y: int, delta: int):
-    swipe_distance = 200
-    duration = 300
-    if delta < 0:
-        end_y = y + swipe_distance
-    else:
-        end_y = y - swipe_distance
-    controller.post_swipe(x, y, x, end_y, duration).wait()
+    scroll_delta = -delta
+    controller.post_scroll(x, y, scroll_delta).wait()
     time.sleep(0.3)
 
 
@@ -121,6 +121,41 @@ def _press_keys(controller, lane_indices: list[int], key_hold_sec: float = 0.01)
     time.sleep(key_hold_sec)
     for li in lane_indices:
         controller.post_key_up(_VK[_LANES[li]])
+
+
+_results_check_tpl_cache: np.ndarray | None = None
+
+
+def _load_results_check_template():
+    global _results_check_tpl_cache
+    if _results_check_tpl_cache is not None:
+        return _results_check_tpl_cache
+    for name, path in list_scene_templates("results"):
+        if name == "score":
+            img = cv2.imread(str(path), cv2.IMREAD_COLOR)
+            if img is None:
+                img_bytes = np.fromfile(str(path), dtype=np.uint8)
+                img = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
+            if img is not None:
+                _results_check_tpl_cache = img
+                logger.info("已加载结算快速检测模板: score.png (%dx%d)", img.shape[1], img.shape[0])
+            break
+    return _results_check_tpl_cache
+
+
+def _quick_check_results(frame: np.ndarray, template: np.ndarray, threshold: float = 0.7) -> bool:
+    fh, fw = frame.shape[:2]
+    x1 = int(0.3 * fw)
+    y1 = int(0.1 * fh)
+    x2 = int(0.7 * fw)
+    y2 = int(0.4 * fh)
+    roi = frame[y1:y2, x1:x2]
+    th, tw = template.shape[:2]
+    if roi.shape[0] < th or roi.shape[1] < tw:
+        return False
+    result = cv2.matchTemplate(roi, template, cv2.TM_CCOEFF_NORMED)
+    _, max_val, _, _ = cv2.minMaxLoc(result)
+    return max_val >= threshold
 
 
 @AgentServer.custom_action("rhythm_set_param")
@@ -173,6 +208,8 @@ class AutoRhythm(CustomAction):
         if "target_fps" in merged:
             cfg.setdefault("run", {})["target_fps"] = int(merged["target_fps"])
 
+        cfg.setdefault("scene", {})["playing_check_interval"] = 1
+
         target_fps = int(cfg.get("run", {}).get("target_fps", 60))
         frame_interval = 1.0 / max(1, target_fps)
 
@@ -191,20 +228,26 @@ class AutoRhythm(CustomAction):
         auto_repeat_count = int(auto_repeat_cfg.get("count", 1))
         auto_repeat_dismiss_delay = float(auto_repeat_cfg.get("dismiss_delay_sec", 0.8))
 
+        results_check_tpl = _load_results_check_template()
+
         logger.info(
-            "演奏任务开始 | 目标FPS=%d | 鼓面检测=%s | 自动选歌=%s(%s) | 自动连打=%s(%d次)",
+            "演奏任务开始 | 目标FPS=%d | 鼓面检测=%s | 自动选歌=%s(%s) | 自动连打=%s(%d次) | 结算快检=%s",
             target_fps,
             drum_available,
             song_selector.enabled, song_selector.song_name,
             auto_repeat_enabled, auto_repeat_count,
+            results_check_tpl is not None,
         )
         repeat_index = 0
         results_seen = False
+        esc_sent_for_results = False
         cached_layout: Any = None
         cached_layout_size: tuple[int, int] = (0, 0)
 
         frame_count = 0
+        playing_frame_count = 0
         prev_logged_state: str | None = None
+        state = STATE_OTHER
 
         try:
             while True:
@@ -227,7 +270,19 @@ class AutoRhythm(CustomAction):
                     time.sleep(0.1)
                     continue
 
-                state, gate_info = scene_gate.step(frame)
+                frame_count += 1
+
+                if state == STATE_PLAYING and results_check_tpl is not None:
+                    need_scene = (playing_frame_count % _FULL_SCENE_CHECK_INTERVAL == 0 and playing_frame_count > 0)
+                    if not need_scene and playing_frame_count % _QUICK_RESULTS_CHECK_INTERVAL == 0:
+                        if _quick_check_results(frame, results_check_tpl):
+                            need_scene = True
+                    if need_scene:
+                        new_state, gate_info = scene_gate.step(frame)
+                        if new_state != state:
+                            state = new_state
+                else:
+                    state, gate_info = scene_gate.step(frame)
 
                 if state != prev_logged_state:
                     logger.info(
@@ -252,6 +307,8 @@ class AutoRhythm(CustomAction):
                 elif state == STATE_PLAYING:
                     song_selector.reset()
                     results_seen = False
+                    esc_sent_for_results = False
+                    playing_frame_count += 1
 
                     if drum_available:
                         if (fw, fh) != cached_layout_size:
@@ -270,9 +327,11 @@ class AutoRhythm(CustomAction):
 
                 elif state == STATE_RESULTS:
                     song_selector.reset()
+                    playing_frame_count = 0
                     if not results_seen:
                         results_seen = True
                         repeat_index += 1
+                        esc_sent_for_results = False
                         logger.info("检测到结算界面: 第 %d/%d 次", repeat_index, auto_repeat_count)
 
                     if auto_repeat_enabled and repeat_index >= auto_repeat_count:
@@ -280,20 +339,22 @@ class AutoRhythm(CustomAction):
                         time.sleep(auto_repeat_dismiss_delay)
                         break
 
-                    time.sleep(auto_repeat_dismiss_delay)
-                    logger.info("发送 ESC 退出结算界面 (第 %d/%d 次)", repeat_index, auto_repeat_count if auto_repeat_enabled else 1)
-                    controller.post_click_key(_VK_ESCAPE).wait()
-                    time.sleep(1.5)
+                    if not esc_sent_for_results:
+                        time.sleep(auto_repeat_dismiss_delay)
+                        logger.info("发送 ESC 退出结算界面 (第 %d/%d 次)", repeat_index, auto_repeat_count if auto_repeat_enabled else 1)
+                        controller.post_click_key(_VK_ESCAPE).wait()
+                        esc_sent_for_results = True
+                    time.sleep(1.0)
                     continue
 
                 else:
                     song_selector.reset()
+                    playing_frame_count = 0
 
-                frame_count += 1
                 if frame_count % 120 == 0:
                     logger.debug(
-                        "帧#%d | state=%s",
-                        frame_count, state,
+                        "帧#%d | state=%s | playing_frames=%d",
+                        frame_count, state, playing_frame_count,
                     )
 
                 elapsed = time.perf_counter() - t0

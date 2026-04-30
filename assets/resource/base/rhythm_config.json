@@ -52,7 +52,7 @@
         "results_match_threshold": 0.75,
         "playing_match_threshold": 0.75,
         "match_vote_min": 1,
-        "playing_check_interval": 30
+        "playing_check_interval": 1
     },
     "song_select": {
         "enabled": false,
