@@ -58,7 +58,7 @@ jobs:
 
           # 检查是否为预发布版本
           is_prerelease=false
-          if [[ $tag =~ .*alpha.* || $tag =~ .*beta.* || $tag =~ .*rc.* || $tag =~ .*dev.* || $tag =~ .*-ci.* ]]; then
+          if [[ $tag =~ .*alpha.* || $tag =~ .*beta.* || $tag =~ .*rc.* || $tag =~ .*dev.* || $tag =~ .*-ci.* || $tag =~ .*preview.* ]]; then
             is_prerelease=true
             echo "This is a pre-release version"
           fi
