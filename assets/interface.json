@@ -67,6 +67,15 @@
                 "RealTimeAutoSkip",
                 "RealTimeAutoTeleport"
             ]
+        },
+        {
+            "name": "自动演奏",
+            "entry": "RhythmStart",
+            "option": [
+                "演奏目标歌曲",
+                "自动连打次数",
+                "演奏目标帧率"
+            ]
         }
     ],
     "option": {
@@ -367,6 +376,68 @@
                 }
             ],
             "default_case": "Yes"
+        },
+        "演奏目标歌曲": {
+            "type": "input",
+            "label": "目标歌曲名称",
+            "description": "在选歌界面自动搜索并选择的目标歌曲名称（对应song_templates目录下模板图片的文件名），留空则禁用自动选歌",
+            "inputs": [
+                {
+                    "name": "song_name",
+                    "label": "歌曲名",
+                    "default": "",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "RhythmStart": {
+                    "custom_action_param": {
+                        "song_name": "{song_name}"
+                    }
+                }
+            }
+        },
+        "自动连打次数": {
+            "type": "input",
+            "label": "自动连打次数",
+            "description": "结算后自动ESC返回并重复演奏的次数（需启用选歌），0表示不连打",
+            "inputs": [
+                {
+                    "name": "count",
+                    "label": "次数",
+                    "default": "0",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "RhythmStart": {
+                    "custom_action_param": {
+                        "auto_repeat_count": "{count}"
+                    }
+                }
+            }
+        },
+        "演奏目标帧率": {
+            "type": "input",
+            "label": "目标帧率 (FPS)",
+            "description": "检测循环的目标帧率，越高检测越灵敏但CPU占用越大",
+            "inputs": [
+                {
+                    "name": "fps",
+                    "label": "FPS",
+                    "default": "60",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "RhythmStart": {
+                    "custom_action_param": {
+                        "target_fps": "{fps}"
+                    }
+                }
+            }
         }
     }
 }
