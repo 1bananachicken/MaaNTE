@@ -44,13 +44,22 @@ class AutoBuyFishBait(CustomAction):
         KEY_R = 82
         KEY_ESC = 27
         controller = context.tasker.controller  
+        
+        found_bait_threshold = 0.8
+        if argv.custom_action_param:
+            try:
+                params = json.loads(argv.custom_action_param)
+                found_bait_threshold = params.get("found_bait_threshold", 0.8)
+            except:
+                pass
+        
         print("=== AutoBuyFishBait Action Started ===")
 
         match_threshold = 0.7
         while True:
             img = get_image(controller)
-            found_bait, prob, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, match_threshold)
-            print(f"Clicked on bait at ({x+15}, {y+5}), probability: {prob:.2f}")
+            found_bait, prob, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, found_bait_threshold)
+            print(f"Current found bait threshold: {found_bait_threshold}, match probability: {prob:.2f}, clicked on bait at ({x+15}, {y+5})")
             if found_bait:
                 for _ in range(3):
                     click_rect(controller, [x, y, 30, 10])
@@ -59,9 +68,11 @@ class AutoBuyFishBait(CustomAction):
                 img = get_image(controller)
                 found_bait_success, _, _, _ = match_template_in_region(img, find_bait_success_region, self.find_bait_success_template, match_threshold)
                 if found_bait_success:
-                    img = get_image(controller)
                     time.sleep(0.5)
                     break
+                else:
+                    print("Bait found but not click correctly, retrying...")
+                    time.sleep(1)
             else:
                 print("Bait not found in fish shop, retrying...")
                 controller.post_click_key(KEY_R).wait()  
@@ -70,12 +81,14 @@ class AutoBuyFishBait(CustomAction):
 
         while True:
             img = get_image(controller)
-            found_select_max, _, _, _ = match_template_in_region(img, select_max_region, self.select_max_template, match_threshold)
+            found_select_max, prob, _, _ = match_template_in_region(img, select_max_region, self.select_max_template, match_threshold)
+            print(f"Looking for select max option, match probability: {prob:.2f}")
             if found_select_max:
-                for _ in range(3):
+                print("Select max option found, clicking...")
+                for _ in range(5):
                     click_rect(controller, select_max_region)
                     time.sleep(0.1)
-                time.sleep(0.5)
+                time.sleep(1)
                 break
             else:
                 print("Select max option not found, retrying...")
@@ -85,6 +98,7 @@ class AutoBuyFishBait(CustomAction):
             img = get_image(controller)
             found_buy, _, _, _ = match_template_in_region(img, buy_region, self.buy_template, match_threshold)
             if found_buy:
+                print("Buy button found, clicking...")
                 for _ in range(3):
                     click_rect(controller, buy_region)
                     time.sleep(0.1)
@@ -98,6 +112,7 @@ class AutoBuyFishBait(CustomAction):
             img = get_image(controller)
             found_buy_confirm, _, _, _ = match_template_in_region(img, buy_confirm_region, self.buy_confirm_template, match_threshold)
             if found_buy_confirm:
+                print("Buy confirm button found, clicking...")
                 for _ in range(3):
                     click_rect(controller, buy_confirm_region)
                     time.sleep(0.1)
@@ -111,6 +126,7 @@ class AutoBuyFishBait(CustomAction):
             img = get_image(controller)
             found_buy_success, _, _, _ = match_template_in_region(img, buy_success_region, self.buy_success_template, match_threshold)
             if found_buy_success:
+                print("Buy success.")
                 controller.post_click_key(KEY_ESC).wait()
                 time.sleep(0.5)
                 controller.post_click_key(KEY_ESC).wait()
