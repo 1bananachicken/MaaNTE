@@ -16,7 +16,7 @@
             "win32": {
                 "class_regex": ".*",
                 "window_regex": "^\\s*(异环|NTE)\\s*$",
-                "screencap": "PrintWindow",
+                "screencap": "DXGI_DesktopDup",
                 "mouse": "SendMessageWithWindowPos",
                 "keyboard": "PostMessage"
             }
@@ -71,6 +71,7 @@
         {
             "name": "自动演奏",
             "entry": "RhythmEntrance",
+            "description": "⚠️ 仅支持前台模式，运行时请勿遮挡游戏窗口",
             "option": [
                 "演奏目标歌曲",
                 "连打次数",
