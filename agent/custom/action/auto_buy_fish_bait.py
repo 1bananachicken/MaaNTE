@@ -43,11 +43,13 @@ class AutoBuyFishBait(CustomAction):
         shell_count_region = [961, 31, 70, 21]
         KEY_R = 82
         KEY_ESC = 27
-        controller = context.tasker.controller  
+        controller = context.tasker.controller
         print("=== AutoBuyFishBait Action Started ===")
 
         match_threshold = 0.7
         while True:
+            if context.tasker.stopping:
+                return CustomAction.RunResult(success=False)
             img = get_image(controller)
             found_bait, prob, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, match_threshold)
             print(f"Clicked on bait at ({x+15}, {y+5}), probability: {prob:.2f}")
@@ -55,7 +57,7 @@ class AutoBuyFishBait(CustomAction):
                 for _ in range(3):
                     click_rect(controller, [x, y, 30, 10])
                     time.sleep(0.1)
-                
+
                 img = get_image(controller)
                 found_bait_success, _, _, _ = match_template_in_region(img, find_bait_success_region, self.find_bait_success_template, match_threshold)
                 if found_bait_success:
@@ -64,11 +66,13 @@ class AutoBuyFishBait(CustomAction):
                     break
             else:
                 print("Bait not found in fish shop, retrying...")
-                controller.post_click_key(KEY_R).wait()  
+                controller.post_click_key(KEY_R).wait()
                 time.sleep(1)
                 continue
 
         while True:
+            if context.tasker.stopping:
+                return CustomAction.RunResult(success=False)
             img = get_image(controller)
             found_select_max, _, _, _ = match_template_in_region(img, select_max_region, self.select_max_template, match_threshold)
             if found_select_max:
@@ -80,8 +84,10 @@ class AutoBuyFishBait(CustomAction):
             else:
                 print("Select max option not found, retrying...")
                 time.sleep(1)
-        
+
         while True:
+            if context.tasker.stopping:
+                return CustomAction.RunResult(success=False)
             img = get_image(controller)
             found_buy, _, _, _ = match_template_in_region(img, buy_region, self.buy_template, match_threshold)
             if found_buy:
@@ -95,6 +101,8 @@ class AutoBuyFishBait(CustomAction):
                 time.sleep(1)
 
         for _ in range(5):
+            if context.tasker.stopping:
+                return CustomAction.RunResult(success=False)
             img = get_image(controller)
             found_buy_confirm, _, _, _ = match_template_in_region(img, buy_confirm_region, self.buy_confirm_template, match_threshold)
             if found_buy_confirm:
@@ -108,6 +116,8 @@ class AutoBuyFishBait(CustomAction):
                 time.sleep(0.2)
 
         while True:
+            if context.tasker.stopping:
+                return CustomAction.RunResult(success=False)
             img = get_image(controller)
             found_buy_success, _, _, _ = match_template_in_region(img, buy_success_region, self.buy_success_template, match_threshold)
             if found_buy_success:
@@ -117,6 +127,6 @@ class AutoBuyFishBait(CustomAction):
                 break
             else:
                 print("Buy success confirmation not found, retrying...")
-                time.sleep(1)                
+                time.sleep(1)
 
         return CustomAction.RunResult(success=True)

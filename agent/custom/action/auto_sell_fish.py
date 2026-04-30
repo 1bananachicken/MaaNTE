@@ -33,12 +33,12 @@ class AutoSellFish(CustomAction):
     sell_fail_template = cv2.imread(str(sell_fail_img), cv2.IMREAD_COLOR)
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
-        print("=== Autofish Action Started ===")
+        print("=== AutoSellFish Action Started ===")
         controller = context.tasker.controller
 
         KEY_Q = 81
         KEY_ESC = 27
-        
+
         no_fish_to_sell_region = [433, 457, 77, 20]
         sell_option_region = [63, 247, 66, 57]
         sell_option_selected_region = [172, 166, 103, 29]
@@ -47,45 +47,53 @@ class AutoSellFish(CustomAction):
         sell_success_region = [565, 628, 149, 21]
         sell_fail_region = [739, 349, 202, 24]
         no_valid_fish_region = [509, 350, 261, 22]
-        
+
         while True:
+            if context.tasker.stopping:
+                return CustomAction.RunResult(success=False)
             img = get_image(controller)
             found_sell_option, _, _, _ = match_template_in_region(img, sell_option_region, self.sell_option_template, 0.7)
             if found_sell_option:
                 for _ in range(3):
                     click_rect(controller, sell_option_region)
                     time.sleep(0.1)
-                
+
                 img = get_image(controller)
                 found_sell_option_selected, _, _, _ = match_template_in_region(img, sell_option_selected_region, self.sell_option_selected_template, 0.8)
                 if found_sell_option_selected:
                     break
-                time.sleep(1)  
+                time.sleep(1)
             else:
-                controller.post_click_key(KEY_Q).wait()  
-                time.sleep(1)  
+                controller.post_click_key(KEY_Q).wait()
+                time.sleep(1)
 
         print("Sell option detected. Proceeding to sell fish.")
 
         for _ in range(5):
+            if context.tasker.stopping:
+                return CustomAction.RunResult(success=False)
             img = get_image(controller)
             found_no_fish_to_sell, prob, _, _ = match_template_in_region(img, no_fish_to_sell_region, self.no_fish_to_sell_template, 0.8)
             time.sleep(0.1)
             if found_no_fish_to_sell:
                 print("No fish to sell detected. Closing fish shop.")
-                controller.post_click_key(KEY_ESC).wait()  
+                controller.post_click_key(KEY_ESC).wait()
                 return CustomAction.RunResult(success=True)
-        
+
         while True:
+            if context.tasker.stopping:
+                return CustomAction.RunResult(success=False)
             img = get_image(controller)
             found_sell_button, _, _, _ = match_template_in_region(img, sell_button_region, self.sell_button_template, 0.8)
             if found_sell_button:
                 print("Sell button detected. Clicking to confirm selling fish.")
                 while True:
+                    if context.tasker.stopping:
+                        return CustomAction.RunResult(success=False)
                     for _ in range(3):
                         click_rect(controller, sell_button_region)
                         time.sleep(0.1)
-                        
+
                     img = get_image(controller)
                     found_confirm_sell, _, _, _ = match_template_in_region(img, confirm_sell_region, self.confirm_sell_template, 0.8)
                     sell_fail, _, _, _ = match_template_in_region(img, sell_fail_region, self.sell_fail_template, 0.8)
@@ -94,10 +102,10 @@ class AutoSellFish(CustomAction):
                         for _ in range(3):
                             click_rect(controller, confirm_sell_region)
                             time.sleep(0.1)
-                        time.sleep(1)  
+                        time.sleep(1)
                         break
                     elif sell_fail:
-                        print("no fish to sell, closing fish shop.")
+                        print("No fish to sell, closing fish shop.")
                         controller.post_click_key(KEY_ESC).wait()
                         return CustomAction.RunResult(success=True)
                     else:
@@ -107,16 +115,18 @@ class AutoSellFish(CustomAction):
                 time.sleep(0.1)
 
         while True:
+            if context.tasker.stopping:
+                return CustomAction.RunResult(success=False)
             img = get_image(controller)
             found_sell_success, _, _, _ = match_template_in_region(img, sell_success_region, self.sell_success_template, 0.8)
             if found_sell_success:
                 print("Sell success detected. Fish sold successfully.")
-                controller.post_click_key(KEY_ESC).wait()  
+                controller.post_click_key(KEY_ESC).wait()
                 time.sleep(0.5)
                 controller.post_click_key(KEY_ESC).wait()
                 break
             else:
                 time.sleep(1)
-        
-        print("All fishing tasks complete.")
+
+        print("All sell tasks complete.")
         return CustomAction.RunResult(success=True)

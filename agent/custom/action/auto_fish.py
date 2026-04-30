@@ -85,6 +85,8 @@ class AutoFish(CustomAction):
         game_region = (400, 33, 882, 63)
         escape_region = (590, 349, 689, 371)
 
+        last_target = None
+
         for i in range(fishing_count):
             if context.tasker.stopping:
                 return CustomAction.RunResult(success=False)
@@ -93,12 +95,26 @@ class AutoFish(CustomAction):
             while True:
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
+
+                # 先尝试关闭可能残留的结算界面
+                img = get_image(controller)
+                m_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
+                if m_settle:
+                    print("  Settlement screen detected before casting, closing...")
+                    self._dismiss_settlement(controller, settlement_region)
+                    time.sleep(0.5)
+                    continue
+
                 controller.post_key_down(KEY_F)
                 time.sleep(0.1)
                 controller.post_key_up(KEY_F)
                 print("  Casting...")
 
-                while True:
+                # 等待上钩，添加超时防止卡死
+                hook_start = time.time()
+                hook_timeout = 60
+                hooked = False
+                while time.time() - hook_start < hook_timeout:
                     if context.tasker.stopping:
                         return CustomAction.RunResult(success=False)
                     time.sleep(check_freq)
@@ -109,8 +125,15 @@ class AutoFish(CustomAction):
                         time.sleep(0.1)
                         controller.post_key_up(KEY_F)
                         print("  Fish hooked!")
+                        hooked = True
                         break
-      
+
+                if not hooked:
+                    print("  Hook timeout, recasting...")
+                    controller.post_key_up(KEY_F)
+                    time.sleep(0.5)
+                    continue
+
                 start_time = time.time()
                 frame = 0
                 deadzone = 15
@@ -136,63 +159,89 @@ class AutoFish(CustomAction):
                     m_right, _, x_right, _ = match_template_in_region(img, game_region, self.valid_region_right_template, 0.7)
                     m_slider, _, x_slider, _ = match_template_in_region(img, game_region, self.slider_template, 0.7)
 
-                    if m_slider:                      
+                    if m_slider:
                         if frame % 10 == 0:
                             controller.post_key_down(KEY_F)
                             time.sleep(0.05)
                             controller.post_key_up(KEY_F)
-            
+
                         if m_left and m_right:
                             target = (x_left + x_right) / 2
+                            last_target = target
                             offset = x_slider - target
                         elif not m_left and m_right:
                             target = x_right
+                            last_target = target
                             offset = x_slider - target
                         elif m_left and not m_right:
                             target = x_left
+                            last_target = target
                             offset = x_slider - target
+                        elif last_target is not None:
+                            offset = x_slider - last_target
                         else:
                             offset = 0
 
-                        if m_left or m_right:
-                            if offset > deadzone:
-                                controller.post_key_up(KEY_D)
-                                controller.post_key_down(KEY_A)
-                            elif offset < -deadzone:
-                                controller.post_key_up(KEY_A)
-                                controller.post_key_down(KEY_D)
-                            else:
-                                controller.post_key_up(KEY_A)
-                                controller.post_key_up(KEY_D)
-                
+                        if offset > deadzone:
+                            controller.post_key_up(KEY_D)
+                            controller.post_key_down(KEY_A)
+                        elif offset < -deadzone:
+                            controller.post_key_up(KEY_A)
+                            controller.post_key_down(KEY_D)
+                        else:
+                            controller.post_key_up(KEY_A)
+                            controller.post_key_up(KEY_D)
+
                 controller.post_key_up(KEY_D)
                 controller.post_key_up(KEY_A)
                 controller.post_key_up(KEY_F)
-                
+
                 img = get_image(controller)
                 time.sleep(0.3)
                 m_escape, _, _, _ = match_template_in_region(img, escape_region, self.escape_template, 0.8)
                 if m_escape:
-                    continue  
-                break  
+                    continue
+                break
 
             print("  Finished.")
 
+            # 关闭结算界面
             img = get_image(controller)
             match_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
             if match_settle:
                 print("  Closing settlement screen...")
-                for _ in range(5):
-                    controller.post_key_down(KEY_ESC)
-                    time.sleep(0.1)
-                    controller.post_key_up(KEY_ESC)
-                    time.sleep(1)
-
-                    img = get_image(controller)
-                    m, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
-                    if not m:
-                        print("  Settlement closed.")
-                        break
+                self._dismiss_settlement(controller, settlement_region)
 
         print("All fishing tasks complete.")
         return CustomAction.RunResult(success=True)
+
+    def _dismiss_settlement(self, controller, settlement_region):
+        """尝试关闭结算界面，使用多种方式"""
+        KEY_ESC = 27
+        for attempt in range(10):
+            # 尝试 ESC
+            controller.post_key_down(KEY_ESC)
+            time.sleep(0.1)
+            controller.post_key_up(KEY_ESC)
+            time.sleep(0.5)
+
+            img = get_image(controller)
+            m, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
+            if not m:
+                print("  Settlement closed.")
+                return
+
+            # 尝试鼠标点击屏幕中央
+            if attempt % 3 == 1:
+                controller.post_click(640, 360).wait()
+                time.sleep(0.5)
+
+            # 尝试空格/回车
+            if attempt % 3 == 2:
+                for key in [32, 13]:  # Space, Enter
+                    controller.post_key_down(key)
+                    time.sleep(0.1)
+                    controller.post_key_up(key)
+                    time.sleep(0.3)
+
+        print("  Warning: Failed to dismiss settlement screen after 10 attempts.")
