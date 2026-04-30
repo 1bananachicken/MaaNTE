@@ -1,0 +1,87 @@
+{
+    "lanes": {
+        "center_x_frac": [
+            0.225,
+            0.406,
+            0.596,
+            0.771
+        ],
+        "top_center_x_frac": [
+            0.214,
+            0.406,
+            0.596,
+            0.783
+        ],
+        "half_width_frac": 0.028,
+        "judge_line_y_frac": 0.78,
+        "judge_line_y_frac_by_lane": [
+            0.78,
+            0.70,
+            0.78,
+            0.78
+        ],
+        "judge_band_half_height_frac": 0.03
+    },
+    "template_detection": {
+        "thresholds": [
+            0.81,
+            0.80,
+            0.80,
+            0.81
+        ],
+        "cooldown_sec": 0.03,
+        "cooldown_sec_by_lane": [
+            0.03,
+            0.03,
+            0.03,
+            0.03
+        ],
+        "region_extend_up_frac": 0.08,
+        "region_extend_down_frac": 0.03,
+        "region_width_multiplier": 1.5,
+        "enabled_lanes": [
+            true,
+            true,
+            true,
+            true
+        ]
+    },
+    "scene": {
+        "state_confirm_frames": 2,
+        "song_select_match_threshold": 0.75,
+        "results_match_threshold": 0.75,
+        "playing_match_threshold": 0.75,
+        "match_vote_min": 1,
+        "playing_check_interval": 30
+    },
+    "song_select": {
+        "enabled": false,
+        "song_name": "",
+        "scroll_area_x_frac": 0.25,
+        "scroll_area_y_frac": 0.50,
+        "scroll_delta": -3,
+        "max_scroll_attempts": 30,
+        "match_threshold": 0.75,
+        "start_match_threshold": 0.75,
+        "click_delay_sec": 0.5,
+        "start_delay_sec": 0.8
+    },
+    "auto_repeat": {
+        "enabled": false,
+        "count": 5,
+        "dismiss_delay_sec": 0.8
+    },
+    "keys": {
+        "press_delay_sec": 0.0,
+        "press_delay_sec_by_lane": [
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "key_hold_sec": 0.01
+    },
+    "run": {
+        "target_fps": 60
+    }
+}
