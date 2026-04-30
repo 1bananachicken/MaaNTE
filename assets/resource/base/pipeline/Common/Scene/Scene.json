@@ -1,28 +1,11 @@
 {
-    "SceneExampleNormalTask": {
-        "desc": "普通接口使用示例",
-        "pre_delay": 0,
-        "post_delay": 0,
+    // 只能使用本文件中定义的接口，禁止引用 SceneManager 文件夹内的 __ScenePrivate 节点，调用方法参考 SceneExample.json
+    "SceneAnyEnterWorld": {
+        "desc": "从任意界面返回大世界界面",
         "next": [
-            "SceneExampleNormalTaskContinue",
-            "[JumpBack]SceneAnyEnterWorld"
+            "__ScenePrivateMenuListEnterWorld",
+            "__ScenePrivateAnyEnterWorldSuccess",
+            "[JumpBack]__ScenePrivateAnyExit"
         ]
-    },
-    "SceneExampleNormalTaskContinue": {
-        "desc": "判断成功进入目标菜单，继续业务流程",
-        "recognition": "And",
-        "all_of": [
-            "InWorld"
-        ],
-        "pre_delay": 0,
-        "post_delay": 0,
-        "next": [
-            "SceneExampleRewardNext"
-        ]
-    },
-    "SceneExampleRewardNext": {
-        "desc": "后续业务流程",
-        "pre_delay": 0,
-        "post_delay": 0
     }
 }

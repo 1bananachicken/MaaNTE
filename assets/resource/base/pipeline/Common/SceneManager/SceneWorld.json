@@ -1,12 +1,4 @@
 {
-    "SceneAnyEnterWorld": {
-        "desc": "从任意界面返回大世界界面",
-        "next": [
-            "__ScenePrivateMenuListEnterWorld",
-            "__ScenePrivateAnyEnterWorldSuccess",
-            "[JumpBack]__PressEsc"
-        ]
-    },
     "__ScenePrivateAnyEnterWorldSuccess": {
         "desc": "从任意界面进入大世界成功",
         "recognition": {

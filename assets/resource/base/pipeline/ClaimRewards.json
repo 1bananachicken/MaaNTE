@@ -16,7 +16,7 @@
         "action": {
             "type":"ClickKey", 
             "param": {
-                "key": [112]
+                "key": [112] // F1
                 }
             },
         "next": [
@@ -99,7 +99,7 @@
         "action": {
             "type":"ClickKey", 
             "param": {
-                "key": [113]
+                "key": [113] // F2
                 }
             },
         "post_wait_freezes": 1000,
@@ -109,22 +109,12 @@
     },
     "ClaimRewardsBattlePassSwitchToPage2":{
         "desc":"切换到环期赏令第二页",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    43,
-                    130,
-                    59,
-                    243
-                ],
-                "template": [
-                    "Common/Scene/BattlePass/Page2.png"
-                ],
-                "threshold": 0.8
+        "action": {
+            "type": "Click",
+            "param":{
+                "target": [58,232,31,32]
             }
         },
-        "action": "Click",
         "post_wait_freezes": 500,
         "next": [
             "[JumpBack]ClaimRewardsBattlePassExp",
@@ -173,7 +163,8 @@
         "action": "Click",
         "post_wait_freezes": 500,
         "next": [
-            "ClaimRewardsBattlePassRewards"
+            "[JumpBack]ClaimRewardsBattlePassRewards",
+            "ClaimRewardsExit"
         ]
     },
     "ClaimRewardsBattlePassRewards":{
@@ -193,16 +184,10 @@
                 "threshold": 0.8
             }
         },
-        "action": "Click",
-        "next": [
-            "ClaimRewardsExit"
-        ]
+        "action": "Click"
     },
     "ClaimRewardsExit":{
         "desc":"领取奖励任务出口",
-        "action": "DoNothing",
-        "next": [
-            "SceneAnyEnterWorld"
-        ]
+        "action": "DoNothing"
     }
 }
