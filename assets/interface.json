@@ -386,7 +386,9 @@
                     "name": "Disabled",
                     "label": "禁用自动选歌",
                     "pipeline_override": {
-                        "RhythmStart": {
+                        "RhythmSetSong": {
+                            "action": "Custom",
+                            "custom_action": "rhythm_set_param",
                             "custom_action_param": {
                                 "song_name": ""
                             }
@@ -397,7 +399,9 @@
                     "name": "Destiny",
                     "label": "Destiny",
                     "pipeline_override": {
-                        "RhythmStart": {
+                        "RhythmSetSong": {
+                            "action": "Custom",
+                            "custom_action": "rhythm_set_param",
                             "custom_action_param": {
                                 "song_name": "Destiny"
                             }
@@ -408,7 +412,9 @@
                     "name": "Everlasting_Dazing_Summer_Short",
                     "label": "Everlasting_Dazing_Summer(Short_Ver.)",
                     "pipeline_override": {
-                        "RhythmStart": {
+                        "RhythmSetSong": {
+                            "action": "Custom",
+                            "custom_action": "rhythm_set_param",
                             "custom_action_param": {
                                 "song_name": "Everlasting_Dazing_Summer(Short_Ver.)"
                             }
@@ -419,7 +425,9 @@
                     "name": "Everlasting_Dazing_Summer",
                     "label": "Everlasting_Dazing_Summer",
                     "pipeline_override": {
-                        "RhythmStart": {
+                        "RhythmSetSong": {
+                            "action": "Custom",
+                            "custom_action": "rhythm_set_param",
                             "custom_action_param": {
                                 "song_name": "Everlasting_Dazing_Summer"
                             }
@@ -430,7 +438,9 @@
                     "name": "Heroic_Appearance",
                     "label": "Heroic_Appearance",
                     "pipeline_override": {
-                        "RhythmStart": {
+                        "RhythmSetSong": {
+                            "action": "Custom",
+                            "custom_action": "rhythm_set_param",
                             "custom_action_param": {
                                 "song_name": "Heroic_Appearance"
                             }
@@ -441,7 +451,9 @@
                     "name": "迷星叫",
                     "label": "迷星叫",
                     "pipeline_override": {
-                        "RhythmStart": {
+                        "RhythmSetSong": {
+                            "action": "Custom",
+                            "custom_action": "rhythm_set_param",
                             "custom_action_param": {
                                 "song_name": "迷星叫"
                             }
@@ -465,7 +477,9 @@
                 }
             ],
             "pipeline_override": {
-                "RhythmStart": {
+                "RhythmSetRepeat": {
+                    "action": "Custom",
+                    "custom_action": "rhythm_set_param",
                     "custom_action_param": {
                         "auto_repeat_count": "{auto_repeat_count}"
                     }
@@ -486,7 +500,9 @@
                 }
             ],
             "pipeline_override": {
-                "RhythmStart": {
+                "RhythmSetFPS": {
+                    "action": "Custom",
+                    "custom_action": "rhythm_set_param",
                     "custom_action_param": {
                         "target_fps": "{target_fps}"
                     }

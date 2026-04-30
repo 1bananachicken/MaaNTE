@@ -3,6 +3,27 @@
         "desc": "演奏功能入口",
         "action": "DoNothing",
         "next": [
+            "RhythmSetSong"
+        ]
+    },
+    "RhythmSetSong": {
+        "desc": "[内部] 记录演奏目标歌曲",
+        "action": "DoNothing",
+        "next": [
+            "RhythmSetRepeat"
+        ]
+    },
+    "RhythmSetRepeat": {
+        "desc": "[内部] 记录连打次数",
+        "action": "DoNothing",
+        "next": [
+            "RhythmSetFPS"
+        ]
+    },
+    "RhythmSetFPS": {
+        "desc": "[内部] 记录目标帧率",
+        "action": "DoNothing",
+        "next": [
             "RhythmStart"
         ]
     },
@@ -20,8 +41,6 @@
     },
     "RhythmExit": {
         "desc": "演奏任务完成",
-        "next": [
-            "__ScenePrivateBackToWorldAny"
-        ]
+        "next": []
     }
 }
