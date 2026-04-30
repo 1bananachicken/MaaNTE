@@ -17,10 +17,12 @@
     "InEscMenu": {
         "desc": "在Esc菜单内",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "roi": [913,98,319,496],
-                "template": ["Common/Scene/EscMenu/EscMenuSign.png"],
+                "roi": [1123,228,59,18],
+                "expected": [
+                    "猎人等级"
+                ],
                 "threshold": 0.8
             }
         },
