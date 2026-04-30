@@ -1,0 +1,79 @@
+{
+    "lanes": {
+        "center_x_frac": [0.225, 0.406, 0.596, 0.771],
+        "top_center_x_frac": [0.214, 0.406, 0.596, 0.783],
+        "half_width_frac": 0.028,
+        "judge_line_y_frac": 0.78,
+        "judge_line_y_frac_by_lane": [0.78, 0.70, 0.78, 0.78],
+        "judge_band_half_height_frac": 0.03,
+        "judge_band_keep_from_top": 0.52,
+        "roi_top_y_frac": 0.35
+    },
+    "hsv_ranges": [
+        {"name": "d", "h_min": 90, "h_max": 125, "s_min": 60, "s_max": 255, "v_min": 120, "v_max": 255},
+        {"name": "f", "h_min": 18, "h_max": 38, "s_min": 95, "s_max": 255, "v_min": 165, "v_max": 255},
+        {"name": "j", "h_min": 0, "h_max": 12, "s_min": 80, "s_max": 255, "v_min": 120, "v_max": 255, "h2_min": 165, "h2_max": 179},
+        {"name": "k", "h_min": 125, "h_max": 165, "s_min": 50, "s_max": 255, "v_min": 100, "v_max": 255}
+    ],
+    "detection": {
+        "enabled_lanes": [true, true, true, true],
+        "component_mode_lanes": [true, false, true, true],
+        "component_min_area_frac": 0.000043,
+        "component_lookahead_y_frac": 0.083,
+        "component_past_y_frac": 0.032,
+        "component_same_note_y_frac": 0.032,
+        "component_history_sec": 0.25,
+        "min_pixels_per_lane": 200,
+        "min_pixels_by_lane": [200, 200, 200, 200],
+        "cooldown_sec": 0.12,
+        "cooldown_sec_by_lane": [0.05, 0.05, 0.05, 0.05],
+        "morph_kernel": 3,
+        "log_cooldown_debug": false
+    },
+    "presence": {
+        "enabled": true,
+        "drum_center_y_frac": 0.80,
+        "patch_half_width_frac": 0.034,
+        "min_laplace_variance": 95,
+        "min_mean_gray": 18,
+        "max_mean_gray": 255,
+        "arm_after_good_frames": 1,
+        "disarm_after_bad_frames": 5
+    },
+    "scene": {
+        "template_match_enabled": false,
+        "state_confirm_frames": 2,
+        "song_select_match_threshold": 0.75,
+        "results_match_threshold": 0.75,
+        "playing_match_threshold": 0.75,
+        "match_vote_min": 2,
+        "match_blur_ksize": 5,
+        "match_downscale": 0.5,
+        "match_skip_playing": true
+    },
+    "song_select": {
+        "enabled": false,
+        "song_name": "",
+        "scroll_area_x_frac": 0.35,
+        "scroll_area_y_frac": 0.50,
+        "scroll_delta": -3,
+        "max_scroll_attempts": 30,
+        "match_threshold": 0.75,
+        "start_match_threshold": 0.75,
+        "click_delay_sec": 0.5,
+        "start_delay_sec": 0.8
+    },
+    "auto_repeat": {
+        "enabled": false,
+        "count": 5,
+        "dismiss_delay_sec": 0.8
+    },
+    "keys": {
+        "press_delay_sec": 0.0,
+        "press_delay_sec_by_lane": [0.0, 0.08, 0.0, 0.0],
+        "key_hold_sec": 0.01
+    },
+    "run": {
+        "target_fps": 60
+    }
+}
