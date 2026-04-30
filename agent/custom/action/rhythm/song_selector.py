@@ -14,6 +14,7 @@ from .assets import list_scene_templates, list_song_templates
 logger = logging.getLogger(__name__)
 
 _SEL_IDLE = "idle"
+_SEL_CLICKING_DEFAULT = "clicking_default"
 _SEL_CLICKING_START = "clicking_start"
 _SEL_SEARCHING = "searching"
 _SEL_SCROLLING = "scrolling"
@@ -151,8 +152,19 @@ class SongSelector:
                 self._state = _SEL_SEARCHING
                 self._scroll_attempts = 0
             else:
-                self._state = _SEL_CLICKING_START
-                logger.info("无自动选歌要求，直接匹配「开始演奏」按钮")
+                self._state = _SEL_CLICKING_DEFAULT
+                logger.info("无自动选歌要求，先点击歌曲列表选中默认歌曲")
+
+        if self._state == _SEL_CLICKING_DEFAULT:
+            if now - self._last_action_time < self._click_delay:
+                return {"state": self._state, "action": "waiting"}
+            click_x = int(self._scroll_area_x_frac * w)
+            click_y = int(self._scroll_area_y_frac * h)
+            controller.post_click(click_x, click_y).wait()
+            self._last_action_time = now
+            self._state = _SEL_CLICKING_START
+            logger.info("已点击歌曲列表默认位置 (%d,%d)，准备点击开始演奏", click_x, click_y)
+            return {"state": self._state, "action": "click_default"}
 
         if self._state == _SEL_SEARCHING:
             match = self._find_template(frame_bgr, self._template, self._match_threshold)
