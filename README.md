@@ -5,21 +5,31 @@
 
 <div align="center">
 
+[English](docs/README_en.md)
+
 # MaaNTE
 
 😊MAA异环小助手😊
+
 由 [MaaFramework](https://github.com/MaaXYZ/MaaFramework) 强力驱动！
 
 本项目还处于早期开发阶段，欢迎提交PR和Issue
+
+QQ交流1群: 1103323319
+
+若1群已满请加2群: 1101147419
+
 </div>
 
 ## ✨ 功能一览
 
 - 🎣 自动钓鱼
-  - 🐟自动卖鱼
-  - 🪝自动买鱼饵
+  - 🐟 自动卖鱼
+  - 🪝 自动买鱼饵
 - 🥤 自动做咖啡
+  - 🔨 驱赶所有顾客
 - 💰 自动提取一咖舍收益
+  - 📦 自动补货
 
 ## ❓常见问题
 ### 🤔找不到怎么启动？
@@ -51,6 +61,8 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 - 安装 python>=3.11
 - 建议使用vscode作为IDE进行开发
 - 强烈建议安装 [vscode插件](https://marketplace.visualstudio.com/items?itemName=nekosu.maa-support) 进行调试
+5. 提交PR
+  - 新功能开发请提交到dev分支
 
 更多开发文档可以参考 [M9A文档站](https://1999.fan/zh_cn/develop/development.html)
 
