@@ -68,7 +68,7 @@ def install_resource():
     with open(install_path / "interface.json", "r", encoding="utf-8") as f:
         interface = json.load(f)
 
-    interface["version"] = version
+    interface["version"] = version.lstrip("v")
     interface["title"] = f"MaaNTE {version} | 异环小助手"
 
     with open(install_path / "interface.json", "w", encoding="utf-8") as f:
