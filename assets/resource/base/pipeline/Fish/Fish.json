@@ -57,13 +57,13 @@
     "FishTaskExit": {
         "desc": "钓鱼任务完成",
         "next": [
-            "__ScenePrivateBackToWorldAny"
+            "SceneAnyEnterWorld"
         ]
     },
     "FishTaskExitWithError": {
         "desc": "钓鱼任务异常退出",
         "next": [
-            "__ScenePrivateBackToWorldAny"
+            "SceneAnyEnterWorld"
         ]
     }
 }
