@@ -29,16 +29,16 @@
             0.80,
             0.81
         ],
-        "cooldown_sec": 0.03,
+        "cooldown_sec": 0.05,
         "cooldown_sec_by_lane": [
-            0.03,
-            0.03,
-            0.03,
-            0.03
+            0.05,
+            0.05,
+            0.05,
+            0.05
         ],
         "region_extend_up_frac": 0.14,
-        "region_extend_down_frac": 0.10,
-        "region_width_multiplier": 3.5,
+        "region_extend_down_frac": 0.15,
+        "region_width_multiplier": 4.0,
         "enabled_lanes": [
             true,
             true,
@@ -47,12 +47,18 @@
         ]
     },
     "scene": {
-        "state_confirm_frames": 2,
+        "state_confirm_frames": 1,
         "song_select_match_threshold": 0.75,
         "results_match_threshold": 0.75,
         "playing_match_threshold": 0.75,
         "match_vote_min": 1,
-        "playing_check_interval": 1
+        "playing_check_interval": 10,
+        "results_roi_frac": [
+            0.25,
+            0.10,
+            0.75,
+            0.60
+        ]
     },
     "song_select": {
         "enabled": false,

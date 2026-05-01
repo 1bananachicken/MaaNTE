@@ -69,15 +69,15 @@ class DrumDetector:
         if len(self._thresholds) < 4:
             self._thresholds.extend([0.80] * (4 - len(self._thresholds)))
         self._region_extend_up_frac = float(tcfg.get("region_extend_up_frac", 0.14))
-        self._region_extend_down_frac = float(tcfg.get("region_extend_down_frac", 0.10))
-        self._region_width_multiplier = float(tcfg.get("region_width_multiplier", 3.5))
+        self._region_extend_down_frac = float(tcfg.get("region_extend_down_frac", 0.15))
+        self._region_width_multiplier = float(tcfg.get("region_width_multiplier", 4.0))
         enabled = tcfg.get("enabled_lanes")
         if isinstance(enabled, list) and len(enabled) == 4:
             self._enabled_lanes = [bool(x) for x in enabled]
         else:
             self._enabled_lanes = [True, True, True, True]
 
-        cooldown_global = float(tcfg.get("cooldown_sec", 0.03))
+        cooldown_global = float(tcfg.get("cooldown_sec", 0.05))
         cooldown_by_lane = tcfg.get("cooldown_sec_by_lane")
         if isinstance(cooldown_by_lane, list) and len(cooldown_by_lane) == 4:
             self._cooldown_sec: list[float] = [float(x) for x in cooldown_by_lane]
