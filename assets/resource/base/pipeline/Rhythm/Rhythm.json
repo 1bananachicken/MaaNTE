@@ -4,6 +4,9 @@
         "action": "DoNothing",
         "next": [
             "RhythmSetSong"
+        ],
+        "on_error": [
+            "RhythmExit"
         ]
     },
     "RhythmSetSong": {
@@ -11,6 +14,9 @@
         "action": "DoNothing",
         "next": [
             "RhythmSetRepeat"
+        ],
+        "on_error": [
+            "RhythmExit"
         ]
     },
     "RhythmSetRepeat": {
@@ -18,6 +24,9 @@
         "action": "DoNothing",
         "next": [
             "RhythmSetFPS"
+        ],
+        "on_error": [
+            "RhythmExit"
         ]
     },
     "RhythmSetFPS": {
@@ -25,6 +34,9 @@
         "action": "DoNothing",
         "next": [
             "RhythmStart"
+        ],
+        "on_error": [
+            "RhythmExit"
         ]
     },
     "RhythmStart": {
@@ -33,9 +45,6 @@
         "custom_action": "auto_rhythm",
         "custom_action_param": {},
         "next": [
-            "RhythmExit"
-        ],
-        "on_error": [
             "RhythmExit"
         ]
     },
