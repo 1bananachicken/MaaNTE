@@ -3,6 +3,7 @@
 import os
 import sys
 import json
+import hashlib
 import subprocess
 from pathlib import Path
 
@@ -189,6 +190,44 @@ def read_interface_version(interface_file_name="./interface.json") -> str:
     except Exception:
         logger.exception(f"读取interface.json版本失败，文件路径：{target_path}")
         return "unknown"
+
+
+def _verify_warning_integrity():
+    """校验 interface.json 中 welcome 字段的完整性，防止第三方篡改。"""
+    _EXPECTED_WELCOME_HASH = "7b4e40b09fb2eb391beb9943cf491129934abe04cb43eaae5b6965be464773ea"
+
+    interface_path = Path(project_root_dir) / "interface.json"
+    assets_interface_path = Path(project_root_dir) / "assets" / "interface.json"
+
+    target_path = None
+    if interface_path.exists():
+        target_path = interface_path
+    elif assets_interface_path.exists():
+        target_path = assets_interface_path
+
+    if target_path is None:
+        return
+
+    try:
+        with open(target_path, "r", encoding="utf-8") as f:
+            interface_data = json.load(f)
+        welcome = interface_data.get("welcome", "")
+        if not welcome:
+            raise ValueError("welcome 字段为空或已被移除")
+        actual_hash = hashlib.sha256(welcome.encode("utf-8")).hexdigest()
+        if actual_hash != _EXPECTED_WELCOME_HASH:
+            raise ValueError(
+                f"welcome 内容哈希不匹配\n"
+                f"  期望: {_EXPECTED_WELCOME_HASH}\n"
+                f"  实际: {actual_hash}"
+            )
+    except Exception as e:
+        logger.error("=" * 60)
+        logger.error("⚠ 警告内容完整性校验失败！")
+        logger.error("⚠ 本软件为免费开源项目，从未授权任何人售卖。")
+        logger.error(f"⚠ 校验详情: {e}")
+        logger.error("⚠ 如在第三方平台购买了本软件，请立即申请退款并举报。")
+        logger.error("=" * 60)
 
 
 def read_pip_config() -> dict:
@@ -514,6 +553,8 @@ def agent(is_dev_mode=False):
 def main():
     current_version = read_interface_version()
     is_dev_mode = current_version == "DEBUG"
+
+    _verify_warning_integrity()
 
     if sys.platform.startswith("win"):
         _check_admin_privilege()
