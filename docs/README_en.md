@@ -26,7 +26,7 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 
 </div>
 
-> [!Caution]
+> [!Warning]
 >
 > This document was translated using AI and may contain inaccuracies. Corrections are welcome!
 
