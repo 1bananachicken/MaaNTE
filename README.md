@@ -14,6 +14,9 @@
     <img src="https://img.shields.io/badge/Platform-Windows-0078D7?style=flat-square&logo=Windows" alt="Platform" />
     <img src="https://img.shields.io/badge/Language-Python%20%2F%20PipeLine-blue?style=flat-square&logo=Python" alt="Language" />
     <img alt="license" src="https://img.shields.io/github/license/1bananachicken/MaaNTE?style=flat-square">
+    <br>
+    <a href="https://maafw.com/" target="_blank"><img alt="website" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/maafw.svg"></a>
+    <a href="https://mirrorchyan.com/zh/projects?rid=MaaNTE" target="_blank"><img alt="mirrorc" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/mirrorc-zh.svg"></a>
     <br/>
     <img alt="commit" src="https://img.shields.io/github/commit-activity/m/1bananachicken/MaaNTE?color=%23ff69b4">
     <img src="https://img.shields.io/github/stars/1bananachicken/MaaNTE?style=flat-square&logo=github&color=darkgreen" alt="Stars" />
@@ -63,23 +66,6 @@
 - 不要把程序放在中文路径下
 - 关闭杀毒软件
 
-### 🤔右下角弹窗提示不支持Mirror酱？
-
-这是自动更新没有配置，不影响，不用管
-
-## ❓常见问题
-### 🤔找不到怎么启动？
-- 普通用户请下载release版本，有开发需求再clone仓库
-### 🤔钓鱼不工作怎么办？
-- 是否以管理员身份运行
-- 游戏分辨率是否调整到1280*720
-- 是否勾选了自动钓鱼
-- 不要把程序放在中文路径下
-- 关闭杀毒软件
-### 🤔右下角弹窗提示不支持Mirror酱？
-这是自动更新没有配置，不影响，不用管
-
-
 ## 💡注意事项
 
 游戏需要运行在1280x720分辨率，窗口化，钓鱼新算法支持120帧运行
@@ -119,15 +105,19 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 
 ## ☕鸣谢
 
-### 开源库
+### 开源项目
 
 - [MaaFramework](https://github.com/MaaXYZ/MaaFramework)
   基于图像识别的自动化黑盒测试框架
+- [MaaAssistantArknights](https://github.com/MaaAssistantArknights/MaaAssistantArknights)
+  《明日方舟》小助手，全日常一键长草！
+- [MaaEnd](https://github.com/MaaEnd/MaaEnd)
+  基于视觉 AI 的「明日方舟：终末地」自动化工具
+- [M9A](https://github.com/MAA1999/M9A)
+  重返未来：1999 小助手
 - [MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia)
   基于 Avalonia UI 构建的 MaaFramework 通用 GUI 解决方案
-- [M9A](https://github.com/MAA1999/M9A)
-  代码以及文档参考
-
+  
 ### ❤️贡献/参与者
 
 感谢全部参与到测试与开发中的开发者(´▽`ʃ♡ƪ)
