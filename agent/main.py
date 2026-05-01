@@ -623,8 +623,6 @@ def main():
 
     _verify_warning_integrity()
 
-    _show_first_use_warning()
-
     if sys.platform.startswith("win"):
         _check_admin_privilege()
 
