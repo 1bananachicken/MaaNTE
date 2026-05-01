@@ -68,24 +68,26 @@ class DrumDetector:
         self._thresholds: list[float] = tcfg.get("thresholds", [0.81, 0.80, 0.80, 0.81])
         if len(self._thresholds) < 4:
             self._thresholds.extend([0.80] * (4 - len(self._thresholds)))
-        self._cooldown_sec = float(tcfg.get("cooldown_sec", 0.03))
-        raw_cd = tcfg.get("cooldown_sec_by_lane")
-        if isinstance(raw_cd, list) and len(raw_cd) >= 4:
-            self._cooldown_by_lane = [float(v) for v in raw_cd[:4]]
-        else:
-            self._cooldown_by_lane = [self._cooldown_sec] * 4
-        self._region_extend_up_frac = float(tcfg.get("region_extend_up_frac", 0.08))
-        self._region_extend_down_frac = float(tcfg.get("region_extend_down_frac", 0.03))
-        self._region_width_multiplier = float(tcfg.get("region_width_multiplier", 1.5))
+        self._region_extend_up_frac = float(tcfg.get("region_extend_up_frac", 0.14))
+        self._region_extend_down_frac = float(tcfg.get("region_extend_down_frac", 0.10))
+        self._region_width_multiplier = float(tcfg.get("region_width_multiplier", 3.5))
         enabled = tcfg.get("enabled_lanes")
         if isinstance(enabled, list) and len(enabled) == 4:
             self._enabled_lanes = [bool(x) for x in enabled]
         else:
             self._enabled_lanes = [True, True, True, True]
 
+        cooldown_global = float(tcfg.get("cooldown_sec", 0.03))
+        cooldown_by_lane = tcfg.get("cooldown_sec_by_lane")
+        if isinstance(cooldown_by_lane, list) and len(cooldown_by_lane) == 4:
+            self._cooldown_sec: list[float] = [float(x) for x in cooldown_by_lane]
+        else:
+            self._cooldown_sec = [cooldown_global] * 4
+
+        self._last_trigger_time: list[float] = [0.0] * 4
+
         self._templates: list[NDArray[np.uint8] | None] = [None, None, None, None]
         self._template_loaded: list[bool] = [False, False, False, False]
-        self._last_fire: list[float] = [0.0, 0.0, 0.0, 0.0]
 
         cache = _load_drum_templates_once()
         for idx, img in cache.items():
@@ -107,15 +109,16 @@ class DrumDetector:
         if not self._enabled_lanes[lane_idx] or not self._template_loaded[lane_idx] or self._templates[lane_idx] is None:
             return False, 0.0
 
-        now = time.perf_counter()
         tpl = self._templates[lane_idx]
         th, tw = tpl.shape[:2]
 
         cx = layout.center_x[lane_idx]
-        half_w = tw // 2 + 5
+        base_half = max(layout.half_width_px, tw // 2)
+        half_w = int(round(base_half * self._region_width_multiplier))
+        half_w = max(half_w, tw // 2 + 2)
         jy0 = layout.judge_y0_by_lane[lane_idx]
         jy1 = layout.judge_y1_by_lane[lane_idx]
-        extend_up = max(th, int(self._region_extend_up_frac * layout.frame_h))
+        extend_up = int(self._region_extend_up_frac * layout.frame_h)
         extend_down = max(4, int(self._region_extend_down_frac * layout.frame_h))
 
         rx0 = max(0, cx - half_w)
@@ -130,9 +133,14 @@ class DrumDetector:
         result = cv2.matchTemplate(roi, tpl, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, _ = cv2.minMaxLoc(result)
 
-        cooldown = self._cooldown_by_lane[lane_idx]
-        if max_val >= self._thresholds[lane_idx] and (now - self._last_fire[lane_idx]) >= cooldown:
-            self._last_fire[lane_idx] = now
+        # 调试日志：显示每个轨道的匹配分数
+        logger.debug(
+            "轨道 %s: max_val=%.3f, threshold=%.3f, triggered=%s, roi_size=(%dx%d)",
+            _LANE_NAMES[lane_idx], max_val, self._thresholds[lane_idx],
+            max_val >= self._thresholds[lane_idx], roi.shape[1], roi.shape[0]
+        )
+
+        if max_val >= self._thresholds[lane_idx]:
             return True, float(max_val)
 
         return False, float(max_val)
@@ -145,15 +153,29 @@ class DrumDetector:
         triggers: list[bool] = [False, False, False, False]
         scores: list[float] = [0.0, 0.0, 0.0, 0.0]
 
-        futures = {}
+        now = time.perf_counter()
+        lanes_to_check: list[int] = []
         for i in range(4):
+            if now - self._last_trigger_time[i] < self._cooldown_sec[i]:
+                continue
+            lanes_to_check.append(i)
+
+        if not lanes_to_check:
+            return triggers, scores
+
+        futures = {}
+        for i in lanes_to_check:
             future = self._executor.submit(self._match_lane, i, frame_bgr, layout)
             futures[future] = i
 
         for future in futures:
             idx = futures[future]
             triggered, score = future.result()
-            triggers[idx] = triggered
-            scores[idx] = score
+            if triggered:
+                triggers[idx] = True
+                scores[idx] = score
+                self._last_trigger_time[idx] = now
+            else:
+                scores[idx] = score
 
         return triggers, scores
