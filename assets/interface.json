@@ -47,17 +47,15 @@
             "../agent/main.py"
         ]
     },
-    "task": [
-    ],
+    "task": [],
     "import": [
-        // 前台only （暂时）
+        
         "resource/tasks/ClaimRewards.json",
         "resource/tasks/WithdrawMoney.json",
-        // 通用
+
         "resource/tasks/Fish.json",
         "resource/tasks/RealTime.json",
         "resource/tasks/MakeCoffee.json"
     ],
-    "option": {
-    }
+    "option": {}
 }
