@@ -72,13 +72,8 @@ class AutoFish(CustomAction):
                 params = json.loads(argv.custom_action_param)
                 fishing_count = params.get("count", 10)
                 check_freq = params.get("freq", 0.001)
-            except:
-                pass
-   
-        KEY_A = 65
-        KEY_D = 68
-        KEY_F = 70
-        KEY_ESC = 27
+            except Exception as e:
+                print(f"Error parsing parameters: {e}. Using default values.")
 
         success_region = (520, 160, 785, 190)
         settlement_region = (564, 642, 1206, 664)
@@ -95,9 +90,7 @@ class AutoFish(CustomAction):
                 m_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
                 if m_settle:
                     print("  Found settlement screen during check, pressing ESC to close...")
-                    controller.post_key_down(KEY_ESC)
-                    time.sleep(0.1)
-                    controller.post_key_up(KEY_ESC)
+                    context.run_action("PressESC")
                     time.sleep(1.5)
                     continue
 
@@ -129,9 +122,8 @@ class AutoFish(CustomAction):
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
                 for _ in range(5):
-                    controller.post_key_down(KEY_F)
+                    context.run_action("pressF")
                     time.sleep(0.1)
-                    controller.post_key_up(KEY_F)
 
                 for _ in range(5):
                     img = context.tasker.controller.post_screencap().wait().get()
@@ -168,17 +160,13 @@ class AutoFish(CustomAction):
 
                     m_catch, _, _, _ = match_template_in_region(img, success_region, self.success_catch_template, 0.7)
                     if m_catch:
-                        controller.post_key_down(KEY_F)
-                        time.sleep(0.1)
-                        controller.post_key_up(KEY_F)
+                        context.run_action("pressF")
                         print("  Fish hooked!")
                         break
                 
                 if m_settle_unexpected or timeout_triggered:
                     if m_settle_unexpected:
-                        controller.post_key_down(KEY_ESC)
-                        time.sleep(0.1)
-                        controller.post_key_up(KEY_ESC)
+                        context.run_action("PressESC")
                         time.sleep(1.5)
                     continue
       
@@ -195,11 +183,11 @@ class AutoFish(CustomAction):
                     nonlocal current_ad_key
                     if current_ad_key == key:
                         return
-                    if current_ad_key is not None:
-                        controller.post_key_up(current_ad_key)
-                    if key is not None:
-                        controller.post_key_down(key)
                     current_ad_key = key
+                    if key == "A":
+                        context.run_action("PressA")
+                    elif key == "D":
+                        context.run_action("PressD")
 
                 while time.time() - start_time < 100:
                     if context.tasker.stopping:
@@ -224,16 +212,8 @@ class AutoFish(CustomAction):
                     m_slider, _, x_slider, _ = match_template_in_region(img, game_region, self.slider_template, 0.7)
 
                     
-                    if frame % 10 == 0:          
-                        if current_ad_key is not None:
-                            controller.post_key_up(current_ad_key)
-                        
-                        controller.post_key_down(KEY_F)
-                        time.sleep(0.05)
-                        controller.post_key_up(KEY_F)       
-
-                        if current_ad_key is not None:
-                            controller.post_key_down(current_ad_key)
+                    if frame % 10 == 0:
+                        context.run_action("pressF")
                     
                     if m_slider:                      
                         slider_miss_count = 0
@@ -261,16 +241,15 @@ class AutoFish(CustomAction):
                     if target is not None and x_slider is not None:
                         offset = x_slider - target
                         if offset > deadzone:
-                            set_ad_key(KEY_A)
+                            set_ad_key("A")
                         elif offset < -deadzone:
-                            set_ad_key(KEY_D)
+                            set_ad_key("D")
                         else:
                             set_ad_key(None)
                     else:
                         set_ad_key(None)
                 
                 set_ad_key(None)
-                controller.post_key_up(KEY_F)
                 
                 img = context.tasker.controller.post_screencap().wait().get()
                 time.sleep(0.3)
@@ -288,9 +267,7 @@ class AutoFish(CustomAction):
             if match_settle:
                 print("  Closing settlement screen...")
                 for _ in range(5):
-                    controller.post_key_down(KEY_ESC)
-                    time.sleep(0.1)
-                    controller.post_key_up(KEY_ESC)
+                    context.run_action("PressESC")
                     time.sleep(1.5)
 
                     img = context.tasker.controller.post_screencap().wait().get()

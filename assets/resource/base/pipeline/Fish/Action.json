@@ -1,0 +1,40 @@
+{
+    "PressA": {
+        "desc": "按下A键",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 65
+            }
+        }
+    },
+    "PressD": {
+        "desc": "按下D键",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 68
+            }
+        }
+    },
+    "pressF": {
+        "desc": "按下F键",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    70
+                ]
+            }
+        }
+    },
+    "PressESC": {
+        "desc": "按下ESC键",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 27
+            }
+        }
+    }
+}
