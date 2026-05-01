@@ -17,7 +17,7 @@
                 "class_regex": ".*",
                 "window_regex": "^\\s*(异环|NTE)\\s*$",
                 "screencap": "PrintWindow",
-                "mouse": "SendMessageWithWindowPos",
+                "mouse": "Seize",
                 "keyboard": "PostMessage"
             }
         }
@@ -41,11 +41,7 @@
             "name": "钓鱼任务",
             "entry": "FishEntrance",
             "option": [
-                "钓鱼循环次数",
-                "钓鱼数量",
-                "自动卖鱼",
-                "自动买鱼饵",
-                "鱼饵识别阈值"
+                "钓鱼次数"
             ]
         },
         {
@@ -54,10 +50,7 @@
         },
         {
             "name": "自动做咖啡",
-            "entry": "AutoMakeCoffee",
-            "option": [
-                "循环次数"
-            ]
+            "entry": "AutoMakeCoffee"
         },
         {
             "name": "实时辅助",
@@ -70,33 +63,14 @@
         }
     ],
     "option": {
-        "钓鱼循环次数": {
+        "钓鱼次数": {
             "type": "input",
-            "label": "最大循环次数",
-            "description": "限制整个钓鱼循环最多执行多少次",
-            "inputs": [
-                {
-                    "name": "max_hit",
-                    "label": "循环次数",
-                    "default": "5",
-                    "pipeline_type": "int",
-                    "verify": "^\\d+$"
-                }
-            ],
-            "pipeline_override": {
-                "FishStart": {
-                    "max_hit": "{max_hit}"
-                }
-            }
-        },
-        "钓鱼数量": {
-            "type": "input",
-            "label": "每次钓鱼数量",
-            "description": "设置每次自动钓鱼的数量，建议小于等于99",
+            "label": "每次钓鱼次数",
+            "description": "设置每次自动钓鱼的次数",
             "inputs": [
                 {
                     "name": "count",
-                    "label": "数量",
+                    "label": "次数",
                     "default": "99",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
@@ -104,113 +78,7 @@
             ],
             "pipeline_override": {
                 "FishGameStart": {
-                    "custom_action_param": {
-                        "count": "{count}"
-                    }
-                }
-            }
-        },
-        "自动卖鱼": {
-            "type": "switch",
-            "label": "自动卖鱼",
-            "description": "是否启用自动卖鱼功能",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "启用",
-                    "pipeline_override": {
-                        "FishStart": {
-                            "enabled": true
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "禁用",
-                    "pipeline_override": {
-                        "AutoSellFish": {
-                            "enabled": false
-                        }
-                    }
-                }
-            ]
-        },
-        "自动买鱼饵": {
-            "type": "switch",
-            "label": "自动买鱼饵",
-            "description": "是否启用自动买鱼饵功能",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "启用",
-                    "pipeline_override": {
-                        "AutoBuyFishBait": {
-                            "enabled": true
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "禁用",
-                    "pipeline_override": {
-                        "AutoBuyFishBait": {
-                            "enabled": false
-                        }
-                    }
-                }
-            ]
-        },
-        "鱼饵识别阈值": {
-            "type": "select",
-            "label": "鱼饵识别阈值",
-            "description": "如果无法识别点击鱼饵位置，请调低该数值",
-            "cases": [
-                {
-                    "name": "0.8",
-                    "pipeline_override": {
-                        "AutoBuyFishBait": {
-                            "custom_action_param": {
-                                "found_bait_threshold": 0.8
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "0.7",
-                    "pipeline_override": {
-                        "AutoBuyFishBait": {
-                            "custom_action_param": {
-                                "found_bait_threshold": 0.7
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "0.6",
-                    "pipeline_override": {
-                        "AutoBuyFishBait": {
-                            "custom_action_param": {
-                                "found_bait_threshold": 0.6
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "循环次数": {
-            "type": "input",
-            "inputs": [
-                {
-                    "name": "循环次数",
-                    "default": "10",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AutoMakeCoffee": {
-                    "custom_action_param": {
-                        "count": "{循环次数}"
-                    }
+                    "max_hit": "{count}"
                 }
             }
         },

@@ -41,11 +41,17 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [1170,359,106,58],
-                "template": [
-                    "auto_fish/FishGameSign.png"
+                "roi": [
+                    1141,
+                    609,
+                    87,
+                    84
                 ],
-                "threshold": 0.8
+                "template": [
+                    "Fish/FishGameSign1.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
             }
         },
         "pre_delay": 0,
@@ -59,7 +65,7 @@
             "param": {
                 "roi": [823,43,117,42],
                 "template": [
-                    "auto_fish/FishPrepareTitle.png"
+                    "Fish/FishPrepareTitle.png"
                 ],
                 "threshold": 0.8
             }
@@ -79,7 +85,7 @@
                     "param": {
                         "roi": [727,365,126,54],
                         "template": [
-                            "auto_fish/FishInteractButton.png"
+                            "Fish/FishInteractButton.png"
                         ],
                         "threshold": 0.8
                     }
