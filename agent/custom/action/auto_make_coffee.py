@@ -7,7 +7,7 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
-from .utils import get_image, click_rect, match_template_in_region
+from .Common.utils import get_image, click_rect, match_template_in_region
 
 # ── 时间驱动的食物点击序列 ───────────────────────────────────────────────────
 # delay_from_start: 点击开始营业后经过多少秒执行本组点击
