@@ -1,0 +1,140 @@
+{
+    "__ScenePrivateLogin": {
+        "desc": "处理登录界面",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    0,
+                    -100,
+                    100,
+                    100
+                ],
+                "template": [
+                    "Common/Scene/Login/LoginExit.png"
+                ],
+                "green_mask": true
+            }
+        },
+        "next": [
+            "__ScenePrivateLoginContinue",
+            "[JumpBack]__ScenePrivateCloseLoginAnnouncement",
+            "__ScenePrivateLogin"
+        ]
+    },
+    "__ScenePrivateLoginContinue": {
+        "desc": "等待登录页面出现按钮继续",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    400,
+                    550,
+                    480,
+                    140
+                ],
+                "expected": [
+                    "游戏"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "[JumpBack]__ScenePrivateLoginMonthlyPassConfirm",
+            "__ScenePrivateLoginSuccess",
+            "[JumpBack]__ScenePrivateLoginCloseDialog"
+        ]
+    },
+    "__ScenePrivateCloseLoginAnnouncement": {
+        "desc": "关闭登录时公告界面",
+        "recognition": "And",
+        "all_of": [
+            "__ScenePrivateCloseAnnouncementButton",
+            {
+                "recognition": {
+                    "type": "OCR",
+                    "param": {
+                        "roi": [
+                            429,
+                            88,
+                            413,
+                            69
+                        ],
+                        "expected": [
+                            "公告"
+                        ]
+                    },
+                    "desc": "识别是否在公告界面"
+                }
+            }
+        ],
+        "action": {
+            "type": "Click"
+        }
+    },
+    "__ScenePrivateCloseAnnouncementButton":{
+        "recognition": "TemplateMatch",
+        "roi": [
+            1090,
+            84,
+            70,
+            70
+        ],
+        "template": [
+            "Common/Scene/Login/LoginAnnouncementClose.png"
+        ],
+        "green_mask": true
+    },
+    "__ScenePrivateLoginMonthlyPassConfirm": {
+        "desc": "领取月卡，无法跳过必须领取",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    400,
+                    180,
+                    500,
+                    350
+                ],
+                "expected": [
+                    "月卡剩余天数",
+                    "月卡剩餘天數",
+                    "(?i)Monthly\\s*Pass\\s*Day\\s*\\(\\s*s\\s*\\)\\s*Left",
+                    "月パス残り",
+                    "今日月卡奖励",
+                    "今日月卡獎勵",
+                    "(?i)Daily\\s*Monthly\\s*Pass\\s*Rewards",
+                    "本日報酬"
+                ]
+            }
+        },
+        "pre_delay": 1000, // 3d移动，pre_wait_freeze不生效
+        "action": {
+            "type": "Click"
+        }
+    },
+    "__ScenePrivateLoginCloseDialog": {
+        "desc": "关闭所有待领取的弹窗，此功能目的是进入游戏，奖励领取统一在单独任务中处理",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 27 // ESC
+            }
+        }
+    },
+    "__ScenePrivateLoginSuccess": {
+        "desc": "进入大世界成功",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    }
+}

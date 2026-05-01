@@ -19,7 +19,12 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "roi": [1123,228,59,18],
+                "roi": [
+                    918,
+                    101,
+                    312,
+                    165
+                ],
                 "expected": [
                     "猎人等级"
                 ],
@@ -29,6 +34,131 @@
         "pre_delay": 0,
         "post_delay": 0,
         "rate_limit": 0
+    },
+    "InExplorationGuideMenu":{
+        "desc":"在探索指南菜单内",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    60,
+                    20,
+                    110,
+                    40
+                ],
+                "expected": [
+                    "探索指南"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "InBattlePassMenu":{
+        "desc":"在环期赏令菜单内（第一页）",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    60,
+                    20,
+                    110,
+                    40
+                ],
+                "expected": [
+                    "历练奖赏"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "InScarboroughFairMenu":{
+        "desc":"在斯卡布罗集市内",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    41,
+                    660,
+                    87,
+                    34
+                ],
+                "expected": [
+                    "弧盘研募"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "InEventsMenu":{
+        "desc":"在活动菜单内",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    60,
+                    20,
+                    110,
+                    40
+                ],
+                "expected": [
+                    "活动"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "InBagMenu":{
+        "desc":"在背包菜单内",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    60,
+                    20,
+                    110,
+                    40
+                ],
+                "expected": [
+                    "背包"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "InCharactersMenu":{
+        "desc":"在角色菜单内",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    60,
+                    20,
+                    110,
+                    40
+                ],
+                "expected": [
+                    "信息"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },"InCityTycoonMenu":{
+        "desc":"在都市大亨菜单内",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    60,
+                    20,
+                    110,
+                    40
+                ],
+                "expected": [
+                    "都市大亨"
+                ],
+                "threshold": 0.8
+            }
+        }
     },
     "EmptyNode": {
         "desc": "空节点，无任何操作和识别，仅用于流程跳转",

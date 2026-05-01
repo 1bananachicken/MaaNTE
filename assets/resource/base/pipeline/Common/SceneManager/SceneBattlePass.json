@@ -1,11 +1,11 @@
 {
-    "__ScenePrivateWorldEnterExplorationGuide":{
-        "desc":"从大世界界面进入探索指南",
+    "__ScenePrivateWorldEnterBattlePass":{
+        "desc":"从大世界界面进入环期赏令",
         "pre_delay": 0,
         "action": {
             "type": "ClickKey",
             "param": {
-                "key": 112 // F1
+                "key": 113 // F2
             }
         },
         "post_wait_freezes": {
@@ -19,13 +19,13 @@
         },
         "post_delay": 0
     },
-    "__ScenePrivateAnyEnterExplorationGuideSuccess": {
-        "desc": "从任意界面进入探索指南成功",
+    "__ScenePrivateAnyEnterBattlePassSuccess": {
+        "desc": "从任意界面进入环期赏令成功",
         "recognition": {
             "type": "And",
             "param": {
                 "all_of": [
-                    "InExplorationGuideMenu"
+                    "InBattlePassMenu"
                 ]
             }
         },

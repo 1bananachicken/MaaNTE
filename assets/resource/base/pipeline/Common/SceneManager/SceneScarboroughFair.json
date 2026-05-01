@@ -1,11 +1,11 @@
 {
-    "__ScenePrivateWorldEnterExplorationGuide":{
-        "desc":"从大世界界面进入探索指南",
+    "__ScenePrivateWorldEnterScarboroughFair":{
+        "desc":"从大世界界面进入斯卡布罗集市",
         "pre_delay": 0,
         "action": {
             "type": "ClickKey",
             "param": {
-                "key": 112 // F1
+                "key": 114 // F3
             }
         },
         "post_wait_freezes": {
@@ -19,13 +19,13 @@
         },
         "post_delay": 0
     },
-    "__ScenePrivateAnyEnterExplorationGuideSuccess": {
-        "desc": "从任意界面进入探索指南成功",
+    "__ScenePrivateAnyEnterScarboroughFairSuccess": {
+        "desc": "从任意界面进入斯卡布罗集市成功",
         "recognition": {
             "type": "And",
             "param": {
                 "all_of": [
-                    "InExplorationGuideMenu"
+                    "InScarboroughFairMenu"
                 ]
             }
         },

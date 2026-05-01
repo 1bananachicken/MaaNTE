@@ -1,11 +1,11 @@
 {
-    "__ScenePrivateWorldEnterExplorationGuide":{
-        "desc":"从大世界界面进入探索指南",
+    "__ScenePrivateWorldEnterBag":{
+        "desc":"从大世界界面进入背包菜单",
         "pre_delay": 0,
         "action": {
             "type": "ClickKey",
             "param": {
-                "key": 112 // F1
+                "key": 66 // B
             }
         },
         "post_wait_freezes": {
@@ -19,13 +19,13 @@
         },
         "post_delay": 0
     },
-    "__ScenePrivateAnyEnterExplorationGuideSuccess": {
-        "desc": "从任意界面进入探索指南成功",
+    "__ScenePrivateAnyEnterBagSuccess": {
+        "desc": "从任意界面进入背包菜单成功",
         "recognition": {
             "type": "And",
             "param": {
                 "all_of": [
-                    "InExplorationGuideMenu"
+                    "InBagMenu"
                 ]
             }
         },

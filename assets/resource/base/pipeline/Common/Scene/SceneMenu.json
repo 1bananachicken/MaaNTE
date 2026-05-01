@@ -1,0 +1,66 @@
+{
+    // 只能使用本文件中定义的接口，禁止引用 SceneManager 文件夹内的 __ScenePrivate 节点，调用方法参考 SceneExample.json
+    "SceneAnyEnterEscMenu":{
+        "desc":"从任意界面进入Esc菜单界面",
+        "next": [
+            "__ScenePrivateAnyEnterEscMenuSuccess",
+            "[JumpBack]__ScenePrivateAnyExit"
+        ]
+    },
+    "SceneAnyEnterBagMenu":{
+        "desc":"从任意界面进入背包菜单界面",
+        "next": [
+            "__ScenePrivateWorldEnterBag",
+            "__ScenePrivateAnyEnterBagSuccess",
+            "[JumpBack]__ScenePrivateAnyEnterWorld"
+        ]
+    },
+    "SceneAnyEnterBattlePassMenu":{
+        "desc":"从任意界面进入环期赏令界面",
+        "next": [
+            "__ScenePrivateWorldEnterBattlePass",
+            "__ScenePrivateAnyEnterBagSuccess",
+            "[JumpBack]__ScenePrivateAnyEnterWorld"
+        ]
+    },
+    "SceneAnyEnterCharactersMenu":{
+        "desc":"从任意界面进入角色菜单界面",
+        "next": [
+            "__ScenePrivateWorldEnterCharacters",
+            "__ScenePrivateAnyEnterCharactersSuccess",
+            "[JumpBack]__ScenePrivateAnyEnterWorld"
+        ]
+    },
+    "SceneAnyEnterCityTycoonsMenu":{
+        "desc":"从任意界面进入都市大亨界面",
+        "next": [
+            "__ScenePrivateWorldEnterCityTycoon",
+            "__ScenePrivateAnyEnterCityTycoonSuccess",
+            "[JumpBack]__ScenePrivateAnyEnterWorld"
+        ]
+    },
+    "SceneAnyEnterEventsMenu":{
+        "desc":"从任意界面进入活动菜单界面",
+        "next": [
+            "__ScenePrivateWorldEnterEvents",
+            "__ScenePrivateAnyEnterEventsSuccess",
+            "[JumpBack]__ScenePrivateAnyEnterWorld"
+        ]
+    },
+    "SceneAnyEnterExplorationGuideMenu":{
+        "desc":"从任意界面进入探索指南界面",
+        "next": [
+            "__ScenePrivateWorldEnterExplorationGuide",
+            "__ScenePrivateAnyEnterExplorationGuideSuccess",
+            "[JumpBack]__ScenePrivateAnyEnterWorld"
+        ]
+    },
+    "SceneAnyEnterScarboroughFairMenu":{
+        "desc":"从任意界面进入斯卡布罗集市界面",
+        "next": [
+            "__ScenePrivateWorldEnterScarboroughFair",
+            "__ScenePrivateAnyEnterScarboroughFairSuccess",
+            "[JumpBack]__ScenePrivateAnyEnterWorld"
+        ]
+    }
+}
