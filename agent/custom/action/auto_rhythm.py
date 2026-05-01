@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any
 
 import cv2
-import numpy as np
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -16,7 +15,6 @@ from .rhythm.lanes import build_lane_layout
 from .rhythm.detector import DrumDetector
 from .rhythm.presence import STATE_OTHER, STATE_PLAYING, STATE_RESULTS, STATE_SONG_SELECT, SceneGate
 from .rhythm.song_selector import SongSelector
-from .rhythm.assets import list_scene_templates
 
 logger = logging.getLogger(__name__)
 
@@ -25,9 +23,6 @@ _VK = {"d": 0x44, "f": 0x46, "j": 0x4A, "k": 0x4B}
 _VK_ESCAPE = 0x1B
 
 _RHYTHM_ENV_KEYS = ("RHYTHM_SONG_NAME", "RHYTHM_AUTO_REPEAT_COUNT", "RHYTHM_TARGET_FPS")
-
-_QUICK_RESULTS_CHECK_INTERVAL = 60
-_FULL_SCENE_CHECK_INTERVAL = 300
 
 _DEFAULT_CONFIG = {
     "lanes": {
@@ -40,20 +35,21 @@ _DEFAULT_CONFIG = {
     },
     "template_detection": {
         "thresholds": [0.81, 0.80, 0.80, 0.81],
-        "cooldown_sec": 0.03,
-        "cooldown_sec_by_lane": [0.03, 0.03, 0.03, 0.03],
+        "cooldown_sec": 0.05,
+        "cooldown_sec_by_lane": [0.05, 0.05, 0.05, 0.05],
         "region_extend_up_frac": 0.14,
-        "region_extend_down_frac": 0.10,
-        "region_width_multiplier": 3.5,
+        "region_extend_down_frac": 0.15,
+        "region_width_multiplier": 4.0,
         "enabled_lanes": [True, True, True, True],
     },
     "scene": {
-        "state_confirm_frames": 2,
+        "state_confirm_frames": 1,
         "song_select_match_threshold": 0.75,
         "results_match_threshold": 0.75,
         "playing_match_threshold": 0.75,
         "match_vote_min": 1,
-        "playing_check_interval": 1,
+        "playing_check_interval": 10,
+        "results_roi_frac": [0.25, 0.10, 0.75, 0.60],
     },
     "song_select": {
         "enabled": False,
@@ -110,10 +106,23 @@ def _get_image(controller):
 
 
 def _do_scroll_via_maa(controller, x: int, y: int, delta: int):
+    """用触摸滑动模拟滚动，避免 post_scroll 无坐标的问题
+
+    delta 为滚动步数（负数向上滚动，正数向下），每步映射为 100 像素的滑动距离。
+    """
+    scroll_distance = delta * 100
+    if scroll_distance == 0:
+        return
     controller.post_touch_down(x, y).wait()
     time.sleep(0.05)
-    controller.post_scroll(0, delta).wait()
+    steps = max(8, abs(scroll_distance) // 15)
+    for i in range(1, steps + 1):
+        new_y = y + int(scroll_distance * i / steps)
+        controller.post_touch_move(x, new_y).wait()
+        time.sleep(0.01)
+    controller.post_touch_up().wait()
     time.sleep(0.3)
+
 
 
 def _press_keys(controller, lane_indices: list[int], key_hold_sec: float = 0.01):
@@ -122,41 +131,6 @@ def _press_keys(controller, lane_indices: list[int], key_hold_sec: float = 0.01)
     time.sleep(key_hold_sec)
     for li in lane_indices:
         controller.post_key_up(_VK[_LANES[li]])
-
-
-_results_check_tpl_cache: np.ndarray | None = None
-
-
-def _load_results_check_template():
-    global _results_check_tpl_cache
-    if _results_check_tpl_cache is not None:
-        return _results_check_tpl_cache
-    for name, path in list_scene_templates("results"):
-        if name == "score":
-            img = cv2.imread(str(path), cv2.IMREAD_COLOR)
-            if img is None:
-                img_bytes = np.fromfile(str(path), dtype=np.uint8)
-                img = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
-            if img is not None:
-                _results_check_tpl_cache = img
-                logger.info("已加载结算快速检测模板: score.png (%dx%d)", img.shape[1], img.shape[0])
-            break
-    return _results_check_tpl_cache
-
-
-def _quick_check_results(frame: np.ndarray, template: np.ndarray, threshold: float = 0.7) -> bool:
-    fh, fw = frame.shape[:2]
-    x1 = int(0.3 * fw)
-    y1 = int(0.1 * fh)
-    x2 = int(0.7 * fw)
-    y2 = int(0.4 * fh)
-    roi = frame[y1:y2, x1:x2]
-    th, tw = template.shape[:2]
-    if roi.shape[0] < th or roi.shape[1] < tw:
-        return False
-    result = cv2.matchTemplate(roi, template, cv2.TM_CCOEFF_NORMED)
-    _, max_val, _, _ = cv2.minMaxLoc(result)
-    return max_val >= threshold
 
 
 @AgentServer.custom_action("rhythm_set_param")
@@ -209,7 +183,9 @@ class AutoRhythm(CustomAction):
         if "target_fps" in merged:
             cfg.setdefault("run", {})["target_fps"] = int(merged["target_fps"])
 
-        cfg.setdefault("scene", {}).setdefault("playing_check_interval", 30)
+        cfg.setdefault("scene", {}).setdefault("playing_check_interval", 10)
+        cfg.setdefault("scene", {}).setdefault("state_confirm_frames", 1)
+        cfg.setdefault("scene", {}).setdefault("results_roi_frac", [0.25, 0.10, 0.75, 0.60])
 
         target_fps = int(cfg.get("run", {}).get("target_fps", 60))
         frame_interval = 1.0 / max(1, target_fps)
@@ -229,15 +205,12 @@ class AutoRhythm(CustomAction):
         auto_repeat_count = int(auto_repeat_cfg.get("count", 1))
         auto_repeat_dismiss_delay = float(auto_repeat_cfg.get("dismiss_delay_sec", 0.8))
 
-        results_check_tpl = _load_results_check_template()
-
         logger.info(
-            "演奏任务开始 | 目标FPS=%d | 鼓面检测=%s | 自动选歌=%s(%s) | 自动连打=%s(%d次) | 结算快检=%s",
+            "演奏任务开始 | 目标FPS=%d | 鼓面检测=%s | 自动选歌=%s(%s) | 自动连打=%s(%d次)",
             target_fps,
             drum_available,
             song_selector.enabled, song_selector.song_name,
             auto_repeat_enabled, auto_repeat_count,
-            results_check_tpl is not None,
         )
         repeat_index = 0
         results_seen = False
@@ -273,15 +246,10 @@ class AutoRhythm(CustomAction):
 
                 frame_count += 1
 
-                if state == STATE_PLAYING and results_check_tpl is not None:
-                    need_scene = (playing_frame_count % _FULL_SCENE_CHECK_INTERVAL == 0 and playing_frame_count > 0)
-                    if not need_scene and playing_frame_count % _QUICK_RESULTS_CHECK_INTERVAL == 0:
-                        if _quick_check_results(frame, results_check_tpl):
-                            need_scene = True
-                    if need_scene:
-                        new_state, gate_info = scene_gate.step(frame)
-                        if new_state != state:
-                            state = new_state
+                if state == STATE_PLAYING:
+                    new_state, _ = scene_gate.step(frame)
+                    if new_state != state:
+                        state = new_state
                 else:
                     state, gate_info = scene_gate.step(frame)
 
