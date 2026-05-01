@@ -16,6 +16,9 @@ from .rhythm.detector import DrumDetector
 from .rhythm.presence import STATE_OTHER, STATE_PLAYING, STATE_RESULTS, STATE_SONG_SELECT, SceneGate
 from .rhythm.song_selector import SongSelector
 
+import ctypes
+WM_MOUSEWHEEL = 0x020A
+
 logger = logging.getLogger(__name__)
 
 _LANES = ("d", "f", "j", "k")
@@ -105,20 +108,19 @@ def _get_image(controller):
     return controller.cached_image
 
 
-def _do_scroll_via_maa(controller, x: int, y: int, delta: int):
-    """鼠标点击定位后发送滚轮事件实现滚动
-
-    post_touch 系列在 Windows 上会被 DWM 解释为窗口拖拽手势，
-    无法产生应用内滚动效果。改用 post_click 定位 + post_scroll
-    发送 WM_MOUSEWHEEL 事件。
-
-    delta 为滚动步数（负数向上滚动），每步 = 120 (WHEEL_DELTA)
-    """
-    controller.post_click(x, y).wait()
-    time.sleep(0.05)
+def _do_scroll_via_maa_hwnd(controller, x: int, y: int, delta: int):
+    # maa 的 post_scroll 方法未正常向底层传递鼠标位置.
+    # 通过 ctypes 直接从底层发送滚动事件, 避开 maa
+    hwnd = controller._my_hwnd 
+    
     wheel_delta = delta * 120
-    controller.post_scroll(0, wheel_delta).wait()
-    time.sleep(0.2)
+    wparam = (wheel_delta << 16) & 0xFFFFFFFF
+    if wheel_delta < 0:
+        wparam = (0x10000 + wheel_delta) << 16 
+
+    lparam = (y << 16) | (x & 0xFFFF)
+    
+    ctypes.windll.user32.PostMessageW(hwnd, WM_MOUSEWHEEL, wparam, lparam)
 
 
 
@@ -266,7 +268,7 @@ class AutoRhythm(CustomAction):
                     prev_logged_state = state
 
                 if state == STATE_SONG_SELECT:
-                    scroll_fn = lambda sx, sy, sd: _do_scroll_via_maa(controller, sx, sy, sd)
+                    scroll_fn = lambda sx, sy, sd: _do_scroll_via_maa_hwnd(controller, sx, sy, -sd * 100)
                     sel_info = song_selector.step(frame, controller, scroll_func=scroll_fn)
                     sel_state = sel_info.get("state", "")
                     if sel_state == "done":
