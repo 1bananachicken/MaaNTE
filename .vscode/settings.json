@@ -2,10 +2,10 @@
     "json.schemas": [
         {
             "fileMatch": [
-                "/assets/resource/**/*.json",
-                "/install/resource/**/*.json",
-                "/assets/resource/**/*.jsonc",
-                "/install/resource/**/*.jsonc"
+                "/assets/resource/**/pipeline/**/*.json",
+                "/install/resource/**/pipeline/**/*.json",
+                "/assets/resource/**/pipeline/**/*.jsonc",
+                "/install/resource/**/pipeline/**/*.jsonc"
             ],
             "url": "/deps/tools/pipeline.schema.json"
         },
