@@ -5,7 +5,7 @@
 # MaaNTE
 
   <p align="center">
-    MAA Neverness to Everness Assistant
+    MAA Assistant for Neverness to Everness
     <br/>
     <a href="../README.md">中文</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">Report Bug</a>
   </p>
