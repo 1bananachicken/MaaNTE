@@ -194,6 +194,11 @@ jobs:
             echo "Copied custom icon to install/logo.ico"
           fi
 
+      - name: Create launcher
+        shell: bash
+        run: |
+          ./install/python/python.exe tools/create_launcher.py
+
       - uses: actions/upload-artifact@v4
         with:
           name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MFAA
