@@ -48,8 +48,8 @@ _DEFAULT_CONFIG = {
         "results_match_threshold": 0.75,
         "playing_match_threshold": 0.75,
         "match_vote_min": 1,
-        "playing_check_interval": 10,
-        "results_roi_frac": [0.25, 0.10, 0.75, 0.60],
+        "playing_check_interval": 5,
+        "scene_lock_timeout_sec": 1.5,
     },
     "song_select": {
         "enabled": False,
@@ -106,22 +106,19 @@ def _get_image(controller):
 
 
 def _do_scroll_via_maa(controller, x: int, y: int, delta: int):
-    """用触摸滑动模拟滚动，避免 post_scroll 无坐标的问题
+    """鼠标点击定位后发送滚轮事件实现滚动
 
-    delta 为滚动步数（负数向上滚动，正数向下），每步映射为 100 像素的滑动距离。
+    post_touch 系列在 Windows 上会被 DWM 解释为窗口拖拽手势，
+    无法产生应用内滚动效果。改用 post_click 定位 + post_scroll
+    发送 WM_MOUSEWHEEL 事件。
+
+    delta 为滚动步数（负数向上滚动），每步 = 120 (WHEEL_DELTA)
     """
-    scroll_distance = delta * 100
-    if scroll_distance == 0:
-        return
-    controller.post_touch_down(x, y).wait()
+    controller.post_click(x, y).wait()
     time.sleep(0.05)
-    steps = max(8, abs(scroll_distance) // 15)
-    for i in range(1, steps + 1):
-        new_y = y + int(scroll_distance * i / steps)
-        controller.post_touch_move(x, new_y).wait()
-        time.sleep(0.01)
-    controller.post_touch_up().wait()
-    time.sleep(0.3)
+    wheel_delta = delta * 120
+    controller.post_scroll(0, wheel_delta).wait()
+    time.sleep(0.2)
 
 
 
@@ -183,9 +180,9 @@ class AutoRhythm(CustomAction):
         if "target_fps" in merged:
             cfg.setdefault("run", {})["target_fps"] = int(merged["target_fps"])
 
-        cfg.setdefault("scene", {}).setdefault("playing_check_interval", 10)
+        cfg.setdefault("scene", {}).setdefault("playing_check_interval", 5)
         cfg.setdefault("scene", {}).setdefault("state_confirm_frames", 1)
-        cfg.setdefault("scene", {}).setdefault("results_roi_frac", [0.25, 0.10, 0.75, 0.60])
+        cfg.setdefault("scene", {}).setdefault("scene_lock_timeout_sec", 1.5)
 
         target_fps = int(cfg.get("run", {}).get("target_fps", 60))
         frame_interval = 1.0 / max(1, target_fps)
@@ -205,6 +202,8 @@ class AutoRhythm(CustomAction):
         auto_repeat_count = int(auto_repeat_cfg.get("count", 1))
         auto_repeat_dismiss_delay = float(auto_repeat_cfg.get("dismiss_delay_sec", 0.8))
 
+        scene_lock_timeout = float(cfg.get("scene", {}).get("scene_lock_timeout_sec", 1.5))
+
         logger.info(
             "演奏任务开始 | 目标FPS=%d | 鼓面检测=%s | 自动选歌=%s(%s) | 自动连打=%s(%d次)",
             target_fps,
@@ -222,6 +221,7 @@ class AutoRhythm(CustomAction):
         playing_frame_count = 0
         prev_logged_state: str | None = None
         state = STATE_OTHER
+        scene_lock_until: float = 0.0
 
         try:
             while True:
@@ -247,9 +247,13 @@ class AutoRhythm(CustomAction):
                 frame_count += 1
 
                 if state == STATE_PLAYING:
-                    new_state, _ = scene_gate.step(frame)
-                    if new_state != state:
-                        state = new_state
+                    now = time.perf_counter()
+                    if now < scene_lock_until:
+                        pass
+                    else:
+                        new_state, _ = scene_gate.step(frame)
+                        if new_state != state:
+                            state = new_state
                 else:
                     state, gate_info = scene_gate.step(frame)
 
@@ -286,6 +290,7 @@ class AutoRhythm(CustomAction):
                         triggers, scores = detector.analyze(frame, cached_layout)
                         triggered_lanes = [i for i, t in enumerate(triggers) if t]
                         if triggered_lanes:
+                            scene_lock_until = time.perf_counter() + scene_lock_timeout
                             lane_names = [_LANES[i] for i in triggered_lanes]
                             logger.debug(
                                 "触发按键: %s | 帧#%d | scores=%s",

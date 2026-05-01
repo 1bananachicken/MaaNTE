@@ -52,13 +52,8 @@
         "results_match_threshold": 0.75,
         "playing_match_threshold": 0.75,
         "match_vote_min": 1,
-        "playing_check_interval": 10,
-        "results_roi_frac": [
-            0.25,
-            0.10,
-            0.75,
-            0.60
-        ]
+        "playing_check_interval": 5,
+        "scene_lock_timeout_sec": 1.5
     },
     "song_select": {
         "enabled": false,
