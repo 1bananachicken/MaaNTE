@@ -13,7 +13,10 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "template": "realtime_assist/skip_story_btn.png",
+                "template": [
+                    "realtime_assist/skip_story_btn.png",
+                    "realtime_assist/skip_story_btn_hover.png"
+                ],
                 "roi": [1000, 0, 1280, 100],
                 "threshold": 0.8
             }
@@ -33,6 +36,7 @@
                 "threshold": 0.8
             }
         },
+        "action": "DoNothing",
         "post_delay": 500,
         "next": ["RealTimeConfirmTeleportWitte"]
     },
@@ -60,6 +64,7 @@
                 "threshold": 0.8
             }
         },
+        "action": "DoNothing",
         "post_delay": 500,
         "next": ["RealTimeConfirmTeleportPhone"]
     },
