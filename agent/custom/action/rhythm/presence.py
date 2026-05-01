@@ -56,7 +56,13 @@ class SceneGate:
         self._playing_thresh = float(sc.get("playing_match_threshold", 0.75))
         self._state_confirm_frames = max(1, int(sc.get("state_confirm_frames", 2)))
         self._match_vote_min = max(1, int(sc.get("match_vote_min", 1)))
-        self._playing_check_interval = max(1, int(sc.get("playing_check_interval", 30)))
+        self._playing_check_interval = max(1, int(sc.get("playing_check_interval", 10)))
+
+        roi_frac = sc.get("results_roi_frac")
+        if isinstance(roi_frac, (list, tuple)) and len(roi_frac) == 4:
+            self._results_roi_frac: list[float] = [float(x) for x in roi_frac]
+        else:
+            self._results_roi_frac = [0.25, 0.10, 0.75, 0.60]
 
         self._song_select_tpls = _load_scene_templates_once("song_select")
         self._results_tpls = _load_scene_templates_once("results")
@@ -95,7 +101,13 @@ class SceneGate:
                     "armed": True,
                     "state_transitioned": False,
                 }
-            rs_ok, rs_val = self._vote(frame_bgr, self._results_tpls, self._results_thresh)
+            fh, fw = frame_bgr.shape[:2]
+            rx1 = int(self._results_roi_frac[0] * fw)
+            ry1 = int(self._results_roi_frac[1] * fh)
+            rx2 = int(self._results_roi_frac[2] * fw)
+            ry2 = int(self._results_roi_frac[3] * fh)
+            roi = frame_bgr[ry1:ry2, rx1:rx2]
+            rs_ok, rs_val = self._vote(roi, self._results_tpls, self._results_thresh)
             if rs_ok:
                 target = STATE_RESULTS
             else:
