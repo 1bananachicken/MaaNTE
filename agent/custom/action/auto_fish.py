@@ -9,12 +9,6 @@ from maa.custom_action import CustomAction
 from maa.context import Context
 
 
-def get_image(controller):
-    job = controller.post_screencap()
-    job.wait()
-    img = controller.cached_image
-    return img
-
 def match_template_in_region(img, region, template, min_similarity=0.8):
     if img is None or not isinstance(img, np.ndarray):
         return False, 0.0, 0, 0
@@ -96,7 +90,7 @@ class AutoFish(CustomAction):
 
         def ensure_fish_game():
             for _ in range(10):
-                img = get_image(controller)
+                img = context.tasker.controller.post_screencap().wait().get()
                 
                 m_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
                 if m_settle:
@@ -140,7 +134,7 @@ class AutoFish(CustomAction):
                     controller.post_key_up(KEY_F)
 
                 for _ in range(5):
-                    img = get_image(controller)
+                    img = context.tasker.controller.post_screencap().wait().get()
                     m_need_bait, prob, _, _ = match_template_in_region(img, need_bait_region, self.need_bait_template, 0.7)
                     print(f"  Checking for bait, probability: {prob:.2f}")
                     if m_need_bait:
@@ -165,7 +159,7 @@ class AutoFish(CustomAction):
                         break
                         
                     time.sleep(check_freq)
-                    img = get_image(controller)
+                    img = context.tasker.controller.post_screencap().wait().get()
                     
                     m_settle_unexpected, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
                     if m_settle_unexpected:
@@ -212,7 +206,7 @@ class AutoFish(CustomAction):
                         set_ad_key(None)
                         return CustomAction.RunResult(success=False)
                     time.sleep(check_freq)
-                    img = get_image(controller)
+                    img = context.tasker.controller.post_screencap().wait().get()
                     frame += 1
 
                     if frame % 10 == 0:
@@ -278,7 +272,7 @@ class AutoFish(CustomAction):
                 set_ad_key(None)
                 controller.post_key_up(KEY_F)
                 
-                img = get_image(controller)
+                img = context.tasker.controller.post_screencap().wait().get()
                 time.sleep(0.3)
                 m_escape, _, _, _ = match_template_in_region(img, escape_region, self.escape_template, 0.8)
                 if m_escape:
@@ -289,7 +283,7 @@ class AutoFish(CustomAction):
     
             time.sleep(3)
             
-            img = get_image(controller)
+            img = context.tasker.controller.post_screencap().wait().get()
             match_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
             if match_settle:
                 print("  Closing settlement screen...")
@@ -299,7 +293,7 @@ class AutoFish(CustomAction):
                     controller.post_key_up(KEY_ESC)
                     time.sleep(1.5)
 
-                    img = get_image(controller)
+                    img = context.tasker.controller.post_screencap().wait().get()
                     m, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
                     if not m:
                         print("  Settlement closed.")
