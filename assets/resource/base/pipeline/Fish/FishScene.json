@@ -48,7 +48,7 @@
                     84
                 ],
                 "template": [
-                    "Fish/FishGameSign1.png"
+                    "Fish/FishGameSign.png"
                 ],
                 "threshold": 0.8,
                 "green_mask": true

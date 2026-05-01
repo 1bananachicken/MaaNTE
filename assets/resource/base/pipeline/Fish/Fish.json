@@ -6,7 +6,7 @@
             "FishStart",
             "[JumpBack]FishScenePrepareToFishGame",
             "[JumpBack]FishSceneWorldToPrepare",
-            "[JumpBack]__ScenePrivateAnyEnterWorldSuccess"
+            "[JumpBack]__PressEsc"
         ]
     },
     "FishStart": {
@@ -19,6 +19,8 @@
                 ]
             }
         },
+        "pre_delay": 0,
+        "post_delay": 0,
         "next": [
             "FishGameStart",
             "FishTaskExit"
@@ -54,7 +56,10 @@
         ]
     },
     "FishTaskExit": {
-        "desc": "钓鱼任务完成"
+        "desc": "钓鱼任务完成",
+        "focus": {
+            "Node.Action.Succeeded":"钓鱼任务结束"
+        }
     },
     "FishBaitLack": {
         "desc": "缺少鱼饵",

@@ -117,6 +117,8 @@ class AutoFish(CustomAction):
         while True:
             if context.tasker.stopping:
                 set_ad_key(None)
+                controller.post_key_down(KEY_A)
+                controller.post_key_down(KEY_D)
                 return CustomAction.RunResult(success=False)
             time.sleep(0.001)
             img = get_image(controller)
