@@ -16,7 +16,7 @@
         "judge_line_y_frac": 0.78,
         "judge_line_y_frac_by_lane": [
             0.78,
-            0.70,
+            0.78,
             0.78,
             0.78
         ],
@@ -36,9 +36,9 @@
             0.03,
             0.03
         ],
-        "region_extend_up_frac": 0.08,
-        "region_extend_down_frac": 0.03,
-        "region_width_multiplier": 1.5,
+        "region_extend_up_frac": 0.14,
+        "region_extend_down_frac": 0.10,
+        "region_width_multiplier": 3.5,
         "enabled_lanes": [
             true,
             true,

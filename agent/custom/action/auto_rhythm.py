@@ -26,8 +26,8 @@ _VK_ESCAPE = 0x1B
 
 _RHYTHM_ENV_KEYS = ("RHYTHM_SONG_NAME", "RHYTHM_AUTO_REPEAT_COUNT", "RHYTHM_TARGET_FPS")
 
-_QUICK_RESULTS_CHECK_INTERVAL = 30
-_FULL_SCENE_CHECK_INTERVAL = 120
+_QUICK_RESULTS_CHECK_INTERVAL = 60
+_FULL_SCENE_CHECK_INTERVAL = 300
 
 _DEFAULT_CONFIG = {
     "lanes": {
@@ -35,16 +35,16 @@ _DEFAULT_CONFIG = {
         "top_center_x_frac": [0.214, 0.406, 0.596, 0.783],
         "half_width_frac": 0.028,
         "judge_line_y_frac": 0.78,
-        "judge_line_y_frac_by_lane": [0.78, 0.70, 0.78, 0.78],
+        "judge_line_y_frac_by_lane": [0.78, 0.78, 0.78, 0.78],
         "judge_band_half_height_frac": 0.03,
     },
     "template_detection": {
         "thresholds": [0.81, 0.80, 0.80, 0.81],
         "cooldown_sec": 0.03,
         "cooldown_sec_by_lane": [0.03, 0.03, 0.03, 0.03],
-        "region_extend_up_frac": 0.08,
-        "region_extend_down_frac": 0.03,
-        "region_width_multiplier": 1.5,
+        "region_extend_up_frac": 0.14,
+        "region_extend_down_frac": 0.10,
+        "region_width_multiplier": 3.5,
         "enabled_lanes": [True, True, True, True],
     },
     "scene": {
@@ -110,8 +110,9 @@ def _get_image(controller):
 
 
 def _do_scroll_via_maa(controller, x: int, y: int, delta: int):
-    scroll_delta = -delta
-    controller.post_scroll(x, y, scroll_delta).wait()
+    controller.post_touch_down(x, y).wait()
+    time.sleep(0.05)
+    controller.post_scroll(0, delta).wait()
     time.sleep(0.3)
 
 
@@ -208,7 +209,7 @@ class AutoRhythm(CustomAction):
         if "target_fps" in merged:
             cfg.setdefault("run", {})["target_fps"] = int(merged["target_fps"])
 
-        cfg.setdefault("scene", {})["playing_check_interval"] = 1
+        cfg.setdefault("scene", {}).setdefault("playing_check_interval", 30)
 
         target_fps = int(cfg.get("run", {}).get("target_fps", 60))
         frame_interval = 1.0 / max(1, target_fps)
@@ -358,7 +359,7 @@ class AutoRhythm(CustomAction):
                     )
 
                 elapsed = time.perf_counter() - t0
-                if elapsed < frame_interval:
+                if state != STATE_PLAYING and elapsed < frame_interval:
                     time.sleep(frame_interval - elapsed)
 
         finally:
