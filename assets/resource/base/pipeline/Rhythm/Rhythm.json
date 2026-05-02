@@ -1,0 +1,67 @@
+{
+    "RhythmEntrance": {
+        "desc": "演奏功能入口",
+        "action": "DoNothing",
+        "next": [
+            "RhythmSetSong"
+        ],
+        "on_error": [
+            "RhythmExit"
+        ]
+    },
+    "RhythmSetSong": {
+        "desc": "[内部] 记录演奏目标歌曲",
+        "action": "DoNothing",
+        "next": [
+            "RhythmSetRepeat"
+        ],
+        "on_error": [
+            "RhythmExit"
+        ]
+    },
+    "RhythmSetRepeat": {
+        "desc": "[内部] 记录连打次数",
+        "action": "DoNothing",
+        "next": [
+            "RhythmSetFPS"
+        ],
+        "on_error": [
+            "RhythmExit"
+        ]
+    },
+    "RhythmSetFPS": {
+        "desc": "[内部] 记录目标帧率",
+        "action": "DoNothing",
+        "next": [
+            "RhythmSelectSong"
+        ],
+        "on_error": [
+            "RhythmExit"
+        ]
+    },
+    "RhythmSelectSong": {
+        "desc": "自动选曲",
+        "action": "Custom",
+        "custom_action": "auto_rhythm_select_song",
+        "custom_action_param": {},
+        "next": [
+            "RhythmStart"
+        ],
+        "on_error": [
+            "RhythmStart"
+        ]
+    },
+    "RhythmStart": {
+        "desc": "演奏主流程",
+        "action": "Custom",
+        "custom_action": "auto_rhythm",
+        "custom_action_param": {},
+        "next": [
+            "RhythmExit"
+        ]
+    },
+    "RhythmExit": {
+        "desc": "演奏任务完成",
+        "next": []
+    }
+}
