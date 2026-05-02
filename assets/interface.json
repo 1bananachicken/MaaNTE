@@ -381,7 +381,7 @@
         "自动选曲": {
             "type": "switch",
             "label": "自动选曲",
-            "description": "启用后自动选择歌曲（待实现），关闭则手动指定目标歌曲",
+            "description": "启用后自动选择歌曲（迷星叫），关闭则手动指定目标歌曲",
             "cases": [
                 {
                     "name": "Yes",
@@ -489,7 +489,7 @@
                     "name": "Yes",
                     "label": "启用",
                     "option": [
-                        "连打次数"
+                        "连打模式"
                     ]
                 },
                 {
@@ -504,6 +504,34 @@
                             }
                         }
                     }
+                }
+            ],
+            "default_case": "No"
+        },
+        "连打模式": {
+            "type": "switch",
+            "label": "连打直到活力耗尽",
+            "description": "开启后自动连打直到活力耗尽，关闭则使用固定次数",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "Max",
+                    "pipeline_override": {
+                        "RhythmSetRepeat": {
+                            "action": "Custom",
+                            "custom_action": "rhythm_set_param",
+                            "custom_action_param": {
+                                "auto_repeat_max": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "固定次数",
+                    "option": [
+                        "连打次数"
+                    ]
                 }
             ],
             "default_case": "No"

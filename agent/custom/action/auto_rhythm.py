@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import re
 import time
 from pathlib import Path
 from typing import Any
@@ -10,6 +11,7 @@ import cv2
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+from maa.pipeline import JRecognitionType, JOCR
 
 from .rhythm.utils.lanes import build_lane_layout
 from .rhythm.utils.detector import DrumDetector
@@ -29,7 +31,12 @@ _LANES = ("d", "f", "j", "k")
 _VK = {"d": 0x44, "f": 0x46, "j": 0x4A, "k": 0x4B}
 _VK_ESCAPE = 0x1B
 
-_RHYTHM_ENV_KEYS = ("RHYTHM_SONG_NAME", "RHYTHM_AUTO_REPEAT_COUNT", "RHYTHM_TARGET_FPS")
+_RHYTHM_ENV_KEYS = (
+    "RHYTHM_SONG_NAME",
+    "RHYTHM_AUTO_REPEAT_COUNT",
+    "RHYTHM_TARGET_FPS",
+    "RHYTHM_AUTO_REPEAT_MAX",
+)
 
 _DEFAULT_CONFIG = {
     "lanes": {
@@ -114,6 +121,32 @@ def _press_keys(controller, lane_indices: list[int], key_hold_sec: float = 0.01)
         controller.post_key_up(_VK[_LANES[li]])
 
 
+_COST_VITALITY_ROI = (540, 594, 187, 35)
+_COST_VITALITY_PATTERN = re.compile(r"-\s*(\d+)")
+
+
+def _detect_cost_vitality(context: Context, frame) -> int:
+    if frame is None or frame.size == 0:
+        return 0
+
+    detail = context.run_recognition_direct(
+        JRecognitionType.OCR, JOCR(roi=_COST_VITALITY_ROI), frame
+    )
+    if detail is None or not detail.hit or detail.best_result is None:
+        logger.debug("消耗活力 OCR 未命中")
+        return 0
+
+    text = detail.best_result.text if hasattr(detail.best_result, "text") else str(detail.best_result)
+    m = _COST_VITALITY_PATTERN.search(text)
+    if m:
+        cost = int(m.group(1))
+        logger.debug("消耗活力 OCR: %s -> %d", text, cost)
+        return cost
+
+    logger.debug("消耗活力 OCR 未匹配: %s", text)
+    return 0
+
+
 @AgentServer.custom_action("rhythm_set_param")
 class RhythmSetParam(CustomAction):
     def run(
@@ -150,7 +183,7 @@ class AutoRhythm(CustomAction):
 
         merged = dict(params)
         for env_key in _RHYTHM_ENV_KEYS:
-            val = os.environ.pop(env_key, None)
+            val = os.environ.get(env_key)
             if val is None:
                 continue
             if env_key.endswith("_SONG_NAME"):
@@ -159,6 +192,8 @@ class AutoRhythm(CustomAction):
                 merged.setdefault("auto_repeat_count", val)
             elif env_key.endswith("_TARGET_FPS"):
                 merged.setdefault("target_fps", val)
+            elif env_key.endswith("_AUTO_REPEAT_MAX"):
+                merged.setdefault("auto_repeat_max", val)
 
         if "song_name" in merged:
             cfg.setdefault("song_select", {})["song_name"] = str(merged["song_name"])
@@ -169,6 +204,12 @@ class AutoRhythm(CustomAction):
                 merged["auto_repeat_count"]
             )
             if cfg["auto_repeat"]["count"] > 0:
+                cfg["auto_repeat"]["enabled"] = True
+        if "auto_repeat_max" in merged:
+            cfg.setdefault("auto_repeat", {})["max"] = (
+                str(merged["auto_repeat_max"]).lower() in ("true", "1", "yes")
+            )
+            if cfg["auto_repeat"]["max"]:
                 cfg["auto_repeat"]["enabled"] = True
         if "target_fps" in merged:
             cfg.setdefault("run", {})["target_fps"] = int(merged["target_fps"])
@@ -193,6 +234,7 @@ class AutoRhythm(CustomAction):
         auto_repeat_cfg = cfg.get("auto_repeat") or {}
         auto_repeat_enabled = bool(auto_repeat_cfg.get("enabled", False))
         auto_repeat_count = int(auto_repeat_cfg.get("count", 1))
+        auto_repeat_max = bool(auto_repeat_cfg.get("max", False))
         auto_repeat_dismiss_delay = float(auto_repeat_cfg.get("dismiss_delay_sec", 0.8))
 
         scene_lock_timeout = float(
@@ -200,13 +242,14 @@ class AutoRhythm(CustomAction):
         )
 
         logger.info(
-            "演奏任务开始 | 目标FPS=%d | 鼓面检测=%s | 自动选歌=%s(%s) | 自动连打=%s(%d次)",
+            "演奏任务开始 | 目标FPS=%d | 鼓面检测=%s | 自动选歌=%s(%s) | 自动连打=%s(次数=%d|Max=%s)",
             target_fps,
             drum_available,
             song_selector.enabled,
             song_selector.song_name,
             auto_repeat_enabled,
             auto_repeat_count,
+            auto_repeat_max,
         )
         repeat_index = 0
         results_seen = False
@@ -300,12 +343,12 @@ class AutoRhythm(CustomAction):
                         if triggered_lanes:
                             scene_lock_until = time.perf_counter() + scene_lock_timeout
                             lane_names = [_LANES[i] for i in triggered_lanes]
-                            logger.debug(
-                                "触发按键: %s | 帧#%d | scores=%s",
-                                lane_names,
-                                frame_count,
-                                [f"{scores[i]:.3f}" for i in triggered_lanes],
-                            )
+                            # logger.debug(
+                            #     "触发按键: %s | 帧#%d | scores=%s",
+                            #     lane_names,
+                            #     frame_count,
+                            #     [f"{scores[i]:.3f}" for i in triggered_lanes],
+                            # )
                             _press_keys(controller, triggered_lanes, key_hold_sec)
 
                 elif state == STATE_RESULTS:
@@ -318,7 +361,7 @@ class AutoRhythm(CustomAction):
                         logger.info(
                             "检测到结算界面: 第 %d/%d 次",
                             repeat_index,
-                            auto_repeat_count,
+                            auto_repeat_count if not auto_repeat_max else -1,
                         )
 
                     if not esc_sent_for_results:
@@ -331,10 +374,22 @@ class AutoRhythm(CustomAction):
                         controller.post_click_key(_VK_ESCAPE).wait()
                         esc_sent_for_results = True
 
-                    if auto_repeat_enabled and repeat_index >= auto_repeat_count:
-                        logger.info("已达到连打次数上限 (%d)，停止", auto_repeat_count)
-                        time.sleep(auto_repeat_dismiss_delay)
-                        break
+                    if auto_repeat_enabled:
+                        if auto_repeat_max:
+                            cost = _detect_cost_vitality(context, frame)
+                            if cost == 0:
+                                logger.info(
+                                    "检测到消耗活力为 0，活力已耗尽，停止连打"
+                                )
+                                time.sleep(auto_repeat_dismiss_delay)
+                                break
+                            logger.info(
+                                "检测到消耗活力为 %d，继续连打", cost
+                            )
+                        elif repeat_index >= auto_repeat_count:
+                            logger.info("已达到连打次数上限 (%d)，停止", auto_repeat_count)
+                            time.sleep(auto_repeat_dismiss_delay)
+                            break
 
                     time.sleep(1.0)
                     continue
@@ -343,19 +398,21 @@ class AutoRhythm(CustomAction):
                     song_selector.reset()
                     playing_frame_count = 0
 
-                if frame_count % 120 == 0:
-                    logger.debug(
-                        "帧#%d | state=%s | playing_frames=%d",
-                        frame_count,
-                        state,
-                        playing_frame_count,
-                    )
+                # if frame_count % 120 == 0:
+                #     logger.debug(
+                #         "帧#%d | state=%s | playing_frames=%d",
+                #         frame_count,
+                #         state,
+                #         playing_frame_count,
+                #     )
 
                 elapsed = time.perf_counter() - t0
                 if state != STATE_PLAYING and elapsed < frame_interval:
                     time.sleep(frame_interval - elapsed)
 
         finally:
+            for env_key in _RHYTHM_ENV_KEYS:
+                os.environ.pop(env_key, None)
             logger.info("演奏自动化已停止")
 
         return CustomAction.RunResult(success=True)

@@ -41,7 +41,7 @@ class AutoRhythmSelectSong(CustomAction):
                 pass
 
         for env_key in ("RHYTHM_SONG_NAME", "RHYTHM_AUTO_SELECT"):
-            val = os.environ.pop(env_key, None)
+            val = os.environ.get(env_key)
             if val is None:
                 continue
             if env_key.endswith("_SONG_NAME"):
@@ -61,10 +61,6 @@ class AutoRhythmSelectSong(CustomAction):
         song_selector = SongSelector(cfg)
         if not song_selector.enabled:
             logger.info("自动选曲未启用，跳过选歌")
-            return CustomAction.RunResult(success=True)
-
-        if auto_select:
-            logger.info("自动选曲功能（待实现），当前跳过")
             return CustomAction.RunResult(success=True)
 
         logger.info("开始选歌: %s", song_selector.song_name)

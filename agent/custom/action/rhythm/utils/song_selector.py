@@ -21,6 +21,7 @@ _SEL_DONE = "done"
 _SEL_FAILED = "failed"
 
 _DEFAULT_SONG = "Heroic_Appearance"
+_AUTO_SELECT_SONG = "迷星叫"
 
 
 class SongSelector:
@@ -71,6 +72,7 @@ class SongSelector:
     def __init__(self, cfg: dict[str, Any]) -> None:
         sc = cfg.get("song_select") or {}
         self._song_select_enabled = bool(sc.get("enabled", False))
+        self._auto_select = bool(sc.get("auto_select", False))
         self._song_name = str(sc.get("song_name", ""))
         self._scroll_area_x_frac = float(sc.get("scroll_area_x_frac", 0.25))
         self._scroll_area_y_frac = float(sc.get("scroll_area_y_frac", 0.50))
@@ -92,7 +94,10 @@ class SongSelector:
 
         self._start_template = self._load_start_template()
 
-        if not self._song_name:
+        if self._auto_select:
+            self._song_name = _AUTO_SELECT_SONG
+            logger.info("自动选曲启用，选择: %s", self._song_name)
+        elif not self._song_name:
             self._song_name = _DEFAULT_SONG
             logger.info("未指定歌曲，默认选择: %s", self._song_name)
 
