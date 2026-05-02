@@ -98,7 +98,7 @@ def _load_rhythm_config() -> dict[str, Any]:
             try:
                 with open(p, "r", encoding="utf-8") as f:
                     loaded = json.load(f)
-                logger.info("已加载演奏配置文件: %s", p)
+                logger.info("已加载演奏配置: %s", p)
                 return loaded
             except Exception:
                 logger.warning("演奏配置文件读取失败: %s，使用内置默认值", p)
