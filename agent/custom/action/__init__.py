@@ -1,4 +1,4 @@
-from .auto_fish import *
+from .auto_fish_new import *
 from .auto_make_coffee import *
 
 

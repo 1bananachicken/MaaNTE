@@ -38,8 +38,8 @@
     },
     "task": [
         {
-            "name": "钓鱼任务",
-            "entry": "FishEntrance",
+            "name": "钓鱼任务（新）",
+            "entry": "FishNewEntrance",
             "option": [
                 "钓鱼次数"
             ]
@@ -77,7 +77,7 @@
                 }
             ],
             "pipeline_override": {
-                "FishGameStart": {
+                "FishNewGameStart": {
                     "max_hit": "{count}"
                 }
             }
