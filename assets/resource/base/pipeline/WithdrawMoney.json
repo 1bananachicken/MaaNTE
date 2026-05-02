@@ -1,5 +1,19 @@
 {
+    "WithdrawMoneyEntrance":{
+        "desc":"领取收益入口",
+        "next": [
+            "领取一咖舍收益"
+        ]
+    },
     "领取一咖舍收益": {
+        "recognition": {
+            "type":"And",
+            "param":{
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
         "action": {
             "type": "ClickKey",
             "param": {
