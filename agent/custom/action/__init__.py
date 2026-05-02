@@ -11,6 +11,6 @@ __all__ = [
     "AutoMakeCoffee",
     "AutoFish",
     "AutoBuyFishBait",
-    "AutoSellFish"
-    "ClickOverride"
+    "AutoSellFish",
+    "ClickOverride",
 ]
