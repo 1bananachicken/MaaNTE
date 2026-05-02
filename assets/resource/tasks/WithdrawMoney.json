@@ -1,0 +1,40 @@
+{
+    "task": [
+        {
+            "name": "领取一咖舍收益",
+            "entry": "WithdrawMoneyEntrance",
+            "description": "自动领取一咖舍收益.[color:red]仅支持Seize的鼠标输入方式（必须前台），使用时请前往左下角设置-连接设置自行配置。暂不支持根据风向标替换商品，若在意收益，建议关闭[/color]",
+            "option": [
+                "Restock"
+            ]
+        }
+    ],
+    "option":{
+        "Restock": {
+            "type": "switch",
+            "label": "自动补货",
+            "description": "是否启用自动补货功能",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "点击补货": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "点击补货": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
+        }
+    }
+}

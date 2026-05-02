@@ -1,0 +1,11 @@
+{
+    // 只能使用本文件中定义的接口，禁止引用 SceneManager 文件夹内的 __ScenePrivate 节点，调用方法参考 SceneExample.json
+    "SceneAnyEnterWorld": {
+        "desc": "从任意界面返回大世界界面",
+        "next": [
+            "__ScenePrivateMenuListEnterWorld",
+            "__ScenePrivateAnyEnterWorldSuccess",
+            "[JumpBack]__ScenePrivateAnyExit"
+        ]
+    }
+}

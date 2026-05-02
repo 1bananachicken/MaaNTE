@@ -9,7 +9,30 @@
                 ]
             }
         },
-        "pre_delay": 0,
+        "post_delay": 2000
+    },
+    "__PressF1": {
+        "desc": "按下F1键",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    112
+                ]
+            }
+        },
+        "post_delay": 2000
+    },
+    "__PressF2": {
+        "desc": "按下F2键",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    113
+                ]
+            }
+        },
         "post_delay": 2000
     }
 }

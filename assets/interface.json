@@ -11,7 +11,7 @@
     "mirrorchyan_multiplatform": true,
     "controller": [
         {
-            "name": "桌面端",
+            "name": "桌面端-默认",
             "type": "Win32",
             "permission_required": true,
             "win32": {
@@ -19,6 +19,17 @@
                 "window_regex": "^\\s*(异环|NTE)\\s*$",
                 "screencap": "PrintWindow",
                 "mouse": "SendMessageWithWindowPos",
+                "keyboard": "PostMessage"
+            }
+        },
+        {
+            "name": "桌面端-前台",
+            "type": "Win32",
+            "win32": {
+                "class_regex": ".*",
+                "window_regex": "^\\s*(异环|NTE)\\s*$",
+                "screencap": "PrintWindow",
+                "mouse": "Seize",
                 "keyboard": "PostMessage"
             }
         }
@@ -37,337 +48,15 @@
             "../agent/main.py"
         ]
     },
-    "task": [
-        {
-            "name": "钓鱼任务",
-            "entry": "FishEntrance",
-            "option": [
-                "钓鱼循环次数",
-                "钓鱼数量",
-                "自动卖鱼",
-                "自动买鱼饵",
-                "鱼饵识别阈值"
-            ]
-        },
-        {
-            "name": "领取一咖舍收益",
-            "entry": "领取一咖舍收益"
-        },
-        {
-            "name": "自动做咖啡",
-            "entry": "AutoMakeCoffee",
-            "option": [
-                "循环次数"
-            ]
-        },
-        {
-            "name": "实时辅助",
-            "entry": "RealTimeTaskMain",
-            "option": [
-                "RealTimeCheckInterval",
-                "RealTimeAutoSkip",
-                "RealTimeAutoTeleport"
-            ]
-        }
+    "task": [],
+    "import": [
+        
+        "resource/tasks/ClaimRewards.json",
+        "resource/tasks/WithdrawMoney.json",
+
+        "resource/tasks/Fish.json",
+        "resource/tasks/RealTime.json",
+        "resource/tasks/MakeCoffee.json"
     ],
-    "option": {
-        "钓鱼循环次数": {
-            "type": "input",
-            "label": "最大循环次数",
-            "description": "限制整个钓鱼循环最多执行多少次",
-            "inputs": [
-                {
-                    "name": "max_hit",
-                    "label": "循环次数",
-                    "default": "5",
-                    "pipeline_type": "int",
-                    "verify": "^\\d+$"
-                }
-            ],
-            "pipeline_override": {
-                "FishStart": {
-                    "max_hit": "{max_hit}"
-                }
-            }
-        },
-        "钓鱼数量": {
-            "type": "input",
-            "label": "每次钓鱼数量",
-            "description": "设置每次自动钓鱼的数量，建议小于等于99",
-            "inputs": [
-                {
-                    "name": "count",
-                    "label": "数量",
-                    "default": "99",
-                    "pipeline_type": "int",
-                    "verify": "^\\d+$"
-                }
-            ],
-            "pipeline_override": {
-                "FishGameStart": {
-                    "custom_action_param": {
-                        "count": "{count}"
-                    }
-                }
-            }
-        },
-        "自动卖鱼": {
-            "type": "switch",
-            "label": "自动卖鱼",
-            "description": "是否启用自动卖鱼功能",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "启用",
-                    "pipeline_override": {
-                        "FishStart": {
-                            "enabled": true
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "禁用",
-                    "pipeline_override": {
-                        "AutoSellFish": {
-                            "enabled": false
-                        }
-                    }
-                }
-            ]
-        },
-        "自动买鱼饵": {
-            "type": "switch",
-            "label": "自动买鱼饵",
-            "description": "是否启用自动买鱼饵功能",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "启用",
-                    "pipeline_override": {
-                        "AutoBuyFishBait": {
-                            "enabled": true
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "禁用",
-                    "pipeline_override": {
-                        "AutoBuyFishBait": {
-                            "enabled": false
-                        }
-                    }
-                }
-            ]
-        },
-        "鱼饵识别阈值": {
-            "type": "select",
-            "label": "鱼饵识别阈值",
-            "description": "如果无法识别点击鱼饵位置，请调低该数值",
-            "cases": [
-                {
-                    "name": "0.8",
-                    "pipeline_override": {
-                        "AutoBuyFishBait": {
-                            "custom_action_param": {
-                                "found_bait_threshold": 0.8
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "0.7",
-                    "pipeline_override": {
-                        "AutoBuyFishBait": {
-                            "custom_action_param": {
-                                "found_bait_threshold": 0.7
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "0.6",
-                    "pipeline_override": {
-                        "AutoBuyFishBait": {
-                            "custom_action_param": {
-                                "found_bait_threshold": 0.6
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "循环次数": {
-            "type": "input",
-            "inputs": [
-                {
-                    "name": "循环次数",
-                    "default": "10",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "AutoMakeCoffee": {
-                    "custom_action_param": {
-                        "count": "{循环次数}"
-                    }
-                }
-            }
-        },
-        "RealTimeCheckInterval": {
-            "type": "input",
-            "label": "检测间隔 (ms)",
-            "description": "两次检测之间的间隔，单位毫秒",
-            "inputs": [
-                {
-                    "name": "interval",
-                    "default": "500",
-                    "pipeline_type": "int",
-                    "verify": "^\\d+$"
-                }
-            ],
-            "pipeline_override": {
-                "RealTimeSleep": {
-                    "post_delay": "{interval}"
-                }
-            }
-        },
-        "RealTimeAutoSkip": {
-            "type": "switch",
-            "label": "自动剧情",
-            "description": "是否自动跳过剧情",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "开启",
-                    "option": [
-                        "RealTimeAutoSkipAll"
-                    ]
-                },
-                {
-                    "name": "No",
-                    "label": "关闭",
-                    "pipeline_override": {
-                        "RealTimeSkipPlot": {
-                            "enabled": false
-                        }
-                    }
-                }
-            ],
-            "default_case": "Yes"
-        },
-        "RealTimeAutoSkipAll": {
-            "type": "switch",
-            "label": "自动跳过全部剧情",
-            "description": "检测到跳过按钮时自动点击",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "pipeline_override": {
-                        "RealTimeSkipPlot": {
-                            "enabled": true
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "pipeline_override": {
-                        "RealTimeSkipPlot": {
-                            "enabled": false
-                        }
-                    }
-                }
-            ],
-            "default_case": "Yes"
-        },
-        "RealTimeAutoTeleport": {
-            "type": "switch",
-            "label": "自动传送",
-            "description": "检测到特定传送点时自动点击传送",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "开启",
-                    "option": [
-                        "RealTimeAutoTeleportWitte",
-                        "RealTimeAutoTeleportPhone"
-                    ]
-                },
-                {
-                    "name": "No",
-                    "label": "关闭",
-                    "pipeline_override": {
-                        "RealTimeTeleportWitte": {
-                            "enabled": false
-                        },
-                        "RealTimeTeleportPhone": {
-                            "enabled": false
-                        }
-                    }
-                }
-            ],
-            "default_case": "No"
-        },
-        "RealTimeAutoTeleportWitte": {
-            "type": "switch",
-            "label": "维特海默塔",
-            "description": "是否检测维特海默塔的传送点",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "pipeline_override": {
-                        "RealTimeTeleportWitte": {
-                            "enabled": true
-                        },
-                        "RealTimeConfirmTeleportWitte": {
-                            "enabled": true
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "pipeline_override": {
-                        "RealTimeTeleportWitte": {
-                            "enabled": false
-                        },
-                        "RealTimeConfirmTeleportWitte": {
-                            "enabled": false
-                        }
-                    }
-                }
-            ],
-            "default_case": "Yes"
-        },
-        "RealTimeAutoTeleportPhone": {
-            "type": "switch",
-            "label": "ReroRero电话亭",
-            "description": "是否检测ReroRero电话亭的传送点",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "pipeline_override": {
-                        "RealTimeTeleportPhone": {
-                            "enabled": true
-                        },
-                        "RealTimeConfirmTeleportPhone": {
-                            "enabled": true
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "pipeline_override": {
-                        "RealTimeTeleportPhone": {
-                            "enabled": false
-                        },
-                        "RealTimeConfirmTeleportPhone": {
-                            "enabled": false
-                        }
-                    }
-                }
-            ],
-            "default_case": "Yes"
-        }
-    }
+    "option": {}
 }

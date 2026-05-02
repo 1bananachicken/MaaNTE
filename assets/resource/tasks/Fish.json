@@ -1,0 +1,144 @@
+{
+    "task": [
+        {
+            "name": "钓鱼任务",
+            "entry": "FishEntrance",
+            "option": [
+                "FishLoopTime",
+                "FishNumber",
+                "FishSellAuto",
+                "FishBuyBaitAuto",
+                "FishBaitThreshold"
+            ]
+        }
+    ],
+    "option": {
+        "FishLoopTime": {
+            "type": "input",
+            "label": "最大循环次数",
+            "description": "限制整个钓鱼循环最多执行多少次",
+            "inputs": [
+                {
+                    "name": "max_hit",
+                    "label": "循环次数",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "FishStart": {
+                    "max_hit": "{max_hit}"
+                }
+            }
+        },
+        "FishNumber": {
+            "type": "input",
+            "label": "每次钓鱼数量",
+            "description": "设置每次自动钓鱼的数量，建议小于等于99",
+            "inputs": [
+                {
+                    "name": "count",
+                    "label": "数量",
+                    "default": "99",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "FishGameStart": {
+                    "custom_action_param": {
+                        "count": "{count}"
+                    }
+                }
+            }
+        },
+        "FishSellAuto": {
+            "type": "switch",
+            "label": "自动卖鱼",
+            "description": "是否启用自动卖鱼功能",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "AutoSellFish": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "AutoSellFish": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "FishBuyBaitAuto": {
+            "type": "switch",
+            "label": "自动买鱼饵",
+            "description": "是否启用自动买鱼饵功能",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "FishBaitThreshold": {
+            "type": "select",
+            "label": "鱼饵识别阈值",
+            "description": "如果无法识别点击鱼饵位置，请调低该数值",
+            "cases": [
+                {
+                    "name": "0.8",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.8
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "0.7",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.7
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "0.6",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.6
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
