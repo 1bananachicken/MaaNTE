@@ -1,49 +1,17 @@
-import time
-from pathlib import Path
 import cv2
-import numpy as np
+import time
+
+from pathlib import Path
+from ..Common.utils import get_image, match_template_in_region
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
 
-def get_image(controller):
-    job = controller.post_screencap()
-    job.wait()
-    img = controller.cached_image
-    return img
-
-
-def match_template_in_region(img, region, template, min_similarity=0.8):
-    if img is None or not isinstance(img, np.ndarray):
-        return False, 0.0, 0, 0
-
-    x1, y1, x2, y2 = region
-
-    h, w = img.shape[:2]
-    x1, y1 = max(0, x1), max(0, y1)
-    x2, y2 = min(w, x2), min(h, y2)
-
-    if x2 <= x1 or y2 <= y1:
-        return False, 0.0, 0, 0
-
-    roi = img[y1:y2, x1:x2]
-
-    if len(roi.shape) == 3 and roi.shape[2] == 4:
-        roi = cv2.cvtColor(roi, cv2.COLOR_BGRA2BGR)
-
-    res = cv2.matchTemplate(roi, template, cv2.TM_CCOEFF_NORMED)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-
-    if max_val >= min_similarity:
-        return True, max_val, x1 + max_loc[0], y1 + max_loc[1]
-    return False, max_val, 0, 0
-
-
 @AgentServer.custom_action("auto_fish_new")
 class AutoFishNew(CustomAction):
-    abs_path = Path(__file__).parents[3]
+    abs_path = Path(__file__).parents[4]
     if Path.exists(abs_path / "assets"):
         image_dir = abs_path / "assets/resource/base/image/Fish"
     else:
