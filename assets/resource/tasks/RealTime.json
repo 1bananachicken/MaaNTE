@@ -7,6 +7,9 @@
                 "RealTimeCheckInterval",
                 "RealTimeAutoSkipStory",
                 "RealTimeAutoTeleport"
+            ],
+            "controller": [
+                "Win32-Front"
             ]
         }
     ],
