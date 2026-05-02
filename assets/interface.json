@@ -13,8 +13,9 @@
         {
             "name": "桌面端",
             "type": "Win32",
+            "permission_required": true,
             "win32": {
-                "class_regex": ".*",
+                "class_regex": "UnrealWindow",
                 "window_regex": "^\\s*(异环|NTE)\\s*$",
                 "screencap": "PrintWindow",
                 "mouse": "SendMessageWithWindowPos",
