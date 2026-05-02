@@ -5,8 +5,7 @@
         "all_of": [
             "FishSceneInWorldNextToFish"
         ],
-        "pre_delay": 500,
-        "post_delay": 500,
+        "post_delay": 2000,
         "action": {
             "type": "ClickKey",
             "param": {
@@ -22,8 +21,7 @@
         "all_of": [
             "FishSceneOnFishPrepare"
         ],
-        "pre_delay": 500,
-        "post_delay": 500,
+        "post_delay": 2000,
         "action": {
             "type": "Click",
             "param": {
@@ -55,8 +53,7 @@
             }
         },
         "pre_delay": 0,
-        "post_delay": 0,
-        "next": []
+        "post_delay": 0
     },
     "FishSceneOnFishPrepare": {
         "desc": "判断正在钓鱼准备界面，继续业务流程",
@@ -71,8 +68,7 @@
             }
         },
         "pre_delay": 0,
-        "post_delay": 0,
-        "next": []
+        "post_delay": 0
     },
     "FishSceneInWorldNextToFish": {
         "desc": "判断正在大世界钓鱼台边，继续业务流程",

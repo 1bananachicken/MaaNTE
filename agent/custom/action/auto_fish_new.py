@@ -39,14 +39,13 @@ def match_template_in_region(img, region, template, min_similarity=0.8):
         return True, max_val, x1 + max_loc[0], y1 + max_loc[1]
     return False, max_val, 0, 0
 
-@AgentServer.custom_action("auto_fish")
-class AutoFish(CustomAction):
+@AgentServer.custom_action("auto_fish_new")
+class AutoFishNew(CustomAction):
     abs_path = Path(__file__).parents[3]
     if Path.exists(abs_path / "assets"):
             image_dir = abs_path / "assets/resource/base/image/Fish"
     else:
         image_dir = abs_path / "resource/base/image/Fish"
-    continue_img = image_dir / "continue.png"
     valid_region_left_img = image_dir / "valid_region_left.png"
     valid_region_right_img = image_dir / "valid_region_right.png"
     slider_img = image_dir / "slider.png"
@@ -55,7 +54,6 @@ class AutoFish(CustomAction):
     slider_template = cv2.imread(str(slider_img), cv2.IMREAD_COLOR)
     valid_region_left_template = cv2.imread(str(valid_region_left_img), cv2.IMREAD_COLOR)
     valid_region_right_template = cv2.imread(str(valid_region_right_img), cv2.IMREAD_COLOR)
-    continue_template = cv2.imread(str(continue_img), cv2.IMREAD_COLOR)
     success_catch_template = cv2.imread(str(success_catch_img), cv2.IMREAD_COLOR)
 
     def run(self, context: Context, _argv: CustomAction.RunArg) -> CustomAction.RunResult:
@@ -65,17 +63,11 @@ class AutoFish(CustomAction):
         KEY_A = 65
         KEY_D = 68
         KEY_F = 70
-        KEY_ESC = 27
 
         success_region = (350,150,830,200)
-        settlement_region = (480, 610, 800, 690)
         game_region = (395, 40, 880, 60)
         deadzone = 15
 
-        # --- 抛竿 ---
-        controller.post_key_down(KEY_F)
-        time.sleep(0.1)
-        controller.post_key_up(KEY_F)
         print("  Casting...")
 
         # --- 等待鱼上钩 ---
@@ -87,8 +79,9 @@ class AutoFish(CustomAction):
             img = get_image(controller)
             wait_frame += 1
             m_catch, catch_score, _, _ = match_template_in_region(img, success_region, self.success_catch_template, 0.7)
-            if wait_frame % 100 == 0:
-                print(f"  [wait] frame={wait_frame} catch_score={catch_score:.3f}")
+            if wait_frame > 300:
+                print(f"  [wait] timeout (f={wait_frame}), fish ended")
+                break
             if m_catch:
                 controller.post_key_down(KEY_F)
                 time.sleep(0.1)
@@ -117,8 +110,8 @@ class AutoFish(CustomAction):
         while True:
             if context.tasker.stopping:
                 set_ad_key(None)
-                controller.post_key_down(KEY_A)
-                controller.post_key_down(KEY_D)
+                controller.post_key_up(KEY_A)
+                controller.post_key_up(KEY_D)
                 return CustomAction.RunResult(success=False)
             time.sleep(0.001)
             img = get_image(controller)
@@ -142,7 +135,7 @@ class AutoFish(CustomAction):
                 last_x_slider = x_slider
             else:
                 slider_miss_count += 1
-                if slider_miss_count >= 20:
+                if slider_miss_count >= 30:
                     set_ad_key(None)
                     controller.post_key_up(KEY_F)
                     print(f"  [minigame] slider lost {slider_miss_count} frames, minigame ended.")
@@ -151,6 +144,8 @@ class AutoFish(CustomAction):
 
             if frame > 300:
                 set_ad_key(None)
+                controller.post_key_up(KEY_A)
+                controller.post_key_up(KEY_D)
                 controller.post_key_up(KEY_F)
                 print(f"  [minigame] timeout (f={frame}), minigame ended.")
                 break
@@ -182,25 +177,6 @@ class AutoFish(CustomAction):
                 print(f"  [minigame] f={frame} slider(x={x_slider:.0f} s={slider_score:.2f}) "
                       f"L({m_left} s={left_score:.2f}) R({m_right} s={right_score:.2f}) "
                       f"bar_w={last_bar_width:.0f} target={target:.0f} offset={offset:+.0f} key={key_name}")
-
-        # --- 小游戏结束，检查是否钓上鱼 ---
-        time.sleep(1)
-        img = get_image(controller)
-        match_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
-        if match_settle:
-            print("  Fish caught! Closing settlement...")
-            for _ in range(5):
-                controller.post_key_down(KEY_ESC)
-                time.sleep(0.1)
-                controller.post_key_up(KEY_ESC)
-                time.sleep(1.5)
-                img = get_image(controller)
-                m, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
-                if not m:
-                    print("  Settlement closed.")
-                    break
-        else:
-            print("  Fish escaped or no settlement.")
 
         print("  Fishing done.")
         return CustomAction.RunResult(success=True)
