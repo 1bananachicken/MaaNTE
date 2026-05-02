@@ -9,7 +9,7 @@ def get_image(controller):
     img = controller.cached_image
     return img
 
-def click_rect(controller, rect, delay=0.001):
+def click_rect(controller, rect, delay=0.125):
     x, y, w, h = rect
     cx = x + w // 2
     cy = y + h // 2
