@@ -4,6 +4,7 @@
         "next": [
             "__ScenePrivateMenuListEnterWorld",
             "__ScenePrivateAnyEnterWorldSuccess",
+            "[JumpBack]__ScenePrivateLogin",
             "[JumpBack]__ScenePrivateAnyExit"
         ]
     },
