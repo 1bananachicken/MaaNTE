@@ -9,12 +9,12 @@ def get_image(controller):
     img = controller.cached_image
     return img
 
-def click_rect(controller, rect):
+def click_rect(controller, rect, delay=0.001):
     x, y, w, h = rect
     cx = x + w // 2
     cy = y + h // 2
     controller.post_touch_down(cx, cy).wait()
-    time.sleep(0.001)
+    time.sleep(delay)
     controller.post_touch_up().wait()
 
 def match_template_in_region(img, region, template, min_similarity=0.8):
