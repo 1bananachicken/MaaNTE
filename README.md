@@ -118,7 +118,7 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 
 感谢全部参与到测试与开发中的开发者(´▽`ʃ♡ƪ)
 
-[![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=105&columns=15)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
+[![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=200&columns=15)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
 
 ## 广告
 
