@@ -1,14 +1,13 @@
 from __future__ import annotations
 
 import logging
-from pathlib import Path
 from typing import Any
 
 import cv2
 import numpy as np
 from numpy.typing import NDArray
 
-from .assets import list_scene_templates
+from .assets import list_scene_templates, read_image
 
 logger = logging.getLogger(__name__)
 
@@ -17,37 +16,28 @@ STATE_SONG_SELECT = "song_select"
 STATE_PLAYING = "playing"
 STATE_RESULTS = "results"
 
-_scene_template_cache: dict[str, list[tuple[str, NDArray[np.uint8]]]] = {}
-
-
-def _load_scene_templates_once(kind: str) -> list[tuple[str, NDArray[np.uint8]]]:
-    if kind in _scene_template_cache:
-        return _scene_template_cache[kind]
-
-    templates: list[tuple[str, NDArray[np.uint8]]] = []
-    for name, tpl_path in list_scene_templates(kind):
-        img = _read_image(tpl_path)
-        if img is None:
-            logger.warning("无法读取场景模板：%s", tpl_path)
-            continue
-        templates.append((name, img))
-        logger.info("已加载场景模板：%s/%s (%dx%d)", kind, name, img.shape[1], img.shape[0])
-    if not templates:
-        logger.debug("未找到场景模板：%s", kind)
-
-    _scene_template_cache[kind] = templates
-    return templates
-
-
-def _read_image(p) -> NDArray[np.uint8] | None:
-    img = cv2.imread(str(p), cv2.IMREAD_COLOR)
-    if img is None:
-        img_bytes = np.fromfile(str(p), dtype=np.uint8)
-        img = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
-    return img
-
 
 class SceneGate:
+    _template_cache: dict[str, list[tuple[str, NDArray[np.uint8]]]] = {}
+
+    @classmethod
+    def _load_scene_templates(cls, kind: str) -> list[tuple[str, NDArray[np.uint8]]]:
+        if kind in cls._template_cache:
+            return cls._template_cache[kind]
+
+        templates: list[tuple[str, NDArray[np.uint8]]] = []
+        for name, tpl_path in list_scene_templates(kind):
+            img = read_image(tpl_path)
+            if img is None:
+                logger.warning("无法读取场景模板：%s", tpl_path)
+                continue
+            templates.append((name, img))
+            logger.info("已加载场景模板：%s/%s (%dx%d)", kind, name, img.shape[1], img.shape[0])
+        if not templates:
+            logger.debug("未找到场景模板：%s", kind)
+
+        cls._template_cache[kind] = templates
+        return templates
 
     def __init__(self, cfg: dict[str, Any]) -> None:
         sc = cfg.get("scene") or {}
@@ -58,9 +48,9 @@ class SceneGate:
         self._match_vote_min = max(1, int(sc.get("match_vote_min", 1)))
         self._playing_check_interval = max(1, int(sc.get("playing_check_interval", 5)))
 
-        self._song_select_tpls = _load_scene_templates_once("song_select")
-        self._results_tpls = _load_scene_templates_once("results")
-        self._playing_tpls = _load_scene_templates_once("playing")
+        self._song_select_tpls = self._load_scene_templates("song_select")
+        self._results_tpls = self._load_scene_templates("results")
+        self._playing_tpls = self._load_scene_templates("playing")
 
         self._has_any_templates = bool(
             self._song_select_tpls or self._results_tpls or self._playing_tpls

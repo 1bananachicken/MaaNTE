@@ -106,16 +106,6 @@ def _load_rhythm_config() -> dict[str, Any]:
     return dict(_DEFAULT_CONFIG)
 
 
-def _get_image(controller):
-    job = controller.post_screencap()
-    job.wait()
-    return controller.cached_image
-
-
-def _do_scroll_via_maa_hwnd(controller, x: int, y: int, delta: int):
-    controller.post_swipe(x, y, x, y - delta, duration=100).wait()
-
-
 def _press_keys(controller, lane_indices: list[int], key_hold_sec: float = 0.01):
     for li in lane_indices:
         controller.post_key_down(_VK[_LANES[li]])
@@ -238,7 +228,8 @@ class AutoRhythm(CustomAction):
 
                 t0 = time.perf_counter()
 
-                frame = _get_image(controller)
+                controller.post_screencap().wait()
+                frame = controller.cached_image
                 if frame is None or frame.size == 0:
                     time.sleep(0.1)
                     continue
@@ -273,8 +264,9 @@ class AutoRhythm(CustomAction):
                     prev_logged_state = state
 
                 if state == STATE_SONG_SELECT:
-                    scroll_fn = lambda sx, sy, sd: _do_scroll_via_maa_hwnd(
-                        controller, sx, sy, -sd * 100
+                    scroll_fn = lambda sx, sy, sd: (
+                        controller.post_swipe(sx, sy, sx, sy + sd * 100, duration=100).wait(),
+                        time.sleep(0.1),
                     )
                     sel_info = song_selector.step(
                         frame, controller, scroll_func=scroll_fn

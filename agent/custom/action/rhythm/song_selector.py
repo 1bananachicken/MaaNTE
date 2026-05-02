@@ -2,14 +2,13 @@ from __future__ import annotations
 
 import logging
 import time
-from pathlib import Path
 from typing import Any, Callable
 
 import cv2
 import numpy as np
 from numpy.typing import NDArray
 
-from .assets import list_scene_templates, list_song_templates
+from .assets import list_scene_templates, list_song_templates, read_image
 
 logger = logging.getLogger(__name__)
 
@@ -21,65 +20,54 @@ _SEL_CLICKING_SONG = "clicking_song"
 _SEL_DONE = "done"
 _SEL_FAILED = "failed"
 
-_start_template_cache: NDArray[np.uint8] | None = None
-_start_template_loaded: bool = False
-
-_song_template_cache: dict[str, NDArray[np.uint8]] = {}
-
-
-def _load_start_template_once() -> NDArray[np.uint8] | None:
-    global _start_template_cache, _start_template_loaded
-    if _start_template_loaded:
-        return _start_template_cache
-    _start_template_loaded = True
-
-    templates = list_scene_templates("song_select")
-    for stem, path in templates:
-        if stem == "start":
-            img = _read_image(path)
-            if img is not None:
-                _start_template_cache = img
-                th, tw = img.shape[:2]
-                logger.info("已加载「开始演奏」按钮模板：%s (%dx%d)", path.name, tw, th)
-                return img
-    logger.warning("未找到「开始演奏」按钮模板：start.png（请放入 scene_templates/song_select/）")
-    return None
-
-
-def _load_song_template_once(name: str) -> NDArray[np.uint8] | None:
-    if name in _song_template_cache:
-        return _song_template_cache[name]
-
-    templates = list_song_templates()
-    for stem, path in templates:
-        if stem == name:
-            img = _read_image(path)
-            if img is not None:
-                _song_template_cache[name] = img
-                th, tw = img.shape[:2]
-                logger.info("已加载歌曲模板：%s (%dx%d)", path.name, tw, th)
-                return img
-            else:
-                logger.warning("无法读取歌曲模板图片：%s", path)
-                return None
-
-    available = [s for s, _ in templates]
-    logger.warning("未找到歌曲模板: %s (可用: %s)", name, available)
-    return None
-
-
-def _read_image(p: Path) -> NDArray[np.uint8] | None:
-    img = cv2.imread(str(p), cv2.IMREAD_COLOR)
-    if img is None:
-        img_bytes = np.fromfile(str(p), dtype=np.uint8)
-        img = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
-    return img
-
-
 _DEFAULT_SONG = "Heroic_Appearance"
 
 
 class SongSelector:
+    _start_template_cache: NDArray[np.uint8] | None = None
+    _start_template_loaded: bool = False
+    _song_template_cache: dict[str, NDArray[np.uint8]] = {}
+
+    @classmethod
+    def _load_start_template(cls) -> NDArray[np.uint8] | None:
+        if cls._start_template_loaded:
+            return cls._start_template_cache
+        cls._start_template_loaded = True
+
+        templates = list_scene_templates("song_select")
+        for stem, path in templates:
+            if stem == "start":
+                img = read_image(path)
+                if img is not None:
+                    cls._start_template_cache = img
+                    th, tw = img.shape[:2]
+                    logger.info("已加载「开始演奏」按钮模板：%s (%dx%d)", path.name, tw, th)
+                    return img
+        logger.warning("未找到「开始演奏」按钮模板：start.png（请放入 scene_templates/song_select/）")
+        return None
+
+    @classmethod
+    def _load_song_template(cls, name: str) -> NDArray[np.uint8] | None:
+        if name in cls._song_template_cache:
+            return cls._song_template_cache[name]
+
+        templates = list_song_templates()
+        for stem, path in templates:
+            if stem == name:
+                img = read_image(path)
+                if img is not None:
+                    cls._song_template_cache[name] = img
+                    th, tw = img.shape[:2]
+                    logger.info("已加载歌曲模板：%s (%dx%d)", path.name, tw, th)
+                    return img
+                else:
+                    logger.warning("无法读取歌曲模板图片：%s", path)
+                    return None
+
+        available = [s for s, _ in templates]
+        logger.warning("未找到歌曲模板: %s (可用: %s)", name, available)
+        return None
+
     def __init__(self, cfg: dict[str, Any]) -> None:
         sc = cfg.get("song_select") or {}
         self._song_select_enabled = bool(sc.get("enabled", False))
@@ -102,13 +90,13 @@ class SongSelector:
         self._match_loc: tuple[int, int] | None = None
         self._start_retry_count: int = 0
 
-        self._start_template = _load_start_template_once()
+        self._start_template = self._load_start_template()
 
         if not self._song_name:
             self._song_name = _DEFAULT_SONG
             logger.info("未指定歌曲，默认选择: %s", self._song_name)
 
-        self._template = _load_song_template_once(self._song_name)
+        self._template = self._load_song_template(self._song_name)
         if self._template is not None:
             self._song_select_enabled = True
 
@@ -122,7 +110,7 @@ class SongSelector:
 
     def select_song(self, name: str) -> bool:
         self._song_name = name
-        tpl = _load_song_template_once(name)
+        tpl = self._load_song_template(name)
         if tpl is not None:
             self._template = tpl
             self._song_select_enabled = True

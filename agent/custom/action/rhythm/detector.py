@@ -10,59 +10,50 @@ import cv2
 import numpy as np
 from numpy.typing import NDArray
 
-from .assets import list_drum_templates, drum_templates_dir
+from .assets import list_drum_templates, _get_image_root, read_image
 from .lanes import LaneLayout
 
 logger = logging.getLogger(__name__)
 
 _LANE_NAMES = ("d", "f", "j", "k")
 
-_drum_template_cache: dict[int, NDArray[np.uint8]] | None = None
-
-
-def _load_drum_templates_once() -> dict[int, NDArray[np.uint8]]:
-    global _drum_template_cache
-    if _drum_template_cache is not None:
-        return _drum_template_cache
-
-    cache: dict[int, NDArray[np.uint8]] = {}
-    available = list_drum_templates()
-    name_to_idx = {name: i for i, name in enumerate(_LANE_NAMES)}
-    for stem, path in available:
-        key = stem.lower().replace("press_", "")
-        idx = name_to_idx.get(key)
-        if idx is None:
-            continue
-        img = _read_image(path)
-        if img is not None:
-            cache[idx] = img
-            th, tw = img.shape[:2]
-            logger.info("已加载鼓面模板: %s (%dx%d)", path.name, tw, th)
-
-    loaded_count = len(cache)
-    if loaded_count == 0:
-        logger.warning(
-            "未找到任何鼓面模板图片，请将 press_d.png / press_f.png / press_j.png / press_k.png "
-            "放入 %s",
-            drum_templates_dir(),
-        )
-    elif loaded_count < 4:
-        missing = [_LANE_NAMES[i] for i in range(4) if i not in cache]
-        logger.warning("部分鼓面模板缺失: %s，对应轨道将无法检测", missing)
-
-    _drum_template_cache = cache
-    return cache
-
-
-def _read_image(p: Path) -> NDArray[np.uint8] | None:
-    img = cv2.imread(str(p), cv2.IMREAD_COLOR)
-    if img is None:
-        img_bytes = np.fromfile(str(p), dtype=np.uint8)
-        img = cv2.imdecode(img_bytes, cv2.IMREAD_COLOR)
-    return img
-
 
 class DrumDetector:
+    _cache: dict[int, NDArray[np.uint8]] | None = None
+
+    @classmethod
+    def _load_drum_templates(cls) -> dict[int, NDArray[np.uint8]]:
+        if cls._cache is not None:
+            return cls._cache
+
+        cache: dict[int, NDArray[np.uint8]] = {}
+        available = list_drum_templates()
+        name_to_idx = {name: i for i, name in enumerate(_LANE_NAMES)}
+        for stem, path in available:
+            key = stem.lower().replace("press_", "")
+            idx = name_to_idx.get(key)
+            if idx is None:
+                continue
+            img = read_image(path)
+            if img is not None:
+                cache[idx] = img
+                th, tw = img.shape[:2]
+                logger.info("已加载鼓面模板: %s (%dx%d)", path.name, tw, th)
+
+        loaded_count = len(cache)
+        if loaded_count == 0:
+            logger.warning(
+                "未找到任何鼓面模板图片，请将 press_d.png / press_f.png / press_j.png / press_k.png "
+                "放入 %s",
+                _get_image_root() / "drum_templates",
+            )
+        elif loaded_count < 4:
+            missing = [_LANE_NAMES[i] for i in range(4) if i not in cache]
+            logger.warning("部分鼓面模板缺失: %s，对应轨道将无法检测", missing)
+
+        cls._cache = cache
+        return cache
+
     def __init__(self, cfg: dict[str, Any]) -> None:
         tcfg = cfg.get("template_detection") or {}
         self._thresholds: list[float] = tcfg.get("thresholds", [0.81, 0.80, 0.80, 0.81])
@@ -89,7 +80,7 @@ class DrumDetector:
         self._templates: list[NDArray[np.uint8] | None] = [None, None, None, None]
         self._template_loaded: list[bool] = [False, False, False, False]
 
-        cache = _load_drum_templates_once()
+        cache = self._load_drum_templates()
         for idx, img in cache.items():
             self._templates[idx] = img
             self._template_loaded[idx] = True
@@ -133,7 +124,6 @@ class DrumDetector:
         result = cv2.matchTemplate(roi, tpl, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, _ = cv2.minMaxLoc(result)
 
-        # 调试日志：显示每个轨道的匹配分数
         logger.debug(
             "轨道 %s: max_val=%.3f, threshold=%.3f, triggered=%s, roi_size=(%dx%d)",
             _LANE_NAMES[lane_idx], max_val, self._thresholds[lane_idx],

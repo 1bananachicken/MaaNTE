@@ -14,19 +14,6 @@ class LaneLayout:
     judge_y1_by_lane: list[int]
 
 
-def _frac(cfg: dict[str, Any], key: str, default: float) -> float:
-    v = cfg.get(key, default)
-    return float(v)
-
-
-def _center_x_at_judge(
-    top_x: int, bottom_x: int, judge_y: int, frame_h: int,
-) -> int:
-    t = judge_y / float(frame_h) if frame_h > 0 else 0.5
-    t = max(0.0, min(1.0, t))
-    return int(round(top_x + (bottom_x - top_x) * t))
-
-
 def build_lane_layout(cfg: dict[str, Any], frame_w: int, frame_h: int) -> LaneLayout:
     lanes = cfg.get("lanes") or {}
     centers = list(lanes.get("center_x_frac") or [0.36, 0.44, 0.56, 0.64])
@@ -37,11 +24,11 @@ def build_lane_layout(cfg: dict[str, Any], frame_w: int, frame_h: int) -> LaneLa
         raise ValueError("lanes.top_center_x_frac 必须为 4 个数")
 
     half_w_frac = float(lanes.get("half_width_frac", 0.028))
-    judge_y = _frac(lanes, "judge_line_y_frac", 0.82)
+    judge_y = float(lanes.get("judge_line_y_frac", 0.82))
     judge_y_by_lane = list(lanes.get("judge_line_y_frac_by_lane") or [judge_y, judge_y, judge_y, judge_y])
     if len(judge_y_by_lane) != 4:
         raise ValueError("lanes.judge_line_y_frac_by_lane 必须为 4 个数")
-    band_half = _frac(lanes, "judge_band_half_height_frac", 0.035)
+    band_half = float(lanes.get("judge_band_half_height_frac", 0.035))
 
     half_band = max(2, int(round(band_half * frame_h)))
     half_width_px = max(2, int(round(half_w_frac * frame_w)))
@@ -57,7 +44,9 @@ def build_lane_layout(cfg: dict[str, Any], frame_w: int, frame_h: int) -> LaneLa
         l_full_bottom = min(frame_h, lcy + half_band)
         judge_y0_by_lane.append(l_full_top)
         judge_y1_by_lane.append(l_full_bottom)
-        center_x.append(_center_x_at_judge(top_center_x[i], bottom_center_x[i], lcy, frame_h))
+        t = lcy / float(frame_h) if frame_h > 0 else 0.5
+        t = max(0.0, min(1.0, t))
+        center_x.append(int(round(top_center_x[i] + (bottom_center_x[i] - top_center_x[i]) * t)))
 
     return LaneLayout(
         frame_w=frame_w,
