@@ -113,7 +113,7 @@ def _get_image(controller):
 
 
 def _do_scroll_via_maa_hwnd(controller, x: int, y: int, delta: int):
-    controller.post_swipe(x, y, x, y + delta).wait()
+    controller.post_swipe(x, y, x, y + delta, duration=100).wait()
 
 
 def _press_keys(controller, lane_indices: list[int], key_hold_sec: float = 0.01):
