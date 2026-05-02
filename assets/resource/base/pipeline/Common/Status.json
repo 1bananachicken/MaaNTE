@@ -17,17 +17,10 @@
     "InEscMenu": {
         "desc": "在Esc菜单内",
         "recognition": {
-            "type": "OCR",
+            "type": "TemplateMatch",
             "param": {
-                "roi": [
-                    1052,
-                    161,
-                    59,
-                    18
-                ],
-                "expected": [
-                    "鉴别等级"
-                ],
+                "roi": [913,98,319,496],
+                "template": ["Common/Scene/EscMenu/EscMenuSign.png"],
                 "threshold": 0.8
             }
         },

@@ -5,7 +5,7 @@
         "post_delay": 0,
         "next": [
             "SceneExampleNormalTaskContinue",
-            "[JumpBack]__ScenePrivateBackToWorldAny"
+            "[JumpBack]SceneAnyEnterWorld"
         ]
     },
     "SceneExampleNormalTaskContinue": {

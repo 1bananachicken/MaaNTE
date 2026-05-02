@@ -1,10 +1,24 @@
 {
+    "WithdrawMoneyEntrance":{
+        "desc":"领取收益入口",
+        "next": [
+            "领取一咖舍收益"
+        ]
+    },
     "领取一咖舍收益": {
+        "recognition": {
+            "type":"And",
+            "param":{
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
         "action": {
             "type": "ClickKey",
             "param": {
                 "key": [
-                    116
+                    116 // F5
                 ]
             }
         },
@@ -101,10 +115,11 @@
         "action": {
             "type": "Click"
         },
+        "post_delay": 500,
         "next": [
-            "点击补货"
-        ],
-        "post_delay": 50
+            "点击补货",
+            "Esc"
+        ]
     },
     "点击补货":{
         "recognition": {
@@ -117,7 +132,7 @@
                     22
                 ],
                 "template": [
-                    "auto_withdraw_money/replenish_cafe.png"
+                    "auto_withdraw_money/restock_cafe.png"
                 ],
                 "threshold": 0.8
             }
@@ -165,7 +180,7 @@
                     44
                 ],
                 "template": [
-                    "auto_withdraw_money/replenish_list.png"
+                    "auto_withdraw_money/restock_list.png"
                 ],
                 "threshold": 0.8
             }
@@ -234,10 +249,7 @@
         },
         "action": {
             "type": "Click"
-        },
-        "next": [
-            "Esc"
-        ]
+        }
     },
     "Esc": {
         "action": {
@@ -255,9 +267,6 @@
         "desc": "提取收益任务出口",
         "pre_delay": 0,
         "post_delay": 0,
-        "rate_limit": 0,
-        "next": [
-            "__ScenePrivateBackToWorldAny"
-        ]
+        "rate_limit": 0
     }
 }
