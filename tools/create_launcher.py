@@ -14,7 +14,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 sys.stderr.reconfigure(encoding="utf-8")
 
 script_dir = Path(__file__).parent
-install_path = script_dir.parent.parent / "install"
+install_path = script_dir.parent / "install"
 
 
 def create_launcher():
