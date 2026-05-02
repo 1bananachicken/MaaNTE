@@ -1,0 +1,45 @@
+{
+    "__ScenePrivateWorldEnterScarboroughFair":{
+        "desc":"从大世界界面进入斯卡布罗集市",
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 114 // F3
+            }
+        },
+        "post_wait_freezes": {
+            "target": [
+                0,
+                0,
+                100,
+                100
+            ],
+            "time": 600
+        },
+        "post_delay": 0
+    },
+    "__ScenePrivateAnyEnterScarboroughFairSuccess": {
+        "desc": "从任意界面进入斯卡布罗集市成功",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InScarboroughFairMenu"
+                ]
+            }
+        },
+        "pre_wait_freezes": {
+            "target": [
+                20,
+                20,
+                40,
+                40
+            ],
+            "time": 800,
+            "timeout": 2000
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    }
+}

@@ -1,11 +1,15 @@
 {
+    "files.insertFinalNewline": true,
+    "files.eol": "\n",
     "json.schemas": [
         {
             "fileMatch": [
                 "/assets/resource/**/*.json",
                 "/install/resource/**/*.json",
-                "/assets/resource/**/*.jsonc",
-                "/install/resource/**/*.jsonc"
+                "!/assets/resource/data/**/**.json",
+                "!/install/resource/data/**/**.json",
+                "!/assets/resource/tasks/**/**.json",
+                "!/install/resource/tasks/**/**.json"
             ],
             "url": "/deps/tools/pipeline.schema.json"
         },
@@ -18,11 +22,21 @@
         },
         {
             "fileMatch": [
+                "/assets/resource/tasks/**/*.json",
+                "/install/resource/tasks/**/*.json"
+            ],
+            "url": "/deps/tools/interface_import.schema.json"
+        },
+        {
+            "fileMatch": [
                 "/install/config/maa_pi_config.json"
             ],
             "url": "/deps/tools/interface_config.schema.json"
         }
     ],
+    "files.exclude": {
+        "__pycache__": true
+    },
     "files.associations": {
         "**/assets/**/*.json": "jsonc"
     },
@@ -33,10 +47,14 @@
         "editor.indentSize": "tabSize"
     },
     "[python]": {
+        "editor.formatOnSave": true,
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
     "[markdown]": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "markdownlint.config": {
+        "MD028": false
     }
 }

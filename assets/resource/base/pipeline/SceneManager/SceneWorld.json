@@ -1,0 +1,34 @@
+{
+    "__ScenePrivateAnyEnterWorld": {
+        "desc": "从任意界面返回大世界界面",
+        "next": [
+            "__ScenePrivateMenuListEnterWorld",
+            "__ScenePrivateAnyEnterWorldSuccess",
+            "[JumpBack]__ScenePrivateLogin",
+            "[JumpBack]__ScenePrivateAnyExit"
+        ]
+    },
+    "__ScenePrivateAnyEnterWorldSuccess": {
+        "desc": "从任意界面进入大世界成功",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "pre_wait_freezes": {
+            "target": [
+                75,
+                60,
+                60,
+                60
+            ],
+            "time": 800,
+            "timeout": 2000
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    }
+}

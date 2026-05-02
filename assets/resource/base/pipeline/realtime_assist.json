@@ -1,87 +1,27 @@
 {
     "RealTimeTaskMain": {
-        "recognition": "DirectHit",
-        "action": "DoNothing",
-        "next": [
-            "RealTimeSkipPlot",
-            "RealTimeTeleportWitte",
-            "RealTimeTeleportPhone",
-            "RealTimeSleep"
-        ]
-    },
-    "RealTimeSkipPlot": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "realtime_assist/skip_story_btn.png",
-                "roi": [1000, 0, 1280, 100],
-                "threshold": 0.8
-            }
+        "desc": "实时任务主入口",
+        "action": "Custom",
+        "custom_action": "RealTimeTaskAction",
+        "custom_action_param": {
+            "nodes": [
+                "RealTimeTeleportWitte",
+                "RealTimeTeleportPhone",
+                "RealTimeSkipStory",
+                "RealTimeSkipStoryDialog",
+                "RealTimeSleep"
+            ]
         },
-        "action": {
-            "type": "Click"
-        },
-        "post_delay": 500,
-        "next": ["RealTimeSleep"]
-    },
-    "RealTimeTeleportWitte": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "realtime_assist/teleport_target_witte.png",
-                "roi": [920, 0, 1280, 140],
-                "threshold": 0.8
-            }
-        },
-        "post_delay": 500,
-        "next": ["RealTimeConfirmTeleportWitte"]
-    },
-    "RealTimeConfirmTeleportWitte": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "realtime_assist/teleport_btn_witte.png",
-                "roi": [920, 600, 1280, 660],
-                "threshold": 0.8
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "post_delay": 2000,
-        "next": ["RealTimeSleep"]
-    },
-    "RealTimeTeleportPhone": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "realtime_assist/teleport_target_phone.png",
-                "roi": [920, 0, 1280, 140],
-                "threshold": 0.8
-            }
-        },
-        "post_delay": 500,
-        "next": ["RealTimeConfirmTeleportPhone"]
-    },
-    "RealTimeConfirmTeleportPhone": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "realtime_assist/teleport_btn_phone.png",
-                "roi": [920, 600, 1280, 660],
-                "threshold": 0.8
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "post_delay": 2000,
-        "next": ["RealTimeSleep"]
+        "attach": {
+            "enable_skland_map": true
+        }
     },
     "RealTimeSleep": {
-        "recognition": "DirectHit",
-        "action": "DoNothing",
-        "post_delay": 500,
-        "next": ["RealTimeTaskMain"]
+        "pre_delay": 0,
+        "post_delay": 200
+    },
+    "RealTimeFakeTrue": {
+        "pre_delay": 0,
+        "post_delay": 0
     }
 }
