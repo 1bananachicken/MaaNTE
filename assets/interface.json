@@ -73,8 +73,8 @@
             "name": "自动演奏",
             "entry": "RhythmEntrance",
             "option": [
-                "演奏目标歌曲",
-                "连打次数",
+                "自动选曲",
+                "自动连打",
                 "目标帧率"
             ]
         }
@@ -378,20 +378,49 @@
             ],
             "default_case": "Yes"
         },
-        "演奏目标歌曲": {
-            "type": "select",
-            "label": "目标歌曲",
-            "description": "选择要演奏的歌曲，选「禁用」则不自动选歌",
+        "自动选曲": {
+            "type": "switch",
+            "label": "自动选曲",
+            "description": "启用后自动选择歌曲（待实现），关闭则手动指定目标歌曲",
             "cases": [
                 {
-                    "name": "Disabled",
-                    "label": "禁用自动选歌",
+                    "name": "Yes",
+                    "label": "启用",
                     "pipeline_override": {
                         "RhythmSetSong": {
                             "action": "Custom",
                             "custom_action": "rhythm_set_param",
                             "custom_action_param": {
+                                "auto_select": true,
                                 "song_name": ""
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "option": [
+                        "演奏目标歌曲选择"
+                    ]
+                }
+            ],
+            "default_case": "No"
+        },
+        "演奏目标歌曲选择": {
+            "type": "select",
+            "label": "目标歌曲",
+            "description": "选择要演奏的歌曲",
+            "cases": [
+                {
+                    "name": "Heroic_Appearance",
+                    "label": "Heroic_Appearance",
+                    "pipeline_override": {
+                        "RhythmSetSong": {
+                            "action": "Custom",
+                            "custom_action": "rhythm_set_param",
+                            "custom_action_param": {
+                                "song_name": "Heroic_Appearance"
                             }
                         }
                     }
@@ -436,19 +465,6 @@
                     }
                 },
                 {
-                    "name": "Heroic_Appearance",
-                    "label": "Heroic_Appearance",
-                    "pipeline_override": {
-                        "RhythmSetSong": {
-                            "action": "Custom",
-                            "custom_action": "rhythm_set_param",
-                            "custom_action_param": {
-                                "song_name": "Heroic_Appearance"
-                            }
-                        }
-                    }
-                },
-                {
                     "name": "迷星叫",
                     "label": "迷星叫",
                     "pipeline_override": {
@@ -462,17 +478,45 @@
                     }
                 }
             ],
-            "default_case": "Disabled"
+            "default_case": "Heroic_Appearance"
+        },
+        "自动连打": {
+            "type": "switch",
+            "label": "自动连打",
+            "description": "启用后连续演奏指定次数，关闭则仅演奏一次",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "option": [
+                        "连打次数"
+                    ]
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "RhythmSetRepeat": {
+                            "action": "Custom",
+                            "custom_action": "rhythm_set_param",
+                            "custom_action_param": {
+                                "auto_repeat_count": 0
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
         },
         "连打次数": {
             "type": "input",
             "label": "连打次数",
-            "description": "连续演奏的次数，设置为0则不连打",
+            "description": "连续演奏的次数",
             "inputs": [
                 {
                     "name": "auto_repeat_count",
                     "label": "次数",
-                    "default": "0",
+                    "default": "5",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
                 }
