@@ -12,6 +12,9 @@ body:
         Please ensure that you have completed the requirements before checking the box.
       options:
         - label: >-
+            I did not confirm the following content; I simply clicked "confirm."
+          required: false
+        - label: >-
             I understand that Issues are for feedback and problem solving,
             not trolling the comments section, and will provide as
             much information as possible to help solve the problem.
@@ -43,9 +46,9 @@ body:
     attributes:
       label: Version
       description: >-
-        Please provide the MXX version.
+        Please provide the MaaNTE version.
       placeholder: |
-        MXX Version:
+        MaaNTE Version:
     validations:
       required: true
   - type: textarea
@@ -53,7 +56,7 @@ body:
     attributes:
       label: Log and config files
       description: >-
-        **After closing MXX, upload the following 3 files:**
+        **After closing MaaNTE, upload the following 3 files:**
           1. The `maa.log` and `maa.bak.log` log file in the `debug` folder, and indicate the approximate point in time when the problem occurred.
           2. The `maa_pi_config.json`(MaaPiCli) config file in the `config` folder
 
@@ -61,7 +64,7 @@ body:
         **Please drag and drop the full file in, not your own cuttings or copies;**
         **compress it before uploading if too large.**
       placeholder: |
-        Please confirm that MXX is not running before uploading files.
+        Please confirm that MaaNTE is not running before uploading files.
     validations:
       required: true
   - type: textarea
@@ -84,9 +87,9 @@ body:
         If related to this issue, please upload them together.
 
         If available, upload screenshots and recordings to help explain your problem,
-        including but not limited to screenshots of MXX software,
-        screenshots of game screens, MXX debug screenshots (`debug/vision` path pictures,
-        after modifying `save_draw` in `config/maa_option.json` to `true`, run MXX again to obtain)
+        including but not limited to screenshots of MaaNTE software,
+        screenshots of game screens, MaaNTE debug screenshots (`debug/vision` path pictures,
+        after modifying `save_draw` in `config/maa_option.json` to `true`, run MaaNTE again to obtain)
 
         If the problem is **recognition related**, please help by providing
         the **original image** taken by the emulator's own screenshot tool
