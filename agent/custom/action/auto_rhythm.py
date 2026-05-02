@@ -13,11 +13,15 @@ from maa.context import Context
 
 from .rhythm.lanes import build_lane_layout
 from .rhythm.detector import DrumDetector
-from .rhythm.presence import STATE_OTHER, STATE_PLAYING, STATE_RESULTS, STATE_SONG_SELECT, SceneGate
+from .rhythm.presence import (
+    STATE_OTHER,
+    STATE_PLAYING,
+    STATE_RESULTS,
+    STATE_SONG_SELECT,
+    SceneGate,
+)
 from .rhythm.song_selector import SongSelector
 
-import ctypes
-WM_MOUSEWHEEL = 0x020A
 
 logger = logging.getLogger(__name__)
 
@@ -109,19 +113,7 @@ def _get_image(controller):
 
 
 def _do_scroll_via_maa_hwnd(controller, x: int, y: int, delta: int):
-    # maa 的 post_scroll 方法未正常向底层传递鼠标位置.
-    # 通过 ctypes 直接从底层发送滚动事件, 避开 maa
-    hwnd = controller._my_hwnd 
-    
-    wheel_delta = delta * 120
-    wparam = (wheel_delta << 16) & 0xFFFFFFFF
-    if wheel_delta < 0:
-        wparam = (0x10000 + wheel_delta) << 16 
-
-    lparam = (y << 16) | (x & 0xFFFF)
-    
-    ctypes.windll.user32.PostMessageW(hwnd, WM_MOUSEWHEEL, wparam, lparam)
-
+    controller.post_swipe(x, y, x, y + delta).wait()
 
 
 def _press_keys(controller, lane_indices: list[int], key_hold_sec: float = 0.01):
@@ -134,7 +126,9 @@ def _press_keys(controller, lane_indices: list[int], key_hold_sec: float = 0.01)
 
 @AgentServer.custom_action("rhythm_set_param")
 class RhythmSetParam(CustomAction):
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
         if argv.custom_action_param:
             try:
                 params = json.loads(argv.custom_action_param)
@@ -142,13 +136,18 @@ class RhythmSetParam(CustomAction):
                 params = {}
             for k, v in params.items():
                 os.environ[f"RHYTHM_{k.upper()}"] = str(v)
-            logger.debug("rhythm_set_param: %s", {k: os.environ.get(f"RHYTHM_{k.upper()}") for k in params})
+            logger.debug(
+                "rhythm_set_param: %s",
+                {k: os.environ.get(f"RHYTHM_{k.upper()}") for k in params},
+            )
         return CustomAction.RunResult(success=True)
 
 
 @AgentServer.custom_action("auto_rhythm")
 class AutoRhythm(CustomAction):
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
         controller = context.tasker.controller
         cfg = _load_rhythm_config()
 
@@ -176,7 +175,9 @@ class AutoRhythm(CustomAction):
             if cfg["song_select"]["song_name"]:
                 cfg["song_select"]["enabled"] = True
         if "auto_repeat_count" in merged:
-            cfg.setdefault("auto_repeat", {})["count"] = int(merged["auto_repeat_count"])
+            cfg.setdefault("auto_repeat", {})["count"] = int(
+                merged["auto_repeat_count"]
+            )
             if cfg["auto_repeat"]["count"] > 0:
                 cfg["auto_repeat"]["enabled"] = True
         if "target_fps" in merged:
@@ -204,14 +205,18 @@ class AutoRhythm(CustomAction):
         auto_repeat_count = int(auto_repeat_cfg.get("count", 1))
         auto_repeat_dismiss_delay = float(auto_repeat_cfg.get("dismiss_delay_sec", 0.8))
 
-        scene_lock_timeout = float(cfg.get("scene", {}).get("scene_lock_timeout_sec", 1.5))
+        scene_lock_timeout = float(
+            cfg.get("scene", {}).get("scene_lock_timeout_sec", 1.5)
+        )
 
         logger.info(
             "演奏任务开始 | 目标FPS=%d | 鼓面检测=%s | 自动选歌=%s(%s) | 自动连打=%s(%d次)",
             target_fps,
             drum_available,
-            song_selector.enabled, song_selector.song_name,
-            auto_repeat_enabled, auto_repeat_count,
+            song_selector.enabled,
+            song_selector.song_name,
+            auto_repeat_enabled,
+            auto_repeat_count,
         )
         repeat_index = 0
         results_seen = False
@@ -268,8 +273,12 @@ class AutoRhythm(CustomAction):
                     prev_logged_state = state
 
                 if state == STATE_SONG_SELECT:
-                    scroll_fn = lambda sx, sy, sd: _do_scroll_via_maa_hwnd(controller, sx, sy, -sd * 100)
-                    sel_info = song_selector.step(frame, controller, scroll_func=scroll_fn)
+                    scroll_fn = lambda sx, sy, sd: _do_scroll_via_maa_hwnd(
+                        controller, sx, sy, -sd * 100
+                    )
+                    sel_info = song_selector.step(
+                        frame, controller, scroll_func=scroll_fn
+                    )
                     sel_state = sel_info.get("state", "")
                     if sel_state == "done":
                         logger.info("选歌完成，等待进入演奏界面")
@@ -296,7 +305,8 @@ class AutoRhythm(CustomAction):
                             lane_names = [_LANES[i] for i in triggered_lanes]
                             logger.debug(
                                 "触发按键: %s | 帧#%d | scores=%s",
-                                lane_names, frame_count,
+                                lane_names,
+                                frame_count,
                                 [f"{scores[i]:.3f}" for i in triggered_lanes],
                             )
                             _press_keys(controller, triggered_lanes, key_hold_sec)
@@ -308,7 +318,11 @@ class AutoRhythm(CustomAction):
                         results_seen = True
                         repeat_index += 1
                         esc_sent_for_results = False
-                        logger.info("检测到结算界面: 第 %d/%d 次", repeat_index, auto_repeat_count)
+                        logger.info(
+                            "检测到结算界面: 第 %d/%d 次",
+                            repeat_index,
+                            auto_repeat_count,
+                        )
 
                     if auto_repeat_enabled and repeat_index >= auto_repeat_count:
                         logger.info("已达到连打次数上限 (%d)，停止", auto_repeat_count)
@@ -317,7 +331,11 @@ class AutoRhythm(CustomAction):
 
                     if not esc_sent_for_results:
                         time.sleep(auto_repeat_dismiss_delay)
-                        logger.info("发送 ESC 退出结算界面 (第 %d/%d 次)", repeat_index, auto_repeat_count if auto_repeat_enabled else 1)
+                        logger.info(
+                            "发送 ESC 退出结算界面 (第 %d/%d 次)",
+                            repeat_index,
+                            auto_repeat_count if auto_repeat_enabled else 1,
+                        )
                         controller.post_click_key(_VK_ESCAPE).wait()
                         esc_sent_for_results = True
                     time.sleep(1.0)
@@ -330,7 +348,9 @@ class AutoRhythm(CustomAction):
                 if frame_count % 120 == 0:
                     logger.debug(
                         "帧#%d | state=%s | playing_frames=%d",
-                        frame_count, state, playing_frame_count,
+                        frame_count,
+                        state,
+                        playing_frame_count,
                     )
 
                 elapsed = time.perf_counter() - t0
