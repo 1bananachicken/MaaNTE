@@ -14,7 +14,7 @@
         {
             "name": "钓鱼任务（新）",
             "entry": "FishNewEntrance",
-            "description": "重构的钓鱼功能，若不选择自动买鱼饵和自动卖鱼，不抢占鼠标。若仅自动卖鱼，建议钓鱼数量小于鱼饵量。自动买鱼饵为识别到鱼饵不足时购买",
+            "description": "重构的钓鱼功能，若不选择自动买鱼饵和自动卖鱼，不抢占鼠标。若仅自动卖鱼，建议钓鱼数量小于鱼饵量。自动买鱼饵为识别到鱼饵不足时购买或切换为万能鱼饵",
             "option": [
                 "FishNumber",
                 "FishSellAuto",
@@ -61,7 +61,7 @@
                         "count": "{count}"
                     }
                 },
-                "FishNewGameStart": {
+                "FishNewCast": {
                     "max_hit": "{count}"
                 }
             }

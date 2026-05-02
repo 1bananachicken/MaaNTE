@@ -1,4 +1,11 @@
 {
+    "FishSceneAnyEnterFishGame":{
+        "next": [
+            "FishScenePrepareToFishGame",
+            "[JumpBack]FishSceneWorldToPrepare",
+            "[JumpBack]SceneAnyEnterWorld"
+        ]
+    },
     "FishSceneWorldToPrepare": {
         "desc": "从大世界进入钓鱼准备界面",
         "recognition":  "And",
