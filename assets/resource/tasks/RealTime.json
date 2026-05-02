@@ -3,6 +3,7 @@
         {
             "name": "实时辅助",
             "entry": "RealTimeTaskMain",
+            "description": "实时辅助小工具，需要[color:red]“桌面端-前台”[/color]控制器",
             "option": [
                 "RealTimeCheckInterval",
                 "RealTimeAutoSkipStory",
