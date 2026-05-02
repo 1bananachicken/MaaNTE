@@ -15,6 +15,14 @@
             "[JumpBack]FishScenePrepareToFishGame"
         ]
     },
+    "FishLoopStart": {
+        "desc": "钓鱼无限循环 - 进入钓鱼游戏界面",
+        "next": [
+            "FishGameStart",
+            "[JumpBack]FishSceneWorldToPrepare",
+            "[JumpBack]FishScenePrepareToFishGame"
+        ]
+    },
     "FishGameStart": {
         "desc": "正在钓鱼游戏界面，执行钓鱼逻辑",
         "recognition": "And",
@@ -57,13 +65,13 @@
     "FishTaskExit": {
         "desc": "钓鱼任务完成",
         "next": [
-            "__ScenePrivateBackToWorldAny"
+            "SceneAnyEnterWorld"
         ]
     },
     "FishTaskExitWithError": {
         "desc": "钓鱼任务异常退出",
         "next": [
-            "__ScenePrivateBackToWorldAny"
+            "SceneAnyEnterWorld"
         ]
     }
 }

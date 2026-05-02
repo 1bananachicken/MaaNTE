@@ -1,0 +1,122 @@
+{
+    "__ScenePrivateLogin": {
+        "desc": "处理登录界面",
+        "recognition": {
+            "type": "Or",
+            "param":{
+                "any_of": [
+                    "__ScenePrivateCloseLoginAnnouncement",
+                    "__ScenePriviteLoginExitButton"
+                ]
+            }
+        },
+        "next": [
+            "__ScenePrivateLoginContinue",
+            "[JumpBack]__ScenePrivateCloseLoginAnnouncement",
+            "__ScenePrivateLogin"
+        ]
+    },
+    "__ScenePriviteLoginExitButton":{
+        "desc":"登陆界面退出按钮",
+        "recognition": "TemplateMatch",
+        "roi": [
+            0,
+            -100,
+            100,
+            100
+        ],
+        "template": [
+            "Common/Scene/Login/LoginExit.png"
+        ],
+        "green_mask": true
+
+    },
+    "__ScenePrivateLoginContinue": {
+        "desc": "等待登录页面出现按钮继续",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    400,
+                    550,
+                    480,
+                    140
+                ],
+                "expected": [
+                    "游戏"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "[JumpBack]__ScenePrivateLoginMonthlyPassConfirm",
+            "__ScenePrivateAnyEnterWorldSuccess",
+            "[JumpBack]__ScenePrivateAnyExit"
+        ]
+    },
+    "__ScenePrivateCloseLoginAnnouncement": {
+        "desc": "关闭登录时公告界面",
+        "recognition": "And",
+        "all_of": [
+            "__ScenePrivateCloseAnnouncementButton",
+            {
+                "recognition": {
+                    "type": "OCR",
+                    "param": {
+                        "roi": [
+                            429,
+                            88,
+                            413,
+                            69
+                        ],
+                        "expected": [
+                            "公告"
+                        ]
+                    },
+                    "desc": "识别是否在公告界面"
+                }
+            }
+        ],
+        "action": {
+            "type": "Click"
+        }
+    },
+    "__ScenePrivateCloseAnnouncementButton":{
+        "recognition": "TemplateMatch",
+        "roi": [
+            1090,
+            84,
+            70,
+            70
+        ],
+        "template": [
+            "Common/Scene/Login/LoginAnnouncementClose.png"
+        ],
+        "green_mask": true
+    },
+    "__ScenePrivateLoginMonthlyPassConfirm": {
+        "desc": "领取月卡，无法跳过必须领取",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    400,
+                    50,
+                    480,
+                    600
+                ],
+                "expected": [
+                    "异晶开采凭证",
+                    "剩余天数",
+                    "今日奖励"  // zh-cn
+                ]
+            }
+        },
+        "pre_delay": 1000, // 3d移动，pre_wait_freeze不生效
+        "action": {
+            "type": "Click"
+        }
+    }
+}
