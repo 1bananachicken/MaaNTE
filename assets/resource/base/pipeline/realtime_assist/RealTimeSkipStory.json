@@ -9,7 +9,7 @@
                     "realtime_assist/skip_story_btn_hover.png"
                 ],
                 "roi": [1210, 20, 50, 50],
-                "threshold": 0.8
+                "threshold": 0.7
             }
         },
         "action": {
