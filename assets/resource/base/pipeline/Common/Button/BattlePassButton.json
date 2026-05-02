@@ -1,49 +1,49 @@
 {
-    "EscMenuButton": {
-        "desc": "大世界中的ESC菜单按钮",
+    "BattlePassButton": {
+        "desc": "大世界中的环期赏令按钮",
         "recognition": "TemplateMatch",
         "roi": [
-            1208,
+            927,
             5,
             60,
             60
         ],
         "template": [
-            "Common/Button/EscPhone.png",
-            "Common/Button/EscPhoneWithRedDot.png"
+            "Common/Button/BattlePass.png",
+            "Common/Button/BattlePassWithRedDot.png"
         ],
         "green_mask": true,
         "pre_delay": 0,
         "post_delay": 0,
         "rate_limit": 0,
         "next": [
-            "AltClickEscMenuButtonKeyDown"
+            "AltClickBattlePassButtonKeyDown"
         ]
     },
-    "AltClickEscMenuButtonKeyDown": {
-        "desc": "使用 Alt + 点击大世界中的ESC菜单按钮（按住 Alt 键）",
+    "AltClickBattlePassButtonKeyDown": {
+        "desc": "使用 Alt + 点击大世界中的环期赏令按钮（按住 Alt 键）",
         "pre_delay": 0,
         "action": "KeyDown",
         "key": 164, // 0xA4	Left Alt key
         "post_delay": 0,
         "rate_limit": 0,
         "next": [
-            "AltClickEscMenuButtonClick"
+            "AltClickBattlePassButtonClick"
         ]
     },
-    "AltClickEscMenuButtonClick": {
-        "desc": "使用 Alt + 点击大世界中的ESC菜单按钮（单击）",
+    "AltClickBattlePassButtonClick": {
+        "desc": "使用 Alt + 点击大世界中的环期赏令按钮（单击）",
         "pre_delay": 0,
         "action": "Click",
-        "target": "EscMenuButton",
+        "target": "BattlePassButton",
         "post_delay": 0,
         "rate_limit": 0,
         "next": [
-            "AltClickEscMenuButtonKeyUp"
+            "AltClickBattlePassButtonKeyUp"
         ]
     },
-    "AltClickEscMenuButtonKeyUp": {
-        "desc": "使用 Alt + 点击大世界中的ESC菜单按钮（释放 Alt 键）",
+    "AltClickBattlePassButtonKeyUp": {
+        "desc": "使用 Alt + 点击大世界中的环期赏令按钮（释放 Alt 键）",
         "pre_delay": 0,
         "action": "KeyUp",
         "key": 164, // 0xA4	Left Alt key

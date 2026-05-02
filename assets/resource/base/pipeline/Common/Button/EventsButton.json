@@ -1,49 +1,49 @@
 {
-    "EscMenuButton": {
-        "desc": "大世界中的ESC菜单按钮",
+    "EventsButton": {
+        "desc": "大世界中的活动按钮",
         "recognition": "TemplateMatch",
         "roi": [
-            1208,
+            1040,
             5,
             60,
             60
         ],
         "template": [
-            "Common/Button/EscPhone.png",
-            "Common/Button/EscPhoneWithRedDot.png"
+            "Common/Button/Events.png",
+            "Common/Button/EventsWithRedDot.png"
         ],
         "green_mask": true,
         "pre_delay": 0,
         "post_delay": 0,
         "rate_limit": 0,
         "next": [
-            "AltClickEscMenuButtonKeyDown"
+            "AltClickEventsButtonKeyDown"
         ]
     },
-    "AltClickEscMenuButtonKeyDown": {
-        "desc": "使用 Alt + 点击大世界中的ESC菜单按钮（按住 Alt 键）",
+    "AltClickEventsButtonKeyDown": {
+        "desc": "使用 Alt + 点击大世界中的活动按钮（按住 Alt 键）",
         "pre_delay": 0,
         "action": "KeyDown",
         "key": 164, // 0xA4	Left Alt key
         "post_delay": 0,
         "rate_limit": 0,
         "next": [
-            "AltClickEscMenuButtonClick"
+            "AltClickEventsButtonClick"
         ]
     },
-    "AltClickEscMenuButtonClick": {
-        "desc": "使用 Alt + 点击大世界中的ESC菜单按钮（单击）",
+    "AltClickEventsButtonClick": {
+        "desc": "使用 Alt + 点击大世界中的活动按钮（单击）",
         "pre_delay": 0,
         "action": "Click",
-        "target": "EscMenuButton",
+        "target": "EventsButton",
         "post_delay": 0,
         "rate_limit": 0,
         "next": [
-            "AltClickEscMenuButtonKeyUp"
+            "AltClickEventsButtonKeyUp"
         ]
     },
-    "AltClickEscMenuButtonKeyUp": {
-        "desc": "使用 Alt + 点击大世界中的ESC菜单按钮（释放 Alt 键）",
+    "AltClickEventsButtonKeyUp": {
+        "desc": "使用 Alt + 点击大世界中的活动按钮（释放 Alt 键）",
         "pre_delay": 0,
         "action": "KeyUp",
         "key": 164, // 0xA4	Left Alt key

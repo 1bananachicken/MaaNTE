@@ -3,10 +3,10 @@
         "desc": "大世界中的任务菜单按钮",
         "recognition": "TemplateMatch",
         "roi": [
-            8,
-            111,
-            42,
-            64
+            0,
+            105,
+            60,
+            60
         ],
         "template": [
             "Common/Button/Tasks.png"
