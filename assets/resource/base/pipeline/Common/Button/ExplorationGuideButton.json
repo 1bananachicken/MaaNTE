@@ -1,0 +1,62 @@
+{
+    "ExplorationGuideButton": {
+        "desc": "大世界中的探索指南按钮",
+        "recognition": "TemplateMatch",
+        "roi": [
+            873,
+            5,
+            60,
+            60
+        ],
+        "template": [
+            "Common/Button/ExplorationGuide.png",
+            "Common/Button/ExplorationGuideWithRedDot.png"
+        ],
+        "green_mask": true,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "next": [
+            "AltClickExplorationGuideButtonKeyDown"
+        ]
+    },
+    "AltClickExplorationGuideButtonKeyDown": {
+        "desc": "使用 Alt + 点击大世界中的探索指南按钮（按住 Alt 键）",
+        "pre_delay": 0,
+        "action": "KeyDown",
+        "key": 164, // 0xA4	Left Alt key
+        "post_delay": 0,
+        "rate_limit": 0,
+        "next": [
+            "AltClickExplorationGuideButtonClick"
+        ]
+    },
+    "AltClickExplorationGuideButtonClick": {
+        "desc": "使用 Alt + 点击大世界中的探索指南按钮（单击）",
+        "pre_delay": 0,
+        "action": "Click",
+        "target": "ExplorationGuideButton",
+        "post_delay": 0,
+        "rate_limit": 0,
+        "next": [
+            "AltClickExplorationGuideButtonKeyUp"
+        ]
+    },
+    "AltClickExplorationGuideButtonKeyUp": {
+        "desc": "使用 Alt + 点击大世界中的探索指南按钮（释放 Alt 键）",
+        "pre_delay": 0,
+        "action": "KeyUp",
+        "key": 164, // 0xA4	Left Alt key
+        "post_wait_freezes": {
+            "time": 80,
+            "target": [
+                0,
+                0,
+                0,
+                0
+            ]
+        },
+        "post_delay": 0,
+        "rate_limit": 0
+    }
+}
