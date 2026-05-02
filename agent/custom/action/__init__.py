@@ -21,11 +21,8 @@ __all__ = [
     "AutoBuyFishBait",
     "AutoSellFish",
     "ClickOverride",
-<<<<<<< HEAD
     "AutoRhythm",
     "AutoRhythmSelectSong",
     "AutoRhythmRepeat",
-=======
     "RealTimeTaskAction",
->>>>>>> b286f87964d454923bb948c1f58b5cbd926f5894
 ]
