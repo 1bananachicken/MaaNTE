@@ -32,6 +32,7 @@ _VK = {"d": 0x44, "f": 0x46, "j": 0x4A, "k": 0x4B}
 _VK_ESCAPE = 0x1B
 
 _RHYTHM_ENV_KEYS = (
+    "RHYTHM_AUTO_SELECT",
     "RHYTHM_SONG_NAME",
     "RHYTHM_AUTO_REPEAT_COUNT",
     "RHYTHM_TARGET_FPS",
@@ -186,7 +187,9 @@ class AutoRhythm(CustomAction):
             val = os.environ.get(env_key)
             if val is None:
                 continue
-            if env_key.endswith("_SONG_NAME"):
+            if env_key.endswith("_AUTO_SELECT"):
+                merged.setdefault("auto_select", val.lower() in ("true", "1", "yes"))
+            elif env_key.endswith("_SONG_NAME"):
                 merged.setdefault("song_name", val)
             elif env_key.endswith("_AUTO_REPEAT_COUNT"):
                 merged.setdefault("auto_repeat_count", val)
@@ -195,6 +198,10 @@ class AutoRhythm(CustomAction):
             elif env_key.endswith("_AUTO_REPEAT_MAX"):
                 merged.setdefault("auto_repeat_max", val)
 
+        if "auto_select" in merged:
+            cfg.setdefault("song_select", {})["auto_select"] = merged["auto_select"]
+            if cfg["song_select"]["auto_select"]:
+                cfg["song_select"]["enabled"] = True
         if "song_name" in merged:
             cfg.setdefault("song_select", {})["song_name"] = str(merged["song_name"])
             if cfg["song_select"]["song_name"]:
