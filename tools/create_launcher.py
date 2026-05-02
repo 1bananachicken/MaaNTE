@@ -41,6 +41,7 @@ def create_launcher():
                 sys.executable, "-m", "PyInstaller",
                 "--onefile", "--noconsole",
                 "--name", "MaaNTE",
+                "--icon", str(install_path / "logo.ico"),
                 "--distpath", str(install_path),
                 "--workpath", str(script_dir / "_build"),
                 "--specpath", str(script_dir),
