@@ -1,0 +1,61 @@
+{
+    "ScarboroughFairButton": {
+        "desc": "大世界中的斯卡布罗集市按钮",
+        "recognition": "TemplateMatch",
+        "roi": [
+            985,
+            5,
+            60,
+            60
+        ],
+        "template": [
+            "Common/Button/ScarboroughFair.png"
+        ],
+        "green_mask": true,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "next": [
+            "AltClickScarboroughFairButtonKeyDown"
+        ]
+    },
+    "AltClickScarboroughFairButtonKeyDown": {
+        "desc": "使用 Alt + 点击大世界中的斯卡布罗集市按钮（按住 Alt 键）",
+        "pre_delay": 0,
+        "action": "KeyDown",
+        "key": 164, // 0xA4	Left Alt key
+        "post_delay": 0,
+        "rate_limit": 0,
+        "next": [
+            "AltClickScarboroughFairButtonClick"
+        ]
+    },
+    "AltClickScarboroughFairButtonClick": {
+        "desc": "使用 Alt + 点击大世界中的斯卡布罗集市按钮（单击）",
+        "pre_delay": 0,
+        "action": "Click",
+        "target": "ScarboroughFairButton",
+        "post_delay": 0,
+        "rate_limit": 0,
+        "next": [
+            "AltClickScarboroughFairButtonKeyUp"
+        ]
+    },
+    "AltClickScarboroughFairButtonKeyUp": {
+        "desc": "使用 Alt + 点击大世界中的斯卡布罗集市按钮（释放 Alt 键）",
+        "pre_delay": 0,
+        "action": "KeyUp",
+        "key": 164, // 0xA4	Left Alt key
+        "post_wait_freezes": {
+            "time": 80,
+            "target": [
+                0,
+                0,
+                0,
+                0
+            ]
+        },
+        "post_delay": 0,
+        "rate_limit": 0
+    }
+}
