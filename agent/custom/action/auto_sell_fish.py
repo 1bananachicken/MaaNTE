@@ -76,6 +76,8 @@ class AutoSellFish(CustomAction):
                 controller.post_click_key(KEY_ESC).wait()  
                 return CustomAction.RunResult(success=True)
         
+        time.sleep(1.5)
+        
         while True:
             img = get_image(controller)
             found_sell_button, _, _, _ = match_template_in_region(img, sell_button_region, self.sell_button_template, 0.8)
