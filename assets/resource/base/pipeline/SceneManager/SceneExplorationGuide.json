@@ -1,0 +1,45 @@
+{
+    "__ScenePrivateWorldEnterExplorationGuide":{
+        "desc":"从大世界界面进入探索指南",
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 112 // F1
+            }
+        },
+        "post_wait_freezes": {
+            "target": [
+                0,
+                0,
+                100,
+                100
+            ],
+            "time": 600
+        },
+        "post_delay": 0
+    },
+    "__ScenePrivateAnyEnterExplorationGuideSuccess": {
+        "desc": "从任意界面进入探索指南成功",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InExplorationGuideMenu"
+                ]
+            }
+        },
+        "pre_wait_freezes": {
+            "target": [
+                20,
+                20,
+                40,
+                40
+            ],
+            "time": 800,
+            "timeout": 2000
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    }
+}

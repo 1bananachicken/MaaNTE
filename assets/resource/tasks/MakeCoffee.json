@@ -1,0 +1,30 @@
+{
+    "task": [
+        {
+            "name": "自动做咖啡",
+            "entry": "AutoMakeCoffee",
+            "option": [
+                "MakeCoffeeLoopTime"
+            ]
+        }
+    ],
+    "option": {
+        "MakeCoffeeLoopTime": {
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "循环次数",
+                    "default": "10",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "AutoMakeCoffee": {
+                    "custom_action_param": {
+                        "count": "{循环次数}"
+                    }
+                }
+            }
+        }
+    }
+}

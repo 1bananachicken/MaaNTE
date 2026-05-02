@@ -1,48 +1,49 @@
 {
-    "TasksMenuButton": {
-        "desc": "大世界中的任务菜单按钮",
+    "CityTycoonButton": {
+        "desc": "大世界中的都市大亨按钮",
         "recognition": "TemplateMatch",
         "roi": [
-            8,
-            111,
-            42,
-            64
+            168,
+            5,
+            60,
+            60
         ],
         "template": [
-            "Common/Button/Tasks.png"
+            "Common/Button/CityTycoon.png",
+            "Common/Button/CityTycoonWithRedDot.png"
         ],
         "green_mask": true,
         "pre_delay": 0,
         "post_delay": 0,
         "rate_limit": 0,
         "next": [
-            "AltClickTasksMenuButtonKeyDown"
+            "AltClickCityTycoonButtonKeyDown"
         ]
     },
-    "AltClickTasksMenuButtonKeyDown": {
-        "desc": "使用 Alt + 点击大世界中的任务菜单按钮（按住 Alt 键）",
+    "AltClickCityTycoonButtonKeyDown": {
+        "desc": "使用 Alt + 点击大世界中的都市大亨按钮（按住 Alt 键）",
         "pre_delay": 0,
         "action": "KeyDown",
         "key": 164, // 0xA4	Left Alt key
         "post_delay": 0,
         "rate_limit": 0,
         "next": [
-            "AltClickTasksMenuButtonClick"
+            "AltClickCityTycoonButtonClick"
         ]
     },
-    "AltClickTasksMenuButtonClick": {
-        "desc": "使用 Alt + 点击大世界中的任务菜单按钮（单击）",
+    "AltClickCityTycoonButtonClick": {
+        "desc": "使用 Alt + 点击大世界中的都市大亨按钮（单击）",
         "pre_delay": 0,
         "action": "Click",
-        "target": "TasksMenuButton",
+        "target": "CityTycoonButton",
         "post_delay": 0,
         "rate_limit": 0,
         "next": [
-            "AltClickTasksMenuButtonKeyUp"
+            "AltClickCityTycoonButtonKeyUp"
         ]
     },
-    "AltClickTasksMenuButtonKeyUp": {
-        "desc": "使用 Alt + 点击大世界中的任务菜单按钮（释放 Alt 键）",
+    "AltClickCityTycoonButtonKeyUp": {
+        "desc": "使用 Alt + 点击大世界中的都市大亨按钮（释放 Alt 键）",
         "pre_delay": 0,
         "action": "KeyUp",
         "key": 164, // 0xA4	Left Alt key
