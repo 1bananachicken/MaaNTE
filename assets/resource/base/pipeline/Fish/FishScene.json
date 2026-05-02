@@ -5,8 +5,7 @@
         "all_of": [
             "FishSceneInWorldNextToFish"
         ],
-        "pre_delay": 500,
-        "post_delay": 500,
+        "post_delay": 2000,
         "action": {
             "type": "ClickKey",
             "param": {
@@ -22,8 +21,7 @@
         "all_of": [
             "FishSceneOnFishPrepare"
         ],
-        "pre_delay": 500,
-        "post_delay": 500,
+        "post_delay": 2000,
         "action": {
             "type": "Click",
             "param": {
@@ -41,16 +39,21 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [1170,359,106,58],
-                "template": [
-                    "auto_fish/FishGameSign.png"
+                "roi": [
+                    1141,
+                    609,
+                    87,
+                    84
                 ],
-                "threshold": 0.8
+                "template": [
+                    "Fish/FishGameSign.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
             }
         },
         "pre_delay": 0,
-        "post_delay": 0,
-        "next": []
+        "post_delay": 0
     },
     "FishSceneOnFishPrepare": {
         "desc": "判断正在钓鱼准备界面，继续业务流程",
@@ -59,14 +62,13 @@
             "param": {
                 "roi": [823,43,117,42],
                 "template": [
-                    "auto_fish/FishPrepareTitle.png"
+                    "Fish/FishPrepareTitle.png"
                 ],
                 "threshold": 0.8
             }
         },
         "pre_delay": 0,
-        "post_delay": 0,
-        "next": []
+        "post_delay": 0
     },
     "FishSceneInWorldNextToFish": {
         "desc": "判断正在大世界钓鱼台边，继续业务流程",
@@ -79,7 +81,7 @@
                     "param": {
                         "roi": [727,365,126,54],
                         "template": [
-                            "auto_fish/FishInteractButton.png"
+                            "Fish/FishInteractButton.png"
                         ],
                         "threshold": 0.8
                     }

@@ -10,6 +10,16 @@
                 "FishBuyBaitAuto",
                 "FishBaitThreshold"
             ]
+        },
+        {
+            "name": "钓鱼任务（新）",
+            "entry": "FishNewEntrance",
+            "description": "重构的钓鱼功能，若不选择自动买鱼饵和自动卖鱼，不抢占鼠标。若仅自动卖鱼，建议钓鱼数量小于鱼饵量。自动买鱼饵为识别到鱼饵不足时购买",
+            "option": [
+                "FishNumber",
+                "FishSellAuto",
+                "FishBuyBaitAuto"
+            ]
         }
     ],
     "option": {
@@ -50,6 +60,9 @@
                     "custom_action_param": {
                         "count": "{count}"
                     }
+                },
+                "FishNewGameStart": {
+                    "max_hit": "{count}"
                 }
             }
         },
@@ -97,6 +110,9 @@
                     "pipeline_override": {
                         "AutoSellFish": {
                             "enabled": true
+                        },
+                        "FishNewOpenFishMaster": {
+                            "enabled": true
                         }
                     }
                 },
@@ -105,6 +121,9 @@
                     "label": "禁用",
                     "pipeline_override": {
                         "AutoSellFish": {
+                            "enabled": false
+                        },
+                        "FishNewOpenFishMaster": {
                             "enabled": false
                         }
                     }
@@ -122,6 +141,9 @@
                     "pipeline_override": {
                         "AutoBuyFishBait": {
                             "enabled": true
+                        },
+                        "FishNewGotoBuyBait": {
+                            "enabled": true
                         }
                     },
                     "option": [
@@ -133,6 +155,9 @@
                     "label": "禁用",
                     "pipeline_override": {
                         "AutoBuyFishBait": {
+                            "enabled": false
+                        },
+                        "FishNewGotoBuyBait": {
                             "enabled": false
                         }
                     }

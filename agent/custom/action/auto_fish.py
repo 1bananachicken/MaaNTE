@@ -44,10 +44,10 @@ def match_template_in_region(img, region, template, min_similarity=0.8):
 class AutoFish(CustomAction):
     abs_path = Path(__file__).parents[3]
     if Path.exists(abs_path / "assets"):
-            image_dir = abs_path / "assets/resource/base/image/auto_fish"
+            image_dir = abs_path / "assets/resource/base/image/Fish"
     else:
-        image_dir = abs_path / "resource/base/image/auto_fish"
-    continue_img = image_dir / "continue.png"
+        image_dir = abs_path / "resource/base/image/Fish"
+    settlement_img = image_dir / "settlement_blank.png"
     valid_region_left_img = image_dir / "valid_region_left.png"
     valid_region_right_img = image_dir / "valid_region_right.png"
     slider_img = image_dir / "slider.png"
@@ -60,7 +60,7 @@ class AutoFish(CustomAction):
     slider_template = cv2.imread(str(slider_img), cv2.IMREAD_COLOR)
     valid_region_left_template = cv2.imread(str(valid_region_left_img), cv2.IMREAD_COLOR)
     valid_region_right_template = cv2.imread(str(valid_region_right_img), cv2.IMREAD_COLOR)
-    continue_template = cv2.imread(str(continue_img), cv2.IMREAD_COLOR)
+    settlement_template = cv2.imread(str(settlement_img), cv2.IMREAD_COLOR)
     success_catch_template = cv2.imread(str(success_catch_img), cv2.IMREAD_COLOR)
     escape_template = cv2.imread(str(escape_img), cv2.IMREAD_COLOR)
     prepare_start_template = cv2.imread(str(prepare_start_img), cv2.IMREAD_COLOR)
@@ -87,24 +87,46 @@ class AutoFish(CustomAction):
         KEY_ESC = 27
 
         success_region = (520, 160, 785, 190)
-        settlement_region = (564, 642, 1206, 664)
+        settlement_region = (570, 640, 570 + 143, 640 + 23)
         game_region = (401, 39, 882, 63)
         escape_region = (590, 349, 689, 371)
         prepare_region = (908, 602, 1247, 654)
         fish_game_sign_region = (1176, 365, 1270, 413)
         need_bait_region = (610, 350, 751, 371)
 
+        def detect_settlement(img, threshold=0.8):
+            return match_template_in_region(
+                img, settlement_region, self.settlement_template, threshold
+            )
+
+        def press_esc():
+            controller.post_key_down(KEY_ESC)
+            time.sleep(0.1)
+            controller.post_key_up(KEY_ESC)
+
+        def wait_until_settlement_disappears(timeout=1.0, interval=0.05):
+            wait_start = time.time()
+            while time.time() - wait_start < timeout:
+                if context.tasker.stopping:
+                    return False
+
+                img = get_image(controller)
+                matched, _, _, _ = detect_settlement(img)
+                if not matched:
+                    return True
+                time.sleep(interval)
+
+            return False
+
         def ensure_fish_game():
             for _ in range(10):
                 img = get_image(controller)
                 
-                m_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
+                m_settle, _, _, _ = detect_settlement(img)
                 if m_settle:
                     print("  Found settlement screen during check, pressing ESC to close...")
-                    controller.post_key_down(KEY_ESC)
-                    time.sleep(0.1)
-                    controller.post_key_up(KEY_ESC)
-                    time.sleep(1.5)
+                    press_esc()
+                    wait_until_settlement_disappears()
                     continue
 
                 m_game, _, _, _ = match_template_in_region(img, fish_game_sign_region, self.fish_game_sign_template, 0.8)
@@ -167,7 +189,7 @@ class AutoFish(CustomAction):
                     time.sleep(check_freq)
                     img = get_image(controller)
                     
-                    m_settle_unexpected, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
+                    m_settle_unexpected, _, _, _ = detect_settlement(img)
                     if m_settle_unexpected:
                         print("  Unexpected settlement screen detected! Breaking to clear it.")
                         break
@@ -182,10 +204,8 @@ class AutoFish(CustomAction):
                 
                 if m_settle_unexpected or timeout_triggered:
                     if m_settle_unexpected:
-                        controller.post_key_down(KEY_ESC)
-                        time.sleep(0.1)
-                        controller.post_key_up(KEY_ESC)
-                        time.sleep(1.5)
+                        press_esc()
+                        wait_until_settlement_disappears()
                     continue
       
                 start_time = time.time()
@@ -216,7 +236,7 @@ class AutoFish(CustomAction):
                     frame += 1
 
                     if frame % 10 == 0:
-                        m_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
+                        m_settle, _, _, _ = detect_settlement(img)
                         if m_settle:
                             print("  Fish caught!")
                             break
@@ -286,25 +306,29 @@ class AutoFish(CustomAction):
                 break  
 
             print("  Finished.")
-    
-            time.sleep(3)
-            
-            img = get_image(controller)
-            match_settle, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
+
+            match_settle = False
+            wait_settlement_start = time.time()
+            while time.time() - wait_settlement_start < 5:
+                if context.tasker.stopping:
+                    return CustomAction.RunResult(success=False)
+
+                img = get_image(controller)
+                match_settle, _, _, _ = detect_settlement(img)
+                if match_settle:
+                    print("  Settlement screen detected.")
+                    break
+                time.sleep(0.05)
+
             if match_settle:
                 print("  Closing settlement screen...")
                 for _ in range(5):
-                    controller.post_key_down(KEY_ESC)
-                    time.sleep(0.1)
-                    controller.post_key_up(KEY_ESC)
-                    time.sleep(1.5)
-
-                    img = get_image(controller)
-                    m, _, _, _ = match_template_in_region(img, settlement_region, self.continue_template, 0.8)
-                    if not m:
+                    press_esc()
+                    if wait_until_settlement_disappears():
                         print("  Settlement closed.")
-                        time.sleep(1)
                         break
+            else:
+                print("  Settlement screen not detected, continuing immediately.")
 
         print("All fishing tasks complete.")
         return CustomAction.RunResult(success=True)
