@@ -17,7 +17,7 @@ def click_rect(controller, rect, delay=0.001):
     time.sleep(delay)
     controller.post_touch_up().wait()
 
-def match_template_in_region(img, region, template, min_similarity=0.8):
+def match_template_in_region(img, region, template, min_similarity=0.8, green_mask=False):
     if img is None or not isinstance(img, np.ndarray):
         return False, 0.0, 0, 0
     
@@ -35,8 +35,15 @@ def match_template_in_region(img, region, template, min_similarity=0.8):
     
     if len(roi.shape) == 3 and roi.shape[2] == 4:
         roi = cv2.cvtColor(roi, cv2.COLOR_BGRA2BGR)
-        
-    res = cv2.matchTemplate(roi, template, cv2.TM_CCOEFF_NORMED)
+    
+    if green_mask:
+        lower_green = np.array([0, 255, 0], dtype=np.uint8)
+        upper_green = np.array([0, 255, 0], dtype=np.uint8)
+        mask = cv2.bitwise_not(cv2.inRange(template, lower_green, upper_green))
+        res = cv2.matchTemplate(roi, template, cv2.TM_CCOEFF_NORMED, mask=mask)
+
+    else:
+        res = cv2.matchTemplate(roi, template, cv2.TM_CCOEFF_NORMED)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
     
     if max_val >= min_similarity:
