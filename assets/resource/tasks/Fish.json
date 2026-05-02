@@ -4,7 +4,7 @@
             "name": "钓鱼任务",
             "entry": "FishEntrance",
             "option": [
-                "FishLoopTime",
+                "FishLoopInfinite",
                 "FishNumber",
                 "FishSellAuto",
                 "FishBuyBaitAuto",
@@ -15,8 +15,8 @@
     "option": {
         "FishLoopTime": {
             "type": "input",
-            "label": "最大循环次数",
-            "description": "限制整个钓鱼循环最多执行多少次",
+            "label": "循环次数",
+            "description": "循环执行多少次钓鱼任务",
             "inputs": [
                 {
                     "name": "max_hit",
@@ -35,7 +35,7 @@
         "FishNumber": {
             "type": "input",
             "label": "每次钓鱼数量",
-            "description": "设置每次自动钓鱼的数量，建议小于等于99",
+            "description": "设置每次循环自动钓鱼的数量，建议小于等于99",
             "inputs": [
                 {
                     "name": "count",
@@ -52,6 +52,39 @@
                     }
                 }
             }
+        },
+        "FishLoopInfinite": {
+            "type": "switch",
+            "label": "无限循环",
+            "description": "启用后钓鱼任务将无限循环，直到手动停止。",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "FishEntrance": {
+                            "next": ["FishLoopStart"]
+                        },
+                        "FishGameStart": {
+                            "next": ["AutoSellFish", "AutoBuyFishBait", "FishLoopStart"]
+                        },
+                        "AutoSellFish": {
+                            "next": ["AutoBuyFishBait", "FishLoopStart"]
+                        },
+                        "AutoBuyFishBait": {
+                            "next": ["FishLoopStart"]
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "option": [
+                        "FishLoopTime"
+                    ]
+                }
+            ]
         },
         "FishSellAuto": {
             "type": "switch",
@@ -81,7 +114,7 @@
         "FishBuyBaitAuto": {
             "type": "switch",
             "label": "自动买鱼饵",
-            "description": "是否启用自动买鱼饵功能",
+            "description": "每次自动购买99（上限）鱼饵",
             "cases": [
                 {
                     "name": "Yes",
@@ -90,7 +123,10 @@
                         "AutoBuyFishBait": {
                             "enabled": true
                         }
-                    }
+                    },
+                    "option": [
+                        "FishBaitThreshold"
+                    ]
                 },
                 {
                     "name": "No",
