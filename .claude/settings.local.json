@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -c \"from maa.context import Context; import inspect; print\\(inspect.getsource\\(Context\\)\\)\")"
+    ]
+  }
+}
