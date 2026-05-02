@@ -11,6 +11,19 @@
     "mirrorchyan_multiplatform": true,
     "controller": [
         {
+            "name": "Win32",
+            "label": "桌面端-默认",
+            "type": "Win32",
+            "permission_required": true,
+            "win32": {
+                "class_regex": "UnrealWindow",
+                "window_regex": "^\\s*(异环|NTE)\\s*$",
+                "screencap": "Background",
+                "mouse": "SendMessageWithCursorPos",
+                "keyboard": "PostMessage"
+            }
+        },
+        {
             "name": "Win32-Front",
             "label": "桌面端-前台",
             "type": "Win32",
