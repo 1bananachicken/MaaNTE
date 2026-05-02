@@ -6,6 +6,7 @@ from .auto_make_coffee import *
 from .Common.click import *
 from .realtime_task import *
 
+
 __all__ = [
     "AutoFishNew",
     "AutoMakeCoffee",

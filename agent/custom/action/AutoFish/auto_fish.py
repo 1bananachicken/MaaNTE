@@ -88,30 +88,6 @@ class AutoFish(CustomAction):
 
             return False
 
-        def detect_settlement(img, threshold=0.8):
-            return match_template_in_region(
-                img, settlement_region, self.settlement_template, threshold
-            )
-
-        def press_esc():
-            controller.post_key_down(KEY_ESC)
-            time.sleep(0.1)
-            controller.post_key_up(KEY_ESC)
-
-        def wait_until_settlement_disappears(timeout=1.0, interval=0.05):
-            wait_start = time.time()
-            while time.time() - wait_start < timeout:
-                if context.tasker.stopping:
-                    return False
-
-                img = get_image(controller)
-                matched, _, _, _ = detect_settlement(img)
-                if not matched:
-                    return True
-                time.sleep(interval)
-
-            return False
-
         def ensure_fish_game():
             for _ in range(10):
                 img = get_image(controller)
