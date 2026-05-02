@@ -5,22 +5,8 @@
             "type": "Or",
             "param":{
                 "any_of": [
-                    {
-                        "type": "TemplateMatch",
-                        "param": {
-                            "roi": [
-                                0,
-                                -100,
-                                100,
-                                100
-                            ],
-                            "template": [
-                                "Common/Scene/Login/LoginExit.png"
-                            ],
-                            "green_mask": true
-                        }
-                    },
-                    "__ScenePrivateCloseLoginAnnouncement"
+                    "__ScenePrivateCloseLoginAnnouncement",
+                    "__ScenePriviteLoginExitButton"
                 ]
             }
         },
@@ -29,6 +15,21 @@
             "[JumpBack]__ScenePrivateCloseLoginAnnouncement",
             "__ScenePrivateLogin"
         ]
+    },
+    "__ScenePriviteLoginExitButton":{
+        "desc":"登陆界面退出按钮",
+        "recognition": "TemplateMatch",
+        "roi": [
+            0,
+            -100,
+            100,
+            100
+        ],
+        "template": [
+            "Common/Scene/Login/LoginExit.png"
+        ],
+        "green_mask": true
+
     },
     "__ScenePrivateLoginContinue": {
         "desc": "等待登录页面出现按钮继续",
