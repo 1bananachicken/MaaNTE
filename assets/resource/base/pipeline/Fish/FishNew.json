@@ -1,16 +1,14 @@
 {
     "FishNewEntrance": {
         "desc": "钓鱼(新)功能入口",
-        "anchor": "FishNewRestart",
         "next": [
             "FishNewStart",
-            "[JumpBack]FishScenePrepareToFishGame",
-            "[JumpBack]FishSceneWorldToPrepare",
-            "[JumpBack]__PressEsc"
+            "[JumpBack]FishSceneAnyEnterFishGame"
         ]
     },
     "FishNewStart": {
         "desc": "钓鱼功能主流程",
+        "anchor": "FishNewRestart",
         "recognition": {
             "type": "And",
             "param": {
@@ -28,17 +26,12 @@
         ]
     },
     "FishNewCast":{
+        "desc":"抛竿",
+        "max_hit": 9999,
         "action": "ClickKey",
         "key": [
             70 // F
         ],
-        "next": [
-            "FishNewGameStart"
-        ]
-    },
-    "FishNewGameStart": {
-        "desc": "正在钓鱼游戏界面，执行钓鱼逻辑",
-        "max_hit": 9999,
         "recognition": {
             "type": "And",
             "param": {
@@ -47,10 +40,19 @@
                 ]
             }
         },
-        "action": {
-            "type": "Custom",
+        "next": [
+            "FishNewBaitLack",
+            "FishNewGameStart"
+        ]
+    },
+    "FishNewGameStart": {
+        "desc": "正在钓鱼游戏界面，执行钓鱼逻辑",
+        "recognition": {
+            "type": "And",
             "param": {
-                "custom_action": "auto_fish_new"
+                "all_of": [
+                    "FishSceneOnFishGame"
+                ]
             }
         },
         "focus": {
@@ -58,11 +60,10 @@
             "Node.Recognition.Failed": "判断不在钓鱼界面，尝试返回"
         },
         "on_error": [
-            "[Anchor]FishNewRestart"
+            "FishSceneAnyEnterFishGame"
         ],
         "next": [
-            "[JumpBack]FishNewBaitLack",
-            "[JumpBack]FishNewGaming",
+            "FishNewGaming",
             "[Anchor]FishNewRestart"
         ]
     },
@@ -78,12 +79,12 @@
                 280,
                 260
             ],
-            "time": 80,
-            "timeout": 200
+            "time": 200,
+            "timeout": 2000
         },
         "next": [
-            "FishNewGameResult",
-            "FishSceneOnFishGame"
+            "[Anchor]FishNewRestart",
+            "[JumpBack]FishNewGameResult"
         ]
     },
     "FishNewGameResult":{
@@ -498,7 +499,7 @@
         ]
     },
     "FishNewOpenFishMaster":{
-        "desc":"在钓鱼界面打开海上钓客",
+        "desc":"在钓鱼界面打开海上钓客以卖鱼",
         "recognition": "And",
         "all_of": [
             "FishSceneOnFishGame"
@@ -656,7 +657,7 @@
             27 // Esc
         ],
         "next": [
-            "[Anchor]FishNewRestart"
+            "FishNewSellFishEntrance"
         ]
     }
 }
