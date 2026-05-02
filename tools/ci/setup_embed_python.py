@@ -86,12 +86,13 @@ def get_python_executable_path(base_dir, os_type):
 
 
 def ensure_pip(python_executable, python_install_dir):
-    """安装 pip，依次尝试阿里云镜像和官方源"""
+    """安装 pip"""
     if not python_executable or not os.path.exists(python_executable):
         print("错误: Python 可执行文件未找到，无法安装 pip。")
         return False
 
     get_pip_url = "https://bootstrap.pypa.io/get-pip.py"
+    # 将 get-pip.py 下载到 Python 安装目录下，执行后再删除
     get_pip_script_path = os.path.join(python_install_dir, "get-pip.py")
 
     print(f"正在下载 get-pip.py 从 {get_pip_url}")
@@ -101,34 +102,18 @@ def ensure_pip(python_executable, python_install_dir):
         print(f"下载 get-pip.py 失败: {e}")
         return False
 
-    index_sources = [
-        ("阿里云镜像", ["--index-url", "https://mirrors.aliyun.com/pypi/simple/",
-                         "--trusted-host", "mirrors.aliyun.com"]),
-        ("清华大学镜像", ["--index-url", "https://pypi.tuna.tsinghua.edu.cn/simple/",
-                          "--trusted-host", "pypi.tuna.tsinghua.edu.cn"]),
-        ("PyPI 官方", []),
-    ]
-
-    pip_installed = False
-    for source_name, extra_args in index_sources:
-        print(f"正在使用 {source_name} 安装 pip...")
-        try:
-            cmd = [python_executable, get_pip_script_path, "--timeout", "120"] + extra_args
-            subprocess.run(cmd, check=True)
-            print("pip 安装成功。")
-            pip_installed = True
-            break
-        except (subprocess.CalledProcessError, OSError) as e:
-            print(f"  {source_name} 安装失败: {e}")
-
-    if os.path.exists(get_pip_script_path):
-        os.remove(get_pip_script_path)
-
-    if pip_installed:
+    print("正在使用 get-pip.py 安装 pip...")
+    try:
+        # 在 Python 安装目录下执行 get-pip.py
+        subprocess.run([python_executable, get_pip_script_path], check=True)
+        print("pip 安装成功。")
         return True
-
-    print("所有源均安装 pip 失败。")
-    return False
+    except (subprocess.CalledProcessError, OSError) as e:
+        print(f"pip 安装失败: {e}")
+        return False
+    finally:
+        if os.path.exists(get_pip_script_path):
+            os.remove(get_pip_script_path)  # 清理下载的脚本
 
 
 # --- 主逻辑 ---
@@ -142,19 +127,12 @@ def main():
 
     # 检查 Python 是否已经存在
     python_exe_check = get_python_executable_path(DEST_DIR, os_type)
-    lib_dir = os.path.join(DEST_DIR, "Lib")
-    if python_exe_check and os.path.exists(python_exe_check) and os.path.isdir(lib_dir):
-        print(f"Python 已完整存在于 {DEST_DIR} (找到: {python_exe_check}, Lib/)。")
-        print("Python 环境完整，跳过安装。")
-        return
-    elif python_exe_check and os.path.exists(python_exe_check):
-        print(f"Python 存在于 {DEST_DIR} 但缺少 Lib/ 目录，尝试安装 pip...")
+    if python_exe_check and os.path.exists(python_exe_check):
+        print(f"Python 似乎已存在于 {DEST_DIR} (找到: {python_exe_check})。")
         if ensure_pip(python_exe_check, DEST_DIR):
-            print("pip 修复成功，Python 环境已完整。")
-            return
+            print("Python 和 pip 已配置。跳过安装。")
         else:
             print("Python 存在但 pip 配置失败。请检查。")
-            sys.exit(1)
         return
 
     if os.path.exists(DEST_DIR):
@@ -332,7 +310,6 @@ def main():
         print("嵌入式 Python 环境安装和 pip 配置完成。")
     else:
         print("嵌入式 Python 环境安装完成，但 pip 配置失败。")
-        sys.exit(1)
 
 
 if __name__ == "__main__":
