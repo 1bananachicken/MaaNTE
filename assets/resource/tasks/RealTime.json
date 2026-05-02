@@ -3,10 +3,14 @@
         {
             "name": "实时辅助",
             "entry": "RealTimeTaskMain",
+            "description": "实时辅助小工具，需要[color:red]“桌面端-前台”[/color]控制器",
             "option": [
                 "RealTimeCheckInterval",
-                "RealTimeAutoSkip",
+                "RealTimeAutoSkipStory",
                 "RealTimeAutoTeleport"
+            ],
+            "controller": [
+                "Win32-Front"
             ]
         }
     ],
@@ -29,23 +33,40 @@
                 }
             }
         },
-        "RealTimeAutoSkip": {
+        "RealTimeAutoSkipStory": {
             "type": "switch",
             "label": "自动剧情",
-            "description": "是否自动跳过剧情",
+            "description": "自动点击跳过剧情按钮",
             "cases": [
                 {
                     "name": "Yes",
                     "label": "开启",
                     "option": [
-                        "RealTimeAutoSkipAll"
-                    ]
+                        "RealTimeAutoSkipStoryDialog"
+                    ],
+                    "pipeline_override": {
+                        "RealTimeSkipStory": {
+                            "enabled": true
+                        },
+                        "RealTimeSkipStoryDialogConfirm": {
+                            "enabled": true
+                        }
+                    }
                 },
                 {
                     "name": "No",
                     "label": "关闭",
                     "pipeline_override": {
-                        "RealTimeSkipPlot": {
+                        "RealTimeSkipStory": {
+                            "enabled": false
+                        },
+                        "RealTimeSkipStoryDialog": {
+                            "enabled": false
+                        },
+                        "RealTimeSkipStoryDialogConfirm": {
+                            "enabled": false
+                        },
+                        "RealTimeSkipStoryDialogCheckbox": {
                             "enabled": false
                         }
                     }
@@ -53,23 +74,25 @@
             ],
             "default_case": "Yes"
         },
-        "RealTimeAutoSkipAll": {
+        "RealTimeAutoSkipStoryDialog": {
             "type": "switch",
-            "label": "自动跳过全部剧情",
-            "description": "检测到跳过按钮时自动点击",
+            "label": "自动勾选“今日不再提示”",
+            "description": "在跳过剧情弹窗中，自动勾选“今日不再提示”，避免每次弹出确认",
             "cases": [
                 {
                     "name": "Yes",
+                    "label": "启用",
                     "pipeline_override": {
-                        "RealTimeSkipPlot": {
+                        "RealTimeSkipStoryDialogCheckbox": {
                             "enabled": true
                         }
                     }
                 },
                 {
                     "name": "No",
+                    "label": "禁用",
                     "pipeline_override": {
-                        "RealTimeSkipPlot": {
+                        "RealTimeSkipStoryDialogCheckbox": {
                             "enabled": false
                         }
                     }

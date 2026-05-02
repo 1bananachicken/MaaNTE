@@ -51,6 +51,12 @@
   - 🔨 驱赶所有顾客
 - 💰 自动提取一咖舍收益
   - 📦 自动补货
+- 💎 自动领取奖励
+  - 🎁 活跃度
+  - 📅 环期赏令
+- 🕛 实时辅助
+  - 🗼 自动传送
+  - ⏩ 自动跳剧情
 
 ## ❓常见问题
 
@@ -65,8 +71,6 @@
 ## 💡注意事项
 
 游戏需要运行在1280x720分辨率，窗口化，钓鱼新算法支持120帧运行
-
-自动做咖啡需要设置鼠标输入方式 `Seize` ，会出现抢占鼠标的情况（正在测试非抢占鼠标的方法，将先在测试版发布）
 
 ## 💻开发指南
 
@@ -118,7 +122,7 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 
 感谢全部参与到测试与开发中的开发者(´▽`ʃ♡ƪ)
 
-[![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=105&columns=15)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
+[![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=200&columns=15)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
 
 ## 广告
 

@@ -1,0 +1,74 @@
+{
+    "RealTimeTeleportWitte": {
+        "desc": "传送至维特海默塔",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "realtime_assist/teleport_target_witte.png",
+                "roi": [920, 0, 1280, 140],
+                "threshold": 0.8
+            }
+        },
+        "action": "DoNothing",
+        "post_delay": 0,
+        "next": [
+            "RealTimeConfirmTeleportWitte",
+            "RealTimeFakeTrue"
+        ]
+    },
+    "RealTimeConfirmTeleportWitte": {
+        "desc": "确认传送至维特海默塔",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "realtime_assist/teleport_btn_witte.png",
+                "roi": [930, 610, 350, 60],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
+        },
+        "post_delay": 0,
+        "next": ["RealTimeFakeTrue"]
+    },
+    "RealTimeTeleportPhone": {
+        "desc": "传送至电话亭",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "realtime_assist/teleport_target_phone.png",
+                "roi": [920, 0, 1280, 140],
+                "threshold": 0.8
+            }
+        },
+        "action": "DoNothing",
+        "post_delay": 0,
+        "next": [
+            "RealTimeConfirmTeleportPhone",
+            "RealTimeFakeTrue"
+        ]
+    },
+    "RealTimeConfirmTeleportPhone": {
+        "desc": "确认传送至电话亭",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "realtime_assist/teleport_btn_phone.png",
+                "roi": [930, 610, 350, 60],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
+        },
+        "post_delay": 0,
+        "next": ["RealTimeFakeTrue"]
+    }
+}

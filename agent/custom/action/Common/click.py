@@ -1,9 +1,11 @@
 import json
+
 from .utils import click_rect
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+
 
 @AgentServer.custom_action("click_override")
 class ClickOverride(CustomAction):

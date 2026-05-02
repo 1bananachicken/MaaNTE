@@ -7,19 +7,18 @@
                 "FishLoopInfinite",
                 "FishNumber",
                 "FishSellAuto",
-                "FishBuyBaitAuto",
-                "FishBaitThreshold"
-            ]
-        },
-        {
-            "name": "钓鱼任务（新）",
-            "entry": "FishNewEntrance",
-            "description": "重构的钓鱼功能，若不选择自动买鱼饵和自动卖鱼，不抢占鼠标。若仅自动卖鱼，建议钓鱼数量小于鱼饵量。自动买鱼饵为识别到鱼饵不足时购买",
-            "option": [
-                "FishNumber",
-                "FishSellAuto",
                 "FishBuyBaitAuto"
             ]
+            // {
+            //     "name": "钓鱼任务（新）",
+            //     "entry": "FishNewEntrance",
+            //     "description": "重构的钓鱼功能，若不选择自动买鱼饵和自动卖鱼，不抢占鼠标。若仅自动卖鱼，建议钓鱼数量小于鱼饵量。自动买鱼饵为识别到鱼饵不足时购买",
+            //     "option": [
+            //         "FishNumber",
+            //         "FishSellAuto",
+            //         "FishBuyBaitAuto"
+            //     ]
+            // }
         }
     ],
     "option": {
@@ -61,7 +60,7 @@
                         "count": "{count}"
                     }
                 },
-                "FishNewGameStart": {
+                "FishNewCast": {
                     "max_hit": "{count}"
                 }
             }
@@ -77,16 +76,27 @@
                     "label": "启用",
                     "pipeline_override": {
                         "FishEntrance": {
-                            "next": ["FishLoopStart"]
+                            "next": [
+                                "FishLoopStart"
+                            ]
                         },
                         "FishGameStart": {
-                            "next": ["AutoSellFish", "AutoBuyFishBait", "FishLoopStart"]
+                            "next": [
+                                "AutoSellFish",
+                                "AutoBuyFishBait",
+                                "FishLoopStart"
+                            ]
                         },
                         "AutoSellFish": {
-                            "next": ["AutoBuyFishBait", "FishLoopStart"]
+                            "next": [
+                                "AutoBuyFishBait",
+                                "FishLoopStart"
+                            ]
                         },
                         "AutoBuyFishBait": {
-                            "next": ["FishLoopStart"]
+                            "next": [
+                                "FishLoopStart"
+                            ]
                         }
                     }
                 },
