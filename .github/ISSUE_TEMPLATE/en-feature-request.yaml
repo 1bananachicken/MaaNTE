@@ -7,6 +7,8 @@ body:
     attributes:
       label: Before raising the issue...
       options:
+        - label: I did not confirm the following content; I simply clicked "confirm."
+          required: false
         - label: I filled in a short, clear title so that developers could quickly identify the general problem when going through the issue list. Instead of "Some suggestions", "Stuck", etc.
           required: true
         - label: I'm probably sure this is a new feature/suggestion and not a bug encountered (please attach logs if you're not sure)
