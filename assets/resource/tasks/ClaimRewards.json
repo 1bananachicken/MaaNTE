@@ -3,7 +3,10 @@
         {
             "name": "领取奖励",
             "entry": "ClaimRewardsEntrance",
-            "description": "自动领取活跃度奖励以及环期赏令的奖励.[color:red]目前仅支持Seize的鼠标输入方式（必须前台），使用时请前往左下角设置-连接设置自行配置[/color]"
+            "description": "自动领取活跃度奖励以及环期赏令的奖励.[color:red]目前仅支持Seize的鼠标输入方式（必须前台），使用时请前往左下角设置-连接设置自行配置[/color]",
+            "controller": [
+                "Win32-Front"
+            ]
         }
     ]
 }

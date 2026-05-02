@@ -4,7 +4,7 @@ from .auto_fish import *
 from .auto_buy_fish_bait import *
 from .auto_sell_fish import *
 from .click import *
-
+from .realtime_task import *
 
 __all__ = [
     "AutoFishNew",
@@ -13,4 +13,5 @@ __all__ = [
     "AutoBuyFishBait",
     "AutoSellFish",
     "ClickOverride",
+    "RealTimeTaskAction",
 ]
