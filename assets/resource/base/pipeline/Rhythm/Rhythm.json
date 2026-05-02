@@ -33,10 +33,22 @@
         "desc": "[内部] 记录目标帧率",
         "action": "DoNothing",
         "next": [
-            "RhythmStart"
+            "RhythmSelectSong"
         ],
         "on_error": [
             "RhythmExit"
+        ]
+    },
+    "RhythmSelectSong": {
+        "desc": "自动选曲",
+        "action": "Custom",
+        "custom_action": "auto_rhythm_select_song",
+        "custom_action_param": {},
+        "next": [
+            "RhythmStart"
+        ],
+        "on_error": [
+            "RhythmStart"
         ]
     },
     "RhythmStart": {

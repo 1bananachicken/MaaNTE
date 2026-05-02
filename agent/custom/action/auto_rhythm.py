@@ -11,16 +11,16 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
-from .rhythm.lanes import build_lane_layout
-from .rhythm.detector import DrumDetector
-from .rhythm.presence import (
+from .rhythm.utils.lanes import build_lane_layout
+from .rhythm.utils.detector import DrumDetector
+from .rhythm.utils.presence import (
     STATE_OTHER,
     STATE_PLAYING,
     STATE_RESULTS,
     STATE_SONG_SELECT,
     SceneGate,
 )
-from .rhythm.song_selector import SongSelector
+from .rhythm.utils.song_selector import SongSelector
 
 
 logger = logging.getLogger(__name__)
