@@ -1,4 +1,5 @@
 {
+    // 用于防止鼠标影响识别目标
     "MouseMoveResetExampleNode1": {
         "desc": "执行第一个node",
         "anchor": {
