@@ -22,14 +22,23 @@
         "pre_delay": 0,
         "post_delay": 0,
         "next": [
-            "FishNewGameStart",
+            "FishNewCast",
             "FishNewOpenFishMaster",
             "FishNewTaskExit"
         ]
     },
+    "FishNewCast":{
+        "action": "ClickKey",
+        "key": [
+            70 // F
+        ],
+        "next": [
+            "FishNewGameStart"
+        ]
+    },
     "FishNewGameStart": {
         "desc": "正在钓鱼游戏界面，执行钓鱼逻辑",
-        "max_hit": 99,
+        "max_hit": 9999,
         "recognition": {
             "type": "And",
             "param": {
