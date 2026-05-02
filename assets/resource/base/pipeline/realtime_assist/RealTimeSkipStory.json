@@ -1,0 +1,75 @@
+{
+    "RealTimeSkipStory": {
+        "desc": "跳过剧情",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "realtime_assist/skip_story_btn.png",
+                    "realtime_assist/skip_story_btn_hover.png"
+                ],
+                "roi": [1210, 20, 50, 50],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 0,
+        "next": [
+            "RealTimeSkipStoryDialog",
+            "RealTimeFakeTrue"
+        ]
+    },
+    "RealTimeSkipStoryDialog": {
+        "desc": "跳过剧情对话框",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": ["realtime_assist/skip_story_dialog.png"],
+                "roi": [420, 275, 450, 50],
+                "threshold": 0.8
+            }
+        },
+        "action": "DoNothing",
+        "post_delay": 0,
+        "next": ["RealTimeSkipStoryDialogCheckbox"],
+        "on_error": ["RealTimeFakeTrue"]
+    },
+    "RealTimeSkipStoryDialogCheckbox": {
+        "desc": "跳过今日剧情复选框",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "realtime_assist/skip_story_dialog_checkbox.png",
+                "roi": [550, 350, 50, 50],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "duration": 500
+            }
+        },
+        "pre_delay": 500,
+        "post_delay": 200,
+        "next": ["RealTimeSkipStoryDialogConfirm"]
+    },
+    "RealTimeSkipStoryDialogConfirm": {
+        "desc": "确认跳过剧情对话框确认按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "realtime_assist/skip_story_dialog_confirm.png",
+                "roi": [700, 410, 250, 70],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 300,
+        "next": ["RealTimeFakeTrue"]
+    }
+}

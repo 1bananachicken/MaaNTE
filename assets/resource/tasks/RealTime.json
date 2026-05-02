@@ -1,0 +1,192 @@
+{
+    "task": [
+        {
+            "name": "实时辅助",
+            "entry": "RealTimeTaskMain",
+            "description": "实时辅助小工具，需要[color:red]“桌面端-前台”[/color]控制器",
+            "option": [
+                "RealTimeCheckInterval",
+                "RealTimeAutoSkipStory",
+                "RealTimeAutoTeleport"
+            ],
+            "controller": [
+                "Win32-Front"
+            ]
+        }
+    ],
+    "option": {
+        "RealTimeCheckInterval": {
+            "type": "input",
+            "label": "检测间隔 (ms)",
+            "description": "两次检测之间的间隔，单位毫秒",
+            "inputs": [
+                {
+                    "name": "interval",
+                    "default": "500",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "RealTimeSleep": {
+                    "post_delay": "{interval}"
+                }
+            }
+        },
+        "RealTimeAutoSkipStory": {
+            "type": "switch",
+            "label": "自动剧情",
+            "description": "自动点击跳过剧情按钮",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "option": [
+                        "RealTimeAutoSkipStoryDialog"
+                    ],
+                    "pipeline_override": {
+                        "RealTimeSkipStory": {
+                            "enabled": true
+                        },
+                        "RealTimeSkipStoryDialogConfirm": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "RealTimeSkipStory": {
+                            "enabled": false
+                        },
+                        "RealTimeSkipStoryDialog": {
+                            "enabled": false
+                        },
+                        "RealTimeSkipStoryDialogConfirm": {
+                            "enabled": false
+                        },
+                        "RealTimeSkipStoryDialogCheckbox": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoSkipStoryDialog": {
+            "type": "switch",
+            "label": "自动勾选“今日不再提示”",
+            "description": "在跳过剧情弹窗中，自动勾选“今日不再提示”，避免每次弹出确认",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "RealTimeSkipStoryDialogCheckbox": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "RealTimeSkipStoryDialogCheckbox": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoTeleport": {
+            "type": "switch",
+            "label": "自动传送",
+            "description": "检测到特定传送点时自动点击传送",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "option": [
+                        "RealTimeAutoTeleportWitte",
+                        "RealTimeAutoTeleportPhone"
+                    ]
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "RealTimeTeleportWitte": {
+                            "enabled": false
+                        },
+                        "RealTimeTeleportPhone": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
+        },
+        "RealTimeAutoTeleportWitte": {
+            "type": "switch",
+            "label": "维特海默塔",
+            "description": "是否检测维特海默塔的传送点",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "RealTimeTeleportWitte": {
+                            "enabled": true
+                        },
+                        "RealTimeConfirmTeleportWitte": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "RealTimeTeleportWitte": {
+                            "enabled": false
+                        },
+                        "RealTimeConfirmTeleportWitte": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoTeleportPhone": {
+            "type": "switch",
+            "label": "ReroRero电话亭",
+            "description": "是否检测ReroRero电话亭的传送点",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "RealTimeTeleportPhone": {
+                            "enabled": true
+                        },
+                        "RealTimeConfirmTeleportPhone": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "RealTimeTeleportPhone": {
+                            "enabled": false
+                        },
+                        "RealTimeConfirmTeleportPhone": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        }
+    }
+}
