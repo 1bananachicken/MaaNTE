@@ -11,8 +11,9 @@
         "max_hit": 5,
         "next": [
             "FishGameStart",
+            "[JumpBack]FishScenePrepareToFishGame",
             "[JumpBack]FishSceneWorldToPrepare",
-            "[JumpBack]FishScenePrepareToFishGame"
+            "[JumpBack]SceneAnyEnterWorld"
         ]
     },
     "FishGameStart": {
@@ -57,13 +58,13 @@
     "FishTaskExit": {
         "desc": "钓鱼任务完成",
         "next": [
-            "__ScenePrivateBackToWorldAny"
+            "SceneAnyEnterWorld"
         ]
     },
     "FishTaskExitWithError": {
         "desc": "钓鱼任务异常退出",
         "next": [
-            "__ScenePrivateBackToWorldAny"
+            "SceneAnyEnterWorld"
         ]
     }
 }

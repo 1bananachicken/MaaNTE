@@ -1,0 +1,229 @@
+{
+    "ClaimRewardsEntrance": {
+        "desc": "领取日常奖励入口",
+        "next": [
+            "ClaimRewardsActivity",
+            "ClaimRewardsBattlePass",
+            "ClaimRewardsExit"
+        ]
+    },
+    "ClaimRewardsActivity": {
+        "desc": "领取活跃度奖励主流程",
+        "next": [
+            "ClaimRewardsActivityStart",
+            "[JumpBack]SceneAnyEnterWorld"
+        ]
+    },
+    "ClaimRewardsActivityStart": {
+        "desc": "开始领取活跃度奖励",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    112
+                ]
+            }
+        },
+        "next": [
+            "ClaimRewardsActivitySwitchToPage2"
+        ]
+    },
+    "ClaimRewardsActivitySwitchToPage2": {
+        "desc": "切换到探索指南第二页",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    44,
+                    94,
+                    55,
+                    532
+                ],
+                "template": [
+                    "Common/Scene/ExplorationGuide/Page2.png",
+                    "Common/Scene/ExplorationGuide/Page2White.png",
+                    "Common/Scene/ExplorationGuide/Page2WithRedDot.png",
+                    "Common/Scene/ExplorationGuide/Page2WhiteWithRedDot.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "[JumpBack]ClaimRewardsActivityPoints",
+            "ClaimRewardsActivityRewards"
+        ]
+    },
+    "ClaimRewardsActivityPoints": {
+        "desc": "领取活跃度点数",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    174,
+                    203,
+                    988,
+                    404
+                ],
+                "template": [
+                    "Common/Button/ClaimButton.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500
+    },
+    "ClaimRewardsActivityRewards": {
+        "desc": "领取活跃度奖励（活跃度奖励部分结束）",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    170,
+                    125,
+                    1006,
+                    79
+                ],
+                "template": [
+                    "ClaimRewards/ClaimActivityRewards.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        }
+    },
+    "ClaimRewardsBattlePass": {
+        "desc": "领取环期赏令主流程",
+        "next": [
+            "ClaimRewardsBattlePassStart",
+            "[JumpBack]SceneAnyEnterWorld"
+        ]
+    },
+    "ClaimRewardsBattlePassStart": {
+        "desc": "开始领取环期赏令",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    113
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "next": [
+            "ClaimRewardsBattlePassSwitchToPage2"
+        ]
+    },
+    "ClaimRewardsBattlePassSwitchToPage2": {
+        "desc": "切换到环期赏令第二页",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    58,
+                    232,
+                    31,
+                    32
+                ]
+            }
+        },
+        "post_wait_freezes": 500,
+        "next": [
+            "ClaimRewardsBattlePassBackToPage1",
+            "ClaimRewardsBattlePassExp"
+        ]
+    },
+    "ClaimRewardsBattlePassExp": {
+        "desc": "领取环期赏令经验",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1007,
+                    567,
+                    219,
+                    52
+                ],
+                "template": [
+                    "Common/Button/ClaimAllButton.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        }
+    },
+    "ClaimRewardsBattlePassBackToPage1": {
+        "desc": "切换到环期赏令第一页",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    43,
+                    130,
+                    59,
+                    243
+                ],
+                "template": [
+                    "Common/Scene/BattlePass/Page1.png"
+                ],
+                "threshold": 0.6
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": 500,
+        "next": [
+            "ClaimRewardsBattlePassRewards"
+        ]
+    },
+    "ClaimRewardsBattlePassRewards": {
+        "desc": "领取历练奖赏",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    782,
+                    568,
+                    217,
+                    49
+                ],
+                "template": [
+                    "Common/Button/ClaimAllButtonBlackPink.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        }
+    },
+    "ClaimRewardsExit": {
+        "desc": "领取奖励任务出口"
+    }
+}
