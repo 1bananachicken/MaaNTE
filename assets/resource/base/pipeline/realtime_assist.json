@@ -1,15 +1,17 @@
 {
     "RealTimeTaskMain": {
-        "recognition": "DirectHit",
+        "desc": "功能入口",
         "action": "DoNothing",
         "next": [
-            "RealTimeSkipPlot",
             "RealTimeTeleportWitte",
             "RealTimeTeleportPhone",
+            "RealTimeSkipStory",
+            "RealTimeSkipStoryDialog",
             "RealTimeSleep"
         ]
     },
-    "RealTimeSkipPlot": {
+    "RealTimeSkipStory": {
+        "desc": "跳过剧情",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -17,17 +19,72 @@
                     "realtime_assist/skip_story_btn.png",
                     "realtime_assist/skip_story_btn_hover.png"
                 ],
-                "roi": [1000, 0, 1280, 100],
+                "roi": [1210, 20, 50, 50],
                 "threshold": 0.8
             }
         },
         "action": {
             "type": "Click"
         },
-        "post_delay": 500,
+        "post_delay": 0,
+        "next": [
+            "RealTimeSkipStoryDialog",
+            "RealTimeTaskMain"
+        ]
+    },
+    "RealTimeSkipStoryDialog": {
+        "desc": "跳过剧情对话框",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": ["realtime_assist/skip_story_dialog.png"],
+                "roi": [420,275,450,50],
+                "threshold": 0.8
+            }
+        },
+        "action": "DoNothing",
+        "post_delay": 0,
+        "next": ["RealTimeSkipStoryDialogCheckbox"],
+        "on_error": ["RealTimeSkipStory"]
+    },
+    "RealTimeSkipStoryDialogCheckbox": {
+        "desc": "跳过今日剧情复选框",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "realtime_assist/skip_story_dialog_checkbox.png",
+                "roi": [550,350,50,50],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "duration": 500
+            }
+        },
+        "pre_delay": 500,
+        "post_delay": 200,
+        "next": ["RealTimeSkipStoryDialogConfirm"]
+    },
+    "RealTimeSkipStoryDialogConfirm": {
+        "desc": "确认跳过剧情对话框确认按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "realtime_assist/skip_story_dialog_confirm.png",
+                "roi": [700,410,250,70],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 300,
         "next": ["RealTimeSleep"]
     },
     "RealTimeTeleportWitte": {
+        "desc": "传送至维特海默塔",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -37,25 +94,33 @@
             }
         },
         "action": "DoNothing",
-        "post_delay": 500,
-        "next": ["RealTimeConfirmTeleportWitte"]
+        "post_delay": 0,
+        "next": [
+            "RealTimeConfirmTeleportWitte",
+            "RealTimeTaskMain"
+        ]
     },
     "RealTimeConfirmTeleportWitte": {
+        "desc": "确认传送至维特海默塔",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "template": "realtime_assist/teleport_btn_witte.png",
-                "roi": [920, 600, 1280, 660],
+                "roi": [930, 610, 350, 60],
                 "threshold": 0.8
             }
         },
         "action": {
-            "type": "Click"
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
         },
-        "post_delay": 2000,
+        "post_delay": 0,
         "next": ["RealTimeSleep"]
     },
     "RealTimeTeleportPhone": {
+        "desc": "传送至电话亭",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -65,25 +130,33 @@
             }
         },
         "action": "DoNothing",
-        "post_delay": 500,
-        "next": ["RealTimeConfirmTeleportPhone"]
+        "post_delay": 0,
+        "next": [
+            "RealTimeConfirmTeleportPhone",
+            "RealTimeTaskMain"
+        ]
     },
     "RealTimeConfirmTeleportPhone": {
+        "desc": "确认传送至电话亭",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "template": "realtime_assist/teleport_btn_phone.png",
-                "roi": [920, 600, 1280, 660],
+                "roi": [930, 610, 350, 60],
                 "threshold": 0.8
             }
         },
         "action": {
-            "type": "Click"
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
         },
-        "post_delay": 2000,
+        "post_delay": 0,
         "next": ["RealTimeSleep"]
     },
     "RealTimeSleep": {
+        "desc": "延迟",
         "recognition": "DirectHit",
         "action": "DoNothing",
         "post_delay": 500,
