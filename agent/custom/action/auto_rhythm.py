@@ -244,6 +244,8 @@ class AutoRhythm(CustomAction):
 
                 frame_count += 1
 
+                state_before_step = state
+
                 if state == STATE_PLAYING:
                     now = time.perf_counter()
                     if now < scene_lock_until:
@@ -254,6 +256,9 @@ class AutoRhythm(CustomAction):
                             state = new_state
                 else:
                     state, gate_info = scene_gate.step(frame)
+
+                if state == STATE_PLAYING and state_before_step != STATE_PLAYING:
+                    scene_lock_until = time.perf_counter() + scene_lock_timeout
 
                 if state != prev_logged_state:
                     logger.info(
@@ -316,11 +321,6 @@ class AutoRhythm(CustomAction):
                             auto_repeat_count,
                         )
 
-                    if auto_repeat_enabled and repeat_index >= auto_repeat_count:
-                        logger.info("已达到连打次数上限 (%d)，停止", auto_repeat_count)
-                        time.sleep(auto_repeat_dismiss_delay)
-                        break
-
                     if not esc_sent_for_results:
                         time.sleep(auto_repeat_dismiss_delay)
                         logger.info(
@@ -330,6 +330,12 @@ class AutoRhythm(CustomAction):
                         )
                         controller.post_click_key(_VK_ESCAPE).wait()
                         esc_sent_for_results = True
+
+                    if auto_repeat_enabled and repeat_index >= auto_repeat_count:
+                        logger.info("已达到连打次数上限 (%d)，停止", auto_repeat_count)
+                        time.sleep(auto_repeat_dismiss_delay)
+                        break
+
                     time.sleep(1.0)
                     continue
 
