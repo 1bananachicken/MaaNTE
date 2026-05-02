@@ -17,7 +17,7 @@
                 "class_regex": ".*",
                 "window_regex": "^\\s*(异环|NTE)\\s*$",
                 "screencap": "PrintWindow",
-                "mouse": "Seize",
+                "mouse": "SendMessageWithWindowPos",
                 "keyboard": "PostMessage"
             }
         }
