@@ -1,8 +1,14 @@
 from .auto_fish_new import *
 from .auto_make_coffee import *
+from .auto_fish import *
+from .auto_buy_fish_bait import *
+from .auto_sell_fish import *
 
 
 __all__ = [
+    "AutoFishNew",
+    "AutoMakeCoffee",
     "AutoFish",
-    "AutoMakeCoffee"
+    "AutoBuyFishBait",
+    "AutoSellFish"
 ]
