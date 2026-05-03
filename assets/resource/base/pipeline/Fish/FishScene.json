@@ -44,19 +44,25 @@
     "FishSceneOnFishGame":{
         "desc": "判断正在钓鱼游戏界面，继续业务流程",
         "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    1045,
-                    601,
-                    100,
-                    100
-                ],
-                "template": [
-                    "Fish/FishGameSign2.png"
-                ],
-                "threshold": 0.8,
-                "green_mask": true
+            "type": "And",
+            "param":{
+                "all_of": [
+                    "FishSceneBaitButton",
+                    "FishSceneHookButton"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "FishSceneOnFishGameCasting":{
+        "desc": "判断正在等待上鱼/钓上大鱼动画中，继续业务流程",
+        "recognition": {
+            "type": "And",
+            "param":{
+                "all_of": [
+                    "FishSceneHookButton"
+                ]
             }
         },
         "pre_delay": 0,
@@ -95,6 +101,26 @@
                 }
             }
         ],
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "FishSceneHookButton":{
+        "desc":"鱼钩按钮(F)",
+        "recognition": "TemplateMatch",
+        "template": [
+            "Fish/FishGameSign.png"
+        ],
+        "green_mask": true,
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "FishSceneBaitButton":{
+        "desc":"鱼饵按钮(E)",
+        "recognition": "TemplateMatch",
+        "template": [
+            "Fish/FishGameSign2.png"
+        ],
+        "green_mask": true,
         "pre_delay": 0,
         "post_delay": 0
     }

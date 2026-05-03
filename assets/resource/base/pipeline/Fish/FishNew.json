@@ -51,7 +51,7 @@
             "type": "And",
             "param": {
                 "all_of": [
-                    "FishSceneOnFishGame"
+                    "FishSceneOnFishGameCasting"
                 ]
             }
         },
