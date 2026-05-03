@@ -1,0 +1,107 @@
+{
+    "RhythmEntrance": {
+        "desc": "演奏功能入口",
+        "action": "DoNothing",
+        "next": [
+            "RhythmSelectSong"
+        ],
+        "on_error": [
+            "RhythmExit"
+        ]
+    },
+    "RhythmSelectSong": {
+        "desc": "自动选曲",
+        "action": "Custom",
+        "custom_action": "auto_rhythm_select_song",
+        "custom_action_param": {},
+        "next": [
+            "RhythmWaitPlaying"
+        ],
+        "on_error": [
+            "RhythmWaitPlaying"
+        ]
+    },
+    "RhythmWaitPlaying": {
+        "desc": "等待进入演奏界面",
+        "recognition": "And",
+        "all_of": [
+            "RhythmSceneOnPlaying"
+        ],
+        "pre_wait_freezes": {
+            "target": [0, 0, 100, 100],
+            "time": 500,
+            "timeout": 10000
+        },
+        "next": [
+            "RhythmPlaying"
+        ]
+    },
+    "RhythmPlaying": {
+        "desc": "演奏主流程 - 鼓面检测紧凑循环",
+        "anchor": "RhythmLoopPoint",
+        "max_hit": 999,
+        "action": "Custom",
+        "custom_action": "auto_rhythm_play",
+        "custom_action_param": {},
+        "next": [
+            "RhythmAfterPlaying"
+        ],
+        "on_error": [
+            "RhythmExit"
+        ]
+    },
+    "RhythmAfterPlaying": {
+        "desc": "演奏结束，判断当前状态",
+        "next": [
+            "RhythmOnResults",
+            "RhythmOnSongSelect",
+            "[Anchor]RhythmLoopPoint"
+        ]
+    },
+    "RhythmOnResults": {
+        "desc": "检测到结算界面",
+        "recognition": "And",
+        "all_of": [
+            "RhythmSceneOnResults"
+        ],
+        "next": [
+            "RhythmDismissResults"
+        ]
+    },
+    "RhythmOnSongSelect": {
+        "desc": "检测到选歌界面",
+        "recognition": "And",
+        "all_of": [
+            "RhythmSceneOnSongSelect"
+        ],
+        "next": [
+            "RhythmSelectSong"
+        ]
+    },
+    "RhythmDismissResults": {
+        "desc": "退出结算界面",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [27]
+            }
+        },
+        "post_delay": 800,
+        "next": [
+            "RhythmRepeatCheck"
+        ]
+    },
+    "RhythmRepeatCheck": {
+        "desc": "连打决策",
+        "action": "Custom",
+        "custom_action": "auto_rhythm_repeat_decision",
+        "custom_action_param": {},
+        "next": [
+            "RhythmExit"
+        ]
+    },
+    "RhythmExit": {
+        "desc": "演奏任务完成",
+        "next": []
+    }
+}
