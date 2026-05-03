@@ -1,0 +1,82 @@
+{
+    "task": [
+        {
+            "name": "[测试] 视角转向",
+            "entry": "TestTurnEntry",
+            "description": "鼠标相对位移转向。dx=100 ≈ 10度，正值右转，负值左转。",
+            "option": [
+                "TestTurnDx"
+            ]
+        },
+        {
+            "name": "[测试] 前进",
+            "entry": "TestMoveForwardEntry",
+            "description": "按住 W 键前进指定时长（秒）。",
+            "option": [
+                "TestMoveDuration"
+            ]
+        },
+        {
+            "name": "[测试] 后退",
+            "entry": "TestMoveBackwardEntry",
+            "description": "按住 S 键后退指定时长（秒）。",
+            "option": [
+                "TestMoveDuration"
+            ]
+        }
+    ],
+    "option": {
+        "TestTurnDx": {
+            "type": "input",
+            "label": "转向幅度",
+            "description": "鼠标 delta 总量。dx=100 ≈ 10度，dx=900 ≈ 90度。正值右转，负值左转。",
+            "inputs": [
+                {
+                    "name": "dx",
+                    "label": "dx",
+                    "default": "900",
+                    "pipeline_type": "int",
+                    "verify": "^-?\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "TestTurnRun": {
+                    "custom_action_param": {
+                        "dx": "{dx}",
+                        "dy": 0,
+                        "steps": 30,
+                        "step_delay": 0.03
+                    }
+                }
+            }
+        },
+        "TestMoveDuration": {
+            "type": "input",
+            "label": "移动时长",
+            "description": "按键持续时间（秒）。",
+            "inputs": [
+                {
+                    "name": "duration",
+                    "label": "duration (秒)",
+                    "default": "1.0",
+                    "pipeline_type": "string",
+                    "verify": "^\\d+(\\.\\d+)?$"
+                }
+            ],
+            "pipeline_override": {
+                "TestMoveForwardRun": {
+                    "custom_action_param": {
+                        "key": "W",
+                        "duration": "{duration}"
+                    }
+                },
+                "TestMoveBackwardRun": {
+                    "custom_action_param": {
+                        "key": "S",
+                        "duration": "{duration}"
+                    }
+                }
+            }
+        }
+    }
+}
