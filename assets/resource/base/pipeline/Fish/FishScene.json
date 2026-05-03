@@ -113,7 +113,8 @@
         "recognition": "TemplateMatch",
         "roi": [1137,600,100,100],
         "template": [
-            "Fish/FishGameSign.png"
+            "Fish/FishGameSign.png",
+            "Fish/FishGameSignThinner.png"
         ],
         "green_mask": true,
         "pre_delay": 0,

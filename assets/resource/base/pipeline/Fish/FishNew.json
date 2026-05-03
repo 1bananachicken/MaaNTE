@@ -40,7 +40,7 @@
             }
         },
         "pre_delay": 0,
-        "post_delay": 0,
+        "post_delay": 200,
         "next": [
             "FishNewBaitLack",
             "FishNewGameStart"
@@ -76,7 +76,7 @@
         "custom_action":"auto_fish_new",
         "pre_delay": 0,
         "post_wait_freezes": {
-            "time": 200,
+            "time": 500,
             "timeout": 3000
         },
         "next": [
