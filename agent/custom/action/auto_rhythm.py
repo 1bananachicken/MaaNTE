@@ -72,7 +72,7 @@ _DEFAULT_CONFIG = {
         "song_name": "",
         "scroll_area_x_frac": 0.25,
         "scroll_area_y_frac": 0.50,
-        "scroll_delta": -3,
+        "scroll_delta": -1,
         "max_scroll_attempts": 30,
         "match_threshold": 0.75,
         "start_match_threshold": 0.75,
@@ -329,7 +329,7 @@ class AutoRhythm(CustomAction):
 
                 if state == STATE_SONG_SELECT:
                     scroll_fn = lambda sx, sy, sd: (
-                        controller.post_swipe(sx, sy, sx, sy + sd * 100, duration=100).wait(),
+                        controller.post_swipe(sx, sy, sx, sy + sd * 100, duration=300).wait(),
                         time.sleep(0.1),
                     )
                     sel_info = song_selector.step(
