@@ -38,18 +38,8 @@ class AutoFishWithoutCV(CustomAction):
                 floor_ms = params.get("floor_ms", floor_ms)
             except Exception:
                 pass
-        logger.info("开始：等待鱼上钩")
-        # 等待鱼上钩
-        while not context.tasker.stopping:
-            image = context.tasker.controller.post_screencap().wait().get()
-            fish_hooked = context.run_recognition("FishHooked", image)
-            time.sleep(0.1)
-            if fish_hooked and fish_hooked.hit:
-                logger.info("识别到鱼上钩，执行 FishHook")
-                context.run_action("FishHook")
-                break
 
-        logger.info("进入控条阶段（绿条/光标对齐）")
+        logger.info("钓鱼开始：进入控条阶段（绿条/光标对齐）")
         # 钓鱼阶段
         while not context.tasker.stopping:
             image = context.tasker.controller.post_screencap().wait().get()
