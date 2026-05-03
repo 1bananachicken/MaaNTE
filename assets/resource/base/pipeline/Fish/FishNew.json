@@ -66,10 +66,6 @@
     },
     "FishNewGaming":{
         "desc":"进行钓鱼游戏",
-        "recognition": "And",
-        "all_of": [
-            "FishSceneOnFishGameCasting"
-        ],
         "action": "Custom",
         "custom_action":"auto_fish_without_cv",
         "pre_delay": 0,

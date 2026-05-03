@@ -27,6 +27,7 @@ from utils import logger
 
 # 路径兼容性检测 —— 最早执行，检测含中文/全角字符/中文符号的路径
 import re
+
 _cwd = os.getcwd()
 if re.search(r"[一-鿿　-〿＀-￯]", _cwd):
     logger.warning(
@@ -474,7 +475,6 @@ def agent(is_dev_mode=False):
 
             change_console_level("DEBUG")
             logger.info("开发模式：日志等级已设置为DEBUG")
-            
 
         from maa.agent.agent_server import AgentServer
         from maa.tasker import Tasker
