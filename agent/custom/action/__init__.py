@@ -5,7 +5,8 @@ from .AutoFish.auto_sell_fish import *
 from .auto_make_coffee import *
 from .Common.click import *
 from .realtime_task import *
-
+from .predict_angle import *
+from .predict_angle_new import *
 
 __all__ = [
     "AutoFishNew",
@@ -15,4 +16,6 @@ __all__ = [
     "AutoSellFish",
     "ClickOverride",
     "RealTimeTaskAction",
+    "PredictAngle",
+    "PredictAngleNew",
 ]
