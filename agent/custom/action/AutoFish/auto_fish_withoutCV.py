@@ -5,6 +5,10 @@ from maa.context import Context
 import time
 import json
 
+from agent.custom.action.Common.logger import get_logger
+
+logger = get_logger("auto_fish_without_cv")
+
 # 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
 CURSOR_PX_PER_SEC = 200.0
 
@@ -34,18 +38,18 @@ class AutoFishWithoutCV(CustomAction):
                 floor_ms = params.get("floor_ms", floor_ms)
             except Exception:
                 pass
-        print("[auto_fish_without_cv] 开始：等待鱼上钩")
+        logger.info("开始：等待鱼上钩")
         # 等待鱼上钩
         while not context.tasker.stopping:
             image = context.tasker.controller.post_screencap().wait().get()
             fish_hooked = context.run_recognition("FishHooked", image)
             time.sleep(0.1)
             if fish_hooked and fish_hooked.hit:
-                print("[auto_fish_without_cv] 识别到鱼上钩，执行 FishHook")
+                logger.info("识别到鱼上钩，执行 FishHook")
                 context.run_action("FishHook")
                 break
 
-        print("[auto_fish_without_cv] 进入控条阶段（绿条/光标对齐）")
+        logger.info("进入控条阶段（绿条/光标对齐）")
         # 钓鱼阶段
         while not context.tasker.stopping:
             image = context.tasker.controller.post_screencap().wait().get()
@@ -63,13 +67,12 @@ class AutoFishWithoutCV(CustomAction):
                 is not None  # 这个是为了消除pylance的warning，实际运行时不应该有None的情况
             ):
                 max_try_item -= 1
-                print(
-                    f"[auto_fish_without_cv] 识别不完整（绿条或光标未命中），"
-                    f"剩余尝试次数: {max_try_item}"
+                logger.warning(
+                    f"识别不完整（绿条或光标未命中），剩余尝试次数: {max_try_item}"
                 )
 
                 if max_try_item <= 0:
-                    print("[auto_fish_without_cv] 尝试次数用尽，控条失败")
+                    logger.error("尝试次数用尽，控条失败")
                     return CustomAction.RunResult(success=True)
                 context.run_action("FishHook")
                 continue
@@ -91,9 +94,8 @@ class AutoFishWithoutCV(CustomAction):
             param_override = {"duration": duration_ms}
 
             if offset > deadzone:
-                print(
-                    f"[auto_fish_without_cv] 控条: offset={offset:.1f}px, "
-                    f"时长={duration_ms}ms → FishLeft"
+                logger.info(
+                    f"控条: offset={offset:.1f}px, 时长={duration_ms}ms → FishLeft"
                 )
                 context.run_action(
                     "FishLeft",
@@ -102,9 +104,8 @@ class AutoFishWithoutCV(CustomAction):
                     },
                 )
             elif offset < -deadzone:
-                print(
-                    f"[auto_fish_without_cv] 控条: offset={offset:.1f}px, "
-                    f"时长={duration_ms}ms → FishRight"
+                logger.info(
+                    f"控条: offset={offset:.1f}px, 时长={duration_ms}ms → FishRight"
                 )
                 context.run_action(
                     "FishRight",
@@ -113,5 +114,5 @@ class AutoFishWithoutCV(CustomAction):
                     },
                 )
 
-        print("[auto_fish_without_cv] 任务结束（success=True）")
+        logger.info("任务结束（success=True）")
         return CustomAction.RunResult(success=True)
