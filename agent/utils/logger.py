@@ -103,6 +103,23 @@ import logging
 from logging.handlers import TimedRotatingFileHandler
 
 
+class _InterceptHandler(logging.Handler):
+    def emit(self, record: logging.LogRecord) -> None:
+        if _loguru_logger is None:
+            return
+        try:
+            level = _loguru_logger.level(record.levelname).name
+        except (ValueError, AttributeError):
+            level = record.levelno
+        frame, depth = logging.currentframe(), 2
+        while frame and frame.f_code.co_filename == logging.__file__:
+            frame = frame.f_back
+            depth += 1
+        _loguru_logger.opt(depth=depth, exception=record.exc_info).log(
+            level, record.getMessage()
+        )
+
+
 class _ConsoleFormatter(logging.Formatter):
     def format(self, record):
         level_name = record.levelname
@@ -154,6 +171,12 @@ def _setup_loguru_logger(log_dir="debug/custom", console_level="INFO"):
         diagnose=True,
         filter=_enrich_record,
     )
+
+    logging.root.handlers = [_InterceptHandler()]
+    logging.root.setLevel(logging.DEBUG)
+    for name in ("cv2", "numpy", "PIL", "matplotlib", "urllib3", "asyncio"):
+        logging.getLogger(name).setLevel(logging.WARNING)
+
     return _loguru_logger
 
 

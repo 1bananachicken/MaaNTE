@@ -1,0 +1,50 @@
+{
+    "RhythmSceneOnPlaying": {
+        "desc": "判断正在演奏界面",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [0, 0, 1280, 720],
+                "template": [
+                    "auto_rhythm/scene_templates/playing/pause.png"
+                ],
+                "threshold": 0.7
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    },
+    "RhythmSceneOnResults": {
+        "desc": "判断正在结算界面",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [0, 0, 1280, 720],
+                "template": [
+                    "auto_rhythm/scene_templates/results/score.png"
+                ],
+                "threshold": 0.7
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    },
+    "RhythmSceneOnSongSelect": {
+        "desc": "判断正在选歌界面",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [0, 0, 1280, 720],
+                "template": [
+                    "auto_rhythm/scene_templates/song_select/logo.png"
+                ],
+                "threshold": 0.7
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    }
+}
