@@ -98,7 +98,7 @@ class AutoRhythmPlay(CustomAction):
         key_hold_sec = float(cfg.get("keys", {}).get("key_hold_sec", 0.01))
 
         scene_lock_sec = float(
-            cfg.get("scene", {}).get("scene_lock_timeout_sec", _SCENE_LOCK_SEC)
+            cfg.get("scene", {}).get("song_select_to_playing_lock_sec", _SCENE_LOCK_SEC)
         )
         confirm_not_playing = max(
             _MIN_CONFIRM_NOT_PLAYING,
