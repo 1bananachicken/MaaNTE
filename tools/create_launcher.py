@@ -19,15 +19,16 @@ install_path = script_dir.parent / "install"
 
 def create_launcher():
     maa_exe = install_path / "MaaNTE.exe"
-    maa_core = install_path / "MaaNTE_core.exe"
+    maa_core = install_path / "bin" / "MaaNTE_core.exe"
 
     if not maa_exe.exists():
         print(f"警告: {maa_exe} 不存在，跳过创建启动器")
         return
 
     # 重命名原始 exe
+    maa_core.parent.mkdir(parents=True, exist_ok=True)
     shutil.move(str(maa_exe), str(maa_core))
-    print(f"已重命名 MaaNTE.exe -> MaaNTE_core.exe")
+    print(f"已重命名 MaaNTE.exe -> bin/MaaNTE_core.exe")
 
     launcher_src = script_dir / "launcher_standalone.py"
     if not launcher_src.exists():

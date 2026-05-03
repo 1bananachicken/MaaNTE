@@ -101,12 +101,12 @@ def main():
     check_first_use(work_dir)
     check_integrity(work_dir)
 
-    core = work_dir / "MaaNTE_core.exe"
+    core = work_dir / "bin" / "MaaNTE_core.exe"
     if core.exists():
         subprocess.Popen([str(core)], cwd=str(work_dir))
     else:
         _msgbox(
-            "找不到 MaaNTE_core.exe，请检查安装是否完整。",
+            "找不到 bin/MaaNTE_core.exe，请检查安装是否完整。",
             "MaaNTE",
             MB_OK | MB_ICONERROR,
         )
