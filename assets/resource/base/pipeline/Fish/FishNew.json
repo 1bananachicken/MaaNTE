@@ -21,8 +21,7 @@
         "post_delay": 0,
         "next": [
             "FishNewCast",
-            "FishNewOpenFishMaster",
-            "FishNewTaskExit"
+            "FishNewOpenFishMaster"
         ]
     },
     "FishNewCast":{
@@ -40,6 +39,8 @@
                 ]
             }
         },
+        "pre_delay": 0,
+        "post_delay": 0,
         "next": [
             "FishNewBaitLack",
             "FishNewGameStart"
@@ -55,6 +56,8 @@
                 ]
             }
         },
+        "pre_delay": 0,
+        "post_delay": 0,
         "focus": {
             "Node.Action.Succeeded": "开始钓鱼",
             "Node.Recognition.Failed": "判断不在钓鱼界面，尝试返回"
@@ -73,14 +76,8 @@
         "custom_action":"auto_fish_new",
         "pre_delay": 0,
         "post_wait_freezes": {
-            "target": [
-                500,
-                200,
-                280,
-                260
-            ],
             "time": 200,
-            "timeout": 2000
+            "timeout": 3000
         },
         "next": [
             "[Anchor]FishNewRestart",

@@ -41,7 +41,7 @@ class AutoFishNew(CustomAction):
         KEY_F = 70
 
         success_region = [350, 150, 580, 50]
-        game_region = [395, 40, 485, 20]
+        game_region = [395, 40, 490, 20]
         deadzone = 15
 
         print("  Casting...")
