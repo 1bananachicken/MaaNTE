@@ -1,0 +1,70 @@
+{
+    "FishRight": {
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "key": 68,
+                "duration": 500
+            }
+        }
+    },
+    "FishRightDown": {
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "KeyDown",
+            "param": {
+                "key": 68
+            }
+        }
+    },
+    "FishRightUp": {
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "KeyUp",
+            "param": {
+                "key": 68
+            }
+        }
+    },
+    "FishLeft": {
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "key": 65,
+                "duration": 500
+            }
+        }
+    },
+    "FishLeftDown": {
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "KeyDown",
+            "param": {
+                "key": 65
+            }
+        }
+    },
+    "FishLeftUp": {
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "KeyUp",
+            "param": {
+                "key": 65
+            }
+        }
+    }
+}

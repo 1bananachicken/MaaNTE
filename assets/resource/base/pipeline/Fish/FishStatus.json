@@ -1,0 +1,95 @@
+{
+    "FishGreenBar": {
+        "desc": "钓鱼界面中绿色条的位置",
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    210,
+                    0,
+                    814,
+                    145
+                ],
+                "method": 40,
+                "lower": [
+                    78,
+                    141,
+                    170
+                ],
+                "upper": [
+                    86,
+                    209,
+                    241
+                ]
+            }
+        }
+    },
+    "FishCursor": {
+        "desc": "钓鱼界面中指针的位置",
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    210,
+                    0,
+                    814,
+                    145
+                ],
+                "method": 40,
+                "lower": [
+                    24,
+                    64,
+                    253
+                ],
+                "upper": [
+                    30,
+                    154,
+                    255
+                ]
+            }
+        }
+    },
+    "FishTest": {
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "auto_fish_without_cv"
+            }
+        }
+    },
+    "FishHooked": {
+        "desc": "鱼上钩",
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    1116,
+                    600,
+                    133,
+                    97
+                ],
+                "lower": [
+                    108,
+                    223,
+                    254
+                ],
+                "upper": [
+                    108,
+                    223,
+                    255
+                ],
+                "connected": true,
+                "count": 50
+            }
+        }
+    }
+}
