@@ -161,8 +161,8 @@
                 463,
                 124
             ],
-            "time": 80,
-            "timeout": 200
+            "time": 1000,
+            "timeout": 2000
         },
         "next": [
             "FishNewChooseGeneralBait",
