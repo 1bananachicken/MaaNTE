@@ -13,16 +13,18 @@ class AutoFishWithoutCV(CustomAction):
 
         deadzone = 15
         max_try_item = 10
+        print("[auto_fish_without_cv] 开始：等待鱼上钩")
         # 等待鱼上钩
         while not context.tasker.stopping:
             image = context.tasker.controller.post_screencap().wait().get()
             fish_hooked = context.run_recognition("FishHooked", image)
-            if fish_hooked and fish_hooked.hit:
-                context.run_action("FishHook")
-                time.sleep(0.1)
-                break
             time.sleep(0.1)
+            if fish_hooked and fish_hooked.hit:
+                print("[auto_fish_without_cv] 识别到鱼上钩，执行 FishHook")
+                context.run_action("FishHook")
+                break
 
+        print("[auto_fish_without_cv] 进入控条阶段（绿条/光标对齐）")
         # 钓鱼阶段
         while not context.tasker.stopping:
             image = context.tasker.controller.post_screencap().wait().get()
@@ -40,7 +42,12 @@ class AutoFishWithoutCV(CustomAction):
                 is not None  # 这个是为了消除pylance的warning，实际运行时不应该有None的情况
             ):
                 max_try_item -= 1
+                print(
+                    f"[auto_fish_without_cv] 识别不完整（绿条或光标未命中），"
+                    f"剩余尝试次数: {max_try_item}"
+                )
                 if max_try_item <= 0:
+                    print("[auto_fish_without_cv] 尝试次数用尽，控条失败")
                     return CustomAction.RunResult(success=False)
                 continue
 
@@ -76,6 +83,10 @@ class AutoFishWithoutCV(CustomAction):
             param_override = {"duration": duration_ms}
 
             if offset > deadzone:
+                print(
+                    f"[auto_fish_without_cv] 控条: offset={offset:.1f}px, "
+                    f"条内={cursor_in_bar}, 模式={mode}, 时长={duration_ms}ms → FishLeft"
+                )
                 context.run_action(
                     "FishLeft",
                     pipeline_override={
@@ -83,6 +94,10 @@ class AutoFishWithoutCV(CustomAction):
                     },
                 )
             elif offset < -deadzone:
+                print(
+                    f"[auto_fish_without_cv] 控条: offset={offset:.1f}px, "
+                    f"条内={cursor_in_bar}, 模式={mode}, 时长={duration_ms}ms → FishRight"
+                )
                 context.run_action(
                     "FishRight",
                     pipeline_override={
@@ -90,4 +105,5 @@ class AutoFishWithoutCV(CustomAction):
                     },
                 )
 
+        print("[auto_fish_without_cv] 任务结束（success=True）")
         return CustomAction.RunResult(success=True)
