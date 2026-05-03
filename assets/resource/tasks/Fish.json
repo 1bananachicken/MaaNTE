@@ -7,8 +7,7 @@
                 "FishLoopInfinite",
                 "FishNumber",
                 "FishSellAuto",
-                "FishBuyBaitAuto",
-                "FishBaitThreshold"
+                "FishBuyBaitAuto"
             ]
         },
         {
@@ -77,16 +76,27 @@
                     "label": "启用",
                     "pipeline_override": {
                         "FishEntrance": {
-                            "next": ["FishLoopStart"]
+                            "next": [
+                                "FishLoopStart"
+                            ]
                         },
                         "FishGameStart": {
-                            "next": ["AutoSellFish", "AutoBuyFishBait", "FishLoopStart"]
+                            "next": [
+                                "AutoSellFish",
+                                "AutoBuyFishBait",
+                                "FishLoopStart"
+                            ]
                         },
                         "AutoSellFish": {
-                            "next": ["AutoBuyFishBait", "FishLoopStart"]
+                            "next": [
+                                "AutoBuyFishBait",
+                                "FishLoopStart"
+                            ]
                         },
                         "AutoBuyFishBait": {
-                            "next": ["FishLoopStart"]
+                            "next": [
+                                "FishLoopStart"
+                            ]
                         }
                     }
                 },

@@ -1,49 +1,17 @@
-import time
-from pathlib import Path
 import cv2
-import numpy as np
+import time
+
+from pathlib import Path
+from ..Common.utils import get_image, match_template_in_region
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
 
-def get_image(controller):
-    job = controller.post_screencap()
-    job.wait()
-    img = controller.cached_image
-    return img
-
-
-def match_template_in_region(img, region, template, min_similarity=0.8):
-    if img is None or not isinstance(img, np.ndarray):
-        return False, 0.0, 0, 0
-
-    x1, y1, x2, y2 = region
-
-    h, w = img.shape[:2]
-    x1, y1 = max(0, x1), max(0, y1)
-    x2, y2 = min(w, x2), min(h, y2)
-
-    if x2 <= x1 or y2 <= y1:
-        return False, 0.0, 0, 0
-
-    roi = img[y1:y2, x1:x2]
-
-    if len(roi.shape) == 3 and roi.shape[2] == 4:
-        roi = cv2.cvtColor(roi, cv2.COLOR_BGRA2BGR)
-
-    res = cv2.matchTemplate(roi, template, cv2.TM_CCOEFF_NORMED)
-    min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-
-    if max_val >= min_similarity:
-        return True, max_val, x1 + max_loc[0], y1 + max_loc[1]
-    return False, max_val, 0, 0
-
-
 @AgentServer.custom_action("auto_fish_new")
 class AutoFishNew(CustomAction):
-    abs_path = Path(__file__).parents[3]
+    abs_path = Path(__file__).parents[4]
     if Path.exists(abs_path / "assets"):
         image_dir = abs_path / "assets/resource/base/image/Fish"
     else:
@@ -90,7 +58,7 @@ class AutoFishNew(CustomAction):
                 img, success_region, self.success_catch_template, 0.7
             )
             if wait_frame > 300:
-                print(f"  [wait] timeout (f={wait_frame}), fish ended")
+                print(f"  [Fish] cast timeout (f={wait_frame}), fish ended")
                 break
             if m_catch:
                 controller.post_key_down(KEY_F)
@@ -155,7 +123,7 @@ class AutoFishNew(CustomAction):
                     set_ad_key(None)
                     controller.post_key_up(KEY_F)
                     print(
-                        f"  [minigame] slider lost {slider_miss_count} frames, minigame ended."
+                        f"  [Fish] slider lost {slider_miss_count} frames, fish ended."
                     )
                     return CustomAction.RunResult(success=True)
                 x_slider = last_x_slider
@@ -165,7 +133,7 @@ class AutoFishNew(CustomAction):
                 controller.post_key_up(KEY_A)
                 controller.post_key_up(KEY_D)
                 controller.post_key_up(KEY_F)
-                print(f"  [minigame] timeout (f={frame}), minigame ended.")
+                print(f"  [Fish] fish timeout (f={frame}), fish ended.")
                 return CustomAction.RunResult(success=False)
 
             if m_left and m_right:
@@ -193,7 +161,7 @@ class AutoFishNew(CustomAction):
             if frame % 30 == 0 or current_ad_key != prev_key:
                 key_name = {None: "-", KEY_A: "A", KEY_D: "D"}.get(current_ad_key, "?")
                 print(
-                    f"  [minigame] f={frame} slider(x={x_slider:.0f} s={slider_score:.2f}) "
+                    f"  [Fish] f={frame} slider(x={x_slider:.0f} s={slider_score:.2f}) "
                     f"L({m_left} s={left_score:.2f}) R({m_right} s={right_score:.2f}) "
                     f"bar_w={last_bar_width:.0f} target={target:.0f} offset={offset:+.0f} key={key_name}"
                 )
