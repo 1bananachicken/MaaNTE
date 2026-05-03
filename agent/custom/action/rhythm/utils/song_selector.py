@@ -91,6 +91,8 @@ class SongSelector:
         self._last_action_time: float = 0.0
         self._match_loc: tuple[int, int] | None = None
         self._start_retry_count: int = 0
+        self._consecutive_down_fails: int = 0
+        self._one_time_ds: int | None = None
 
         self._start_template = self._load_start_template()
 
@@ -129,6 +131,8 @@ class SongSelector:
         self._last_action_time = 0.0
         self._match_loc = None
         self._start_retry_count = 0
+        self._consecutive_down_fails = 0
+        self._one_time_ds = None
 
     @property
     def state(self) -> str:
@@ -153,12 +157,18 @@ class SongSelector:
             match = self._find_template(frame_bgr, self._template, self._match_threshold)
             if match is not None:
                 self._match_loc = match
+                self._consecutive_down_fails = 0
+                self._one_time_ds = None
                 self._state = _SEL_CLICKING_SONG
                 logger.info(
                     "歌曲模板匹配成功: 位置=(%d,%d), 将点击选中",
                     match[0], match[1],
                 )
             elif self._scroll_attempts < self._max_scroll_attempts:
+                if self._consecutive_down_fails >= 5 and self._one_time_ds is None:
+                    self._one_time_ds = 1
+                    self._consecutive_down_fails = 0
+                    logger.info("连续 %d 次下滚未命中，改为上滚 (ds=1)", 5)
                 self._state = _SEL_SCROLLING
             else:
                 self._state = _SEL_FAILED
@@ -171,14 +181,20 @@ class SongSelector:
         if self._state == _SEL_SCROLLING:
             if now - self._last_action_time < self._click_delay:
                 return {"state": self._state, "action": "waiting"}
+            direction = self._one_time_ds if self._one_time_ds is not None else self._scroll_delta
+            if self._one_time_ds is not None:
+                logger.debug("使用一次性上滚 ds=%d", self._one_time_ds)
+                self._one_time_ds = None
+            else:
+                self._consecutive_down_fails += 1
             if scroll_func is not None:
                 sx = int(self._scroll_area_x_frac * w)
                 sy = int(self._scroll_area_y_frac * h)
-                scroll_func(sx, sy, self._scroll_delta)
+                scroll_func(sx, sy, direction)
             self._scroll_attempts += 1
             self._last_action_time = now
             self._state = _SEL_SEARCHING
-            logger.debug("滚动搜索: 第 %d 次", self._scroll_attempts)
+            logger.debug("滚动搜索: 第 %d 次 (方向=%d)", self._scroll_attempts, direction)
             return {"state": self._state, "action": "scroll", "scroll_attempts": self._scroll_attempts}
 
         if self._state == _SEL_CLICKING_SONG:
