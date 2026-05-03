@@ -46,9 +46,11 @@ class AutoFishWithoutCV(CustomAction):
                     f"[auto_fish_without_cv] 识别不完整（绿条或光标未命中），"
                     f"剩余尝试次数: {max_try_item}"
                 )
+
                 if max_try_item <= 0:
                     print("[auto_fish_without_cv] 尝试次数用尽，控条失败")
-                    return CustomAction.RunResult(success=False)
+                    return CustomAction.RunResult(success=True)
+                context.run_action("FishHook")
                 continue
 
             green_bar_x, green_bar_y, green_bar_w, green_bar_h = green_bar.box
