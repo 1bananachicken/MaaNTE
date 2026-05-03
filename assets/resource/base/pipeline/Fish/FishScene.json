@@ -47,13 +47,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    1141,
-                    609,
-                    87,
-                    84
+                    1045,
+                    601,
+                    100,
+                    100
                 ],
                 "template": [
-                    "Fish/FishGameSign.png"
+                    "Fish/FishGameSign2.png"
                 ],
                 "threshold": 0.8,
                 "green_mask": true
