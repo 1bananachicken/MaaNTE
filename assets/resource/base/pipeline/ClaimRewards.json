@@ -2,38 +2,14 @@
     "ClaimRewardsEntrance": {
         "desc": "领取日常奖励入口",
         "next": [
-            "ClaimRewardsActivity",
-            "ClaimRewardsBattlePass",
-            "ClaimRewardsExit"
+            "ClaimRewardsActivity"
         ]
     },
     "ClaimRewardsActivity": {
         "desc": "领取活跃度奖励主流程",
         "next": [
-            "ClaimRewardsActivityStart",
-            "[JumpBack]SceneAnyEnterWorld"
-        ]
-    },
-    "ClaimRewardsActivityStart": {
-        "desc": "开始领取活跃度奖励",
-        "recognition": {
-            "type": "And",
-            "param": {
-                "all_of": [
-                    "InWorld"
-                ]
-            }
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": [
-                    112
-                ]
-            }
-        },
-        "next": [
-            "ClaimRewardsActivitySwitchToPage2"
+            "ClaimRewardsActivitySwitchToPage2",
+            "[JumpBack]SceneAnyEnterExplorationGuideMenu"
         ]
     },
     "ClaimRewardsActivitySwitchToPage2": {
@@ -56,12 +32,12 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        },
+        "action": "LongPress",
+        "duration": 2,
         "next": [
             "[JumpBack]ClaimRewardsActivityPoints",
-            "ClaimRewardsActivityRewards"
+            "[JumpBack]ClaimRewardsActivityRewards",
+            "ClaimRewardsBattlePass"
         ]
     },
     "ClaimRewardsActivityPoints": {
@@ -81,9 +57,8 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        },
+        "action": "LongPress",
+        "duration": 2,
         "post_delay": 500
     },
     "ClaimRewardsActivityRewards": {
@@ -103,57 +78,29 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        }
+        "action": "LongPress",
+        "duration": 2
     },
     "ClaimRewardsBattlePass": {
         "desc": "领取环期赏令主流程",
         "next": [
-            "ClaimRewardsBattlePassStart",
-            "[JumpBack]SceneAnyEnterWorld"
-        ]
-    },
-    "ClaimRewardsBattlePassStart": {
-        "desc": "开始领取环期赏令",
-        "recognition": {
-            "type": "And",
-            "param": {
-                "all_of": [
-                    "InWorld"
-                ]
-            }
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": [
-                    113
-                ]
-            }
-        },
-        "post_wait_freezes": 1000,
-        "next": [
-            "ClaimRewardsBattlePassSwitchToPage2"
+            "ClaimRewardsBattlePassSwitchToPage2",
+            "[JumpBack]SceneAnyEnterBattlePassMenu"
         ]
     },
     "ClaimRewardsBattlePassSwitchToPage2": {
         "desc": "切换到环期赏令第二页",
-        "action": {
-            "type": "Click",
-            "param": {
-                "target": [
-                    58,
-                    232,
-                    31,
-                    32
-                ]
-            }
-        },
+        "recognition": "TemplateMatch",
+        "template": [
+            "Common/Scene/BattlePass/Page2.png",
+            "Common/Scene/BattlePass/Page2WithRedDot.png"
+        ],
+        "action": "LongPress",
+        "duration": 2,
         "post_wait_freezes": 500,
         "next": [
-            "ClaimRewardsBattlePassBackToPage1",
-            "ClaimRewardsBattlePassExp"
+            "ClaimRewardsBattlePassExp",
+            "ClaimRewardsBattlePassBackToPage1"
         ]
     },
     "ClaimRewardsBattlePassExp": {
@@ -173,9 +120,8 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        }
+        "action": "LongPress",
+        "duration": 2
     },
     "ClaimRewardsBattlePassBackToPage1": {
         "desc": "切换到环期赏令第一页",
@@ -194,9 +140,8 @@
                 "threshold": 0.6
             }
         },
-        "action": {
-            "type": "Click"
-        },
+        "action": "LongPress",
+        "duration": 2,
         "post_wait_freezes": 500,
         "next": [
             "ClaimRewardsBattlePassRewards"
@@ -219,9 +164,11 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        }
+        "action": "LongPress",
+        "duration": 2,
+        "next": [
+            "ClaimRewardsExit"
+        ]
     },
     "ClaimRewardsExit": {
         "desc": "领取奖励任务出口"
