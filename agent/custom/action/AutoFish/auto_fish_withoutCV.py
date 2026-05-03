@@ -4,6 +4,9 @@ from maa.context import Context
 
 import time
 
+# 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
+CURSOR_PX_PER_SEC = 200.0
+
 
 @AgentServer.custom_action("auto_fish_without_cv")
 class AutoFishWithoutCV(CustomAction):
@@ -67,19 +70,20 @@ class AutoFishWithoutCV(CustomAction):
             cursor_in_bar = bar_left <= cursor_center_x <= bar_right
 
             abs_offset = abs(offset)
-            # 条内：积极对齐中心；条外：激进拉回
+            # 按 ~200px/s 估算覆盖偏移所需按压时间；条内略欠矫减轻来回抖，条外按满速拉回
+            base_ms = (abs_offset / CURSOR_PX_PER_SEC) * 1000.0
             if cursor_in_bar:
-                scale = 4
+                factor = 0.88
                 cap_ms = 720
-                floor_ms = 90
+                floor_ms = 80
                 mode = "fine"
             else:
-                scale = 7
+                factor = 1.0
                 cap_ms = 900
-                floor_ms = 140
+                floor_ms = 120
                 mode = "aggressive"
 
-            duration_ms = min(cap_ms, max(floor_ms, int(abs_offset * scale)))
+            duration_ms = min(cap_ms, max(floor_ms, int(base_ms * factor)))
 
             # 键码与 LongPressKey 定义见资源 pipeline FishKey（FishLeft / FishRight），此处只覆盖时长
             param_override = {"duration": duration_ms}
