@@ -1,6 +1,5 @@
 import json
 import logging
-import os
 import time
 from typing import Any
 
@@ -10,6 +9,7 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
+from ..utils.config import load_rhythm_config
 from ..utils.presence import (
     STATE_SONG_SELECT,
     SceneGate,
@@ -20,34 +20,20 @@ from ..utils.song_selector import SongSelector
 logger = logging.getLogger(__name__)
 
 
-def _load_rhythm_config() -> dict[str, Any]:
-    from ...auto_rhythm import _load_rhythm_config as _load
-    return _load()
-
-
 @AgentServer.custom_action("auto_rhythm_select_song")
 class AutoRhythmSelectSong(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         controller = context.tasker.controller
-        cfg = _load_rhythm_config()
+        cfg = load_rhythm_config()
 
-        params = {}
+        params: dict[str, Any] = {}
         if argv.custom_action_param:
             try:
                 params = json.loads(argv.custom_action_param)
             except Exception:
                 pass
-
-        for env_key in ("RHYTHM_SONG_NAME", "RHYTHM_AUTO_SELECT"):
-            val = os.environ.get(env_key)
-            if val is None:
-                continue
-            if env_key.endswith("_SONG_NAME"):
-                params.setdefault("song_name", val)
-            elif env_key.endswith("_AUTO_SELECT"):
-                params.setdefault("auto_select", val.lower() in ("true", "1", "yes"))
 
         if "song_name" in params:
             cfg.setdefault("song_select", {})["song_name"] = str(params["song_name"])
