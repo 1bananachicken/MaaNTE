@@ -15,14 +15,14 @@ class AutoFishWithoutCV(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
 
-        deadzone = 5  # 光标与绿条中心的距离在 deadzone（像素）以内时不操作，避免过度频繁地轻微调整导致的抖动
+        deadzone = 10  # 光标与绿条中心的距离在 deadzone（像素）以内时不操作，避免过度频繁地轻微调整导致的抖动
         max_try_item = 10  # 识别不完整（绿条或光标未命中）的最大尝试次数，超过后放弃本次钓鱼，重新抛竿（执行 FishHook）
         factor = 1.5  # 控条时长的调整因子，实际时长 = 基础时长 * factor，基础时长 = (光标与绿条中心的像素偏移 / CURSOR_PX_PER_SEC) * 1000ms，增加 factor 可以适当补偿识别误差和按键响应延迟
         cap_ms = (
-            1200  # 控条时长的上限（毫秒），避免因识别到较大偏移时按键过久，导致过度补偿
+            1500  # 控条时长的上限（毫秒），避免因识别到较大偏移时按键过久，导致过度补偿
         )
         floor_ms = (
-            150  # 控条时长的下限（毫秒），避免因识别到较小偏移时按键过短，导致补偿不足
+            50  # 控条时长的下限（毫秒），避免因识别到较小偏移时按键过短，导致补偿不足
         )
         if argv.custom_action_param:
             try:
