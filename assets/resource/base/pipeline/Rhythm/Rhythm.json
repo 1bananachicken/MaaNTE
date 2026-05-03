@@ -16,9 +16,6 @@
         "custom_action_param": {},
         "next": [
             "RhythmWaitPlaying"
-        ],
-        "on_error": [
-            "RhythmWaitPlaying"
         ]
     },
     "RhythmWaitPlaying": {
