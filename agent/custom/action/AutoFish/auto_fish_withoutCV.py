@@ -12,11 +12,14 @@ class AutoFishWithoutCV(CustomAction):
     ) -> CustomAction.RunResult:
 
         deadzone = 15
+        max_try_item = 10
         # 等待鱼上钩
         while not context.tasker.stopping:
             image = context.tasker.controller.post_screencap().wait().get()
             fish_hooked = context.run_recognition("FishHooked", image)
             if fish_hooked and fish_hooked.hit:
+                context.run_action("FishHook")
+                time.sleep(0.1)
                 break
             time.sleep(0.1)
 
@@ -36,7 +39,10 @@ class AutoFishWithoutCV(CustomAction):
                 and cursor.box
                 is not None  # 这个是为了消除pylance的warning，实际运行时不应该有None的情况
             ):
-                return CustomAction.RunResult(success=True)
+                max_try_item -= 1
+                if max_try_item <= 0:
+                    return CustomAction.RunResult(success=False)
+                continue
 
             green_bar_x, green_bar_y, green_bar_w, green_bar_h = green_bar.box
             cursor_x, cursor_y, cursor_w, cursor_h = cursor.box

@@ -11,28 +11,6 @@
             }
         }
     },
-    "FishRightDown": {
-        "post_delay": 0,
-        "pre_delay": 0,
-        "rate_limit": 0,
-        "action": {
-            "type": "KeyDown",
-            "param": {
-                "key": 68
-            }
-        }
-    },
-    "FishRightUp": {
-        "post_delay": 0,
-        "pre_delay": 0,
-        "rate_limit": 0,
-        "action": {
-            "type": "KeyUp",
-            "param": {
-                "key": 68
-            }
-        }
-    },
     "FishLeft": {
         "post_delay": 0,
         "pre_delay": 0,
@@ -45,25 +23,14 @@
             }
         }
     },
-    "FishLeftDown": {
+    "FishHook": {
         "post_delay": 0,
         "pre_delay": 0,
         "rate_limit": 0,
         "action": {
-            "type": "KeyDown",
+            "type": "ClickKey",
             "param": {
-                "key": 65
-            }
-        }
-    },
-    "FishLeftUp": {
-        "post_delay": 0,
-        "pre_delay": 0,
-        "rate_limit": 0,
-        "action": {
-            "type": "KeyUp",
-            "param": {
-                "key": 65
+                "key": 70
             }
         }
     }
