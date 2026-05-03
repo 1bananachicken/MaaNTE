@@ -3,6 +3,7 @@ from maa.custom_action import CustomAction
 from maa.context import Context
 
 import time
+import json
 
 # 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
 CURSOR_PX_PER_SEC = 200.0
@@ -14,8 +15,25 @@ class AutoFishWithoutCV(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
 
-        deadzone = 15
-        max_try_item = 10
+        deadzone = 5  # 光标与绿条中心的距离在 deadzone（像素）以内时不操作，避免过度频繁地轻微调整导致的抖动
+        max_try_item = 10  # 识别不完整（绿条或光标未命中）的最大尝试次数，超过后放弃本次钓鱼，重新抛竿（执行 FishHook）
+        factor = 1.5  # 控条时长的调整因子，实际时长 = 基础时长 * factor，基础时长 = (光标与绿条中心的像素偏移 / CURSOR_PX_PER_SEC) * 1000ms，增加 factor 可以适当补偿识别误差和按键响应延迟
+        cap_ms = (
+            1200  # 控条时长的上限（毫秒），避免因识别到较大偏移时按键过久，导致过度补偿
+        )
+        floor_ms = (
+            150  # 控条时长的下限（毫秒），避免因识别到较小偏移时按键过短，导致补偿不足
+        )
+        if argv.custom_action_param:
+            try:
+                params = json.loads(argv.custom_action_param)
+                deadzone = params.get("deadzone", deadzone)
+                max_try_item = params.get("max_try", max_try_item)
+                factor = params.get("factor", factor)
+                cap_ms = params.get("cap_ms", cap_ms)
+                floor_ms = params.get("floor_ms", floor_ms)
+            except Exception:
+                pass
         print("[auto_fish_without_cv] 开始：等待鱼上钩")
         # 等待鱼上钩
         while not context.tasker.stopping:
@@ -65,24 +83,8 @@ class AutoFishWithoutCV(CustomAction):
             # 与 auto_fish.py 一致：offset = 滑块 x - 目标中心 x（此处用识别框中心对应 slider / target）
             offset = cursor_center_x - green_bar_center_x
 
-            bar_left = green_bar_x
-            bar_right = green_bar_x + green_bar_w
-            cursor_in_bar = bar_left <= cursor_center_x <= bar_right
-
             abs_offset = abs(offset)
-            # 按 ~200px/s 估算覆盖偏移所需按压时间；条内略欠矫减轻来回抖，条外按满速拉回
             base_ms = (abs_offset / CURSOR_PX_PER_SEC) * 1000.0
-            if cursor_in_bar:
-                factor = 0.88
-                cap_ms = 720
-                floor_ms = 80
-                mode = "fine"
-            else:
-                factor = 1.0
-                cap_ms = 900
-                floor_ms = 120
-                mode = "aggressive"
-
             duration_ms = min(cap_ms, max(floor_ms, int(base_ms * factor)))
 
             # 键码与 LongPressKey 定义见资源 pipeline FishKey（FishLeft / FishRight），此处只覆盖时长
@@ -91,7 +93,7 @@ class AutoFishWithoutCV(CustomAction):
             if offset > deadzone:
                 print(
                     f"[auto_fish_without_cv] 控条: offset={offset:.1f}px, "
-                    f"条内={cursor_in_bar}, 模式={mode}, 时长={duration_ms}ms → FishLeft"
+                    f"时长={duration_ms}ms → FishLeft"
                 )
                 context.run_action(
                     "FishLeft",
@@ -102,7 +104,7 @@ class AutoFishWithoutCV(CustomAction):
             elif offset < -deadzone:
                 print(
                     f"[auto_fish_without_cv] 控条: offset={offset:.1f}px, "
-                    f"条内={cursor_in_bar}, 模式={mode}, 时长={duration_ms}ms → FishRight"
+                    f"时长={duration_ms}ms → FishRight"
                 )
                 context.run_action(
                     "FishRight",
