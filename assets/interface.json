@@ -44,7 +44,7 @@
                 "class_regex": "UnrealWindow",
                 "window_regex": "^\\s*(异环|NTE)\\s*$",
                 "screencap": "PrintWindow",
-                "mouse": "SendMessageWithWindowPos",
+                "mouse": "Seize",
                 "keyboard": "PostMessage"
             }
         }
@@ -65,13 +65,12 @@
     },
     "task": [],
     "import": [
-        
         "resource/tasks/ClaimRewards.json",
         "resource/tasks/WithdrawMoney.json",
-
         "resource/tasks/Fish.json",
         "resource/tasks/RealTime.json",
-        "resource/tasks/MakeCoffee.json"
+        "resource/tasks/MakeCoffee.json",
+        "resource/tasks/Rhythm.json"
     ],
     "option": {}
 }
