@@ -463,8 +463,6 @@ assets/resource/base/model/detect/sos_nodes.onnx
 # local gui test
 MFA/
 deps_maafw.zip
-setup_gui.ps1
-setup_gui.bat
 test/
 output/
-Tetris/
+
