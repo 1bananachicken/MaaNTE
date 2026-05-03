@@ -1,0 +1,126 @@
+{
+    "TetrisEntrance": {
+        "desc": "泯除方块入口",
+        "action": "DoNothing",
+        "next": [
+            "TetrisHome"
+        ]
+    },
+    "TetrisHome": {
+        "desc": "检测泯除方块首页",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    25,
+                    19,
+                    144,
+                    36
+                ],
+                "template": [
+                    "Tetris/banner.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "next": [
+            "TetrisSelectSingle",
+            "TetrisSelectMultiple"
+        ]
+    },
+    "TetrisSelectSingle": {
+        "desc": "选择单人模式",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    825,
+                    196,
+                    120,
+                    108
+                ],
+                "template": [
+                    "Tetris/single.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "TetrisStartGame"
+        ]
+    },
+    "TetrisSelectMultiple": {
+        "desc": "选择多人模式",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    825,
+                    364,
+                    120,
+                    108
+                ],
+                "template": [
+                    "Tetris/multiple.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "TetrisStartGame"
+        ]
+    },
+    "TetrisStartGame": {
+        "desc": "点击开始游戏",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1035,
+                    624,
+                    167,
+                    35
+                ],
+                "template": [
+                    "Tetris/start.png"
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "TetrisGamePlay"
+        ]
+    },
+    "TetrisGamePlay": {
+        "desc": "泯除方块游戏流程（投票检测游玩与结算）",
+        "action": "Custom",
+        "custom_action": "auto_tetris",
+        "custom_action_param": {},
+        "next": [
+            "TetrisExit"
+        ],
+        "on_error": [
+            "TetrisExitWithError"
+        ]
+    },
+    "TetrisExit": {
+        "desc": "泯除方块任务完成",
+        "next": []
+    },
+    "TetrisExitWithError": {
+        "desc": "泯除方块异常退出",
+        "next": []
+    }
+}
