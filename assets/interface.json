@@ -50,12 +50,15 @@
             "../agent/main.py"
         ]
     },
-    "task": [],
+    "task": [
+        {
+            "name": "NaviTest",
+            "entry": "NaviTest"
+        }
+    ],
     "import": [
-        
         "resource/tasks/ClaimRewards.json",
         "resource/tasks/WithdrawMoney.json",
-
         "resource/tasks/Fish.json",
         "resource/tasks/RealTime.json",
         "resource/tasks/MakeCoffee.json"

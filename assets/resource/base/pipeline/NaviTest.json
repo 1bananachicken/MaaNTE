@@ -1,0 +1,6 @@
+{
+    "NaviTest": {
+        "action": "Custom",
+        "custom_action": "predict_angle_new"
+    }
+}
