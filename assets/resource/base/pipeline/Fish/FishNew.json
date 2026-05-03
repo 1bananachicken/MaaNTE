@@ -166,7 +166,7 @@
         },
         "next": [
             "FishNewChooseGeneralBait",
-            "[JumpBack]FishNewBaitScrollMouse",
+            // "[JumpBack]FishNewBaitScrollMouse",
             "[JumpBack]MouseMoveReset"
         ]
     },
@@ -295,7 +295,7 @@
         },
         "next": [
             "FishNewStoreChooseGeneralBait",
-            "[JumpBack]FishNewStoreScrollMouse",
+            // "[JumpBack]FishNewStoreScrollMouse",
             "[JumpBack]MouseMoveReset"
         ]
     },
