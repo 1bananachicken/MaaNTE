@@ -65,6 +65,7 @@ _DEFAULT_CONFIG = {
         "match_vote_min": 1,
         "playing_check_interval": 5,
         "scene_lock_timeout_sec": 1.5,
+        "song_select_to_playing_lock_sec": 8.0,
     },
     "song_select": {
         "enabled": False,
@@ -247,6 +248,9 @@ class AutoRhythm(CustomAction):
         scene_lock_timeout = float(
             cfg.get("scene", {}).get("scene_lock_timeout_sec", 1.5)
         )
+        song_select_to_playing_lock = float(
+            cfg.get("scene", {}).get("song_select_to_playing_lock_sec", 8.0)
+        )
 
         logger.info(
             "演奏任务开始 | 目标FPS=%d | 鼓面检测=%s | 自动选歌=%s(%s) | 自动连打=%s(次数=%d|Max=%s)",
@@ -269,6 +273,7 @@ class AutoRhythm(CustomAction):
         prev_logged_state: str | None = None
         state = STATE_OTHER
         scene_lock_until: float = 0.0
+        scene_lock_duration: float = scene_lock_timeout
 
         try:
             while True:
@@ -308,7 +313,11 @@ class AutoRhythm(CustomAction):
                     state, gate_info = scene_gate.step(frame)
 
                 if state == STATE_PLAYING and state_before_step != STATE_PLAYING:
-                    scene_lock_until = time.perf_counter() + scene_lock_timeout
+                    if state_before_step == STATE_SONG_SELECT:
+                        scene_lock_duration = song_select_to_playing_lock
+                    else:
+                        scene_lock_duration = scene_lock_timeout
+                    scene_lock_until = time.perf_counter() + scene_lock_duration
 
                 if state != prev_logged_state:
                     logger.info(
@@ -348,7 +357,7 @@ class AutoRhythm(CustomAction):
                         triggers, scores = detector.analyze(frame, cached_layout)
                         triggered_lanes = [i for i, t in enumerate(triggers) if t]
                         if triggered_lanes:
-                            scene_lock_until = time.perf_counter() + scene_lock_timeout
+                            scene_lock_until = time.perf_counter() + scene_lock_duration
                             lane_names = [_LANES[i] for i in triggered_lanes]
                             # logger.debug(
                             #     "触发按键: %s | 帧#%d | scores=%s",
@@ -381,22 +390,29 @@ class AutoRhythm(CustomAction):
                         controller.post_click_key(_VK_ESCAPE).wait()
                         esc_sent_for_results = True
 
-                    if auto_repeat_enabled:
-                        if auto_repeat_max:
-                            cost = _detect_cost_vitality(context, frame)
-                            if cost == 0:
-                                logger.info(
-                                    "检测到消耗活力为 0，活力已耗尽，停止连打"
-                                )
-                                time.sleep(auto_repeat_dismiss_delay)
-                                break
+                    if not auto_repeat_enabled:
+                        logger.info(
+                            "自动连打未启用，已完成第 %d 次演奏，停止",
+                            repeat_index,
+                        )
+                        time.sleep(auto_repeat_dismiss_delay)
+                        break
+
+                    if auto_repeat_max:
+                        cost = _detect_cost_vitality(context, frame)
+                        if cost == 0:
                             logger.info(
-                                "检测到消耗活力为 %d，继续连打", cost
+                                "检测到消耗活力为 0，活力已耗尽，停止连打"
                             )
-                        elif repeat_index >= auto_repeat_count:
-                            logger.info("已达到连打次数上限 (%d)，停止", auto_repeat_count)
                             time.sleep(auto_repeat_dismiss_delay)
                             break
+                        logger.info(
+                            "检测到消耗活力为 %d，继续连打", cost
+                        )
+                    elif repeat_index >= auto_repeat_count:
+                        logger.info("已达到连打次数上限 (%d)，停止", auto_repeat_count)
+                        time.sleep(auto_repeat_dismiss_delay)
+                        break
 
                     time.sleep(1.0)
                     continue

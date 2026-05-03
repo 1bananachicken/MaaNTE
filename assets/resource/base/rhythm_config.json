@@ -53,7 +53,8 @@
         "playing_match_threshold": 0.75,
         "match_vote_min": 1,
         "playing_check_interval": 5,
-        "scene_lock_timeout_sec": 1.5
+        "scene_lock_timeout_sec": 1.5,
+        "song_select_to_playing_lock_sec": 8.0
     },
     "song_select": {
         "enabled": false,
