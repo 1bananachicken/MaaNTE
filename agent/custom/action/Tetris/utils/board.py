@@ -190,6 +190,23 @@ def calculate_edge_height_penalty(heights: list[int]):
     return float(heights[0] * heights[0] + heights[-1] * heights[-1])
 
 
+def detect_t_spin(board: np.ndarray, piece_name: str, rotation: int, target_col: int, drop_row: int) -> bool:
+    if piece_name != "T":
+        return False
+
+    t_shape = PIECES["T"][rotation]
+    corners_blocked = 0
+
+    for row_offset, col_offset in t_shape:
+        r = drop_row + row_offset
+        c = target_col + col_offset
+        if (row_offset, col_offset) in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
+            if r < 0 or r >= BOARD_ROWS or c < 0 or c >= BOARD_COLS or (0 <= r < BOARD_ROWS and board[r, c]):
+                corners_blocked += 1
+
+    return corners_blocked >= 3
+
+
 def calculate_top_occupancy_penalty(board: np.ndarray, rows: int = 4):
     top_rows = board[: max(1, rows)]
     return float(np.count_nonzero(top_rows))
@@ -221,27 +238,84 @@ def calculate_dense_row_reward(board: np.ndarray):
     return dense_reward, almost_clear_reward
 
 
-def evaluate_board(board: np.ndarray, lines_cleared: int):
+def evaluate_board(
+    board: np.ndarray,
+    lines_cleared: int,
+    dynamic_weights: bool = True,
+    combo_count: int = 0,
+    is_t_spin: bool = False,
+):
     heights = calculate_column_heights(board)
     holes, hole_depth, covered_holes = calculate_holes(board)
     row_transitions, col_transitions = calculate_transitions(board)
     well_penalty = calculate_well_penalty(heights)
+    open_well_reward = calculate_open_well_reward(heights)
 
     aggregate_height = sum(heights)
     bumpiness = sum(
         abs(heights[idx] - heights[idx + 1]) for idx in range(len(heights) - 1)
     )
 
-    # Classic Dellacherie / El-Osmani inspired weights
-    return (
-        lines_cleared * 34.18
-        - aggregate_height * 1.30
-        - holes * 38.99
-        - bumpiness * 1.84
-        - row_transitions * 3.21
-        - col_transitions * 9.34
-        - well_penalty * 3.38
+    if dynamic_weights:
+        occupancy = np.count_nonzero(board) / (BOARD_ROWS * BOARD_COLS)
+        avg_height = aggregate_height / BOARD_COLS
+
+        if avg_height < 8:
+            lines_weight = 42.0
+            holes_weight = 32.0
+            height_weight = 0.95
+            bumpiness_weight = 1.4
+            transitions_weight = 2.5
+            well_weight = 2.8
+            open_well_weight = 1.5
+        elif avg_height < 14:
+            lines_weight = 34.18
+            holes_weight = 38.99
+            height_weight = 1.30
+            bumpiness_weight = 1.84
+            transitions_weight = 3.21
+            well_weight = 3.38
+            open_well_weight = 1.0
+        else:
+            lines_weight = 28.0
+            holes_weight = 52.0
+            height_weight = 1.85
+            bumpiness_weight = 2.2
+            transitions_weight = 4.0
+            well_weight = 4.5
+            open_well_weight = 0.5
+
+        if occupancy > 0.45:
+            holes_weight *= 1.3
+            well_weight *= 1.2
+    else:
+        lines_weight = 34.18
+        holes_weight = 38.99
+        height_weight = 1.30
+        bumpiness_weight = 1.84
+        transitions_weight = 3.21
+        well_weight = 3.38
+        open_well_weight = 1.0
+
+    score = (
+        lines_cleared * lines_weight
+        - aggregate_height * height_weight
+        - holes * holes_weight
+        - bumpiness * bumpiness_weight
+        - row_transitions * transitions_weight
+        - col_transitions * (transitions_weight * 2.9)
+        - well_penalty * well_weight
+        + open_well_reward * open_well_weight
     )
+
+    if combo_count > 1:
+        score += combo_count * 18.0
+
+    if is_t_spin:
+        t_spin_lines_bonus = lines_cleared * 25.0
+        score += t_spin_lines_bonus + 30.0
+
+    return score
 
 
 def simulate_drop(board: np.ndarray, shape, target_col: int):
