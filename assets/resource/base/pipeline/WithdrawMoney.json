@@ -22,8 +22,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "WithdrawMoneyWithdraw"
         ]
@@ -44,8 +43,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "确认收益"
         ]
@@ -66,8 +64,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "点击空白区域关闭"
         ]
@@ -88,12 +85,11 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "post_delay": 500,
         "next": [
             "点击补货",
-            "Esc"
+            "[JumpBack]WithdrawMoneyEsc"
         ]
     },
     "点击补货":{
@@ -112,8 +108,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "选择24小时"
         ]
@@ -135,9 +130,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2,
-        "post_delay": 500,
+        "action": "Click" ,
          "next": [
             "确认补货"
         ]
@@ -158,8 +151,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "库存已满",
             "送货上门"
@@ -176,8 +168,11 @@
                 "threshold": 0.8
             }
         },
+        "focus": {
+            "Node.Recognition.Succeeded": "库存已满"
+        },
         "next": [
-            "Esc"
+            "WithdrawMoneyEsc"
         ]
     },
     "送货上门": {
@@ -196,8 +191,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "确认送货"
         ]
@@ -218,10 +212,12 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2
+        "action": "Click",
+        "focus": {
+            "Node.Action.Succeeded":"补货成功"
+        }
     },
-    "Esc": {
+    "WithdrawMoneyEsc": {
         "action": {
             "type": "ClickKey",
             "param": {
