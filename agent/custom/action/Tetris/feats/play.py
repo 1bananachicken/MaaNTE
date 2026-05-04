@@ -487,11 +487,11 @@ class TetrisGamePlayer:
                     piece_name, piece_state["rotation"], rotation_index
                 )
                 shift_distance = abs(target_col - piece_state["col"])
-                execution_penalty = rot_dist * 1.5 + shift_distance * 0.3
+                execution_penalty = rot_dist * 0.5 + shift_distance * 0.12
                 if piece_name == "I" and rot_dist > 0:
-                    execution_penalty += 0.8
+                    execution_penalty += 0.3
                 if rot_dist > 0 and shift_distance > 3:
-                    execution_penalty += 0.6
+                    execution_penalty += 0.2
 
                 move = {
                     "piece": piece_name,
