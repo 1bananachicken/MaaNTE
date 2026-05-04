@@ -2,32 +2,11 @@
     "WithdrawMoneyEntrance":{
         "desc":"领取收益入口",
         "next": [
-            "领取一咖舍收益"
+            "WithdrawMoneyClickCafe",
+            "[JumpBack]SceneAnyEnterCityTycoonsMenu"
         ]
     },
-    "领取一咖舍收益": {
-        "recognition": {
-            "type":"And",
-            "param":{
-                "all_of": [
-                    "InWorld"
-                ]
-            }
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": [
-                    116 // F5
-                ]
-            }
-        },
-        "next": [
-            "点击一咖舍"
-        ],
-        "post_delay": 500
-    },
-    "点击一咖舍": {
+    "WithdrawMoneyClickCafe": {
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -43,14 +22,12 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        },
+        "action": "Click",
         "next": [
-            "提取收益"
+            "WithdrawMoneyWithdraw"
         ]
     },
-    "提取收益": {
+    "WithdrawMoneyWithdraw": {
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -66,9 +43,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        },
+        "action": "Click",
         "next": [
             "确认收益"
         ]
@@ -89,9 +64,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        },
+        "action": "Click",
         "next": [
             "点击空白区域关闭"
         ]
@@ -112,13 +85,11 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        },
+        "action": "Click",
         "post_delay": 500,
         "next": [
             "点击补货",
-            "Esc"
+            "[JumpBack]WithdrawMoneyEsc"
         ]
     },
     "点击补货":{
@@ -137,9 +108,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        },
+        "action": "Click",
         "next": [
             "选择24小时"
         ]
@@ -161,10 +130,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        },
-        "post_delay": 500,
+        "action": "Click" ,
          "next": [
             "确认补货"
         ]
@@ -185,9 +151,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        },
+        "action": "Click",
         "next": [
             "库存已满",
             "送货上门"
@@ -204,8 +168,11 @@
                 "threshold": 0.8
             }
         },
+        "focus": {
+            "Node.Recognition.Succeeded": "库存已满"
+        },
         "next": [
-            "Esc"
+            "WithdrawMoneyEsc"
         ]
     },
     "送货上门": {
@@ -224,9 +191,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
-        },
+        "action": "Click",
         "next": [
             "确认送货"
         ]
@@ -247,11 +212,12 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "Click"
+        "action": "Click",
+        "focus": {
+            "Node.Action.Succeeded":"补货成功"
         }
     },
-    "Esc": {
+    "WithdrawMoneyEsc": {
         "action": {
             "type": "ClickKey",
             "param": {

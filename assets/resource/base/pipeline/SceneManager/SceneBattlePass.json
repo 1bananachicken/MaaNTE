@@ -2,6 +2,10 @@
     "__ScenePrivateWorldEnterBattlePass":{
         "desc":"从大世界界面进入环期赏令",
         "pre_delay": 0,
+        "recognition": "And",
+        "all_of": [
+            "InWorld"
+        ],
         "action": {
             "type": "ClickKey",
             "param": {

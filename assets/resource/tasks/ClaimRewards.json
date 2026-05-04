@@ -3,10 +3,63 @@
         {
             "name": "领取奖励",
             "entry": "ClaimRewardsEntrance",
-            "description": "自动领取活跃度奖励以及环期赏令的奖励.[color:red]目前仅支持Seize的鼠标输入方式（必须前台），使用时请前往左下角设置-连接设置自行配置[/color]",
-            "controller": [
-                "Win32-Front"
+            "description": "自动领取活跃度/环期赏令的奖励。",
+            "option":[
+                "ClaimRewardsActivity",
+                "ClaimRewardsBattlePass"
             ]
         }
-    ]
+    ],
+    "option":{
+        "ClaimRewardsActivity":{
+            "type": "switch",
+            "label": "领取活跃度奖励",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "ClaimRewardsActivity": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "ClaimRewardsActivity": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "ClaimRewardsBattlePass":{
+            "type": "switch",
+            "label": "领取环期赏令奖励",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "ClaimRewardsBattlePass": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "ClaimRewardsBattlePass": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        }
+    }
 }

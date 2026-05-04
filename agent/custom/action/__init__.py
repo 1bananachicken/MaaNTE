@@ -9,7 +9,7 @@ from .rhythm.feats.select_song import *
 from .Common.click import *
 from .realtime_task import *
 from .auto_tetris import *
-
+from .AutoFish.auto_fish_withoutCV import *
 
 __all__ = [
     "AutoFishNew",
@@ -23,4 +23,5 @@ __all__ = [
     "AutoRhythmRepeatDecision",
     "AutoRhythmSelectSong",
     "RealTimeTaskAction",
+    "AutoFishWithoutCV",
 ]
