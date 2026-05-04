@@ -182,6 +182,11 @@ def calculate_open_well_reward(heights: list[int]):
     return reward
 
 
+def calculate_top_occupancy_penalty(board: np.ndarray, rows: int = 4):
+    top_rows = board[: max(1, rows)]
+    return float(np.count_nonzero(top_rows))
+
+
 def calculate_lower_fill_score(board: np.ndarray):
     score = 0.0
     for row in range(BOARD_ROWS):
@@ -213,7 +218,7 @@ def evaluate_board(board: np.ndarray, lines_cleared: int):
     holes, hole_depth, covered_holes = calculate_holes(board)
     row_transitions, col_transitions = calculate_transitions(board)
     well_penalty = calculate_well_penalty(heights)
-    open_well_reward = calculate_open_well_reward(heights)
+    top_occupancy = calculate_top_occupancy_penalty(board, rows=4)
     lower_fill_score = calculate_lower_fill_score(board)
     dense_row_reward, almost_clear_reward = calculate_dense_row_reward(board)
     aggregate_height = sum(heights)
@@ -221,24 +226,22 @@ def evaluate_board(board: np.ndarray, lines_cleared: int):
         abs(heights[idx] - heights[idx + 1]) for idx in range(len(heights) - 1)
     )
     max_height = max(heights) if heights else 0
-    surface_variance = float(np.var(heights)) if heights else 0.0
 
     return (
-        lines_cleared * 52.0
-        - aggregate_height * 0.7
-        - holes * 18.0
-        - hole_depth * 1.6
-        - covered_holes * 3.4
-        - bumpiness * 0.95
-        - max_height * 1.8
-        - row_transitions * 0.5
-        - col_transitions * 0.7
-        - well_penalty * 0.55
-        - surface_variance * 0.12
-        + open_well_reward * 0.9
-        + lower_fill_score * 0.018
-        + dense_row_reward * 0.42
-        + almost_clear_reward * 4.0
+        lines_cleared * 76.0
+        - aggregate_height * 0.78
+        - holes * 19.5
+        - hole_depth * 1.85
+        - covered_holes * 3.9
+        - bumpiness * 1.0
+        - max_height * 2.1
+        - top_occupancy * 1.7
+        - row_transitions * 0.55
+        - col_transitions * 0.72
+        - well_penalty * 0.6
+        + lower_fill_score * 0.08
+        + dense_row_reward * 1.0
+        + almost_clear_reward * 3.2
     )
 
 
@@ -433,10 +436,10 @@ def identify_active_piece(grid: np.ndarray, prefer_cells=None):
             prefer_set = set(prefer_cells)
             candidates.sort(
                 key=lambda item: (
+                    -len(set(item[3]).intersection(prefer_set)),
                     item[0],
                     item[1],
                     item[2],
-                    -len(set(item[3]).intersection(prefer_set)),
                 )
             )
         else:
@@ -444,12 +447,20 @@ def identify_active_piece(grid: np.ndarray, prefer_cells=None):
         return candidates[0][3]
 
     prefer_set = set(prefer_cells) if prefer_cells else None
+    row_lo = 0
+    row_hi = min(6, BOARD_ROWS)
+    if prefer_cells:
+        min_prefer_row = min(row for row, _ in prefer_cells)
+        max_prefer_row = max(row for row, _ in prefer_cells)
+        row_lo = max(0, min_prefer_row - 2)
+        row_hi = min(BOARD_ROWS, max_prefer_row + 3)
+
     fallback_candidates = []
     for piece_name, rotations in PIECES.items():
         for shape in rotations:
             shape_height = max(row for row, _ in shape) + 1
             shape_width = max(col for _, col in shape) + 1
-            for row in range(0, BOARD_ROWS - shape_height + 1):
+            for row in range(row_lo, row_hi - shape_height + 1):
                 for col in range(0, BOARD_COLS - shape_width + 1):
                     cells = []
                     matched = True
@@ -476,6 +487,9 @@ def identify_active_piece(grid: np.ndarray, prefer_cells=None):
                         ):
                             support_count += 1
 
+                    if support_count >= 4:
+                        continue
+
                     overlap = (
                         len(cell_set.intersection(prefer_set))
                         if prefer_set is not None
@@ -486,7 +500,7 @@ def identify_active_piece(grid: np.ndarray, prefer_cells=None):
                             support_count,
                             min(row for row, _ in cells),
                             -max(row for row, _ in cells),
-                            -overlap,
+                            overlap,
                             cells,
                         )
                     )
@@ -494,5 +508,10 @@ def identify_active_piece(grid: np.ndarray, prefer_cells=None):
     if not fallback_candidates:
         return None
 
-    fallback_candidates.sort(key=lambda item: (item[0], item[1], item[2], item[3]))
+    if prefer_set:
+        fallback_candidates.sort(
+            key=lambda item: (-item[3], item[0], item[1], item[2])
+        )
+    else:
+        fallback_candidates.sort(key=lambda item: (item[0], item[1], item[2]))
     return fallback_candidates[0][4]

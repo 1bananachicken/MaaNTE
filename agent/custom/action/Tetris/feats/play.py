@@ -443,7 +443,7 @@ class TetrisGamePlayer:
                     beam_width=beam_width,
                 )
                 if future is not None:
-                    total_score += future["total_score"] * 0.62
+                    total_score += future["total_score"] * 0.45
 
             enriched = dict(candidate)
             enriched["total_score"] = total_score
@@ -462,9 +462,7 @@ class TetrisGamePlayer:
         planning_queue: list[str],
     ):
         piece_name = piece_state["piece"]
-        future_queue = (
-            planning_queue[1:] if planning_queue[:1] == [piece_name] else planning_queue
-        )
+        future_queue = planning_queue[1:]
         best_move = None
 
         for rotation_index, shape in enumerate(PIECES[piece_name]):
@@ -483,17 +481,17 @@ class TetrisGamePlayer:
                         beam_width=8,
                     )
                     if future_move is not None:
-                        future_bonus = future_move["total_score"] * 0.58
+                        future_bonus = future_move["total_score"] * 0.38
 
                 rot_dist = rotation_distance(
                     piece_name, piece_state["rotation"], rotation_index
                 )
                 shift_distance = abs(target_col - piece_state["col"])
-                execution_penalty = rot_dist * 0.14 + shift_distance * 0.025
+                execution_penalty = rot_dist * 1.5 + shift_distance * 0.3
                 if piece_name == "I" and rot_dist > 0:
-                    execution_penalty += 0.08
+                    execution_penalty += 0.8
                 if rot_dist > 0 and shift_distance > 3:
-                    execution_penalty += 0.05
+                    execution_penalty += 0.6
 
                 move = {
                     "piece": piece_name,
@@ -643,6 +641,7 @@ class TetrisGamePlayer:
             return False
 
         last_piece_signature = None
+        skip_count = 0
         round_start = time.time()
         non_active_since = None
 
@@ -704,9 +703,19 @@ class TetrisGamePlayer:
             queue_pieces = play_state["queue_pieces"]
 
             if piece_state["cells"] == last_piece_signature:
-                if not self._sleep_with_stop(tasker, 0.03):
-                    return False
-                continue
+                skip_count += 1
+                if skip_count >= 10:
+                    print(
+                        "Same piece signature repeated too long, forcing re-evaluation."
+                    )
+                    last_piece_signature = None
+                    skip_count = 0
+                else:
+                    if not self._sleep_with_stop(tasker, 0.03):
+                        return False
+                    continue
+
+            skip_count = 0
 
             settled_board = grid.copy()
             for row, col in active_cells:
@@ -715,14 +724,8 @@ class TetrisGamePlayer:
             if queue_pieces:
                 print(f"Queue(bottom->top)={queue_pieces}")
 
-            if queue_pieces and queue_pieces[0] == piece_state["piece"]:
-                planning_queue = queue_pieces[:3]
-            elif queue_pieces:
-                try:
-                    aligned_index = queue_pieces.index(piece_state["piece"])
-                    planning_queue = queue_pieces[aligned_index : aligned_index + 3]
-                except ValueError:
-                    planning_queue = [piece_state["piece"], *queue_pieces[:2]]
+            if queue_pieces:
+                planning_queue = [piece_state["piece"], *queue_pieces[:3]]
             else:
                 planning_queue = [piece_state["piece"]]
 
