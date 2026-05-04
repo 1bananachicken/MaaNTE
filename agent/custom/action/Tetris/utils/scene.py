@@ -16,6 +16,8 @@ PREPARE_ONE_REGION = [831, 176, 371, 136]
 PREPARE_TWO_REGION = [1029, 650, 184, 48]
 EXIT_REGION = [536, 601, 197, 39]
 MULTIPLE_REGION = [825, 39, 130, 130]
+LOADING_REGION = [1167, 638, 100, 70]
+RETURN_REGION = [1195, 16, 50, 50]
 
 PREPARE_ONE_CLICK_POINT = (1016, 244)
 PREPARE_ONE_MULTI_CLICK_POINT = (885, 418)
@@ -75,6 +77,8 @@ class SceneGate:
         self.multi_player_tpl = _read_image("multiple.png")
         self.start_match_tpl = _read_image("start_match.png")
         self.exit_tpl = _read_image("exit_button.png")
+        self.loading_tpl = _read_image("loading.png")
+        self.return_tpl = _read_image("return.png")
 
         self.queue_preview_templates = {
             "T": self._make_preview_template(((0, 1), (1, 0), (1, 1), (1, 2))),
@@ -209,6 +213,19 @@ class SceneGate:
             attempts=((0.76, False), (0.72, True)),
         )
 
+    def _find_loading(self, img):
+        return self._match_scene_marker(
+            img, LOADING_REGION, self.loading_tpl,
+            attempts=((0.78, False), (0.74, True)),
+        )
+
+    def _find_return_button(self, img):
+        if self.return_tpl is None:
+            return False, 0.0, 0, 0
+        return self._match_template_region(
+            img, RETURN_REGION, self.return_tpl, 0.72,
+        )
+
     def classify_scene(self, img, play_state=None):
         from ..utils.board import looks_like_game_scene
 
@@ -227,12 +244,62 @@ class SceneGate:
                 "template": self.exit_tpl, "play_state": play_state,
             }
 
-        matched, score, x, y = self._find_world_prompt(img)
+        matched, score, x, y = self._find_loading(img)
         if matched:
             return {
-                "name": "world_prompt", "score": score, "x": x, "y": y,
+                "name": "loading", "score": score, "x": x, "y": y,
+                "template": self.loading_tpl, "play_state": play_state,
+            }
+
+        marker_matched, marker_score, marker_x, marker_y = self._match_scene_marker(
+            img, WORLD_SCENE_MARKER_REGION, self.world_scene_marker,
+        )
+        prompt_matched = False
+        prompt_score = 0.0
+        prompt_x = 0
+        prompt_y = 0
+        if marker_matched:
+            for region, threshold, grayscale in (
+                (WORLD_TO_PREPARE_REGION, 0.75, False),
+                (WORLD_TO_PREPARE_FALLBACK_REGION, 0.73, False),
+                (WORLD_TO_PREPARE_FALLBACK_REGION, 0.71, True),
+            ):
+                pm, ps, px, py = self._match_template_region(
+                    img, region, self.world_prompt_tpl, threshold, grayscale=grayscale,
+                )
+                if pm:
+                    prompt_matched = True
+                    prompt_score = ps
+                    prompt_x = px
+                    prompt_y = py
+                    break
+            if prompt_matched:
+                return {
+                    "name": "world_prompt", "score": prompt_score,
+                    "x": prompt_x, "y": prompt_y,
+                    "template": self.world_prompt_tpl, "play_state": play_state,
+                }
+            return {
+                "name": "world_no_prompt", "score": marker_score,
+                "x": marker_x, "y": marker_y,
                 "template": self.world_scene_marker, "play_state": play_state,
             }
+
+        if not marker_matched:
+            for region, threshold, grayscale in (
+                (WORLD_TO_PREPARE_REGION, 0.75, False),
+                (WORLD_TO_PREPARE_FALLBACK_REGION, 0.73, False),
+                (WORLD_TO_PREPARE_FALLBACK_REGION, 0.71, True),
+            ):
+                pm, ps, px, py = self._match_template_region(
+                    img, region, self.world_prompt_tpl, threshold, grayscale=grayscale,
+                )
+                if pm:
+                    return {
+                        "name": "world_prompt", "score": ps,
+                        "x": px, "y": py,
+                        "template": self.world_prompt_tpl, "play_state": play_state,
+                    }
 
         matched, score, x, y, template = self._find_prepare_two(img)
         if matched:

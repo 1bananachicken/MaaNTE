@@ -182,17 +182,10 @@ def calculate_open_well_reward(heights: list[int]):
     return reward
 
 
-def calculate_edge_well_reward(heights: list[int]):
-    reward = 0.0
-    for col in (0, BOARD_COLS - 1):
-        if col == 0:
-            neighbor_height = heights[1]
-        else:
-            neighbor_height = heights[BOARD_COLS - 2]
-        well_depth = max(0, neighbor_height - heights[col])
-        if well_depth >= 2:
-            reward += well_depth * well_depth
-    return reward
+def calculate_edge_height_penalty(heights: list[int]):
+    if not heights:
+        return 0.0
+    return float(heights[0] * heights[0] + heights[-1] * heights[-1])
 
 
 def calculate_top_occupancy_penalty(board: np.ndarray, rows: int = 4):
@@ -220,8 +213,8 @@ def calculate_dense_row_reward(board: np.ndarray):
         occupancy = filled / BOARD_COLS
         dense_reward += occupancy * occupancy * row_weight
 
-        if filled >= BOARD_COLS - 2:
-            almost_clear_reward += (filled - (BOARD_COLS - 3)) * row_weight
+        if filled >= BOARD_COLS - 3:
+            almost_clear_reward += (filled - (BOARD_COLS - 4)) * row_weight
 
     return dense_reward, almost_clear_reward
 
@@ -231,43 +224,21 @@ def evaluate_board(board: np.ndarray, lines_cleared: int):
     holes, hole_depth, covered_holes = calculate_holes(board)
     row_transitions, col_transitions = calculate_transitions(board)
     well_penalty = calculate_well_penalty(heights)
-    edge_well_reward = calculate_edge_well_reward(heights)
-    top_occupancy = calculate_top_occupancy_penalty(board, rows=4)
-    lower_fill_score = calculate_lower_fill_score(board)
-    dense_row_reward, almost_clear_reward = calculate_dense_row_reward(board)
+
     aggregate_height = sum(heights)
     bumpiness = sum(
         abs(heights[idx] - heights[idx + 1]) for idx in range(len(heights) - 1)
     )
-    max_height = max(heights) if heights else 0
 
-    overstack_penalty = 0.0
-    for h in heights:
-        if h > 2:
-            overstack_penalty += (h - 2) * (h - 2) * 2.0
-
-    overstack_clear_bonus = 0.0
-    if max_height > 2:
-        overstack_clear_bonus = lines_cleared * 50.0
-
+    # Classic Dellacherie / El-Osmani inspired weights
     return (
-        lines_cleared * 76.0
-        + overstack_clear_bonus
-        - aggregate_height * 0.78
-        - holes * 19.5
-        - hole_depth * 1.85
-        - covered_holes * 3.9
-        - bumpiness * 0.85
-        - max_height * 1.5
-        - overstack_penalty
-        - top_occupancy * 1.7
-        - row_transitions * 0.55
-        - col_transitions * 0.72
-        - well_penalty * 0.6
-        + edge_well_reward * 0.45
-        + lower_fill_score * 0.08
-        + dense_row_reward * 1.0
-        + almost_clear_reward * 3.2
+        lines_cleared * 34.18
+        - aggregate_height * 1.30
+        - holes * 38.99
+        - bumpiness * 1.84
+        - row_transitions * 3.21
+        - col_transitions * 9.34
+        - well_penalty * 3.38
     )
 
 
@@ -308,7 +279,7 @@ def simulate_drop(board: np.ndarray, shape, target_col: int):
 
     landing_height = BOARD_ROWS - (drop_row + (shape_height / 2.0))
     score = evaluate_board(new_board, lines_cleared)
-    score -= landing_height * 0.18
+    score -= landing_height * 4.5
     return {
         "score": score,
         "lines_cleared": lines_cleared,
@@ -535,9 +506,7 @@ def identify_active_piece(grid: np.ndarray, prefer_cells=None):
         return None
 
     if prefer_set:
-        fallback_candidates.sort(
-            key=lambda item: (-item[3], item[0], item[1], item[2])
-        )
+        fallback_candidates.sort(key=lambda item: (-item[3], item[0], item[1], item[2]))
     else:
         fallback_candidates.sort(key=lambda item: (item[0], item[1], item[2]))
     return fallback_candidates[0][4]

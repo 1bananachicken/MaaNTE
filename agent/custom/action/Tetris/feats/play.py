@@ -16,6 +16,8 @@ from ..utils.pieces import PIECES, match_piece_state, rotation_distance
 from ..utils.scene import (
     SceneGate,
     EXIT_REGION,
+    LOADING_REGION,
+    RETURN_REGION,
     PREPARE_ONE_CLICK_POINT,
     PREPARE_ONE_MULTI_CLICK_POINT,
     PREPARE_TWO_CLICK_POINT,
@@ -39,26 +41,29 @@ class TetrisGamePlayer:
     def run(self, controller, tasker, mode="single"):
         self.mode = mode
         print(f"=== Auto Tetris Started | mode={self.mode} ===")
-        loop_count = 1
 
-        if not self._normalize_scene_for_round(controller, tasker):
-            print("Failed to normalize Tetris scene before entering a round.")
+        initial_scene = self._detect_initial_scene(controller, tasker)
+        if initial_scene is None:
+            print("Cannot detect Tetris initial scene, ending task.")
             return False
 
-        for round_index in range(loop_count):
-            if tasker.stopping:
-                return False
+        scene_name = initial_scene["name"]
+        print(f"Initial scene detected: {scene_name}")
 
-            print(f"=== Tetris round {round_index + 1}/{loop_count} ===")
-            if not self._ensure_game_session(controller, tasker):
-                return False
-            if not self._run_single_round(controller, tasker):
-                return False
-            if not self._sleep_with_stop(tasker, 1.0):
-                return False
+        if scene_name == "world_no_prompt":
+            print(
+                "World scene detected but no Tetris entrance prompt found, ending task."
+            )
+            return False
 
-        print("=== Auto Tetris Finished ===")
-        return True
+        if scene_name == "unknown":
+            print("Unknown initial scene, ending task.")
+            return False
+
+        if scene_name in ("game_active", "game_idle"):
+            return self._play_from_game(controller, tasker)
+
+        return self._navigate_to_game_and_play(controller, tasker)
 
     def _sleep_with_stop(self, tasker, seconds: float) -> bool:
         end_at = time.time() + seconds
@@ -172,45 +177,305 @@ class TetrisGamePlayer:
 
         return last_scene
 
-    def _normalize_scene_for_round(
-        self, controller, tasker, timeout_seconds=6.0
-    ) -> bool:
+    def _detect_initial_scene(self, controller, tasker, timeout_seconds=6.0):
         start_time = time.time()
         while time.time() - start_time < timeout_seconds:
             if tasker.stopping:
-                return False
+                return None
 
             img = self._safe_get_image(controller)
             if img is None:
                 if not self._sleep_with_stop(tasker, 0.2):
-                    return False
+                    return None
                 continue
 
             play_state = self._scan_play_state(img)
             scene = self._classify_scene(img, play_state)
-            if scene["name"] in (
+            scene_name = scene["name"]
+
+            if scene_name in (
                 "world_prompt",
+                "world_no_prompt",
                 "prepare_one",
                 "prepare_two",
                 "game_active",
                 "game_idle",
                 "exit",
+                "loading",
             ):
-                return True
+                return scene
 
-            print("Tetris start scene is unknown, pressing ESC to normalize.")
-            self._press_escape(controller)
-            if not self._sleep_with_stop(tasker, 0.8):
+            if not self._sleep_with_stop(tasker, 0.15):
+                return None
+
+        return None
+
+    def _navigate_to_game_and_play(self, controller, tasker):
+        img = self._safe_get_image(controller)
+        if img is None:
+            return False
+
+        play_state = self._scan_play_state(img)
+        scene = self._classify_scene(img, play_state)
+        scene_name = scene["name"]
+
+        if scene_name == "loading":
+            print("Waiting for loading screen to finish...")
+            result = self._wait_for_scene_names(
+                controller,
+                tasker,
+                {"game_active", "game_idle", "world_prompt", "world_no_prompt", "exit"},
+                timeout_seconds=30.0,
+            )
+            if result is None:
+                print("Loading wait timed out.")
+                return False
+            scene_name = result["name"]
+            if scene_name in ("game_active", "game_idle"):
+                return self._play_from_game(controller, tasker)
+            if scene_name in ("world_prompt", "world_no_prompt"):
+                scene = result
+
+        if scene_name == "exit":
+            print(f"Exit scene at start, clicking exit. score={scene['score']:.2f}")
+            self._click_template(controller, scene["x"], scene["y"], scene["template"])
+            if not self._wait_until_exit_to_world(controller, tasker):
+                return False
+            img = self._safe_get_image(controller)
+            if img is None:
+                return False
+            scene = self._classify_scene(img)
+            scene_name = scene["name"]
+
+        if scene_name == "world_prompt":
+            print(f"World with prompt, pressing F. score={scene['score']:.2f}")
+            self._tap_key(controller, VK_F)
+            result = self._wait_for_scene_names(
+                controller,
+                tasker,
+                {"prepare_one", "prepare_two"},
+                timeout_seconds=6.0,
+            )
+            if result is None:
+                return False
+            scene_name = result["name"]
+            scene = result
+
+        if scene_name == "prepare_one":
+            click_point = (
+                PREPARE_ONE_MULTI_CLICK_POINT
+                if self.mode == "multiple"
+                else PREPARE_ONE_CLICK_POINT
+            )
+            mode_label = "多人" if self.mode == "multiple" else "单人"
+            print(f"{mode_label}模式入口, clicking. score={scene['score']:.2f}")
+            self._click_point(controller, *click_point)
+            result = self._wait_for_scene_names(
+                controller,
+                tasker,
+                {"prepare_two", "game_active", "game_idle", "loading"},
+                timeout_seconds=6.0,
+            )
+            if result is None:
+                return False
+            scene_name = result["name"]
+            scene = result
+
+        if scene_name == "prepare_two":
+            print(f"Start-match scene, clicking. score={scene['score']:.2f}")
+            self._click_point(controller, *PREPARE_TWO_CLICK_POINT)
+            expected_after_start = {"game_active", "game_idle", "exit", "loading"}
+            result = self._wait_for_scene_names(
+                controller,
+                tasker,
+                expected_after_start,
+                timeout_seconds=12.0,
+            )
+            if result is None:
+                return False
+            scene_name = result["name"]
+
+            if scene_name == "loading":
+                print("Loading after match, waiting...")
+                result = self._wait_for_scene_names(
+                    controller,
+                    tasker,
+                    {"game_active", "game_idle", "world_prompt", "world_no_prompt"},
+                    timeout_seconds=30.0,
+                )
+                if result is None:
+                    print("Loading wait timed out.")
+                    return False
+                scene_name = result["name"]
+
+        if scene_name in ("game_active", "game_idle"):
+            return self._play_from_game(controller, tasker)
+
+        print(f"Unexpected scene after navigation: {scene_name}")
+        return False
+
+    def _play_from_game(self, controller, tasker):
+        last_piece_signature = None
+        skip_count = 0
+        round_start = time.time()
+        non_active_since = None
+
+        while time.time() - round_start < 900:
+            if tasker.stopping:
                 return False
 
+            img = self._safe_get_image(controller)
+            if img is None:
+                if not self._sleep_with_stop(tasker, 0.05):
+                    return False
+                continue
+
+            play_state = self._scan_play_state(img)
+            scene = self._classify_scene(img, play_state)
+            scene_name = scene["name"]
+
+            if scene_name == "exit":
+                print(
+                    f"Exit detected, clicking to leave match. score={scene['score']:.2f}"
+                )
+                self._click_template(
+                    controller, scene["x"], scene["y"], self.scene_gate.exit_tpl
+                )
+                self._wait_until_exit_to_world(controller, tasker)
+                print("=== Auto Tetris Finished ===")
+                return True
+
+            if (
+                scene_name != "game_active"
+                or play_state is None
+                or play_state["piece_state"] is None
+            ):
+                self.last_active_cells = None
+
+                if scene_name == "game_idle":
+                    if not self._sleep_with_stop(tasker, 0.15):
+                        return False
+                    continue
+
+                if scene_name == "loading":
+                    print("Loading detected during play, waiting...")
+                    result = self._wait_for_scene_names(
+                        controller,
+                        tasker,
+                        {"game_active", "game_idle", "world_prompt", "world_no_prompt"},
+                        timeout_seconds=30.0,
+                    )
+                    if result is None:
+                        return False
+                    if result["name"] in ("game_active", "game_idle"):
+                        continue
+                    print(f"Unexpected scene after loading: {result['name']}")
+                    return False
+
+                if scene_name == "world_no_prompt":
+                    print("Drifted to world without prompt during play, ending task.")
+                    return False
+
+                if non_active_since is None:
+                    non_active_since = time.time()
+                elif time.time() - non_active_since >= 5.0:
+                    recovered = self._attempt_round_recovery(
+                        controller,
+                        tasker,
+                        f"Scene drifted to {scene_name}.",
+                    )
+                    if not recovered:
+                        return False
+                    non_active_since = None
+                    last_piece_signature = None
+                    if not self._sleep_with_stop(tasker, 0.4):
+                        return False
+                    continue
+
+                if not self._recover_from_scene(controller, tasker, scene):
+                    return False
+                continue
+
+            non_active_since = None
+
+            grid = play_state["grid"]
+            active_cells = play_state["active_cells"]
+            piece_state = play_state["piece_state"]
+            queue_pieces = play_state["queue_pieces"]
+
+            if piece_state["cells"] == last_piece_signature:
+                skip_count += 1
+                if skip_count >= 10:
+                    print(
+                        "Same piece signature repeated too long, forcing re-evaluation."
+                    )
+                    last_piece_signature = None
+                    skip_count = 0
+                else:
+                    if not self._sleep_with_stop(tasker, 0.03):
+                        return False
+                    continue
+
+            skip_count = 0
+
+            settled_board = grid.copy()
+            for row, col in active_cells:
+                settled_board[row, col] = False
+
+            if queue_pieces:
+                print(f"Queue(bottom->top)={queue_pieces}")
+
+            if queue_pieces:
+                planning_queue = [piece_state["piece"], *queue_pieces[:3]]
+            else:
+                planning_queue = [piece_state["piece"]]
+
+            planning_queue = planning_queue[:4]
+
+            best_move = self._choose_best_current_piece_move(
+                settled_board,
+                piece_state,
+                planning_queue,
+            )
+            if best_move is None:
+                best_move = self._find_best_move(settled_board, piece_state["piece"])
+            if best_move is None:
+                print("No valid move found, waiting for next stable frame.")
+                if not self._sleep_with_stop(tasker, 0.06):
+                    return False
+                continue
+
+            print(
+                "Piece=%s rot=%s col=%s -> target_rot=%s target_col=%s score=%.2f penalty=%.2f"
+                % (
+                    piece_state["piece"],
+                    piece_state["rotation"],
+                    piece_state["col"],
+                    best_move["rotation"],
+                    best_move["target_col"],
+                    best_move.get("total_score", best_move["score"]),
+                    best_move.get("execution_penalty", 0.0),
+                )
+            )
+            move_applied = self._apply_move_with_feedback(
+                controller, tasker, piece_state, best_move
+            )
+            if move_applied:
+                last_piece_signature = piece_state["cells"]
+            else:
+                print(
+                    "Move did not reach target position, retrying with a fresh board state."
+                )
+            if not self._sleep_with_stop(tasker, 0.04):
+                return False
+
+        print("Tetris round timed out.")
         return False
 
     def _recover_from_scene(self, controller, tasker, scene: dict) -> bool:
         scene_name = scene["name"]
         if scene_name == "world_prompt":
-            print(
-                f"Recovery: world prompt detected, pressing F. score={scene['score']:.2f}"
-            )
+            print(f"Recovery: world prompt, pressing F. score={scene['score']:.2f}")
             self._tap_key(controller, VK_F)
             return (
                 self._wait_for_scene_names(
@@ -230,7 +495,7 @@ class TetrisGamePlayer:
             )
             mode_label = "多人" if self.mode == "multiple" else "单人"
             print(
-                f"Recovery: {mode_label}模式入口 detected, clicking. score={scene['score']:.2f}"
+                f"Recovery: {mode_label}模式入口, clicking. score={scene['score']:.2f}"
             )
             self._click_point(controller, *click_point)
             return (
@@ -244,33 +509,59 @@ class TetrisGamePlayer:
             )
 
         if scene_name == "prepare_two":
-            print(
-                f"Recovery: start-match scene detected, clicking. score={scene['score']:.2f}"
-            )
+            print(f"Recovery: start-match, clicking. score={scene['score']:.2f}")
             self._click_point(controller, *PREPARE_TWO_CLICK_POINT)
             return (
                 self._wait_for_scene_names(
                     controller,
                     tasker,
-                    {"game_active", "game_idle", "exit"},
+                    {"game_active", "game_idle", "exit", "loading"},
                     timeout_seconds=12.0,
                 )
                 is not None
             )
 
         if scene_name == "exit":
-            print(
-                f"Recovery: exit button detected, clicking. score={scene['score']:.2f}"
-            )
+            print(f"Recovery: exit button, clicking. score={scene['score']:.2f}")
             self._click_template(controller, scene["x"], scene["y"], scene["template"])
             return self._wait_until_exit_to_world(
                 controller, tasker, timeout_seconds=6.0
             )
 
+        if scene_name == "loading":
+            print("Recovery: loading screen, waiting...")
+            result = self._wait_for_scene_names(
+                controller,
+                tasker,
+                {"game_active", "game_idle", "world_prompt", "world_no_prompt"},
+                timeout_seconds=30.0,
+            )
+            return result is not None and result["name"] in ("game_active", "game_idle")
+
         if scene_name == "game_idle":
             return self._sleep_with_stop(tasker, 0.08)
 
-        print("Recovery: unknown Tetris scene, pressing ESC to go back.")
+        img = self._safe_get_image(controller)
+        if img is not None:
+            found, score, rx, ry = self.scene_gate._find_return_button(img)
+            if found:
+                print(
+                    f"Recovery: return button found at ({rx},{ry}), clicking. score={score:.2f}"
+                )
+                click_x = int(rx + self.scene_gate.return_tpl.shape[1] / 2)
+                click_y = int(ry + self.scene_gate.return_tpl.shape[0] / 2)
+                self._click_point(controller, click_x, click_y)
+                return (
+                    self._wait_for_scene_names(
+                        controller,
+                        tasker,
+                        {"prepare_one", "world_prompt"},
+                        timeout_seconds=4.0,
+                    )
+                    is not None
+                )
+
+        print("Recovery: unknown scene, pressing ESC.")
         self._press_escape(controller)
         return self._sleep_with_stop(tasker, 0.8)
 
@@ -286,7 +577,7 @@ class TetrisGamePlayer:
                 continue
 
             scene = self._classify_scene(img)
-            if scene["name"] == "world_prompt":
+            if scene["name"] in ("world_prompt", "world_no_prompt"):
                 return True
 
             if scene["name"] == "exit":
@@ -318,65 +609,23 @@ class TetrisGamePlayer:
                     return False
                 continue
             scene = self._classify_scene(img)
-            if scene["name"] == "world_prompt":
+            if scene["name"] in ("world_prompt", "world_no_prompt"):
                 return True
             if not self._sleep_with_stop(tasker, 0.2):
                 return False
-        return False
-
-    def _ensure_game_session(self, controller, tasker, timeout_seconds=20.0) -> bool:
-        start_time = time.time()
-        unknown_since = None
-
-        while time.time() - start_time < timeout_seconds:
-            if tasker.stopping:
-                return False
-
-            img = self._safe_get_image(controller)
-            if img is None:
-                if not self._sleep_with_stop(tasker, 0.2):
-                    return False
-                continue
-
-            play_state = self._scan_play_state(img)
-            scene = self._classify_scene(img, play_state)
-            scene_name = scene["name"]
-
-            if scene_name in ("game_active", "game_idle"):
-                return True
-
-            if scene_name == "world_prompt":
-                if not self._recover_from_scene(controller, tasker, scene):
-                    return False
-                continue
-
-            if scene_name == "unknown":
-                if unknown_since is None:
-                    unknown_since = time.time()
-                elif time.time() - unknown_since >= 2.0:
-                    print("Tetris scene unknown during session recovery, retrying.")
-                    unknown_since = None
-                    if not self._back_to_world_from_anywhere(
-                        controller, tasker, max_attempts=2
-                    ):
-                        return False
-                    continue
-                if not self._sleep_with_stop(tasker, 0.2):
-                    return False
-                continue
-
-            unknown_since = None
-            if not self._recover_from_scene(controller, tasker, scene):
-                return False
-
-        print("Failed to enter Tetris game scene within timeout.")
         return False
 
     def _attempt_round_recovery(self, controller, tasker, reason: str) -> bool:
         print(f"{reason} Trying to recover Tetris flow automatically.")
         if not self._back_to_world_from_anywhere(controller, tasker, max_attempts=2):
             return False
-        return self._ensure_game_session(controller, tasker, timeout_seconds=10.0)
+        img = self._safe_get_image(controller)
+        if img is None:
+            return False
+        scene = self._classify_scene(img)
+        if scene["name"] == "world_prompt":
+            return self._navigate_to_game_and_play(controller, tasker)
+        return False
 
     def _find_best_move(self, board: np.ndarray, piece_name: str):
         best_move = None
@@ -576,12 +825,14 @@ class TetrisGamePlayer:
                     if not self._sleep_with_stop(tasker, 0.03):
                         return False
                     continue
+                return False
 
             if expected_col_change and current_col == last_col:
                 if time.time() - last_action_time < 0.20:
                     if not self._sleep_with_stop(tasker, 0.03):
                         return False
                     continue
+                return False
 
             expected_rot_change = False
             expected_col_change = False
@@ -619,6 +870,10 @@ class TetrisGamePlayer:
                 continue
 
             if current_col != target_col:
+                if (current_col == 0 and target_col < current_col) or (
+                    current_col == BOARD_COLS - 1 and target_col > current_col
+                ):
+                    return False
                 correction_key = VK_D if current_col < target_col else VK_A
                 self._tap_key(controller, correction_key, hold=0.04)
                 last_action_time = time.time()
@@ -630,143 +885,4 @@ class TetrisGamePlayer:
             if not self._sleep_with_stop(tasker, 0.04):
                 return False
 
-        return False
-
-    def _run_single_round(self, controller, tasker) -> bool:
-        if not self._normalize_scene_for_round(controller, tasker):
-            print("Failed to normalize Tetris scene before entering a round.")
-            return False
-
-        if not self._ensure_game_session(controller, tasker):
-            return False
-
-        last_piece_signature = None
-        skip_count = 0
-        round_start = time.time()
-        non_active_since = None
-
-        while time.time() - round_start < 900:
-            if tasker.stopping:
-                return False
-
-            img = self._safe_get_image(controller)
-            if img is None:
-                if not self._sleep_with_stop(tasker, 0.05):
-                    return False
-                continue
-
-            play_state = self._scan_play_state(img)
-            scene = self._classify_scene(img, play_state)
-            scene_name = scene["name"]
-
-            if scene_name == "exit":
-                print(
-                    f"Detected exit button, leaving match. score={scene['score']:.2f}"
-                )
-                self._click_template(
-                    controller, scene["x"], scene["y"], self.scene_gate.exit_tpl
-                )
-                self._wait_until_exit_to_world(controller, tasker)
-                return True
-
-            if (
-                scene_name != "game_active"
-                or play_state is None
-                or play_state["piece_state"] is None
-            ):
-                self.last_active_cells = None
-                if non_active_since is None:
-                    non_active_since = time.time()
-                elif time.time() - non_active_since >= 2.0:
-                    recovered = self._attempt_round_recovery(
-                        controller,
-                        tasker,
-                        f"Tetris scene drifted to {scene_name}.",
-                    )
-                    if not recovered:
-                        return False
-                    non_active_since = None
-                    last_piece_signature = None
-                    if not self._sleep_with_stop(tasker, 0.4):
-                        return False
-                    continue
-
-                if not self._recover_from_scene(controller, tasker, scene):
-                    return False
-                continue
-
-            non_active_since = None
-
-            grid = play_state["grid"]
-            active_cells = play_state["active_cells"]
-            piece_state = play_state["piece_state"]
-            queue_pieces = play_state["queue_pieces"]
-
-            if piece_state["cells"] == last_piece_signature:
-                skip_count += 1
-                if skip_count >= 10:
-                    print(
-                        "Same piece signature repeated too long, forcing re-evaluation."
-                    )
-                    last_piece_signature = None
-                    skip_count = 0
-                else:
-                    if not self._sleep_with_stop(tasker, 0.03):
-                        return False
-                    continue
-
-            skip_count = 0
-
-            settled_board = grid.copy()
-            for row, col in active_cells:
-                settled_board[row, col] = False
-
-            if queue_pieces:
-                print(f"Queue(bottom->top)={queue_pieces}")
-
-            if queue_pieces:
-                planning_queue = [piece_state["piece"], *queue_pieces[:3]]
-            else:
-                planning_queue = [piece_state["piece"]]
-
-            planning_queue = planning_queue[:4]
-
-            best_move = self._choose_best_current_piece_move(
-                settled_board,
-                piece_state,
-                planning_queue,
-            )
-            if best_move is None:
-                best_move = self._find_best_move(settled_board, piece_state["piece"])
-            if best_move is None:
-                print("No valid move found, waiting for next stable frame.")
-                if not self._sleep_with_stop(tasker, 0.06):
-                    return False
-                continue
-
-            print(
-                "Piece=%s rot=%s col=%s -> target_rot=%s target_col=%s score=%.2f penalty=%.2f"
-                % (
-                    piece_state["piece"],
-                    piece_state["rotation"],
-                    piece_state["col"],
-                    best_move["rotation"],
-                    best_move["target_col"],
-                    best_move.get("total_score", best_move["score"]),
-                    best_move.get("execution_penalty", 0.0),
-                )
-            )
-            move_applied = self._apply_move_with_feedback(
-                controller, tasker, piece_state, best_move
-            )
-            if move_applied:
-                last_piece_signature = piece_state["cells"]
-            else:
-                print(
-                    "Move did not reach target position, retrying with a fresh board state."
-                )
-            if not self._sleep_with_stop(tasker, 0.04):
-                return False
-
-        print("Tetris round timed out.")
         return False
