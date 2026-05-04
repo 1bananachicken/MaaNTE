@@ -54,6 +54,10 @@
         {
             "name": "NaviTest",
             "entry": "NaviTest"
+        },
+        {
+            "name": "NaviLineFollow",
+            "entry": "NaviLineFollow"
         }
     ],
     "import": [
