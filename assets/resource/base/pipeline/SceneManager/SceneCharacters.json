@@ -2,6 +2,10 @@
     "__ScenePrivateWorldEnterCharacters":{
         "desc":"从大世界界面进入角色菜单",
         "pre_delay": 0,
+        "recognition": "And",
+        "all_of": [
+            "InWorld"
+        ],
         "action": {
             "type": "ClickKey",
             "param": {
