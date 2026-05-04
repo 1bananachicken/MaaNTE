@@ -78,6 +78,30 @@ class TetrisGamePlayer:
             time.sleep(min(0.1, end_at - time.time()))
         return True
 
+    def _wait_for_new_piece(self, controller, tasker, old_piece_name: str, timeout: float = 1.2):
+        start = time.time()
+        while time.time() - start < timeout:
+            if tasker.stopping:
+                return False
+            img = self._safe_get_image(controller)
+            if img is None:
+                if not self._sleep_with_stop(tasker, 0.05):
+                    return False
+                continue
+            play_state = self._scan_play_state(img)
+            if play_state is None or play_state["piece_state"] is None:
+                if not self._sleep_with_stop(tasker, 0.05):
+                    return False
+                continue
+            new_piece = play_state["piece_state"]["piece"]
+            if new_piece != old_piece_name:
+                print(f"[Landing] New piece detected: {new_piece} (old: {old_piece_name})")
+                return True
+            if not self._sleep_with_stop(tasker, 0.05):
+                return False
+        print(f"[Landing] Wait for new piece timed out after {timeout}s")
+        return True
+
     def _tap_key(self, controller, key_code: int, hold: float = 0.03):
         controller.post_key_down(key_code)
         time.sleep(hold)
@@ -404,10 +428,12 @@ class TetrisGamePlayer:
         non_active_since = None
         scene_lock_until = time.time() + self._SCENE_LOCK_SEC
         scene_locked = True
+        last_piece_name = None
 
         self.combo_count = 0
         self.last_clear_time = 0
         self.total_lines_cleared = 0
+        self.last_hard_drop_time = 0
 
         while time.time() - round_start < 900:
             if tasker.stopping:
@@ -530,7 +556,8 @@ class TetrisGamePlayer:
             piece_state = play_state["piece_state"]
             queue_pieces = play_state["queue_pieces"]
 
-            if piece_state["cells"] == last_piece_signature:
+            current_signature = (piece_state["piece"], piece_state["rotation"], piece_state["col"])
+            if current_signature == last_piece_signature:
                 skip_count += 1
                 if skip_count >= 10:
                     print(
@@ -547,6 +574,8 @@ class TetrisGamePlayer:
             scene_locked = True
             scene_lock_until = time.time() + self._SCENE_LOCK_SEC
 
+            decision_start = time.time()
+
             settled_board = grid.copy()
             for row, col in active_cells:
                 settled_board[row, col] = False
@@ -555,11 +584,11 @@ class TetrisGamePlayer:
                 print(f"Queue(bottom->top)={queue_pieces}")
 
             if queue_pieces:
-                planning_queue = [piece_state["piece"], *queue_pieces[:3]]
+                planning_queue = [piece_state["piece"], *queue_pieces[:5]]
             else:
                 planning_queue = [piece_state["piece"]]
 
-            planning_queue = planning_queue[:4]
+            planning_queue = planning_queue[:6]
 
             best_move = self._choose_best_current_piece_move(
                 settled_board,
@@ -573,6 +602,18 @@ class TetrisGamePlayer:
                 if not self._sleep_with_stop(tasker, 0.06):
                     return False
                 continue
+
+            decision_time = time.time() - decision_start
+            if decision_time > 0.3:
+                print(f"[Perf] Decision took {decision_time:.3f}s")
+
+            now = time.time()
+            time_since_last_drop = now - self.last_hard_drop_time
+            if time_since_last_drop < 0.8:
+                wait_time = 0.8 - time_since_last_drop
+                print(f"[RateLimit] Waiting {wait_time:.2f}s before next hard drop")
+                if not self._sleep_with_stop(tasker, wait_time):
+                    return False
 
             print(
                 "Piece=%s rot=%s col=%s -> target_rot=%s target_col=%s score=%.2f penalty=%.2f"
@@ -590,7 +631,10 @@ class TetrisGamePlayer:
                 controller, tasker, piece_state, best_move
             )
             if move_applied:
-                last_piece_signature = piece_state["cells"]
+                last_piece_name = piece_state["piece"]
+                self._wait_for_new_piece(controller, tasker, last_piece_name)
+                self.last_hard_drop_time = time.time()
+                last_piece_signature = (piece_state["piece"], piece_state["rotation"], piece_state["col"])
                 move_fail_count = 0
 
                 if best_move.get("lines_cleared", 0) > 0:
@@ -805,20 +849,27 @@ class TetrisGamePlayer:
         queue_pieces: list[str],
         depth=0,
         max_depth=2,
-        beam_width=4,
+        beam_width=5,
         combo_count=0,
     ):
         if not queue_pieces:
             return None
 
         occupancy = np.count_nonzero(board) / (BOARD_ROWS * BOARD_COLS)
-        avg_height = np.mean([r for r in range(BOARD_ROWS) if np.any(board[r])]) if np.any(board) else 0
 
         adaptive_depth = max_depth
         if occupancy < 0.25:
+            adaptive_depth = max_depth
+        elif occupancy > 0.55:
+            adaptive_depth = min(max_depth + 2, 5)
+        elif occupancy > 0.4:
             adaptive_depth = min(max_depth + 1, 4)
-        elif occupancy > 0.5:
-            adaptive_depth = max(1, max_depth - 1)
+
+        adaptive_beam = beam_width
+        if len(queue_pieces) >= 3:
+            adaptive_beam = min(beam_width + 2, 8)
+        elif occupancy > 0.45:
+            adaptive_beam = min(beam_width + 1, 7)
 
         piece_name = queue_pieces[0]
         candidates = []
@@ -830,17 +881,23 @@ class TetrisGamePlayer:
                     continue
 
                 is_t_spin = False
-                from ..utils.board import detect_t_spin
-                if piece_name == "T":
-                    is_t_spin = detect_t_spin(board, piece_name, rotation_index, target_col, result["row"])
+                if depth == 0 and piece_name == "T":
+                    from ..utils.board import detect_t_spin
+                    t_spin_result = detect_t_spin(board, piece_name, rotation_index, target_col, result["row"])
+                    is_t_spin = t_spin_result["is_t_spin"]
 
-                eval_score = evaluate_board(
-                    result["board"],
-                    result["lines_cleared"],
-                    dynamic_weights=True,
-                    combo_count=combo_count if result["lines_cleared"] > 0 else 0,
-                    is_t_spin=is_t_spin,
-                )
+                next_combo = combo_count + 1 if result["lines_cleared"] > 0 else 0
+                if depth == 0:
+                    eval_score = evaluate_board(
+                        result["board"],
+                        result["lines_cleared"],
+                        dynamic_weights=True,
+                        combo_count=next_combo,
+                        is_t_spin=is_t_spin,
+                    )
+                else:
+                    from ..utils.board import evaluate_board_fast
+                    eval_score = evaluate_board_fast(result["board"], result["lines_cleared"], combo_count=next_combo)
 
                 candidates.append(
                     {
@@ -858,24 +915,28 @@ class TetrisGamePlayer:
             return None
 
         candidates.sort(key=lambda item: item["score"], reverse=True)
-        search_candidates = candidates[:beam_width]
+        search_candidates = candidates[:adaptive_beam]
 
         best_choice = None
         for candidate in search_candidates:
             total_score = candidate["score"]
+            next_combo = combo_count + 1 if candidate["lines_cleared"] > 0 else 0
             if depth + 1 < adaptive_depth and len(queue_pieces) > 1:
                 future = self._search_best_queue_move(
                     candidate["board"],
                     queue_pieces[1:],
                     depth=depth + 1,
                     max_depth=adaptive_depth,
-                    beam_width=beam_width,
-                    combo_count=self.combo_count + 1 if candidate["lines_cleared"] > 0 else 0,
+                    beam_width=adaptive_beam,
+                    combo_count=next_combo,
                 )
                 if future is not None:
                     future_value = future["total_score"]
                     depth_discount = 0.85 ** (depth + 1)
-                    total_score = candidate["score"] + future_value * 0.42 * depth_discount
+                    future_weight = 0.7 if next_combo > 0 else 0.5
+                    if candidate.get("is_t_spin"):
+                        future_weight = 0.8
+                    total_score = candidate["score"] + future_value * future_weight * depth_discount
 
             enriched = dict(candidate)
             enriched["total_score"] = total_score
@@ -897,15 +958,16 @@ class TetrisGamePlayer:
         future_queue = planning_queue[1:]
 
         occupancy = np.count_nonzero(board) / (BOARD_ROWS * BOARD_COLS)
-        avg_height = np.mean([r for r in range(BOARD_ROWS) if np.any(board[r])]) if np.any(board) else 0
 
         adaptive_depth = 2
         if occupancy < 0.25:
-            adaptive_depth = 3
-        elif occupancy > 0.5:
             adaptive_depth = 2
+        elif occupancy > 0.55:
+            adaptive_depth = 4
+        elif occupancy > 0.4:
+            adaptive_depth = 3
 
-        beam_width = 5 if len(future_queue) >= 2 else 4
+        beam_width = 6 if len(future_queue) >= 2 else 5
 
         best_move = None
 
@@ -919,19 +981,24 @@ class TetrisGamePlayer:
                 is_t_spin = False
                 from ..utils.board import detect_t_spin
                 if piece_name == "T":
-                    is_t_spin = detect_t_spin(board, piece_name, rotation_index, target_col, result["row"])
+                    t_spin_result = detect_t_spin(board, piece_name, rotation_index, target_col, result["row"])
+                    is_t_spin = t_spin_result["is_t_spin"]
 
                 future_bonus = 0.0
                 if future_queue:
+                    next_combo = self.combo_count + 1 if result["lines_cleared"] > 0 else 0
                     future_move = self._search_best_queue_move(
                         result["board"],
                         future_queue,
                         max_depth=adaptive_depth,
                         beam_width=beam_width,
-                        combo_count=self.combo_count + 1 if result["lines_cleared"] > 0 else 0,
+                        combo_count=next_combo,
                     )
                     if future_move is not None:
-                        future_bonus = future_move["total_score"] * 0.42
+                        future_weight = 0.7 if next_combo > 0 else 0.5
+                        if is_t_spin:
+                            future_weight = 0.8
+                        future_bonus = future_move["total_score"] * future_weight
 
                 current_score = evaluate_board(
                     result["board"],
@@ -941,24 +1008,14 @@ class TetrisGamePlayer:
                     is_t_spin=is_t_spin,
                 )
 
-                if piece_state["col"] <= 1 or piece_state["col"] >= BOARD_COLS - 2:
-                    boundary_penalty = 0.25
-                else:
-                    boundary_penalty = 0.0
-
-                if target_col <= 1 or target_col >= BOARD_COLS - 2:
-                    boundary_penalty += 0.2
-
                 rot_dist = rotation_distance(
                     piece_name, piece_state["rotation"], rotation_index
                 )
                 shift_distance = abs(target_col - piece_state["col"])
-                execution_penalty = rot_dist * 0.5 + shift_distance * 0.12 + boundary_penalty
+                execution_penalty = rot_dist * 0.15 + shift_distance * 0.06
 
-                if piece_name == "I" and rot_dist > 0:
-                    execution_penalty += 0.3
-                if rot_dist > 0 and shift_distance > 3:
-                    execution_penalty += 0.2
+                if rot_dist > 0 and shift_distance > 4:
+                    execution_penalty += 0.15
 
                 move = {
                     "piece": piece_name,

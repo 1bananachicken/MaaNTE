@@ -119,6 +119,7 @@ def calculate_holes(board: np.ndarray):
     holes = 0
     hole_depth = 0
     covered_holes = 0
+    hard_holes = 0
 
     for col in range(BOARD_COLS):
         seen_block = False
@@ -132,8 +133,10 @@ def calculate_holes(board: np.ndarray):
                 holes += 1
                 hole_depth += BOARD_ROWS - row
                 covered_holes += blocks_above
+                if blocks_above >= 3:
+                    hard_holes += 1
 
-    return holes, hole_depth, covered_holes
+    return holes, hole_depth, covered_holes, hard_holes
 
 
 def calculate_transitions(board: np.ndarray):
@@ -190,21 +193,47 @@ def calculate_edge_height_penalty(heights: list[int]):
     return float(heights[0] * heights[0] + heights[-1] * heights[-1])
 
 
-def detect_t_spin(board: np.ndarray, piece_name: str, rotation: int, target_col: int, drop_row: int) -> bool:
+def detect_t_spin(board: np.ndarray, piece_name: str, rotation: int, target_col: int, drop_row: int, was_rotation_move: bool = True) -> dict:
     if piece_name != "T":
-        return False
+        return {"is_t_spin": False, "is_mini": False}
 
     t_shape = PIECES["T"][rotation]
-    corners_blocked = 0
 
-    for row_offset, col_offset in t_shape:
+    front_corner_offsets = {
+        0: [(-1, -1), (-1, 1)],
+        1: [(-1, 1), (1, 1)],
+        2: [(1, -1), (1, 1)],
+        3: [(-1, -1), (1, -1)],
+    }
+    back_corner_offsets = {
+        0: [(1, -1), (1, 1)],
+        1: [(-1, -1), (1, -1)],
+        2: [(-1, -1), (-1, 1)],
+        3: [(-1, 1), (1, 1)],
+    }
+
+    front_corners_blocked = 0
+    for row_offset, col_offset in front_corner_offsets[rotation]:
         r = drop_row + row_offset
         c = target_col + col_offset
-        if (row_offset, col_offset) in [(-1, -1), (-1, 1), (1, -1), (1, 1)]:
-            if r < 0 or r >= BOARD_ROWS or c < 0 or c >= BOARD_COLS or (0 <= r < BOARD_ROWS and board[r, c]):
-                corners_blocked += 1
+        if r < 0 or r >= BOARD_ROWS or c < 0 or c >= BOARD_COLS or (0 <= r < BOARD_ROWS and 0 <= c < BOARD_COLS and board[r, c]):
+            front_corners_blocked += 1
 
-    return corners_blocked >= 3
+    back_corners_blocked = 0
+    for row_offset, col_offset in back_corner_offsets[rotation]:
+        r = drop_row + row_offset
+        c = target_col + col_offset
+        if r < 0 or r >= BOARD_ROWS or c < 0 or c >= BOARD_COLS or (0 <= r < BOARD_ROWS and 0 <= c < BOARD_COLS and board[r, c]):
+            back_corners_blocked += 1
+
+    if was_rotation_move:
+        is_t_spin = front_corners_blocked >= 2 and (front_corners_blocked + back_corners_blocked) >= 3
+        is_mini = not is_t_spin and front_corners_blocked >= 2
+    else:
+        is_t_spin = False
+        is_mini = (front_corners_blocked + back_corners_blocked) >= 3
+
+    return {"is_t_spin": is_t_spin, "is_mini": is_mini}
 
 
 def calculate_top_occupancy_penalty(board: np.ndarray, rows: int = 4):
@@ -246,7 +275,7 @@ def evaluate_board(
     is_t_spin: bool = False,
 ):
     heights = calculate_column_heights(board)
-    holes, hole_depth, covered_holes = calculate_holes(board)
+    holes, hole_depth, covered_holes, hard_holes = calculate_holes(board)
     row_transitions, col_transitions = calculate_transitions(board)
     well_penalty = calculate_well_penalty(heights)
     open_well_reward = calculate_open_well_reward(heights)
@@ -301,6 +330,7 @@ def evaluate_board(
         lines_cleared * lines_weight
         - aggregate_height * height_weight
         - holes * holes_weight
+        - hard_holes * (holes_weight * 0.5)
         - bumpiness * bumpiness_weight
         - row_transitions * transitions_weight
         - col_transitions * (transitions_weight * 2.9)
@@ -309,11 +339,33 @@ def evaluate_board(
     )
 
     if combo_count > 1:
-        score += combo_count * 18.0
+        score += combo_count * 25.0
 
     if is_t_spin:
-        t_spin_lines_bonus = lines_cleared * 25.0
-        score += t_spin_lines_bonus + 30.0
+        t_spin_lines_bonus = lines_cleared * 30.0
+        score += t_spin_lines_bonus + 40.0
+
+    return score
+
+
+def evaluate_board_fast(board: np.ndarray, lines_cleared: int, combo_count: int = 0):
+    heights = calculate_column_heights(board)
+    holes, _, _, hard_holes = calculate_holes(board)
+    aggregate_height = sum(heights)
+    bumpiness = sum(
+        abs(heights[idx] - heights[idx + 1]) for idx in range(len(heights) - 1)
+    )
+
+    score = (
+        lines_cleared * 35.0
+        - aggregate_height * 1.2
+        - holes * 40.0
+        - hard_holes * 20.0
+        - bumpiness * 1.5
+    )
+
+    if combo_count > 1:
+        score += combo_count * 25.0
 
     return score
 
@@ -356,11 +408,44 @@ def simulate_drop(board: np.ndarray, shape, target_col: int):
     landing_height = BOARD_ROWS - (drop_row + (shape_height / 2.0))
     score = evaluate_board(new_board, lines_cleared)
     score -= landing_height * 4.5
+
+    piece_name = None
+    for name, rotations in PIECES.items():
+        for rot_shape in rotations:
+            if tuple(sorted(rot_shape)) == tuple(sorted(shape)):
+                piece_name = name
+                break
+        if piece_name:
+            break
+
+    is_t_spin = False
+    is_mini = False
+    if piece_name == "T":
+        rotation = None
+        for rot_idx, rot_shape in enumerate(PIECES["T"]):
+            if tuple(sorted(rot_shape)) == tuple(sorted(shape)):
+                rotation = rot_idx
+                break
+        if rotation is not None:
+            t_spin_result = detect_t_spin(board, "T", rotation, target_col, drop_row)
+            is_t_spin = t_spin_result["is_t_spin"]
+            is_mini = t_spin_result["is_mini"]
+
+    landing_info = {
+        "combo_lines": lines_cleared,
+        "is_t_spin": is_t_spin,
+        "is_mini": is_mini,
+        "cleared_rows": full_rows,
+        "drop_row": drop_row,
+    }
+
     return {
         "score": score,
         "lines_cleared": lines_cleared,
         "row": drop_row,
         "board": new_board,
+        "is_t_spin": is_t_spin,
+        "landing_info": landing_info,
     }
 
 
@@ -456,8 +541,8 @@ def dump_board_state(grid, active_cells=None, piece_state=None, filepath="tetris
     lines.append("")
     lines.append(f"Column heights: {heights}")
     lines.append(f"Aggregate height: {sum(heights)}")
-    holes, hole_depth, covered_holes = calculate_holes(grid)
-    lines.append(f"Holes: {holes}, depth: {hole_depth}, covered: {covered_holes}")
+    holes, hole_depth, covered_holes, hard_holes = calculate_holes(grid)
+    lines.append(f"Holes: {holes}, depth: {hole_depth}, covered: {covered_holes}, hard: {hard_holes}")
 
     content = "\n".join(lines)
 
