@@ -13,7 +13,21 @@ from ..utils.board import (
     evaluate_board,
 )
 from ..utils.pieces import PIECES, match_piece_state, rotation_distance
-from ..utils.scene import SceneGate, EXIT_REGION, PREPARE_ONE_CLICK_POINT, PREPARE_ONE_MULTI_CLICK_POINT, PREPARE_TWO_CLICK_POINT, VK_A, VK_D, VK_F, VK_J, VK_K, VK_ESC, VK_S, VK_SPACE
+from ..utils.scene import (
+    SceneGate,
+    EXIT_REGION,
+    PREPARE_ONE_CLICK_POINT,
+    PREPARE_ONE_MULTI_CLICK_POINT,
+    PREPARE_TWO_CLICK_POINT,
+    VK_A,
+    VK_D,
+    VK_F,
+    VK_J,
+    VK_K,
+    VK_ESC,
+    VK_S,
+    VK_SPACE,
+)
 
 
 class TetrisGamePlayer:
@@ -111,7 +125,12 @@ class TetrisGamePlayer:
         return self.scene_gate.classify_scene(img, play_state)
 
     def _wait_for_scene_names(
-        self, controller, tasker, expected_names, timeout_seconds=6.0, stable_hits=2,
+        self,
+        controller,
+        tasker,
+        expected_names,
+        timeout_seconds=6.0,
+        stable_hits=2,
     ):
         deadline = time.time() + timeout_seconds
         stable_count = 0
@@ -149,7 +168,9 @@ class TetrisGamePlayer:
 
         return last_scene
 
-    def _normalize_scene_for_round(self, controller, tasker, timeout_seconds=6.0) -> bool:
+    def _normalize_scene_for_round(
+        self, controller, tasker, timeout_seconds=6.0
+    ) -> bool:
         start_time = time.time()
         while time.time() - start_time < timeout_seconds:
             if tasker.stopping:
@@ -164,8 +185,12 @@ class TetrisGamePlayer:
             play_state = self._scan_play_state(img)
             scene = self._classify_scene(img, play_state)
             if scene["name"] in (
-                "world_prompt", "prepare_one", "prepare_two",
-                "game_active", "game_idle", "exit",
+                "world_prompt",
+                "prepare_one",
+                "prepare_two",
+                "game_active",
+                "game_idle",
+                "exit",
             ):
                 return True
 
@@ -179,11 +204,14 @@ class TetrisGamePlayer:
     def _recover_from_scene(self, controller, tasker, scene: dict) -> bool:
         scene_name = scene["name"]
         if scene_name == "world_prompt":
-            print(f"Recovery: world prompt detected, pressing F. score={scene['score']:.2f}")
+            print(
+                f"Recovery: world prompt detected, pressing F. score={scene['score']:.2f}"
+            )
             self._tap_key(controller, VK_F)
             return (
                 self._wait_for_scene_names(
-                    controller, tasker,
+                    controller,
+                    tasker,
                     {"prepare_one", "prepare_two", "game_active", "game_idle"},
                     timeout_seconds=6.0,
                 )
@@ -191,13 +219,20 @@ class TetrisGamePlayer:
             )
 
         if scene_name == "prepare_one":
-            click_point = PREPARE_ONE_MULTI_CLICK_POINT if self.mode == "multiple" else PREPARE_ONE_CLICK_POINT
+            click_point = (
+                PREPARE_ONE_MULTI_CLICK_POINT
+                if self.mode == "multiple"
+                else PREPARE_ONE_CLICK_POINT
+            )
             mode_label = "多人" if self.mode == "multiple" else "单人"
-            print(f"Recovery: {mode_label}模式入口 detected, clicking. score={scene['score']:.2f}")
+            print(
+                f"Recovery: {mode_label}模式入口 detected, clicking. score={scene['score']:.2f}"
+            )
             self._click_point(controller, *click_point)
             return (
                 self._wait_for_scene_names(
-                    controller, tasker,
+                    controller,
+                    tasker,
                     {"prepare_two", "game_active", "game_idle"},
                     timeout_seconds=6.0,
                 )
@@ -205,11 +240,14 @@ class TetrisGamePlayer:
             )
 
         if scene_name == "prepare_two":
-            print(f"Recovery: start-match scene detected, clicking. score={scene['score']:.2f}")
+            print(
+                f"Recovery: start-match scene detected, clicking. score={scene['score']:.2f}"
+            )
             self._click_point(controller, *PREPARE_TWO_CLICK_POINT)
             return (
                 self._wait_for_scene_names(
-                    controller, tasker,
+                    controller,
+                    tasker,
                     {"game_active", "game_idle", "exit"},
                     timeout_seconds=12.0,
                 )
@@ -217,9 +255,13 @@ class TetrisGamePlayer:
             )
 
         if scene_name == "exit":
-            print(f"Recovery: exit button detected, clicking. score={scene['score']:.2f}")
+            print(
+                f"Recovery: exit button detected, clicking. score={scene['score']:.2f}"
+            )
             self._click_template(controller, scene["x"], scene["y"], scene["template"])
-            return self._wait_until_exit_to_world(controller, tasker, timeout_seconds=6.0)
+            return self._wait_until_exit_to_world(
+                controller, tasker, timeout_seconds=6.0
+            )
 
         if scene_name == "game_idle":
             return self._sleep_with_stop(tasker, 0.08)
@@ -244,8 +286,12 @@ class TetrisGamePlayer:
                 return True
 
             if scene["name"] == "exit":
-                self._click_template(controller, scene["x"], scene["y"], scene["template"])
-                if self._wait_until_exit_to_world(controller, tasker, timeout_seconds=4.0):
+                self._click_template(
+                    controller, scene["x"], scene["y"], scene["template"]
+                )
+                if self._wait_until_exit_to_world(
+                    controller, tasker, timeout_seconds=4.0
+                ):
                     return True
                 continue
 
@@ -255,7 +301,9 @@ class TetrisGamePlayer:
 
         return False
 
-    def _wait_until_exit_to_world(self, controller, tasker, timeout_seconds=8.0) -> bool:
+    def _wait_until_exit_to_world(
+        self, controller, tasker, timeout_seconds=8.0
+    ) -> bool:
         start_time = time.time()
         while time.time() - start_time < timeout_seconds:
             if tasker.stopping:
@@ -304,7 +352,9 @@ class TetrisGamePlayer:
                 elif time.time() - unknown_since >= 2.0:
                     print("Tetris scene unknown during session recovery, retrying.")
                     unknown_since = None
-                    if not self._back_to_world_from_anywhere(controller, tasker, max_attempts=2):
+                    if not self._back_to_world_from_anywhere(
+                        controller, tasker, max_attempts=2
+                    ):
                         return False
                     continue
                 if not self._sleep_with_stop(tasker, 0.2):
@@ -343,8 +393,12 @@ class TetrisGamePlayer:
         return best_move
 
     def _search_best_queue_move(
-        self, board: np.ndarray, queue_pieces: list[str],
-        depth=0, max_depth=4, beam_width=8,
+        self,
+        board: np.ndarray,
+        queue_pieces: list[str],
+        depth=0,
+        max_depth=4,
+        beam_width=8,
     ):
         if not queue_pieces:
             return None
@@ -357,13 +411,15 @@ class TetrisGamePlayer:
                 result = simulate_drop(board, shape, target_col)
                 if result is None:
                     continue
-                candidates.append({
-                    "rotation": rotation_index,
-                    "target_col": target_col,
-                    "score": result["score"],
-                    "board": result["board"],
-                    "piece": piece_name,
-                })
+                candidates.append(
+                    {
+                        "rotation": rotation_index,
+                        "target_col": target_col,
+                        "score": result["score"],
+                        "board": result["board"],
+                        "piece": piece_name,
+                    }
+                )
 
         if not candidates:
             return None
@@ -376,24 +432,35 @@ class TetrisGamePlayer:
             total_score = candidate["score"]
             if depth + 1 < max_depth and len(queue_pieces) > 1:
                 future = self._search_best_queue_move(
-                    candidate["board"], queue_pieces[1:],
-                    depth=depth + 1, max_depth=max_depth, beam_width=beam_width,
+                    candidate["board"],
+                    queue_pieces[1:],
+                    depth=depth + 1,
+                    max_depth=max_depth,
+                    beam_width=beam_width,
                 )
                 if future is not None:
                     total_score += future["total_score"] * 0.62
 
             enriched = dict(candidate)
             enriched["total_score"] = total_score
-            if best_choice is None or enriched["total_score"] > best_choice["total_score"]:
+            if (
+                best_choice is None
+                or enriched["total_score"] > best_choice["total_score"]
+            ):
                 best_choice = enriched
 
         return best_choice
 
     def _choose_best_current_piece_move(
-        self, board: np.ndarray, piece_state: dict, planning_queue: list[str],
+        self,
+        board: np.ndarray,
+        piece_state: dict,
+        planning_queue: list[str],
     ):
         piece_name = piece_state["piece"]
-        future_queue = planning_queue[1:] if planning_queue[:1] == [piece_name] else planning_queue
+        future_queue = (
+            planning_queue[1:] if planning_queue[:1] == [piece_name] else planning_queue
+        )
         best_move = None
 
         for rotation_index, shape in enumerate(PIECES[piece_name]):
@@ -406,13 +473,17 @@ class TetrisGamePlayer:
                 future_bonus = 0.0
                 if future_queue:
                     future_move = self._search_best_queue_move(
-                        result["board"], future_queue,
-                        max_depth=min(4, len(future_queue)), beam_width=8,
+                        result["board"],
+                        future_queue,
+                        max_depth=min(4, len(future_queue)),
+                        beam_width=8,
                     )
                     if future_move is not None:
                         future_bonus = future_move["total_score"] * 0.58
 
-                rot_dist = rotation_distance(piece_name, piece_state["rotation"], rotation_index)
+                rot_dist = rotation_distance(
+                    piece_name, piece_state["rotation"], rotation_index
+                )
                 shift_distance = abs(target_col - piece_state["col"])
                 execution_penalty = rot_dist * 0.14 + shift_distance * 0.025
                 if piece_name == "I" and rot_dist > 0:
@@ -444,8 +515,10 @@ class TetrisGamePlayer:
         hard_drop_sent = False
         post_drop_deadline = None
 
-        expected_state_change = False
-        last_cells = piece_state["cells"]
+        expected_rot_change = False
+        expected_col_change = False
+        last_rotation = piece_state["rotation"]
+        last_col = piece_state["col"]
         last_action_time = 0.0
 
         while time.time() < deadline:
@@ -466,7 +539,10 @@ class TetrisGamePlayer:
                 if scene_name in ("exit", "game_idle"):
                     return True
                 if play_state is None or play_state["piece_state"] is None:
-                    if post_drop_deadline is not None and time.time() >= post_drop_deadline:
+                    if (
+                        post_drop_deadline is not None
+                        and time.time() >= post_drop_deadline
+                    ):
                         return True
                     if not self._sleep_with_stop(tasker, 0.04):
                         return False
@@ -492,17 +568,23 @@ class TetrisGamePlayer:
 
             current_rotation = current_piece_state["rotation"]
             current_col = current_piece_state["col"]
-            current_cells = current_piece_state["cells"]
 
-            if expected_state_change and current_cells == last_cells:
-                if time.time() - last_action_time < 0.25:
+            if expected_rot_change and current_rotation == last_rotation:
+                if time.time() - last_action_time < 0.20:
                     if not self._sleep_with_stop(tasker, 0.03):
                         return False
                     continue
-                # Timeout passed, maybe input dropped, proceed to retry
-            
-            expected_state_change = False
-            last_cells = current_cells
+
+            if expected_col_change and current_col == last_col:
+                if time.time() - last_action_time < 0.20:
+                    if not self._sleep_with_stop(tasker, 0.03):
+                        return False
+                    continue
+
+            expected_rot_change = False
+            expected_col_change = False
+            last_rotation = current_rotation
+            last_col = current_col
 
             if current_rotation == target_rotation and current_col == target_col:
                 if not hard_drop_sent:
@@ -519,13 +601,17 @@ class TetrisGamePlayer:
                 continue
 
             clockwise_steps = (target_rotation - current_rotation) % rotation_count
-            counterclockwise_steps = (current_rotation - target_rotation) % rotation_count
+            counterclockwise_steps = (
+                current_rotation - target_rotation
+            ) % rotation_count
 
             if current_rotation != target_rotation:
-                correction_key = VK_K if clockwise_steps <= counterclockwise_steps else VK_J
+                correction_key = (
+                    VK_K if clockwise_steps <= counterclockwise_steps else VK_J
+                )
                 self._tap_key(controller, correction_key, hold=0.04)
                 last_action_time = time.time()
-                expected_state_change = True
+                expected_rot_change = True
                 if not self._sleep_with_stop(tasker, 0.03):
                     return False
                 continue
@@ -534,7 +620,7 @@ class TetrisGamePlayer:
                 correction_key = VK_D if current_col < target_col else VK_A
                 self._tap_key(controller, correction_key, hold=0.04)
                 last_action_time = time.time()
-                expected_state_change = True
+                expected_col_change = True
                 if not self._sleep_with_stop(tasker, 0.03):
                     return False
                 continue
@@ -571,17 +657,26 @@ class TetrisGamePlayer:
             scene_name = scene["name"]
 
             if scene_name == "exit":
-                print(f"Detected exit button, leaving match. score={scene['score']:.2f}")
-                self._click_template(controller, scene["x"], scene["y"], self.scene_gate.exit_tpl)
+                print(
+                    f"Detected exit button, leaving match. score={scene['score']:.2f}"
+                )
+                self._click_template(
+                    controller, scene["x"], scene["y"], self.scene_gate.exit_tpl
+                )
                 self._wait_until_exit_to_world(controller, tasker)
                 return True
 
-            if scene_name != "game_active" or play_state is None or play_state["piece_state"] is None:
+            if (
+                scene_name != "game_active"
+                or play_state is None
+                or play_state["piece_state"] is None
+            ):
                 if non_active_since is None:
                     non_active_since = time.time()
                 elif time.time() - non_active_since >= 2.0:
                     recovered = self._attempt_round_recovery(
-                        controller, tasker,
+                        controller,
+                        tasker,
                         f"Tetris scene drifted to {scene_name}.",
                     )
                     if not recovered:
@@ -629,7 +724,9 @@ class TetrisGamePlayer:
             planning_queue = planning_queue[:4]
 
             best_move = self._choose_best_current_piece_move(
-                settled_board, piece_state, planning_queue,
+                settled_board,
+                piece_state,
+                planning_queue,
             )
             if best_move is None:
                 best_move = self._find_best_move(settled_board, piece_state["piece"])
@@ -651,11 +748,15 @@ class TetrisGamePlayer:
                     best_move.get("execution_penalty", 0.0),
                 )
             )
-            move_applied = self._apply_move_with_feedback(controller, tasker, piece_state, best_move)
+            move_applied = self._apply_move_with_feedback(
+                controller, tasker, piece_state, best_move
+            )
             if move_applied:
                 last_piece_signature = piece_state["cells"]
             else:
-                print("Move did not reach target position, retrying with a fresh board state.")
+                print(
+                    "Move did not reach target position, retrying with a fresh board state."
+                )
             if not self._sleep_with_stop(tasker, 0.04):
                 return False
 

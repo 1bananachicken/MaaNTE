@@ -19,13 +19,48 @@ REAL_BLOCK_SATURATION_THRESHOLD = 45
 
 BOARD_LINE_COLUMNS = [17, 47, 76, 105, 135, 164, 193, 223, 252, 281, 301]
 BOARD_LINE_ROWS = [
-    23, 53, 82, 111, 141, 170, 199, 229, 258, 287,
-    316, 346, 375, 404, 434, 463, 492, 522, 551, 580,
+    23,
+    53,
+    82,
+    111,
+    141,
+    170,
+    199,
+    229,
+    258,
+    287,
+    316,
+    346,
+    375,
+    404,
+    434,
+    463,
+    492,
+    522,
+    551,
+    580,
 ]
 BOARD_INTERIOR_COLUMNS = [32, 62, 91, 120, 149, 178, 208, 237, 266, 291]
 BOARD_INTERIOR_ROWS = [
-    38, 67, 96, 126, 155, 184, 214, 243, 272, 301,
-    331, 360, 389, 419, 448, 477, 507, 536, 565,
+    38,
+    67,
+    96,
+    126,
+    155,
+    184,
+    214,
+    243,
+    272,
+    301,
+    331,
+    360,
+    389,
+    419,
+    448,
+    477,
+    507,
+    536,
+    565,
 ]
 
 QUEUE_REGION = [782, 86, 67, 388]
@@ -170,7 +205,9 @@ def evaluate_board(board: np.ndarray, lines_cleared: int):
     lower_fill_score = calculate_lower_fill_score(board)
     dense_row_reward, almost_clear_reward = calculate_dense_row_reward(board)
     aggregate_height = sum(heights)
-    bumpiness = sum(abs(heights[idx] - heights[idx + 1]) for idx in range(len(heights) - 1))
+    bumpiness = sum(
+        abs(heights[idx] - heights[idx + 1]) for idx in range(len(heights) - 1)
+    )
     max_height = max(heights) if heights else 0
     surface_variance = float(np.var(heights)) if heights else 0.0
 
