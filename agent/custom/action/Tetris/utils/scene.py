@@ -31,6 +31,10 @@ VK_K = 75
 VK_ESC = 27
 VK_S = 83
 VK_SPACE = 32
+VK_W = 87
+
+
+DROP_BUTTON_REGION = [270, 425, 92, 97]
 
 
 def _find_image_root() -> Path:
@@ -79,6 +83,7 @@ class SceneGate:
         self.exit_tpl = _read_image("exit_button.png")
         self.loading_tpl = _read_image("loading.png")
         self.return_tpl = _read_image("return.png")
+        self.drop_tpl = _read_image("drop.png")
 
         self.queue_preview_templates = {
             "T": self._make_preview_template(((0, 1), (1, 0), (1, 1), (1, 2))),
@@ -96,7 +101,9 @@ class SceneGate:
             canvas[row, col] = 255
         return canvas
 
-    def _match_template_region(self, img, region, template, min_similarity=0.8, grayscale=False):
+    def _match_template_region(
+        self, img, region, template, min_similarity=0.8, grayscale=False
+    ):
         if template is None:
             return False, 0.0, 0, 0
 
@@ -142,10 +149,16 @@ class SceneGate:
             return True, max_val, x1 + max_loc[0], y1 + max_loc[1]
         return False, max_val, 0, 0
 
-    def _match_scene_marker(self, img, region, template, attempts=((0.78, False), (0.74, True))):
+    def _match_scene_marker(
+        self, img, region, template, attempts=((0.78, False), (0.74, True))
+    ):
         for threshold, grayscale in attempts:
             matched, score, x, y = self._match_template_region(
-                img, region, template, threshold, grayscale=grayscale,
+                img,
+                region,
+                template,
+                threshold,
+                grayscale=grayscale,
             )
             if matched:
                 return True, score, x, y
@@ -153,7 +166,9 @@ class SceneGate:
 
     def _find_world_prompt(self, img):
         matched, score, x, y = self._match_scene_marker(
-            img, WORLD_SCENE_MARKER_REGION, self.world_scene_marker,
+            img,
+            WORLD_SCENE_MARKER_REGION,
+            self.world_scene_marker,
         )
         if matched:
             return True, score, x, y
@@ -164,7 +179,11 @@ class SceneGate:
             (WORLD_TO_PREPARE_FALLBACK_REGION, 0.71, True),
         ):
             matched, score, x, y = self._match_template_region(
-                img, region, self.world_prompt_tpl, threshold, grayscale=grayscale,
+                img,
+                region,
+                self.world_prompt_tpl,
+                threshold,
+                grayscale=grayscale,
             )
             if matched:
                 return True, score, x, y
@@ -173,19 +192,27 @@ class SceneGate:
 
     def _find_prepare_one(self, img):
         matched, score, x, y = self._match_scene_marker(
-            img, PREPARE_ONE_SCENE_MARKER_REGION, self.prepare_one_marker,
+            img,
+            PREPARE_ONE_SCENE_MARKER_REGION,
+            self.prepare_one_marker,
         )
         if matched:
             return True, score, x, y, self.prepare_one_marker
 
         matched, score, x, y = match_template_in_region(
-            img, PREPARE_ONE_REGION, self.single_player_tpl, 0.75,
+            img,
+            PREPARE_ONE_REGION,
+            self.single_player_tpl,
+            0.75,
         )
         if matched:
             return True, score, x, y, self.single_player_tpl
 
         matched, score, x, y = match_template_in_region(
-            img, MULTIPLE_REGION, self.multi_player_tpl, 0.75,
+            img,
+            MULTIPLE_REGION,
+            self.multi_player_tpl,
+            0.75,
         )
         if matched:
             return True, score, x, y, self.multi_player_tpl
@@ -194,13 +221,18 @@ class SceneGate:
 
     def _find_prepare_two(self, img):
         matched, score, x, y = self._match_scene_marker(
-            img, PREPARE_TWO_SCENE_MARKER_REGION, self.prepare_two_marker,
+            img,
+            PREPARE_TWO_SCENE_MARKER_REGION,
+            self.prepare_two_marker,
         )
         if matched:
             return True, score, x, y, self.prepare_two_marker
 
         matched, score, x, y = match_template_in_region(
-            img, PREPARE_TWO_REGION, self.start_match_tpl, 0.75,
+            img,
+            PREPARE_TWO_REGION,
+            self.start_match_tpl,
+            0.75,
         )
         if matched:
             return True, score, x, y, self.start_match_tpl
@@ -209,13 +241,17 @@ class SceneGate:
 
     def _find_game_scene_marker(self, img):
         return self._match_scene_marker(
-            img, GAME_SCENE_MARKER_REGION, self.game_scene_marker,
+            img,
+            GAME_SCENE_MARKER_REGION,
+            self.game_scene_marker,
             attempts=((0.76, False), (0.72, True)),
         )
 
     def _find_loading(self, img):
         return self._match_scene_marker(
-            img, LOADING_REGION, self.loading_tpl,
+            img,
+            LOADING_REGION,
+            self.loading_tpl,
             attempts=((0.78, False), (0.74, True)),
         )
 
@@ -223,7 +259,20 @@ class SceneGate:
         if self.return_tpl is None:
             return False, 0.0, 0, 0
         return self._match_template_region(
-            img, RETURN_REGION, self.return_tpl, 0.72,
+            img,
+            RETURN_REGION,
+            self.return_tpl,
+            0.72,
+        )
+
+    def _find_drop_button(self, img):
+        if self.drop_tpl is None:
+            return False, 0.0, 0, 0
+        return self._match_template_region(
+            img,
+            DROP_BUTTON_REGION,
+            self.drop_tpl,
+            0.70,
         )
 
     def classify_scene(self, img, play_state=None):
@@ -231,28 +280,45 @@ class SceneGate:
 
         if img is None or not isinstance(img, np.ndarray):
             return {
-                "name": "unknown", "score": 0.0, "x": 0, "y": 0,
-                "template": None, "play_state": play_state,
+                "name": "unknown",
+                "score": 0.0,
+                "x": 0,
+                "y": 0,
+                "template": None,
+                "play_state": play_state,
             }
 
         matched, score, x, y = match_template_in_region(
-            img, EXIT_REGION, self.exit_tpl, 0.75,
+            img,
+            EXIT_REGION,
+            self.exit_tpl,
+            0.75,
         )
         if matched:
             return {
-                "name": "exit", "score": score, "x": x, "y": y,
-                "template": self.exit_tpl, "play_state": play_state,
+                "name": "exit",
+                "score": score,
+                "x": x,
+                "y": y,
+                "template": self.exit_tpl,
+                "play_state": play_state,
             }
 
         matched, score, x, y = self._find_loading(img)
         if matched:
             return {
-                "name": "loading", "score": score, "x": x, "y": y,
-                "template": self.loading_tpl, "play_state": play_state,
+                "name": "loading",
+                "score": score,
+                "x": x,
+                "y": y,
+                "template": self.loading_tpl,
+                "play_state": play_state,
             }
 
         marker_matched, marker_score, marker_x, marker_y = self._match_scene_marker(
-            img, WORLD_SCENE_MARKER_REGION, self.world_scene_marker,
+            img,
+            WORLD_SCENE_MARKER_REGION,
+            self.world_scene_marker,
         )
         prompt_matched = False
         prompt_score = 0.0
@@ -265,7 +331,11 @@ class SceneGate:
                 (WORLD_TO_PREPARE_FALLBACK_REGION, 0.71, True),
             ):
                 pm, ps, px, py = self._match_template_region(
-                    img, region, self.world_prompt_tpl, threshold, grayscale=grayscale,
+                    img,
+                    region,
+                    self.world_prompt_tpl,
+                    threshold,
+                    grayscale=grayscale,
                 )
                 if pm:
                     prompt_matched = True
@@ -275,14 +345,20 @@ class SceneGate:
                     break
             if prompt_matched:
                 return {
-                    "name": "world_prompt", "score": prompt_score,
-                    "x": prompt_x, "y": prompt_y,
-                    "template": self.world_prompt_tpl, "play_state": play_state,
+                    "name": "world_prompt",
+                    "score": prompt_score,
+                    "x": prompt_x,
+                    "y": prompt_y,
+                    "template": self.world_prompt_tpl,
+                    "play_state": play_state,
                 }
             return {
-                "name": "world_no_prompt", "score": marker_score,
-                "x": marker_x, "y": marker_y,
-                "template": self.world_scene_marker, "play_state": play_state,
+                "name": "world_no_prompt",
+                "score": marker_score,
+                "x": marker_x,
+                "y": marker_y,
+                "template": self.world_scene_marker,
+                "play_state": play_state,
             }
 
         if not marker_matched:
@@ -292,51 +368,82 @@ class SceneGate:
                 (WORLD_TO_PREPARE_FALLBACK_REGION, 0.71, True),
             ):
                 pm, ps, px, py = self._match_template_region(
-                    img, region, self.world_prompt_tpl, threshold, grayscale=grayscale,
+                    img,
+                    region,
+                    self.world_prompt_tpl,
+                    threshold,
+                    grayscale=grayscale,
                 )
                 if pm:
                     return {
-                        "name": "world_prompt", "score": ps,
-                        "x": px, "y": py,
-                        "template": self.world_prompt_tpl, "play_state": play_state,
+                        "name": "world_prompt",
+                        "score": ps,
+                        "x": px,
+                        "y": py,
+                        "template": self.world_prompt_tpl,
+                        "play_state": play_state,
                     }
 
         matched, score, x, y, template = self._find_prepare_two(img)
         if matched:
             return {
-                "name": "prepare_two", "score": score, "x": x, "y": y,
-                "template": template, "play_state": play_state,
+                "name": "prepare_two",
+                "score": score,
+                "x": x,
+                "y": y,
+                "template": template,
+                "play_state": play_state,
             }
 
         matched, score, x, y, template = self._find_prepare_one(img)
         if matched:
             return {
-                "name": "prepare_one", "score": score, "x": x, "y": y,
-                "template": template, "play_state": play_state,
+                "name": "prepare_one",
+                "score": score,
+                "x": x,
+                "y": y,
+                "template": template,
+                "play_state": play_state,
             }
 
         if play_state is not None and play_state.get("piece_state") is not None:
             return {
-                "name": "game_active", "score": 1.0, "x": 0, "y": 0,
-                "template": None, "play_state": play_state,
+                "name": "game_active",
+                "score": 1.0,
+                "x": 0,
+                "y": 0,
+                "template": None,
+                "play_state": play_state,
             }
 
         matched, score, x, y = self._find_game_scene_marker(img)
         if matched:
             return {
-                "name": "game_idle", "score": score, "x": x, "y": y,
-                "template": self.game_scene_marker, "play_state": play_state,
+                "name": "game_idle",
+                "score": score,
+                "x": x,
+                "y": y,
+                "template": self.game_scene_marker,
+                "play_state": play_state,
             }
 
         if looks_like_game_scene(img, play_state):
             return {
-                "name": "game_idle", "score": 1.0, "x": 0, "y": 0,
-                "template": None, "play_state": play_state,
+                "name": "game_idle",
+                "score": 1.0,
+                "x": 0,
+                "y": 0,
+                "template": None,
+                "play_state": play_state,
             }
 
         return {
-            "name": "unknown", "score": 0.0, "x": 0, "y": 0,
-            "template": None, "play_state": play_state,
+            "name": "unknown",
+            "score": 0.0,
+            "x": 0,
+            "y": 0,
+            "template": None,
+            "play_state": play_state,
         }
 
     def read_piece_queue(self, img):
@@ -347,9 +454,7 @@ class SceneGate:
             return []
 
         hsv = cv2.cvtColor(queue_crop, cv2.COLOR_BGR2HSV)
-        mask = (
-            (hsv[:, :, 1] > 80) & (hsv[:, :, 2] > 120)
-        ).astype(np.uint8) * 255
+        mask = ((hsv[:, :, 1] > 80) & (hsv[:, :, 2] > 120)).astype(np.uint8) * 255
         kernel = np.ones((2, 2), dtype=np.uint8)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
 
@@ -359,9 +464,9 @@ class SceneGate:
             x, y, width, height, area = stats[component_id]
             if area < 50:
                 continue
-            component_mask = (labels[y : y + height, x : x + width] == component_id).astype(
-                np.uint8
-            ) * 255
+            component_mask = (
+                labels[y : y + height, x : x + width] == component_id
+            ).astype(np.uint8) * 255
             piece_name = self._classify_queue_component(component_mask)
             if piece_name is None:
                 continue
@@ -384,7 +489,9 @@ class SceneGate:
         component_binary = component_mask > 0
         for piece_name, template in self.queue_preview_templates.items():
             resized_template = cv2.resize(
-                template, (width, height), interpolation=cv2.INTER_NEAREST,
+                template,
+                (width, height),
+                interpolation=cv2.INTER_NEAREST,
             )
             template_binary = resized_template > 0
             intersection = np.logical_and(component_binary, template_binary).sum()

@@ -6,11 +6,13 @@ from ...Common.utils import get_image
 from ..utils.board import (
     BOARD_COLS,
     BOARD_ROWS,
+    DEBUG_BOARD,
     extract_board_crop,
     extract_visible_grid,
     identify_active_piece,
     simulate_drop,
     evaluate_board,
+    dump_board_state,
 )
 from ..utils.pieces import PIECES, match_piece_state, rotation_distance
 from ..utils.scene import (
@@ -114,7 +116,7 @@ class TetrisGamePlayer:
         if board_crop is None or board_crop.size == 0:
             return None
 
-        grid = extract_visible_grid(board_crop)
+        grid = extract_visible_grid(board_crop, debug=DEBUG_BOARD)
         active_cells = identify_active_piece(grid, prefer_cells=self.last_active_cells)
         piece_state = match_piece_state(active_cells) if active_cells else None
         queue_pieces = self.scene_gate.read_piece_queue(img)
@@ -129,6 +131,60 @@ class TetrisGamePlayer:
             "piece_state": piece_state,
             "queue_pieces": queue_pieces,
         }
+
+    def _diagnose_move_failure(self, settled_board, piece_state, best_move, attempt_num):
+        """诊断移动失败原因，输出详细调试信息"""
+        piece_name = piece_state["piece"]
+        target_rotation = best_move["rotation"]
+        target_col = best_move["target_col"]
+        current_col = piece_state["col"]
+        current_rotation = piece_state["rotation"]
+
+        print(f"[MoveDiag] === 诊断开始 (attempt #{attempt_num}) ===")
+        print(f"[MoveDiag] Piece={piece_name} current_rot={current_rotation} current_col={current_col}")
+        print(f"[MoveDiag] Target: rot={target_rotation} col={target_col}")
+
+        # 检查每个旋转状态的 drop 结果
+        from ..utils.pieces import PIECES
+        shapes = PIECES[piece_name]
+        for rot_idx, shape in enumerate(shapes):
+            width = max(col for _, col in shape) + 1
+            for tcol in range(0, BOARD_COLS - width + 1):
+                result = simulate_drop(settled_board, shape, tcol)
+                if result is None:
+                    # 诊断碰撞原因 - 使用 simulate_drop 的逻辑检查实际落点
+                    collision_cells = []
+                    shape_height = max(row for row, _ in shape) + 1
+                    # 找到实际会碰撞的行
+                    for test_row in range(BOARD_ROWS):
+                        collides = False
+                        for row_offset, col_offset in shape:
+                            r = test_row + row_offset
+                            c = tcol + col_offset
+                            if r >= BOARD_ROWS or c < 0 or c >= BOARD_COLS:
+                                collides = True
+                                collision_cells.append(f"({r},{c})OUT_OF_BOUNDS")
+                                break
+                            if r >= 0 and settled_board[r, c]:
+                                collides = True
+                                collision_cells.append(f"({r},{c})BLOCKED")
+                                break
+                        if collides:
+                            break
+                    if rot_idx == target_rotation and tcol == target_col:
+                        print(f"[MoveDiag] TARGET rot={rot_idx} col={tcol}: COLLISION at row~{test_row} {collision_cells}")
+                elif rot_idx == target_rotation and tcol == target_col:
+                    print(f"[MoveDiag] TARGET rot={rot_idx} col={tcol}: OK score={result['score']:.2f} land_row={result['row']}")
+
+        # dump 棋盘状态
+        board_content = dump_board_state(
+            settled_board,
+            active_cells=piece_state["cells"],
+            piece_state=piece_state,
+            filepath="tetris_debug_move_fail.txt",
+        )
+        print(f"[MoveDiag] Board state:\n{board_content}")
+        print(f"[MoveDiag] === 诊断结束 ===")
 
     def _classify_scene(self, img, play_state=None):
         return self.scene_gate.classify_scene(img, play_state)
@@ -261,6 +317,27 @@ class TetrisGamePlayer:
             scene_name = result["name"]
             scene = result
 
+        if scene_name == "prepare_two":
+            print(
+                f"Found prepare_two at start, clicking return to re-select mode. score={scene['score']:.2f}"
+            )
+            img = self._safe_get_image(controller)
+            if img is not None:
+                found, score, rx, ry = self.scene_gate._find_return_button(img)
+                if found:
+                    click_x = int(rx + self.scene_gate.return_tpl.shape[1] / 2)
+                    click_y = int(ry + self.scene_gate.return_tpl.shape[0] / 2)
+                    self._click_point(controller, click_x, click_y)
+                    result = self._wait_for_scene_names(
+                        controller,
+                        tasker,
+                        {"prepare_one", "world_prompt"},
+                        timeout_seconds=6.0,
+                    )
+                    if result is not None:
+                        scene_name = result["name"]
+                        scene = result
+
         if scene_name == "prepare_one":
             click_point = (
                 PREPARE_ONE_MULTI_CLICK_POINT
@@ -319,6 +396,7 @@ class TetrisGamePlayer:
     def _play_from_game(self, controller, tasker):
         last_piece_signature = None
         skip_count = 0
+        move_fail_count = 0  # 连续移动失败计数
         round_start = time.time()
         non_active_since = None
         scene_lock_until = time.time() + self._SCENE_LOCK_SEC
@@ -506,10 +584,17 @@ class TetrisGamePlayer:
             )
             if move_applied:
                 last_piece_signature = piece_state["cells"]
+                move_fail_count = 0
             else:
+                move_fail_count += 1
                 print(
                     "Move did not reach target position, retrying with a fresh board state."
                 )
+                # 连续失败3次时输出诊断信息
+                if move_fail_count >= 3:
+                    self._diagnose_move_failure(
+                        settled_board, piece_state, best_move, move_fail_count
+                    )
             if not self._sleep_with_stop(tasker, 0.04):
                 return False
 
@@ -694,8 +779,8 @@ class TetrisGamePlayer:
         board: np.ndarray,
         queue_pieces: list[str],
         depth=0,
-        max_depth=4,
-        beam_width=8,
+        max_depth=2,
+        beam_width=4,
     ):
         if not queue_pieces:
             return None
@@ -737,7 +822,7 @@ class TetrisGamePlayer:
                 )
                 if future is not None:
                     # Only evaluate terminal state value, don't accumulate intermediate board evaluations
-                    # However, we might want to still reward early lines cleared, but since `score` represents 
+                    # However, we might want to still reward early lines cleared, but since `score` represents
                     # board evaluation, propagating the max future score is structurally more sound for a state value function.
                     total_score = future["total_score"]
 
@@ -773,8 +858,8 @@ class TetrisGamePlayer:
                     future_move = self._search_best_queue_move(
                         result["board"],
                         future_queue,
-                        max_depth=min(4, len(future_queue)),
-                        beam_width=8,
+                        max_depth=min(2, len(future_queue)),
+                        beam_width=4,
                     )
                     if future_move is not None:
                         future_bonus = future_move["total_score"] * 0.38
@@ -809,9 +894,12 @@ class TetrisGamePlayer:
         rotation_count = len(PIECES[piece_name])
         target_rotation = best_move["rotation"]
         target_col = best_move["target_col"]
-        deadline = time.time() + 2.6
+        deadline = time.time() + 3.0
         hard_drop_sent = False
+        hard_drop_method = None  # "space" or "button"
+        hard_drop_deadline = None  # hard drop 阶段的独立超时
         post_drop_deadline = None
+        space_drop_attempt_time = None
 
         expected_rot_change = False
         expected_col_change = False
@@ -819,7 +907,9 @@ class TetrisGamePlayer:
         last_col = piece_state["col"]
         last_action_time = 0.0
 
-        while time.time() < deadline:
+        FEEDBACK_TIMEOUT = 0.50  # 反馈超时时间
+
+        while time.time() < deadline or (hard_drop_sent and time.time() < hard_drop_deadline):
             if tasker.stopping:
                 return False
 
@@ -845,6 +935,29 @@ class TetrisGamePlayer:
                     if not self._sleep_with_stop(tasker, 0.04):
                         return False
                     continue
+                # SPACE 发送后方块仍在 → 尝试点击 drop 按钮
+                if hard_drop_method == "space" and space_drop_attempt_time is not None:
+                    if time.time() - space_drop_attempt_time >= 0.50:
+                        print("[KeyInput] SPACE drop failed, trying drop button click")
+                        found, score, dx, dy = self.scene_gate._find_drop_button(img)
+                        if found:
+                            click_x = int(dx + self.scene_gate.drop_tpl.shape[1] / 2)
+                            click_y = int(dy + self.scene_gate.drop_tpl.shape[0] / 2)
+                            self._click_point(controller, click_x, click_y)
+                            print(f"[KeyInput] Drop button clicked at ({click_x},{click_y}) score={score:.2f}")
+                            hard_drop_method = "button"
+                            space_drop_attempt_time = None
+                            post_drop_deadline = time.time() + 0.9
+                            if not self._sleep_with_stop(tasker, 0.10):
+                                return False
+                            continue
+                        else:
+                            print("[KeyInput] Drop button not found, retrying SPACE")
+                            self._tap_key(controller, VK_SPACE, hold=0.06)
+                            space_drop_attempt_time = time.time()
+                            if not self._sleep_with_stop(tasker, 0.08):
+                                return False
+                            continue
             else:
                 if scene_name in ("world_prompt", "prepare_one", "prepare_two", "exit"):
                     return False
@@ -868,17 +981,19 @@ class TetrisGamePlayer:
             current_col = current_piece_state["col"]
 
             if expected_rot_change and current_rotation == last_rotation:
-                if time.time() - last_action_time < 0.20:
-                    if not self._sleep_with_stop(tasker, 0.03):
+                if time.time() - last_action_time < FEEDBACK_TIMEOUT:
+                    if not self._sleep_with_stop(tasker, 0.04):
                         return False
                     continue
+                print(f"[KeyFeedback] ROTATION FAILED: still at rot={current_rotation} after {FEEDBACK_TIMEOUT}s")
                 return False
 
             if expected_col_change and current_col == last_col:
-                if time.time() - last_action_time < 0.20:
-                    if not self._sleep_with_stop(tasker, 0.03):
+                if time.time() - last_action_time < FEEDBACK_TIMEOUT:
+                    if not self._sleep_with_stop(tasker, 0.04):
                         return False
                     continue
+                print(f"[KeyFeedback] MOVEMENT FAILED: still at col={current_col} after {FEEDBACK_TIMEOUT}s (expected col change)")
                 return False
 
             expected_rot_change = False
@@ -888,10 +1003,14 @@ class TetrisGamePlayer:
 
             if current_rotation == target_rotation and current_col == target_col:
                 if not hard_drop_sent:
+                    print(f"[KeyInput] HARD DROP: piece at target rot={current_rotation} col={current_col}")
                     self._tap_key(controller, VK_SPACE, hold=0.06)
                     hard_drop_sent = True
-                    post_drop_deadline = time.time() + 0.9
-                    if not self._sleep_with_stop(tasker, 0.08):
+                    hard_drop_method = "space"
+                    hard_drop_deadline = time.time() + 3.0
+                    space_drop_attempt_time = time.time()
+                    post_drop_deadline = time.time() + 1.5
+                    if not self._sleep_with_stop(tasker, 0.10):
                         return False
                     continue
                 if post_drop_deadline is not None and time.time() >= post_drop_deadline:
@@ -909,10 +1028,12 @@ class TetrisGamePlayer:
                 correction_key = (
                     VK_K if clockwise_steps <= counterclockwise_steps else VK_J
                 )
-                self._tap_key(controller, correction_key, hold=0.04)
+                key_name = "K(clockwise)" if correction_key == VK_K else "J(counter)"
+                print(f"[KeyInput] ROTATE: {key_name} current_rot={current_rotation} -> target_rot={target_rotation}")
+                self._tap_key(controller, correction_key, hold=0.05)
                 last_action_time = time.time()
                 expected_rot_change = True
-                if not self._sleep_with_stop(tasker, 0.03):
+                if not self._sleep_with_stop(tasker, 0.08):
                     return False
                 continue
 
@@ -920,12 +1041,15 @@ class TetrisGamePlayer:
                 if (current_col == 0 and target_col < current_col) or (
                     current_col == BOARD_COLS - 1 and target_col > current_col
                 ):
+                    print(f"[KeyInput] BOUNDARY BLOCKED: current_col={current_col} target_col={target_col} BOARD_COLS={BOARD_COLS}")
                     return False
                 correction_key = VK_D if current_col < target_col else VK_A
-                self._tap_key(controller, correction_key, hold=0.04)
+                key_name = "D(right)" if correction_key == VK_D else "A(left)"
+                print(f"[KeyInput] MOVE: {key_name} current_col={current_col} -> target_col={target_col}")
+                self._tap_key(controller, correction_key, hold=0.05)
                 last_action_time = time.time()
                 expected_col_change = True
-                if not self._sleep_with_stop(tasker, 0.03):
+                if not self._sleep_with_stop(tasker, 0.08):
                     return False
                 continue
 

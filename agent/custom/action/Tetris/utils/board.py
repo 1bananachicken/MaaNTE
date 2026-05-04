@@ -14,8 +14,10 @@ GRID_BOTTOM = 582
 CELL_WIDTH = (GRID_RIGHT - GRID_LEFT) / BOARD_COLS
 CELL_HEIGHT = (GRID_BOTTOM - GRID_TOP) / BOARD_ROWS
 
-REAL_BLOCK_VALUE_THRESHOLD = 140
-REAL_BLOCK_SATURATION_THRESHOLD = 45
+REAL_BLOCK_VALUE_THRESHOLD = 160
+REAL_BLOCK_SATURATION_THRESHOLD = 80
+
+DEBUG_BOARD = False  # 设为 True 启用棋盘识别调试输出
 
 BOARD_LINE_COLUMNS = [17, 47, 76, 105, 135, 164, 193, 223, 252, 281, 301]
 BOARD_LINE_ROWS = [
@@ -288,11 +290,12 @@ def simulate_drop(board: np.ndarray, shape, target_col: int):
     }
 
 
-def extract_visible_grid(board_crop):
+def extract_visible_grid(board_crop, debug=False):
     import cv2
 
     hsv = cv2.cvtColor(board_crop, cv2.COLOR_BGR2HSV)
     grid = np.zeros((BOARD_ROWS, BOARD_COLS), dtype=bool)
+    debug_cells = []
 
     for row in range(BOARD_ROWS):
         for col in range(BOARD_COLS):
@@ -307,16 +310,91 @@ def extract_visible_grid(board_crop):
             if x2 <= x1 or y2 <= y1:
                 continue
 
-            patch = hsv[y1:y2, x1:x2]
-            value_mean = float(np.mean(patch[:, :, 2]))
-            saturation_mean = float(np.mean(patch[:, :, 1]))
+            hsv_patch = hsv[y1:y2, x1:x2]
+            v_mean = float(np.mean(hsv_patch[:, :, 2]))
+            s_mean = float(np.mean(hsv_patch[:, :, 1]))
+
+            # The background grids and shadows possess very low saturation and lower values.
+            # Real blocks are bright (V>155) and colorful (S>80).
             if (
-                value_mean >= REAL_BLOCK_VALUE_THRESHOLD
-                and saturation_mean >= REAL_BLOCK_SATURATION_THRESHOLD
+                v_mean >= REAL_BLOCK_VALUE_THRESHOLD
+                and s_mean >= REAL_BLOCK_SATURATION_THRESHOLD
             ):
                 grid[row, col] = True
 
+            if debug:
+                debug_cells.append((row, col, v_mean, s_mean, grid[row, col]))
+
+    if debug and debug_cells:
+        filled = [(r, c, v, s, f) for r, c, v, s, f in debug_cells if f]
+        borderline = [
+            (r, c, v, s, f)
+            for r, c, v, s, f in debug_cells
+            if not f
+            and v >= REAL_BLOCK_VALUE_THRESHOLD * 0.85
+            and s >= REAL_BLOCK_SATURATION_THRESHOLD * 0.85
+        ]
+        if filled:
+            print(f"[BoardDebug] filled cells ({len(filled)}):")
+            for r, c, v, s, f in filled:
+                print(f"  ({r},{c}) V={v:.1f} S={s:.1f}")
+        if borderline:
+            print(f"[BoardDebug] borderline cells ({len(borderline)}):")
+            for r, c, v, s, f in borderline:
+                print(f"  ({r},{c}) V={v:.1f} S={s:.1f}")
+
     return grid
+
+
+def dump_board_state(grid, active_cells=None, piece_state=None, filepath="tetris_debug.txt"):
+    """将棋盘状态写入调试文件"""
+    import os
+
+    lines = []
+    lines.append("=== Tetris Board Debug Dump ===")
+    lines.append(f"Grid shape: {grid.shape}")
+    lines.append(f"Occupied cells: {int(np.count_nonzero(grid))}")
+
+    if active_cells:
+        lines.append(f"Active cells: {active_cells}")
+    if piece_state:
+        lines.append(f"Piece state: {piece_state}")
+
+    lines.append("")
+    lines.append("Board (0=empty, 1=filled, A=active):")
+    active_set = set(active_cells) if active_cells else set()
+
+    header = "   " + "".join(f"{c:>2}" for c in range(BOARD_COLS))
+    lines.append(header)
+    for row in range(BOARD_ROWS):
+        row_str = f"{row:>2} "
+        for col in range(BOARD_COLS):
+            if (row, col) in active_set:
+                row_str += " A"
+            elif grid[row, col]:
+                row_str += " 1"
+            else:
+                row_str += " ."
+        lines.append(row_str)
+
+    # 逐列高度
+    heights = calculate_column_heights(grid)
+    lines.append("")
+    lines.append(f"Column heights: {heights}")
+    lines.append(f"Aggregate height: {sum(heights)}")
+    holes, hole_depth, covered_holes = calculate_holes(grid)
+    lines.append(f"Holes: {holes}, depth: {hole_depth}, covered: {covered_holes}")
+
+    content = "\n".join(lines)
+
+    try:
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(content)
+        print(f"[BoardDebug] Board state dumped to {os.path.abspath(filepath)}")
+    except Exception as e:
+        print(f"[BoardDebug] Failed to dump board state: {e}")
+
+    return content
 
 
 def looks_like_game_scene(img, play_state=None):
