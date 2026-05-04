@@ -40,8 +40,8 @@ class AutoFishNew(CustomAction):
         KEY_D = 68
         KEY_F = 70
 
-        success_region = (350, 150, 830, 200)
-        game_region = (395, 40, 880, 60)
+        success_region = [350, 150, 580, 50]
+        game_region = [395, 40, 490, 20]
         deadzone = 15
 
         print("  Casting...")
@@ -58,7 +58,7 @@ class AutoFishNew(CustomAction):
                 img, success_region, self.success_catch_template, 0.7
             )
             if wait_frame > 300:
-                print(f"  [wait] timeout (f={wait_frame}), fish ended")
+                print(f"  [Fish] cast timeout (f={wait_frame}), fish ended")
                 break
             if m_catch:
                 controller.post_key_down(KEY_F)
@@ -123,7 +123,7 @@ class AutoFishNew(CustomAction):
                     set_ad_key(None)
                     controller.post_key_up(KEY_F)
                     print(
-                        f"  [minigame] slider lost {slider_miss_count} frames, minigame ended."
+                        f"  [Fish] slider lost {slider_miss_count} frames, fish ended."
                     )
                     return CustomAction.RunResult(success=True)
                 x_slider = last_x_slider
@@ -133,7 +133,7 @@ class AutoFishNew(CustomAction):
                 controller.post_key_up(KEY_A)
                 controller.post_key_up(KEY_D)
                 controller.post_key_up(KEY_F)
-                print(f"  [minigame] timeout (f={frame}), minigame ended.")
+                print(f"  [Fish] fish timeout (f={frame}), fish ended.")
                 return CustomAction.RunResult(success=False)
 
             if m_left and m_right:
@@ -161,7 +161,7 @@ class AutoFishNew(CustomAction):
             if frame % 30 == 0 or current_ad_key != prev_key:
                 key_name = {None: "-", KEY_A: "A", KEY_D: "D"}.get(current_ad_key, "?")
                 print(
-                    f"  [minigame] f={frame} slider(x={x_slider:.0f} s={slider_score:.2f}) "
+                    f"  [Fish] f={frame} slider(x={x_slider:.0f} s={slider_score:.2f}) "
                     f"L({m_left} s={left_score:.2f}) R({m_right} s={right_score:.2f}) "
                     f"bar_w={last_bar_width:.0f} target={target:.0f} offset={offset:+.0f} key={key_name}"
                 )
