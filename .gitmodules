@@ -1,3 +1,7 @@
 [submodule "assets/MaaCommonAssets"]
 	path = assets/MaaCommonAssets
 	url = https://github.com/MaaXYZ/MaaCommonAssets
+
+[submodule "assets/MaaNTEModels"]
+	path = assets/MaaNTEModels
+	url = https://github.com/1bananachicken/MaaNTEModels
