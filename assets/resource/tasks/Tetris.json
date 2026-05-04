@@ -18,11 +18,10 @@
                     "name": "Single",
                     "label": "单人模式",
                     "pipeline_override": {
-                        "TetrisSelectSingle": {
-                            "enabled": true
-                        },
-                        "TetrisSelectMultiple": {
-                            "enabled": false
+                        "TetrisGamePlay": {
+                            "custom_action_param": {
+                                "mode": "single"
+                            }
                         }
                     }
                 },
@@ -30,11 +29,10 @@
                     "name": "Multiple",
                     "label": "多人模式",
                     "pipeline_override": {
-                        "TetrisSelectSingle": {
-                            "enabled": false
-                        },
-                        "TetrisSelectMultiple": {
-                            "enabled": true
+                        "TetrisGamePlay": {
+                            "custom_action_param": {
+                                "mode": "multiple"
+                            }
                         }
                     }
                 }
