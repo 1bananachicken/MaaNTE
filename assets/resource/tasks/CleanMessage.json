@@ -1,0 +1,9 @@
+{
+    "task": [
+        {
+            "name": "自动清理消息",
+            "entry": "自动清理消息",
+            "description": "自动清理消息列表里的[color:red]红点[/color]，和未完成对话"
+        }
+    ]
+}
