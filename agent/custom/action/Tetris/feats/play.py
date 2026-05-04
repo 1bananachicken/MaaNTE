@@ -34,6 +34,7 @@ class TetrisGamePlayer:
     def __init__(self):
         self.scene_gate = SceneGate()
         self.mode = "single"
+        self.last_active_cells = None
 
     def run(self, controller, tasker, mode="single"):
         self.mode = mode
@@ -109,9 +110,12 @@ class TetrisGamePlayer:
             return None
 
         grid = extract_visible_grid(board_crop)
-        active_cells = identify_active_piece(grid)
+        active_cells = identify_active_piece(grid, prefer_cells=self.last_active_cells)
         piece_state = match_piece_state(active_cells) if active_cells else None
         queue_pieces = self.scene_gate.read_piece_queue(img)
+
+        if active_cells is not None:
+            self.last_active_cells = active_cells
 
         return {
             "board_crop": board_crop,
@@ -671,6 +675,7 @@ class TetrisGamePlayer:
                 or play_state is None
                 or play_state["piece_state"] is None
             ):
+                self.last_active_cells = None
                 if non_active_since is None:
                     non_active_since = time.time()
                 elif time.time() - non_active_since >= 2.0:

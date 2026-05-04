@@ -171,6 +171,17 @@ def calculate_well_penalty(heights: list[int]):
     return well_score
 
 
+def calculate_open_well_reward(heights: list[int]):
+    reward = 0.0
+    for col in range(BOARD_COLS):
+        left_height = heights[col - 1] if col > 0 else BOARD_ROWS
+        right_height = heights[col + 1] if col < BOARD_COLS - 1 else BOARD_ROWS
+        well_depth = max(0, min(left_height, right_height) - heights[col])
+        if well_depth >= 2:
+            reward += well_depth * well_depth
+    return reward
+
+
 def calculate_lower_fill_score(board: np.ndarray):
     score = 0.0
     for row in range(BOARD_ROWS):
@@ -202,6 +213,7 @@ def evaluate_board(board: np.ndarray, lines_cleared: int):
     holes, hole_depth, covered_holes = calculate_holes(board)
     row_transitions, col_transitions = calculate_transitions(board)
     well_penalty = calculate_well_penalty(heights)
+    open_well_reward = calculate_open_well_reward(heights)
     lower_fill_score = calculate_lower_fill_score(board)
     dense_row_reward, almost_clear_reward = calculate_dense_row_reward(board)
     aggregate_height = sum(heights)
@@ -212,20 +224,21 @@ def evaluate_board(board: np.ndarray, lines_cleared: int):
     surface_variance = float(np.var(heights)) if heights else 0.0
 
     return (
-        lines_cleared * 45.0
-        - aggregate_height * 0.65
-        - holes * 16.5
-        - hole_depth * 1.2
-        - covered_holes * 2.5
-        - bumpiness * 1.8
-        - max_height * 1.5
-        - row_transitions * 0.6
-        - col_transitions * 0.8
-        - well_penalty * 0.8
-        - surface_variance * 0.2
-        + lower_fill_score * 0.02
-        + dense_row_reward * 0.5
-        + almost_clear_reward * 3.5
+        lines_cleared * 52.0
+        - aggregate_height * 0.7
+        - holes * 18.0
+        - hole_depth * 1.6
+        - covered_holes * 3.4
+        - bumpiness * 0.95
+        - max_height * 1.8
+        - row_transitions * 0.5
+        - col_transitions * 0.7
+        - well_penalty * 0.55
+        - surface_variance * 0.12
+        + open_well_reward * 0.9
+        + lower_fill_score * 0.018
+        + dense_row_reward * 0.42
+        + almost_clear_reward * 4.0
     )
 
 
@@ -380,7 +393,7 @@ def extract_queue_crop(img):
     return crop
 
 
-def identify_active_piece(grid: np.ndarray):
+def identify_active_piece(grid: np.ndarray, prefer_cells=None):
     from .pieces import match_piece_state
 
     components = collect_components(grid)
@@ -416,7 +429,70 @@ def identify_active_piece(grid: np.ndarray):
         )
 
     if candidates:
-        candidates.sort(key=lambda item: (item[0], item[1], item[2]))
+        if prefer_cells:
+            prefer_set = set(prefer_cells)
+            candidates.sort(
+                key=lambda item: (
+                    item[0],
+                    item[1],
+                    item[2],
+                    -len(set(item[3]).intersection(prefer_set)),
+                )
+            )
+        else:
+            candidates.sort(key=lambda item: (item[0], item[1], item[2]))
         return candidates[0][3]
 
-    return None
+    prefer_set = set(prefer_cells) if prefer_cells else None
+    fallback_candidates = []
+    for piece_name, rotations in PIECES.items():
+        for shape in rotations:
+            shape_height = max(row for row, _ in shape) + 1
+            shape_width = max(col for _, col in shape) + 1
+            for row in range(0, BOARD_ROWS - shape_height + 1):
+                for col in range(0, BOARD_COLS - shape_width + 1):
+                    cells = []
+                    matched = True
+                    for row_offset, col_offset in shape:
+                        cell_row = row + row_offset
+                        cell_col = col + col_offset
+                        if not grid[cell_row, cell_col]:
+                            matched = False
+                            break
+                        cells.append((cell_row, cell_col))
+                    if not matched:
+                        continue
+
+                    cell_set = set(cells)
+                    support_count = 0
+                    for cell_row, cell_col in cells:
+                        next_row = cell_row + 1
+                        if next_row >= BOARD_ROWS:
+                            support_count += 1
+                            continue
+                        if (
+                            grid[next_row, cell_col]
+                            and (next_row, cell_col) not in cell_set
+                        ):
+                            support_count += 1
+
+                    overlap = (
+                        len(cell_set.intersection(prefer_set))
+                        if prefer_set is not None
+                        else 0
+                    )
+                    fallback_candidates.append(
+                        (
+                            support_count,
+                            min(row for row, _ in cells),
+                            -max(row for row, _ in cells),
+                            -overlap,
+                            cells,
+                        )
+                    )
+
+    if not fallback_candidates:
+        return None
+
+    fallback_candidates.sort(key=lambda item: (item[0], item[1], item[2], item[3]))
+    return fallback_candidates[0][4]
