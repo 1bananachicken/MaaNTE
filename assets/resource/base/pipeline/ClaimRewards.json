@@ -81,7 +81,7 @@
         "action": "LongPress",
         "duration": 2,
         "focus": {
-            "Noded.Action.Succeed":"活跃度奖励领取成功"
+            "Node.Action.Succeeded":"活跃度奖励领取成功"
         }
     },
     "ClaimRewardsBattlePass": {
@@ -171,13 +171,13 @@
         "action": "LongPress",
         "duration": 2,
         "focus": {
-            "Noded.Action.Succeed":"历练奖赏奖励领取成功"
+            "Node.Action.Succeeded":"历练奖赏奖励领取成功"
         }
     },
     "ClaimRewardsExit": {
         "desc": "领取奖励任务出口",
         "focus": {
-            "Noded.Action.Succeed":"领取奖励任务结束"
+            "Node.Action.Succeeded":"领取奖励任务结束"
         }
     }
 }

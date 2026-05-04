@@ -93,7 +93,7 @@
         "post_delay": 500,
         "next": [
             "点击补货",
-            "Esc"
+            "[JumpBack]WithdrawMoneyEsc"
         ]
     },
     "点击补货":{
@@ -176,8 +176,11 @@
                 "threshold": 0.8
             }
         },
+        "focus": {
+            "Node.Recognition.Succeeded": "库存已满"
+        },
         "next": [
-            "Esc"
+            "WithdrawMoneyEsc"
         ]
     },
     "送货上门": {
@@ -219,9 +222,12 @@
             }
         },
         "action": "LongPress",
-        "duration": 2
+        "duration": 2,
+        "focus": {
+            "Node.Action.Succeeded":"补货成功"
+        }
     },
-    "Esc": {
+    "WithdrawMoneyEsc": {
         "action": {
             "type": "ClickKey",
             "param": {
