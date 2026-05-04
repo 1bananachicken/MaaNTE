@@ -7,6 +7,8 @@ from .Common.click import *
 from .realtime_task import *
 from .predict_angle import *
 from .auto_navigate_by_line import *
+from .map_locator import *
+from .map_locator_pyramid import *
 
 __all__ = [
     "AutoFishNew",
@@ -18,4 +20,6 @@ __all__ = [
     "RealTimeTaskAction",
     "PredictAngle",
     "AutoNavigateByLine",
+    "MapLocator",
+    "MapLocatorPyramid",
 ]

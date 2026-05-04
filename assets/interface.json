@@ -52,12 +52,16 @@
     },
     "task": [
         {
-            "name": "NaviTest",
-            "entry": "NaviTest"
+            "name": "AnglePredictor",
+            "entry": "AnglePredictor"
         },
         {
-            "name": "NaviLineFollow",
-            "entry": "NaviLineFollow"
+            "name": "MapLocator",
+            "entry": "MapLocator"
+        },
+        {
+            "name": "MapLocatorPyramid",
+            "entry": "MapLocatorPyramid"
         }
     ],
     "import": [
