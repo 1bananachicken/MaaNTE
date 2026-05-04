@@ -83,6 +83,9 @@ class SongSelector:
         self._start_delay = float(sc.get("start_delay_sec", 0.8))
         self._start_match_threshold = float(sc.get("start_match_threshold", 0.75))
         self._max_start_retries = max(1, int(sc.get("max_start_retries", 5)))
+        self._scroll_settle_delay = float(sc.get("scroll_settle_delay_sec", 0.4))
+        self._click_reverify_threshold = float(sc.get("click_reverify_threshold", 0.70))
+        self._max_click_reverify_retries = max(1, int(sc.get("max_click_reverify_retries", 2)))
 
         self._template: NDArray[np.uint8] | None = None
         self._start_template: NDArray[np.uint8] | None = None
@@ -93,6 +96,8 @@ class SongSelector:
         self._start_retry_count: int = 0
         self._consecutive_down_fails: int = 0
         self._one_time_ds: int | None = None
+        self._post_scroll_time: float = 0.0
+        self._click_reverify_retries: int = 0
 
         self._start_template = self._load_start_template()
 
@@ -133,6 +138,8 @@ class SongSelector:
         self._start_retry_count = 0
         self._consecutive_down_fails = 0
         self._one_time_ds = None
+        self._post_scroll_time = 0.0
+        self._click_reverify_retries = 0
 
     @property
     def state(self) -> str:
@@ -154,11 +161,14 @@ class SongSelector:
             self._scroll_attempts = 0
 
         if self._state == _SEL_SEARCHING:
+            if self._scroll_attempts > 0 and now - self._post_scroll_time < self._scroll_settle_delay:
+                return {"state": self._state, "action": "settling", "scroll_attempts": self._scroll_attempts}
             match = self._find_template(frame_bgr, self._template, self._match_threshold)
             if match is not None:
                 self._match_loc = match
                 self._consecutive_down_fails = 0
                 self._one_time_ds = None
+                self._click_reverify_retries = 0
                 self._state = _SEL_CLICKING_SONG
                 logger.info(
                     "歌曲模板匹配成功: 位置=(%d,%d), 将点击选中",
@@ -193,22 +203,44 @@ class SongSelector:
                 scroll_func(sx, sy, direction)
             self._scroll_attempts += 1
             self._last_action_time = now
+            self._post_scroll_time = time.perf_counter()
             self._state = _SEL_SEARCHING
-            logger.debug("滚动搜索: 第 %d 次 (方向=%d)", self._scroll_attempts, direction)
+            logger.debug("滚动搜索: 第 %d 次 (方向=%d), 等待%.2fs稳定",
+                         self._scroll_attempts, direction, self._scroll_settle_delay)
             return {"state": self._state, "action": "scroll", "scroll_attempts": self._scroll_attempts}
 
         if self._state == _SEL_CLICKING_SONG:
             if now - self._last_action_time < self._click_delay:
                 return {"state": self._state, "action": "waiting"}
-            if self._match_loc is not None:
-                mx, my = self._match_loc
-                controller.post_click(mx, my).wait()
-                self._last_action_time = now
-                self._start_retry_count = 0
-                self._state = _SEL_CLICKING_START
-                logger.info("已点击目标歌曲位置 (%d,%d)，等待后点击开始演奏", mx, my)
-            else:
-                self._state = _SEL_SEARCHING
+            current_match = self._find_template(frame_bgr, self._template, self._click_reverify_threshold)
+            if current_match is None:
+                self._click_reverify_retries += 1
+                if self._click_reverify_retries < self._max_click_reverify_retries:
+                    logger.warning(
+                        "点击前重验证失败 (%d/%d)，歌单可能已回滚，重新搜索",
+                        self._click_reverify_retries, self._max_click_reverify_retries,
+                    )
+                    self._last_action_time = now
+                    self._post_scroll_time = 0.0
+                    self._state = _SEL_SEARCHING
+                    return {"state": self._state, "action": "reverify_fail"}
+                else:
+                    logger.warning(
+                        "重验证 %d 次均失败，回退到滚动搜索",
+                        self._click_reverify_retries,
+                    )
+                    self._click_reverify_retries = 0
+                    self._last_action_time = now
+                    self._post_scroll_time = 0.0
+                    self._state = _SEL_SEARCHING
+                    return {"state": self._state, "action": "reverify_fail"}
+            self._match_loc = current_match
+            mx, my = current_match
+            controller.post_click(mx, my).wait()
+            self._last_action_time = now
+            self._start_retry_count = 0
+            self._state = _SEL_CLICKING_START
+            logger.info("已点击目标歌曲位置 (%d,%d)，等待后点击开始演奏", mx, my)
             return {"state": self._state, "action": "click_song"}
 
         if self._state == _SEL_CLICKING_START:

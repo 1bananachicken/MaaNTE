@@ -46,11 +46,22 @@ _DEFAULT_CONFIG: dict[str, Any] = {
         "start_match_threshold": 0.75,
         "click_delay_sec": 0.5,
         "start_delay_sec": 0.8,
+        "scroll_settle_delay_sec": 0.4,
+        "click_reverify_threshold": 0.70,
+        "max_click_reverify_retries": 2,
     },
     "auto_repeat": {
         "enabled": False,
         "count": 5,
         "dismiss_delay_sec": 0.8,
+    },
+    "vitality_detect": {
+        "enabled": True,
+        "roi": [544, 622, 184, 46],
+        "cost_pattern": "(\\d+)",
+        "min_confirm_reads": 2,
+        "confirm_interval_sec": 0.3,
+        "vitality_threshold": 1,
     },
     "keys": {
         "press_delay_sec": 0.0,
