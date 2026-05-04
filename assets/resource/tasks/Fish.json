@@ -219,7 +219,11 @@
                     "name": "新",
                     "pipeline_override": {
                         "FishNewGaming": {
-                            "custom_action": "auto_fish_without_cv"
+                            "custom_action": "auto_fish_without_cv",
+                            "post_wait_freezes": {
+                                "time": 500,
+                                "timeout": 3000
+                            }
                         }
                     }
                 },
@@ -227,7 +231,11 @@
                     "name": "旧",
                     "pipeline_override": {
                         "FishNewGaming": {
-                            "custom_action": "auto_fish_new"
+                            "custom_action": "auto_fish_new",
+                            "post_wait_freezes": {
+                                "time": 1000,
+                                "timeout": 6000
+                            }
                         }
                     }
                 }

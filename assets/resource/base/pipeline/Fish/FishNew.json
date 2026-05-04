@@ -70,7 +70,7 @@
         "custom_action":"auto_fish_without_cv",
         "pre_delay": 0,
         "post_wait_freezes": {
-            "time": 500,
+            "time": 1000,
             "timeout": 3000
         },
         "next": [
