@@ -1,0 +1,10 @@
+{
+    "MapLocator": {
+        "action": "Custom",
+        "custom_action": "map_locator"
+    },
+    "MapLocatorPyramid": {
+        "action": "Custom",
+        "custom_action": "map_locator_pyramid"
+    }
+}
