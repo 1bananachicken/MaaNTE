@@ -55,7 +55,17 @@ class AutoFishNew(CustomAction):
             wait_frame += 1
 
             if wait_frame > 300:
+<<<<<<< HEAD
                 logger.info(f"钓鱼超时")
+=======
+                print(f"  [Fish] cast timeout (f={wait_frame}), fish ended")
+                break
+            if m_catch:
+                controller.post_key_down(KEY_F)
+                time.sleep(0.1)
+                controller.post_key_up(KEY_F)
+                print(f"  Fish hooked! (score={catch_score:.3f})")
+>>>>>>> dev
                 break
 
         # --- 小游戏 ---
@@ -104,7 +114,12 @@ class AutoFishNew(CustomAction):
                 slider_miss_count += 1
                 if slider_miss_count >= 30:
                     set_ad_key(None)
+<<<<<<< HEAD
                     logger.debug(
+=======
+                    controller.post_key_up(KEY_F)
+                    print(
+>>>>>>> dev
                         f"  [Fish] slider lost {slider_miss_count} frames, fish ended."
                     )
                     return CustomAction.RunResult(success=True)
@@ -114,7 +129,12 @@ class AutoFishNew(CustomAction):
                 set_ad_key(None)
                 controller.post_key_up(KEY_A)
                 controller.post_key_up(KEY_D)
+<<<<<<< HEAD
                 logger.debug(f"  [Fish] fish timeout (f={frame}), fish ended.")
+=======
+                controller.post_key_up(KEY_F)
+                print(f"  [Fish] fish timeout (f={frame}), fish ended.")
+>>>>>>> dev
                 return CustomAction.RunResult(success=False)
 
             if m_left and m_right:
@@ -141,7 +161,11 @@ class AutoFishNew(CustomAction):
 
             if frame % 30 == 0 or current_ad_key != prev_key:
                 key_name = {None: "-", KEY_A: "A", KEY_D: "D"}.get(current_ad_key, "?")
+<<<<<<< HEAD
                 logger.debug(
+=======
+                print(
+>>>>>>> dev
                     f"  [Fish] f={frame} slider(x={x_slider:.0f} s={slider_score:.2f}) "
                     f"L({m_left} s={left_score:.2f}) R({m_right} s={right_score:.2f}) "
                     f"bar_w={last_bar_width:.0f} target={target:.0f} offset={offset:+.0f} key={key_name}"

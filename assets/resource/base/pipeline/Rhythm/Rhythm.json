@@ -62,7 +62,7 @@
             "RhythmSceneOnResults"
         ],
         "next": [
-            "RhythmDismissResults"
+            "RhythmCheckVitality"
         ]
     },
     "RhythmOnSongSelect": {
@@ -73,6 +73,15 @@
         ],
         "next": [
             "RhythmSelectSong"
+        ]
+    },
+    "RhythmCheckVitality": {
+        "desc": "结算页识别消耗活力",
+        "action": "Custom",
+        "custom_action": "auto_rhythm_vitality_on_results",
+        "custom_action_param": {},
+        "next": [
+            "RhythmDismissResults"
         ]
     },
     "RhythmDismissResults": {

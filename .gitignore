@@ -468,3 +468,6 @@ setup_gui.bat
 test/
 output/
 Tetris/
+
+# Models
+assets/resource/base/model/*

@@ -2,7 +2,8 @@
     "ClaimRewardsEntrance": {
         "desc": "领取日常奖励入口",
         "next": [
-            "ClaimRewardsActivity"
+            "ClaimRewardsActivity",
+            "ClaimRewardsBattlePass"
         ]
     },
     "ClaimRewardsActivity": {
@@ -32,8 +33,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "[JumpBack]ClaimRewardsActivityPoints",
             "[JumpBack]ClaimRewardsActivityRewards",
@@ -57,8 +57,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "post_delay": 500
     },
     "ClaimRewardsActivityRewards": {
@@ -78,8 +77,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2
+        "action": "Click"
     },
     "ClaimRewardsBattlePass": {
         "desc": "领取环期赏令主流程",
@@ -95,8 +93,7 @@
             "Common/Scene/BattlePass/Page2.png",
             "Common/Scene/BattlePass/Page2WithRedDot.png"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "post_wait_freezes": 500,
         "next": [
             "ClaimRewardsBattlePassExp",
@@ -120,8 +117,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2
+        "action": "Click"
     },
     "ClaimRewardsBattlePassBackToPage1": {
         "desc": "切换到环期赏令第一页",
@@ -140,8 +136,7 @@
                 "threshold": 0.6
             }
         },
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "post_wait_freezes": 500,
         "next": [
             "ClaimRewardsBattlePassRewards"
@@ -164,8 +159,7 @@
                 "threshold": 0.8
             }
         },
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "ClaimRewardsExit"
         ]
