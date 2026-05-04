@@ -79,7 +79,10 @@
             }
         },
         "action": "LongPress",
-        "duration": 2
+        "duration": 2,
+        "focus": {
+            "Noded.Action.Succeed":"活跃度奖励领取成功"
+        }
     },
     "ClaimRewardsBattlePass": {
         "desc": "领取环期赏令主流程",
@@ -99,7 +102,7 @@
         "duration": 2,
         "post_wait_freezes": 500,
         "next": [
-            "ClaimRewardsBattlePassExp",
+            "[JumpBack]ClaimRewardsBattlePassExp",
             "ClaimRewardsBattlePassBackToPage1"
         ]
     },
@@ -144,7 +147,8 @@
         "duration": 2,
         "post_wait_freezes": 500,
         "next": [
-            "ClaimRewardsBattlePassRewards"
+            "[JumpBack]ClaimRewardsBattlePassRewards",
+            "ClaimRewardsExit"
         ]
     },
     "ClaimRewardsBattlePassRewards": {
@@ -166,11 +170,14 @@
         },
         "action": "LongPress",
         "duration": 2,
-        "next": [
-            "ClaimRewardsExit"
-        ]
+        "focus": {
+            "Noded.Action.Succeed":"历练奖赏奖励领取成功"
+        }
     },
     "ClaimRewardsExit": {
-        "desc": "领取奖励任务出口"
+        "desc": "领取奖励任务出口",
+        "focus": {
+            "Noded.Action.Succeed":"领取奖励任务结束"
+        }
     }
 }
