@@ -2,6 +2,10 @@
     "__ScenePrivateWorldEnterExplorationGuide":{
         "desc":"从大世界界面进入探索指南",
         "pre_delay": 0,
+        "recognition": "And",
+        "all_of": [
+            "InWorld"
+        ],
         "action": {
             "type": "ClickKey",
             "param": {

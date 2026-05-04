@@ -2,6 +2,10 @@
     "__ScenePrivateWorldEnterCityTycoon":{
         "desc":"从大世界界面进入都市大亨",
         "pre_delay": 0,
+        "recognition": "And",
+        "all_of": [
+            "InWorld"
+        ],
         "action": {
             "type": "ClickKey",
             "param": {
