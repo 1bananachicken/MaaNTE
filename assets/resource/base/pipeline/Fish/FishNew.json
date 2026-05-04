@@ -68,6 +68,10 @@
         "desc":"进行钓鱼游戏",
         "action": "Custom",
         "custom_action":"auto_fish_without_cv",
+        "custom_action_param": {
+            "floor_ms": 80,
+            "factor": 1.4
+        },
         "pre_delay": 0,
         "post_wait_freezes": {
             "time": 500,
@@ -210,6 +214,25 @@
         "post_wait_freezes": 2000
     },
     "FishNewBaitExit":{
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    663,
+                    449,
+                    237,
+                    44
+                ],
+                "expected": [
+                    "购买"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": "ClickKey",
+        "key": [
+            27
+        ],
         "focus": {
             "Node.Action.Succeeded": "未开启自动买鱼饵，尝试前往卖鱼"
         },
@@ -434,6 +457,7 @@
                 "threshold": 0.8
             }
         },
+        "pre_delay": 500,
         "action": {
             "type": "LongPress",
             "param": {
@@ -688,6 +712,7 @@
         ],
         "action": "LongPress",
         "duration": 2,
+        "pre_wait_freezes": 200,
         "post_wait_freezes": 200,
         "next": [
             "FishNewFishingMasterPage2Submit"
@@ -756,7 +781,7 @@
             27 // Esc
         ],
         "next": [
-            "FishNewSellFishEntrance"
+            "FishNewTaskExit"
         ]
     }
 }
