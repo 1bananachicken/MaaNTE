@@ -321,7 +321,7 @@ class TetrisGamePlayer:
         skip_count = 0
         round_start = time.time()
         non_active_since = None
-        scene_lock_until = time.time() + _SCENE_LOCK_SEC
+        scene_lock_until = time.time() + self._SCENE_LOCK_SEC
         scene_locked = True
 
         while time.time() - round_start < 900:
@@ -339,7 +339,7 @@ class TetrisGamePlayer:
 
             if scene_locked and now < scene_lock_until:
                 if play_state is not None and play_state["piece_state"] is not None:
-                    scene_lock_until = now + _SCENE_LOCK_SEC
+                    scene_lock_until = now + self._SCENE_LOCK_SEC
                 else:
                     scene_locked = False
 
@@ -362,7 +362,7 @@ class TetrisGamePlayer:
                     self.last_active_cells = None
                     if play_state is not None and play_state["piece_state"] is not None:
                         scene_locked = True
-                        scene_lock_until = now + _SCENE_LOCK_SEC
+                        scene_lock_until = now + self._SCENE_LOCK_SEC
                     else:
                         if not self._sleep_with_stop(tasker, 0.15):
                             return False
@@ -381,7 +381,7 @@ class TetrisGamePlayer:
                         return False
                     if result["name"] in ("game_active", "game_idle"):
                         scene_locked = True
-                        scene_lock_until = time.time() + _SCENE_LOCK_SEC
+                        scene_lock_until = time.time() + self._SCENE_LOCK_SEC
                         continue
                     print(f"Unexpected scene after loading: {result['name']}")
                     return False
@@ -405,7 +405,7 @@ class TetrisGamePlayer:
                     ):
                         self.last_active_cells = None
                         scene_locked = True
-                        scene_lock_until = now + _SCENE_LOCK_SEC
+                        scene_lock_until = now + self._SCENE_LOCK_SEC
                     else:
                         self.last_active_cells = None
                         if non_active_since is None:
@@ -460,7 +460,7 @@ class TetrisGamePlayer:
 
             skip_count = 0
             scene_locked = True
-            scene_lock_until = time.time() + _SCENE_LOCK_SEC
+            scene_lock_until = time.time() + self._SCENE_LOCK_SEC
 
             settled_board = grid.copy()
             for row, col in active_cells:
