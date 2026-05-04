@@ -4,7 +4,7 @@ import numpy as np
 
 from .pieces import PIECES
 
-BOARD_REGION = [471, 48, 302, 591]
+BOARD_REGION = [473, 50, 294, 587]
 BOARD_COLS = 10
 BOARD_ROWS = 20
 GRID_LEFT = 17
@@ -63,7 +63,7 @@ BOARD_INTERIOR_ROWS = [
     565,
 ]
 
-QUEUE_REGION = [782, 86, 67, 388]
+QUEUE_REGION = [782, 85, 64, 389]
 
 
 def collect_components(grid: np.ndarray):

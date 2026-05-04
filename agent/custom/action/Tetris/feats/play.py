@@ -314,11 +314,15 @@ class TetrisGamePlayer:
         print(f"Unexpected scene after navigation: {scene_name}")
         return False
 
+    _SCENE_LOCK_SEC = 3.0
+
     def _play_from_game(self, controller, tasker):
         last_piece_signature = None
         skip_count = 0
         round_start = time.time()
         non_active_since = None
+        scene_lock_until = time.time() + _SCENE_LOCK_SEC
+        scene_locked = True
 
         while time.time() - round_start < 900:
             if tasker.stopping:
@@ -330,34 +334,42 @@ class TetrisGamePlayer:
                     return False
                 continue
 
+            now = time.time()
             play_state = self._scan_play_state(img)
-            scene = self._classify_scene(img, play_state)
-            scene_name = scene["name"]
 
-            if scene_name == "exit":
-                print(
-                    f"Exit detected, clicking to leave match. score={scene['score']:.2f}"
-                )
-                self._click_template(
-                    controller, scene["x"], scene["y"], self.scene_gate.exit_tpl
-                )
-                self._wait_until_exit_to_world(controller, tasker)
-                print("=== Auto Tetris Finished ===")
-                return True
+            if scene_locked and now < scene_lock_until:
+                if play_state is not None and play_state["piece_state"] is not None:
+                    scene_lock_until = now + _SCENE_LOCK_SEC
+                else:
+                    scene_locked = False
 
-            if (
-                scene_name != "game_active"
-                or play_state is None
-                or play_state["piece_state"] is None
-            ):
-                self.last_active_cells = None
+            if not scene_locked:
+                scene = self._classify_scene(img, play_state)
+                scene_name = scene["name"]
+
+                if scene_name == "exit":
+                    print(
+                        f"Exit detected, clicking to leave match. score={scene['score']:.2f}"
+                    )
+                    self._click_template(
+                        controller, scene["x"], scene["y"], self.scene_gate.exit_tpl
+                    )
+                    self._wait_until_exit_to_world(controller, tasker)
+                    print("=== Auto Tetris Finished ===")
+                    return True
 
                 if scene_name == "game_idle":
-                    if not self._sleep_with_stop(tasker, 0.15):
-                        return False
-                    continue
+                    self.last_active_cells = None
+                    if play_state is not None and play_state["piece_state"] is not None:
+                        scene_locked = True
+                        scene_lock_until = now + _SCENE_LOCK_SEC
+                    else:
+                        if not self._sleep_with_stop(tasker, 0.15):
+                            return False
+                        continue
 
-                if scene_name == "loading":
+                elif scene_name == "loading":
+                    self.last_active_cells = None
                     print("Loading detected during play, waiting...")
                     result = self._wait_for_scene_names(
                         controller,
@@ -368,32 +380,62 @@ class TetrisGamePlayer:
                     if result is None:
                         return False
                     if result["name"] in ("game_active", "game_idle"):
+                        scene_locked = True
+                        scene_lock_until = time.time() + _SCENE_LOCK_SEC
                         continue
                     print(f"Unexpected scene after loading: {result['name']}")
                     return False
 
-                if scene_name == "world_no_prompt":
+                elif scene_name == "world_no_prompt":
+                    self.last_active_cells = None
                     print("Drifted to world without prompt during play, ending task.")
                     return False
 
-                if non_active_since is None:
-                    non_active_since = time.time()
-                elif time.time() - non_active_since >= 5.0:
-                    recovered = self._attempt_round_recovery(
-                        controller,
-                        tasker,
-                        f"Scene drifted to {scene_name}.",
-                    )
-                    if not recovered:
-                        return False
-                    non_active_since = None
-                    last_piece_signature = None
-                    if not self._sleep_with_stop(tasker, 0.4):
-                        return False
-                    continue
+                elif scene_name in (
+                    "game_active",
+                    "world_prompt",
+                    "prepare_one",
+                    "prepare_two",
+                    "unknown",
+                ):
+                    if (
+                        scene_name == "game_active"
+                        and play_state is not None
+                        and play_state["piece_state"] is not None
+                    ):
+                        self.last_active_cells = None
+                        scene_locked = True
+                        scene_lock_until = now + _SCENE_LOCK_SEC
+                    else:
+                        self.last_active_cells = None
+                        if non_active_since is None:
+                            non_active_since = now
+                        elif now - non_active_since >= 5.0:
+                            recovered = self._attempt_round_recovery(
+                                controller,
+                                tasker,
+                                f"Scene drifted to {scene_name}.",
+                            )
+                            if not recovered:
+                                return False
+                            non_active_since = None
+                            last_piece_signature = None
+                            scene_locked = False
+                            if not self._sleep_with_stop(tasker, 0.4):
+                                return False
+                            continue
 
-                if not self._recover_from_scene(controller, tasker, scene):
-                    return False
+                        if not self._recover_from_scene(controller, tasker, scene):
+                            return False
+                        continue
+
+            if play_state is None or play_state["piece_state"] is None:
+                if not scene_locked:
+                    if not self._sleep_with_stop(tasker, 0.08):
+                        return False
+                else:
+                    if not self._sleep_with_stop(tasker, 0.04):
+                        return False
                 continue
 
             non_active_since = None
@@ -417,6 +459,8 @@ class TetrisGamePlayer:
                     continue
 
             skip_count = 0
+            scene_locked = True
+            scene_lock_until = time.time() + _SCENE_LOCK_SEC
 
             settled_board = grid.copy()
             for row, col in active_cells:
@@ -692,7 +736,10 @@ class TetrisGamePlayer:
                     beam_width=beam_width,
                 )
                 if future is not None:
-                    total_score += future["total_score"] * 0.45
+                    # Only evaluate terminal state value, don't accumulate intermediate board evaluations
+                    # However, we might want to still reward early lines cleared, but since `score` represents 
+                    # board evaluation, propagating the max future score is structurally more sound for a state value function.
+                    total_score = future["total_score"]
 
             enriched = dict(candidate)
             enriched["total_score"] = total_score
