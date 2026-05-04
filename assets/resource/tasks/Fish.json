@@ -15,6 +15,7 @@
             "entry": "FishNewEntrance",
             "description": "重构的钓鱼功能。理论上目前能无限钓鱼。（仍无法跨夜钓鱼，可以尝试设置定时任务来继续钓鱼，实际效果无法保证。）[color:red]若不选择自动买鱼饵和自动卖鱼，不抢占鼠标。自动买鱼饵为识别到鱼饵不足时购买或切换为万能鱼饵（鱼饵识别功能与本任务无关，数值无影响），卖鱼也是在鱼鳞币不足时尝试卖[/color]",
             "option": [
+                "FishNewAction",
                 "FishSellAuto",
                 "FishBuyBaitAuto"
             ]
@@ -209,6 +210,29 @@
                     }
                 }
             ]
+        },
+        "FishNewAction": {
+            "type": "select",
+            "label": "钓鱼使用算法",
+            "cases": [
+                {
+                    "name": "新",
+                    "pipeline_override": {
+                        "FishNewGaming": {
+                            "custom_action": "auto_fish_without_cv"
+                        }
+                    }
+                },
+                {
+                    "name": "旧",
+                    "pipeline_override": {
+                        "FishNewGaming": {
+                            "custom_action": "auto_fish_new"
+                        }
+                    }
+                }
+            ],
+            "default_case": "旧"
         }
     }
 }

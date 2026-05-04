@@ -48,9 +48,7 @@ class AutoFishNew(CustomAction):
 
         # --- 等待鱼上钩 ---
         wait_frame = 0
-        while True:
-            if context.tasker.stopping:
-                return CustomAction.RunResult(success=False)
+        while not context.tasker.stopping:
             time.sleep(0.001)
             img = get_image(controller)
             wait_frame += 1
@@ -85,12 +83,7 @@ class AutoFishNew(CustomAction):
                 controller.post_key_down(key)
             current_ad_key = key
 
-        while True:
-            if context.tasker.stopping:
-                set_ad_key(None)
-                controller.post_key_up(KEY_A)
-                controller.post_key_up(KEY_D)
-                return CustomAction.RunResult(success=False)
+        while not context.tasker.stopping:
             time.sleep(0.001)
             img = get_image(controller)
             frame += 1
@@ -165,3 +158,7 @@ class AutoFishNew(CustomAction):
                     f"L({m_left} s={left_score:.2f}) R({m_right} s={right_score:.2f}) "
                     f"bar_w={last_bar_width:.0f} target={target:.0f} offset={offset:+.0f} key={key_name}"
                 )
+
+        controller.post_key_up(KEY_A)
+        controller.post_key_up(KEY_D)
+        return CustomAction.RunResult(success=True)
