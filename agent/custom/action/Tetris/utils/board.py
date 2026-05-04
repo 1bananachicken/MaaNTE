@@ -175,20 +175,20 @@ def evaluate_board(board: np.ndarray, lines_cleared: int):
     surface_variance = float(np.var(heights)) if heights else 0.0
 
     return (
-        lines_cleared * 18.0
-        - aggregate_height * 0.29
-        - holes * 8.6
-        - hole_depth * 0.55
-        - covered_holes * 1.18
-        - bumpiness * 0.96
-        - max_height * 0.82
-        - row_transitions * 0.38
-        - col_transitions * 0.62
-        - well_penalty * 0.48
-        - surface_variance * 0.14
-        + lower_fill_score * 0.016
-        + dense_row_reward * 0.72
-        + almost_clear_reward * 2.9
+        lines_cleared * 45.0
+        - aggregate_height * 0.65
+        - holes * 16.5
+        - hole_depth * 1.2
+        - covered_holes * 2.5
+        - bumpiness * 1.8
+        - max_height * 1.5
+        - row_transitions * 0.6
+        - col_transitions * 0.8
+        - well_penalty * 0.8
+        - surface_variance * 0.2
+        + lower_fill_score * 0.02
+        + dense_row_reward * 0.5
+        + almost_clear_reward * 3.5
     )
 
 

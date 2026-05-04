@@ -444,6 +444,10 @@ class TetrisGamePlayer:
         hard_drop_sent = False
         post_drop_deadline = None
 
+        expected_state_change = False
+        last_cells = piece_state["cells"]
+        last_action_time = 0.0
+
         while time.time() < deadline:
             if tasker.stopping:
                 return False
@@ -488,6 +492,18 @@ class TetrisGamePlayer:
 
             current_rotation = current_piece_state["rotation"]
             current_col = current_piece_state["col"]
+            current_cells = current_piece_state["cells"]
+
+            if expected_state_change and current_cells == last_cells:
+                if time.time() - last_action_time < 0.25:
+                    if not self._sleep_with_stop(tasker, 0.03):
+                        return False
+                    continue
+                # Timeout passed, maybe input dropped, proceed to retry
+            
+            expected_state_change = False
+            last_cells = current_cells
+
             if current_rotation == target_rotation and current_col == target_col:
                 if not hard_drop_sent:
                     self._tap_key(controller, VK_SPACE, hold=0.06)
@@ -507,15 +523,19 @@ class TetrisGamePlayer:
 
             if current_rotation != target_rotation:
                 correction_key = VK_K if clockwise_steps <= counterclockwise_steps else VK_J
-                self._tap_key(controller, correction_key, hold=0.05)
-                if not self._sleep_with_stop(tasker, 0.085):
+                self._tap_key(controller, correction_key, hold=0.04)
+                last_action_time = time.time()
+                expected_state_change = True
+                if not self._sleep_with_stop(tasker, 0.03):
                     return False
                 continue
 
             if current_col != target_col:
                 correction_key = VK_D if current_col < target_col else VK_A
-                self._tap_key(controller, correction_key, hold=0.05)
-                if not self._sleep_with_stop(tasker, 0.08):
+                self._tap_key(controller, correction_key, hold=0.04)
+                last_action_time = time.time()
+                expected_state_change = True
+                if not self._sleep_with_stop(tasker, 0.03):
                     return False
                 continue
 
