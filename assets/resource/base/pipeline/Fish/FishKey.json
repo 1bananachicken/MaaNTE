@@ -1,0 +1,37 @@
+{
+    "FishRight": {
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "key": 68,
+                "duration": 500
+            }
+        }
+    },
+    "FishLeft": {
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "key": 65,
+                "duration": 500
+            }
+        }
+    },
+    "FishHook": {
+        "post_delay": 0,
+        "pre_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70
+            }
+        }
+    }
+}
