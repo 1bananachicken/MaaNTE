@@ -6,7 +6,7 @@ from .auto_make_coffee import *
 from .Common.click import *
 from .realtime_task import *
 from .predict_angle import *
-from .predict_angle_new import *
+from .auto_navigate_by_line import *
 
 __all__ = [
     "AutoFishNew",
@@ -17,5 +17,5 @@ __all__ = [
     "ClickOverride",
     "RealTimeTaskAction",
     "PredictAngle",
-    "PredictAngleNew",
+    "AutoNavigateByLine",
 ]

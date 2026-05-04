@@ -4,4 +4,4 @@ pillow
 pytz
 requests
 opencv-python
-onnxruntime
+onnxruntime-directml
