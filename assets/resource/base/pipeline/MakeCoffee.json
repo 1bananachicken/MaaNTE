@@ -101,10 +101,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    586,
-                    43,
-                    105,
-                    25
+                    466,
+                    18,
+                    341,
+                    46
                 ],
                 "template": "auto_make_coffee/timer.png",
                 "threshold": 0.8
