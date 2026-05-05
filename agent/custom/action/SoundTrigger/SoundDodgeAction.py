@@ -65,7 +65,7 @@ class Ctx:
             counter_threshold=counter_threshold,
             stop_check=_stopped,
         )
-        self.dodger = Dodger(stop_check=_stopped)
+        self.dodger = Dodger(controller=controller, stop_check=_stopped)
         self.ear.on_dodge = self._on_dodge
         self.ear.on_counter = self._on_counter
         self.active = True
@@ -103,7 +103,9 @@ class Ctx:
 
 @AgentServer.custom_action("SoundDodgeAction")
 class SoundDodgeAction(CustomAction):
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
         logger.info("=== Sound Dodge Started ===")
         ctrl = context.tasker.controller
 

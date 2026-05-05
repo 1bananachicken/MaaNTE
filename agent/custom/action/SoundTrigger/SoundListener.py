@@ -14,6 +14,7 @@ def _log():
     global logger
     if logger is None:
         from custom.action.Common.logger import get_logger
+
         logger = get_logger(__name__)
     return logger
 
@@ -83,6 +84,7 @@ class Ear:
 
     def _filt(self, wav):
         from scipy.signal import filtfilt
+
         return filtfilt(self._b, self._a, wav)
 
     def match(self, stream, sample):
@@ -126,6 +128,7 @@ class Ear:
         rec = None
         try:
             import ctypes
+
             ctypes.windll.ole32.CoInitialize(None)
             rec = self._open_device()
             rec.__enter__()
@@ -148,6 +151,7 @@ class Ear:
                 for _ in range(chunks):
                     data = rec.record(numframes=self.chunk)
                     import librosa
+
                     frame[idx : idx + self.chunk] = librosa.to_mono(data.T)
                     idx += self.chunk
 
@@ -166,9 +170,7 @@ class Ear:
                     if pos >= max_s:
                         win = buf[pos - max_s : pos]
                     else:
-                        win = np.concatenate(
-                            [buf[-(max_s - pos) :], buf[:pos]]
-                        )
+                        win = np.concatenate([buf[-(max_s - pos) :], buf[:pos]])
 
                     d_score = self.match(win, self._sample)
                     c_score = 0.0
