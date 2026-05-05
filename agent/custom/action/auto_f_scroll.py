@@ -38,5 +38,4 @@ class AutoFScroll(CustomAction):
 
                 time.sleep(0.1)
 
-        # 无论按没按，都瞬间返回成功，不卡主循环
         return CustomAction.RunResult(success=True)
