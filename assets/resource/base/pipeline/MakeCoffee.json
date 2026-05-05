@@ -23,27 +23,22 @@
         ]
     },
     "MakeCoffeeOneOneEnter": {
-        "desc": "等待店长特供入口并按 F 进入",
+        "desc": "等待店长特供入口并点击进入",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "roi": [
                     0,
                     0,
-                    1280,
-                    720
+                    240,
+                    80
                 ],
                 "template": "auto_make_coffee/enter.png",
                 "threshold": 0.8
             }
         },
         "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": [
-                    70
-                ]
-            }
+            "type": "Click"
         },
         "post_delay": 1000,
         "next": [
@@ -101,10 +96,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    466,
-                    18,
-                    341,
-                    46
+                    450,
+                    0,
+                    400,
+                    90
                 ],
                 "template": "auto_make_coffee/timer.png",
                 "threshold": 0.8
@@ -135,13 +130,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    326,
-                    483,
-                    205,
-                    101
+                    306,
+                    463,
+                    245,
+                    141
                 ],
                 "template": "auto_make_coffee/food_1_ready_2.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
@@ -169,13 +164,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    189,
-                    488,
-                    140,
-                    91
+                    159,
+                    458,
+                    200,
+                    150
                 ],
                 "template": "auto_make_coffee/food_1_ready_3.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
@@ -219,13 +214,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    744,
-                    624,
-                    208,
-                    95
+                    703,
+                    575,
+                    290,
+                    145
                 ],
                 "template": "auto_make_coffee/food_2_ready_2.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
@@ -253,13 +248,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    547,
-                    484,
-                    188,
-                    96
+                    516,
+                    454,
+                    250,
+                    155
                 ],
                 "template": "auto_make_coffee/food_2_ready_3.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
@@ -303,13 +298,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    3,
-                    492,
-                    182,
-                    85
+                    0,
+                    472,
+                    205,
+                    125
                 ],
                 "template": "auto_make_coffee/food_3_ready_2.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
@@ -337,13 +332,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    189,
-                    488,
-                    138,
-                    89
+                    151,
+                    455,
+                    214,
+                    155
                 ],
                 "template": "auto_make_coffee/food_3_ready_3.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
@@ -371,10 +366,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    14,
-                    13,
-                    33,
-                    31
+                    0,
+                    0,
+                    64,
+                    64
                 ],
                 "template": "auto_make_coffee/exit.png",
                 "threshold": 0.8
