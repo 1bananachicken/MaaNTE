@@ -19,11 +19,12 @@
         "max_hit": 1,
         "next": [
             "MakeCoffeeOneOneEnter",
+            "MakeCoffeeOneOneScrollToEnter",
             "MakeCoffeeTaskExit"
         ]
     },
     "MakeCoffeeOneOneEnter": {
-        "desc": "等待店长特供入口并点击进入",
+        "desc": "等待粉色店长特供入口并按 F 进入",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -38,14 +39,31 @@
             }
         },
         "action": {
-            "type": "LongPress",
+            "type": "ClickKey",
             "param": {
-                "duration": 100
+                "key": [
+                    70
+                ]
             }
         },
         "post_delay": 1000,
         "next": [
             "MakeCoffeeOneOneChooseLevel"
+        ]
+    },
+    "MakeCoffeeOneOneScrollToEnter": {
+        "desc": "未找到粉色店长特供入口时上滚列表",
+        "action": "Scroll",
+        "target": [
+            120,
+            45,
+            80,
+            30
+        ],
+        "dy": -1200,
+        "post_delay": 300,
+        "next": [
+            "[JumpBack]MakeCoffeeOneOneEnter"
         ]
     },
     "MakeCoffeeOneOneChooseLevel": {
@@ -167,7 +185,8 @@
             }
         },
         "next": [
-            "MakeCoffeeOneOneFood1Ready3"
+            "MakeCoffeeOneOneFood1Ready3",
+            "[JumpBack]MakeCoffeeOneOneFood1Click2"
         ]
     },
     "MakeCoffeeOneOneFood1Ready3": {
@@ -202,7 +221,27 @@
                 "duration": 100
             }
         },
-        "post_delay": 3000,
+        "next": [
+            "MakeCoffeeOneOneFood1EmptyAfter3",
+            "[JumpBack]MakeCoffeeOneOneFood1Click3"
+        ]
+    },
+    "MakeCoffeeOneOneFood1EmptyAfter3": {
+        "desc": "等待菜品 1 第三次点击完成：准备盘变为空盘",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    159,
+                    458,
+                    200,
+                    150
+                ],
+                "template": "auto_make_coffee/food_1_empty_after_3.png",
+                "threshold": 0.6
+            }
+        },
+        "post_delay": 100,
         "next": [
             "MakeCoffeeOneOneFood2Click1"
         ]
@@ -256,7 +295,8 @@
             }
         },
         "next": [
-            "MakeCoffeeOneOneFood2Ready3"
+            "MakeCoffeeOneOneFood2Ready3",
+            "[JumpBack]MakeCoffeeOneOneFood2Click2"
         ]
     },
     "MakeCoffeeOneOneFood2Ready3": {
@@ -291,7 +331,27 @@
                 "duration": 100
             }
         },
-        "post_delay": 3000,
+        "next": [
+            "MakeCoffeeOneOneFood2EmptyAfter3",
+            "[JumpBack]MakeCoffeeOneOneFood2Click3"
+        ]
+    },
+    "MakeCoffeeOneOneFood2EmptyAfter3": {
+        "desc": "等待菜品 2 第三次点击完成：准备盘变为空盘",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    516,
+                    454,
+                    250,
+                    155
+                ],
+                "template": "auto_make_coffee/food_2_empty_after_3.png",
+                "threshold": 0.6
+            }
+        },
+        "post_delay": 100,
         "next": [
             "MakeCoffeeOneOneFood3Click1"
         ]
@@ -345,7 +405,8 @@
             }
         },
         "next": [
-            "MakeCoffeeOneOneFood3Ready3"
+            "MakeCoffeeOneOneFood3Ready3",
+            "[JumpBack]MakeCoffeeOneOneFood3Click2"
         ]
     },
     "MakeCoffeeOneOneFood3Ready3": {
@@ -380,6 +441,27 @@
                 "duration": 100
             }
         },
+        "next": [
+            "MakeCoffeeOneOneFood3EmptyAfter3",
+            "[JumpBack]MakeCoffeeOneOneFood3Click3"
+        ]
+    },
+    "MakeCoffeeOneOneFood3EmptyAfter3": {
+        "desc": "等待菜品 3 第三次点击完成：准备盘变为空盘",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    151,
+                    455,
+                    214,
+                    155
+                ],
+                "template": "auto_make_coffee/food_3_empty_after_3.png",
+                "threshold": 0.6
+            }
+        },
+        "post_delay": 100,
         "next": [
             "MakeCoffeeOneOneExitBusiness"
         ]
