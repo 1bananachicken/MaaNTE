@@ -184,6 +184,7 @@
                 "duration": 100
             }
         },
+        "post_delay": 300,
         "next": [
             "MakeCoffeeOneOneFood1Ready3",
             "[JumpBack]MakeCoffeeOneOneFood1Click2"
@@ -221,6 +222,7 @@
                 "duration": 100
             }
         },
+        "post_delay": 300,
         "next": [
             "MakeCoffeeOneOneFood1EmptyAfter3",
             "[JumpBack]MakeCoffeeOneOneFood1Click3"
@@ -274,7 +276,7 @@
                     145
                 ],
                 "template": "auto_make_coffee/food_2_ready_2.png",
-                "threshold": 0.6
+                "threshold": 0.8
             }
         },
         "post_delay": 100,
@@ -294,6 +296,7 @@
                 "duration": 100
             }
         },
+        "post_delay": 300,
         "next": [
             "MakeCoffeeOneOneFood2Ready3",
             "[JumpBack]MakeCoffeeOneOneFood2Click2"
@@ -331,6 +334,7 @@
                 "duration": 100
             }
         },
+        "post_delay": 300,
         "next": [
             "MakeCoffeeOneOneFood2EmptyAfter3",
             "[JumpBack]MakeCoffeeOneOneFood2Click3"
@@ -404,6 +408,7 @@
                 "duration": 100
             }
         },
+        "post_delay": 300,
         "next": [
             "MakeCoffeeOneOneFood3Ready3",
             "[JumpBack]MakeCoffeeOneOneFood3Click2"
@@ -441,6 +446,7 @@
                 "duration": 100
             }
         },
+        "post_delay": 300,
         "next": [
             "MakeCoffeeOneOneFood3EmptyAfter3",
             "[JumpBack]MakeCoffeeOneOneFood3Click3"
