@@ -28,7 +28,9 @@
         "template": [
             "Common/Scene/Login/LoginExit.png"
         ],
-        "green_mask": true
+        "green_mask": true,
+        "pre_delay": 0,
+        "post_delay": 0
 
     },
     "__ScenePrivateLoginContinue": {
@@ -53,6 +55,7 @@
         "next": [
             "[JumpBack]__ScenePrivateLoginMonthlyPassConfirm",
             "__ScenePrivateAnyEnterWorldSuccess",
+            "[JumpBack]__ScenePrivateLoginLoading",
             "[JumpBack]__ScenePrivateAnyExit"
         ]
     },
@@ -94,7 +97,9 @@
         "template": [
             "Common/Scene/Login/LoginAnnouncementClose.png"
         ],
-        "green_mask": true
+        "green_mask": true,
+        "pre_delay": 0,
+        "post_delay": 0
     },
     "__ScenePrivateLoginMonthlyPassConfirm": {
         "desc": "领取月卡，无法跳过必须领取",
@@ -114,9 +119,24 @@
                 ]
             }
         },
-        "pre_delay": 1000, // 3d移动，pre_wait_freeze不生效
-        "action": {
-            "type": "Click"
-        }
+        "action": "ClickKey",
+        "pre_delay": 1000,
+        "key": [
+            27
+        ]
+    },
+    "__ScenePrivateLoginLoading":{
+        "desc":"判断正在登录加载界面",
+        "recognition": "OCR",
+        "roi": [1158,644,101,49],
+        "expected": [
+            "%"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "__ScenePrivateLoginLoading",
+            "__ScenePrivateNextTrue"
+        ]
     }
 }
