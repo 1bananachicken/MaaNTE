@@ -23,26 +23,24 @@
         ]
     },
     "MakeCoffeeOneOneEnter": {
-        "desc": "等待店长特供入口并按 F 进入",
+        "desc": "等待店长特供入口并点击进入",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "roi": [
                     0,
                     0,
-                    240,
-                    80
+                    1280,
+                    720
                 ],
                 "template": "auto_make_coffee/enter.png",
                 "threshold": 0.8
             }
         },
         "action": {
-            "type": "ClickKey",
+            "type": "LongPress",
             "param": {
-                "key": [
-                    70
-                ]
+                "duration": 100
             }
         },
         "post_delay": 1000,
@@ -66,7 +64,10 @@
             }
         },
         "action": {
-            "type": "Click"
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
         },
         "post_delay": 1000,
         "next": [
@@ -89,7 +90,10 @@
             }
         },
         "action": {
-            "type": "Click"
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
         },
         "next": [
             "MakeCoffeeOneOneWaitTimer"
@@ -117,12 +121,13 @@
     "MakeCoffeeOneOneFood1Click1": {
         "desc": "菜品 1 第一次点击：直接点击",
         "action": {
-            "type": "Click",
+            "type": "LongPress",
             "param": {
                 "target": [
                     496,
                     673
-                ]
+                ],
+                "duration": 100
             }
         },
         "next": [
@@ -144,6 +149,7 @@
                 "threshold": 0.6
             }
         },
+        "post_delay": 100,
         "next": [
             "MakeCoffeeOneOneFood1Click2"
         ]
@@ -151,12 +157,13 @@
     "MakeCoffeeOneOneFood1Click2": {
         "desc": "菜品 1 第二次点击",
         "action": {
-            "type": "Click",
+            "type": "LongPress",
             "param": {
                 "target": [
                     408,
                     536
-                ]
+                ],
+                "duration": 100
             }
         },
         "next": [
@@ -178,6 +185,7 @@
                 "threshold": 0.6
             }
         },
+        "post_delay": 100,
         "next": [
             "MakeCoffeeOneOneFood1Click3"
         ]
@@ -185,12 +193,13 @@
     "MakeCoffeeOneOneFood1Click3": {
         "desc": "菜品 1 第三次点击",
         "action": {
-            "type": "Click",
+            "type": "LongPress",
             "param": {
                 "target": [
                     264,
                     428
-                ]
+                ],
+                "duration": 100
             }
         },
         "post_delay": 3000,
@@ -201,12 +210,13 @@
     "MakeCoffeeOneOneFood2Click1": {
         "desc": "菜品 2 第一次点击：直接点击",
         "action": {
-            "type": "Click",
+            "type": "LongPress",
             "param": {
                 "target": [
                     663,
                     668
-                ]
+                ],
+                "duration": 100
             }
         },
         "next": [
@@ -228,6 +238,7 @@
                 "threshold": 0.6
             }
         },
+        "post_delay": 100,
         "next": [
             "MakeCoffeeOneOneFood2Click2"
         ]
@@ -235,12 +246,13 @@
     "MakeCoffeeOneOneFood2Click2": {
         "desc": "菜品 2 第二次点击",
         "action": {
-            "type": "Click",
+            "type": "LongPress",
             "param": {
                 "target": [
                     856,
                     685
-                ]
+                ],
+                "duration": 100
             }
         },
         "next": [
@@ -262,6 +274,7 @@
                 "threshold": 0.6
             }
         },
+        "post_delay": 100,
         "next": [
             "MakeCoffeeOneOneFood2Click3"
         ]
@@ -269,12 +282,13 @@
     "MakeCoffeeOneOneFood2Click3": {
         "desc": "菜品 2 第三次点击",
         "action": {
-            "type": "Click",
+            "type": "LongPress",
             "param": {
                 "target": [
                     697,
                     445
-                ]
+                ],
+                "duration": 100
             }
         },
         "post_delay": 3000,
@@ -285,12 +299,13 @@
     "MakeCoffeeOneOneFood3Click1": {
         "desc": "菜品 3 第一次点击：直接点击",
         "action": {
-            "type": "Click",
+            "type": "LongPress",
             "param": {
                 "target": [
                     113,
                     659
-                ]
+                ],
+                "duration": 100
             }
         },
         "next": [
@@ -312,6 +327,7 @@
                 "threshold": 0.6
             }
         },
+        "post_delay": 100,
         "next": [
             "MakeCoffeeOneOneFood3Click2"
         ]
@@ -319,12 +335,13 @@
     "MakeCoffeeOneOneFood3Click2": {
         "desc": "菜品 3 第二次点击",
         "action": {
-            "type": "Click",
+            "type": "LongPress",
             "param": {
                 "target": [
                     135,
                     526
-                ]
+                ],
+                "duration": 100
             }
         },
         "next": [
@@ -346,6 +363,7 @@
                 "threshold": 0.6
             }
         },
+        "post_delay": 100,
         "next": [
             "MakeCoffeeOneOneFood3Click3"
         ]
@@ -353,12 +371,13 @@
     "MakeCoffeeOneOneFood3Click3": {
         "desc": "菜品 3 第三次点击",
         "action": {
-            "type": "Click",
+            "type": "LongPress",
             "param": {
                 "target": [
                     155,
                     431
-                ]
+                ],
+                "duration": 100
             }
         },
         "next": [
@@ -381,7 +400,10 @@
             }
         },
         "action": {
-            "type": "Click"
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
         },
         "post_delay": 1000,
         "next": [
@@ -404,7 +426,10 @@
             }
         },
         "action": {
-            "type": "Click"
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
         },
         "post_delay": 1000,
         "next": [
