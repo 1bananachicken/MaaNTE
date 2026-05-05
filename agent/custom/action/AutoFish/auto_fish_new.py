@@ -3,10 +3,13 @@ import time
 
 from pathlib import Path
 from ..Common.utils import get_image, match_template_in_region
+from ..Common.logger import get_logger
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+
+logger = get_logger("auto_fish_new")
 
 
 @AgentServer.custom_action("auto_fish_new")
@@ -33,7 +36,7 @@ class AutoFishNew(CustomAction):
     def run(
         self, context: Context, _argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        print("=== Autofish Action Started ===")
+        logger.info("钓鱼动作开始 (auto_fish_new)")
         controller = context.tasker.controller
 
         KEY_A = 65
@@ -44,7 +47,7 @@ class AutoFishNew(CustomAction):
         game_region = [395, 40, 490, 20]
         deadzone = 15
 
-        print("  Casting...")
+        logger.info("阶段 1/2: 抛竿后等待鱼上钩")
 
         # --- 等待鱼上钩 ---
         wait_frame = 0
@@ -58,14 +61,16 @@ class AutoFishNew(CustomAction):
                 img, success_region, self.success_catch_template, 0.7
             )
             if wait_frame > 300:
-                print(f"  [Fish] cast timeout (f={wait_frame}), fish ended")
+                logger.warning(f"  等待鱼上钩超时 (f={wait_frame})，结束本次钓鱼")
                 break
             if m_catch:
                 controller.post_key_down(KEY_F)
                 time.sleep(0.1)
                 controller.post_key_up(KEY_F)
-                print(f"  Fish hooked! (score={catch_score:.3f})")
+                logger.info(f"  鱼已上钩！(f={wait_frame}, score={catch_score:.3f})")
                 break
+
+        logger.info("阶段 2/2: 进入控条小游戏")
 
         # --- 小游戏 ---
         frame = 0
@@ -122,8 +127,8 @@ class AutoFishNew(CustomAction):
                 if slider_miss_count >= 30:
                     set_ad_key(None)
                     controller.post_key_up(KEY_F)
-                    print(
-                        f"  [Fish] slider lost {slider_miss_count} frames, fish ended."
+                    logger.info(
+                        f"  滑块连续 {slider_miss_count} 帧丢失，本次钓鱼结束 (success)"
                     )
                     return CustomAction.RunResult(success=True)
                 x_slider = last_x_slider
@@ -133,7 +138,7 @@ class AutoFishNew(CustomAction):
                 controller.post_key_up(KEY_A)
                 controller.post_key_up(KEY_D)
                 controller.post_key_up(KEY_F)
-                print(f"  [Fish] fish timeout (f={frame}), fish ended.")
+                logger.warning(f"  控条阶段超时 (f={frame})，本次钓鱼结束 (failure)")
                 return CustomAction.RunResult(success=False)
 
             if m_left and m_right:
@@ -160,8 +165,8 @@ class AutoFishNew(CustomAction):
 
             if frame % 30 == 0 or current_ad_key != prev_key:
                 key_name = {None: "-", KEY_A: "A", KEY_D: "D"}.get(current_ad_key, "?")
-                print(
-                    f"  [Fish] f={frame} slider(x={x_slider:.0f} s={slider_score:.2f}) "
+                logger.debug(
+                    f"  f={frame} slider(x={x_slider:.0f} s={slider_score:.2f}) "
                     f"L({m_left} s={left_score:.2f}) R({m_right} s={right_score:.2f}) "
                     f"bar_w={last_bar_width:.0f} target={target:.0f} offset={offset:+.0f} key={key_name}"
                 )
