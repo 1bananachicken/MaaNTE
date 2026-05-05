@@ -532,10 +532,18 @@ def extract_visible_grid(board_crop, debug=False):
                 continue
 
             hsv_patch = hsv[y1:y2, x1:x2]
-            v_mean = float(np.mean(hsv_patch[:, :, 2]))
-            s_mean = float(np.mean(hsv_patch[:, :, 1]))
+            v_channel = hsv_patch[:, :, 2]
+            s_channel = hsv_patch[:, :, 1]
+            v_mean = float(np.mean(v_channel))
+            s_mean = float(np.mean(s_channel))
+            v_max = float(np.max(v_channel))
+            bright_ratio = float(np.mean(v_channel >= REAL_BLOCK_VALUE_THRESHOLD))
 
-            if v_mean >= REAL_BLOCK_VALUE_THRESHOLD:
+            if (
+                v_mean >= REAL_BLOCK_VALUE_THRESHOLD
+                or v_max >= REAL_BLOCK_VALUE_THRESHOLD
+                or bright_ratio >= 0.08
+            ):
                 grid[row, col] = True
 
             if debug:
@@ -707,6 +715,7 @@ def identify_active_piece(grid: np.ndarray, prefer_cells=None):
 
         component_cells = set(component)
         support_count = 0
+        floating_count = 0
         for row, col in component:
             next_row = row + 1
             if next_row >= BOARD_ROWS:
@@ -714,9 +723,12 @@ def identify_active_piece(grid: np.ndarray, prefer_cells=None):
                 continue
             if grid[next_row, col] and (next_row, col) not in component_cells:
                 support_count += 1
+            else:
+                floating_count += 1
 
         candidates.append(
             (
+                floating_count,
                 support_count,
                 min(row for row, _ in component),
                 -max(row for row, _ in component),
@@ -729,15 +741,16 @@ def identify_active_piece(grid: np.ndarray, prefer_cells=None):
             prefer_set = set(prefer_cells)
             candidates.sort(
                 key=lambda item: (
-                    -len(set(item[3]).intersection(prefer_set)),
-                    item[0],
+                    -len(set(item[4]).intersection(prefer_set)),
+                    -item[0],
                     item[1],
                     item[2],
+                    item[3],
                 )
             )
         else:
-            candidates.sort(key=lambda item: (item[0], item[1], item[2]))
-        return candidates[0][3]
+            candidates.sort(key=lambda item: (-item[0], item[1], item[2], item[3]))
+        return candidates[0][4]
 
     prefer_set = set(prefer_cells) if prefer_cells else None
     row_lo = 0

@@ -7,15 +7,15 @@ from ..utils.board import (
     BOARD_COLS,
     BOARD_REGION,
     BOARD_ROWS,
-    DEBUG_BOARD,
-    REAL_BLOCK_VALUE_THRESHOLD,
+    CELL_HEIGHT,
+    CELL_WIDTH,
     extract_board_crop,
-    extract_visible_grid,
-    identify_active_piece,
     simulate_drop,
     evaluate_board,
+    GRID_LEFT,
+    GRID_TOP,
 )
-from ..utils.pieces import PIECES, match_piece_state, rotation_distance
+from ..utils.pieces import PIECES, rotation_distance
 from ..utils.scene import (
     SceneGate,
     EXIT_REGION,
@@ -41,6 +41,7 @@ class TetrisGamePlayer:
         self.combo_count = 0
         self.last_clear_time = 0
         self.total_lines_cleared = 0
+        self.drop_ready_hits = 0
 
         self.internal_board = np.zeros((BOARD_ROWS, BOARD_COLS), dtype=bool)
         self.current_piece_name = None
@@ -49,7 +50,8 @@ class TetrisGamePlayer:
         self.current_row = 0
         self.current_cells = None
         self.queue_pieces_state = []
-        self.needs_state_update = True
+
+        self.new_piece_roi = (474, 50, 295, 60)
 
     def run(self, controller, tasker, mode="single"):
         self.mode = mode
@@ -86,39 +88,42 @@ class TetrisGamePlayer:
             time.sleep(min(0.1, end_at - time.time()))
         return True
 
-    def _wait_for_next_piece(self, controller, tasker):
-        import cv2
-        board_h = BOARD_REGION[3]
-        top_height = max(1, int(board_h * 2 / BOARD_ROWS))
-        min_pixels = 20
-
+    def _detect_next_piece(self, controller, tasker):
         while True:
             if tasker.stopping:
-                return False
+                return None
             img = self._safe_get_image(controller)
             if img is None:
                 if not self._sleep_with_stop(tasker, 0.05):
-                    return False
+                    return None
                 continue
 
-            board_crop = extract_board_crop(img)
-            if board_crop is None or board_crop.size == 0:
+            if not self._is_drop_ready(img):
                 if not self._sleep_with_stop(tasker, 0.05):
-                    return False
+                    return None
                 continue
 
-            top_crop = board_crop[:top_height, :, :]
-            if len(top_crop.shape) == 3 and top_crop.shape[2] == 4:
-                top_crop = cv2.cvtColor(top_crop, cv2.COLOR_BGRA2BGR)
-            hsv = cv2.cvtColor(top_crop, cv2.COLOR_BGR2HSV)
-            bright_pixels = int(np.count_nonzero(hsv[:, :, 2] >= REAL_BLOCK_VALUE_THRESHOLD))
+            match = self.scene_gate.match_active_piece_in_region(
+                img, self.new_piece_roi
+            )
+            if match is not None:
+                print(
+                    f"[NewPiece] Template matched {match['piece']} score={match['score']:.2f}, new piece spawned"
+                )
 
-            if bright_pixels >= min_pixels:
-                print(f"[NewPiece] Block detected in top region ({bright_pixels} px), new piece spawned")
-                return True
+                base_rotation = 0
+                shape = PIECES[match["piece"]][base_rotation]
+                piece_info = {
+                    "piece": match["piece"],
+                    "rotation": base_rotation,
+                    "row": 0,
+                    "col": 3,
+                    "cells": tuple(sorted((r, 3 + c) for r, c in shape)),
+                }
+                return piece_info
 
             if not self._sleep_with_stop(tasker, 0.05):
-                return False
+                return None
 
     def _tap_key(self, controller, key_code: int, hold: float = 0.03):
         controller.post_key_down(key_code)
@@ -161,9 +166,35 @@ class TetrisGamePlayer:
         if board_crop is None or board_crop.size == 0:
             return None
 
-        grid = extract_visible_grid(board_crop, debug=DEBUG_BOARD)
-        active_cells = identify_active_piece(grid, prefer_cells=self.last_active_cells)
-        piece_state = match_piece_state(active_cells) if active_cells else None
+        if not self._is_drop_ready(img):
+            return {
+                "board_crop": board_crop,
+                "grid": None,
+                "active_cells": None,
+                "piece_state": None,
+                "queue_pieces": [],
+            }
+
+        match = self.scene_gate.match_active_piece_in_region(img, self.new_piece_roi)
+        piece_state = None
+        active_cells = None
+
+        if match is not None:
+            base_rotation = 0
+            shape = PIECES[match["piece"]][base_rotation]
+
+            col = 3
+            row = 0
+
+            active_cells = [(row + r, col + c) for r, c in shape]
+            piece_state = {
+                "piece": match["piece"],
+                "rotation": base_rotation,
+                "row": row,
+                "col": col,
+                "cells": tuple(sorted(active_cells)),
+            }
+
         queue_pieces = self.scene_gate.read_piece_queue(img)
 
         if active_cells is not None:
@@ -171,60 +202,50 @@ class TetrisGamePlayer:
 
         return {
             "board_crop": board_crop,
-            "grid": grid,
+            "grid": None,
             "active_cells": active_cells,
             "piece_state": piece_state,
             "queue_pieces": queue_pieces,
         }
 
-    def _update_game_state(self, img):
-        board_crop = extract_board_crop(img)
-        if board_crop is None or board_crop.size == 0:
-            return False
+    def _is_drop_ready(self, img) -> bool:
+        matched, score, _, _ = self.scene_gate._find_drop_button(img)
+        if matched:
+            self.drop_ready_hits = min(self.drop_ready_hits + 1, 3)
+        else:
+            self.drop_ready_hits = 0
+        return self.drop_ready_hits >= 2
 
-        grid = extract_visible_grid(board_crop, debug=DEBUG_BOARD)
-        active_cells = identify_active_piece(grid, prefer_cells=None)
-
-        if active_cells is None:
-            return False
-
-        piece_state = match_piece_state(active_cells)
-        if piece_state is None:
-            return False
-
-        self.internal_board = grid.copy()
-        for row, col in active_cells:
-            self.internal_board[row, col] = False
-
-        self.current_piece_name = piece_state["piece"]
-        self.current_rotation = piece_state["rotation"]
-        self.current_col = piece_state["col"]
-        self.current_row = piece_state["row"]
-        self.current_cells = piece_state["cells"]
-
-        self.queue_pieces_state = self.scene_gate.read_piece_queue(img)
-        if self.queue_pieces_state:
-            print(f"Queue(bottom->top)={self.queue_pieces_state}")
-
-        self.last_active_cells = active_cells
-        return True
+    def _log_internal_board(self):
+        rows = []
+        for r in range(BOARD_ROWS):
+            row_cells = [
+                "#" if self.internal_board[r, c] else "." for c in range(BOARD_COLS)
+            ]
+            rows.append("".join(row_cells))
+        print("[Board] internal state:\n" + "\n".join(rows))
 
     def _apply_move_no_feedback(self, controller, target_rotation, target_col):
         rotation_count = len(PIECES[self.current_piece_name])
 
         clockwise_steps = (target_rotation - self.current_rotation) % rotation_count
-        counterclockwise_steps = (self.current_rotation - target_rotation) % rotation_count
+        counterclockwise_steps = (
+            self.current_rotation - target_rotation
+        ) % rotation_count
 
+        rotated = False
         if clockwise_steps <= counterclockwise_steps:
             for _ in range(clockwise_steps):
                 self._tap_key(controller, VK_K, hold=0.03)
                 time.sleep(0.03)
                 self.current_rotation = (self.current_rotation + 1) % rotation_count
+                rotated = True
         else:
             for _ in range(counterclockwise_steps):
                 self._tap_key(controller, VK_J, hold=0.03)
                 time.sleep(0.03)
                 self.current_rotation = (self.current_rotation - 1) % rotation_count
+                rotated = True
 
         col_diff = target_col - self.current_col
         if col_diff > 0:
@@ -241,6 +262,135 @@ class TetrisGamePlayer:
         print(
             f"[ApplyMove] piece={self.current_piece_name} rot={self.current_rotation} col={self.current_col}"
         )
+
+    def _rotate_and_standardize(self, controller, target_rotation):
+        rotation_count = len(PIECES[self.current_piece_name])
+        actual_rotation = target_rotation % rotation_count
+
+        if actual_rotation != self.current_rotation:
+            clockwise_steps = (actual_rotation - self.current_rotation) % rotation_count
+            counterclockwise_steps = (self.current_rotation - actual_rotation) % rotation_count
+            if clockwise_steps <= counterclockwise_steps:
+                for _ in range(clockwise_steps):
+                    self._tap_key(controller, VK_K, hold=0.03)
+                    time.sleep(0.01)
+            else:
+                for _ in range(counterclockwise_steps):
+                    self._tap_key(controller, VK_J, hold=0.03)
+                    time.sleep(0.01)
+            self.current_rotation = actual_rotation
+
+        for _ in range(10):
+            self._tap_key(controller, VK_A, hold=0.03)
+            time.sleep(0.01)
+        self.current_col = 0
+
+        print(
+            f"[RotateAndStd] piece={self.current_piece_name} rot={self.current_rotation} col={self.current_col}"
+        )
+
+    def _update_active_piece_state(self, img) -> bool:
+        play_state = self._scan_play_state(img)
+        if play_state is None:
+            return False
+
+        piece_state = play_state.get("piece_state")
+        if piece_state is None:
+            return False
+
+        self.current_piece_name = piece_state["piece"]
+        self.current_rotation = piece_state["rotation"]
+        self.current_col = piece_state["col"]
+        self.current_row = piece_state["row"]
+        self.current_cells = piece_state["cells"]
+
+        self.queue_pieces_state = play_state.get("queue_pieces", [])
+        if self.queue_pieces_state:
+            print(f"Queue(bottom->top)={self.queue_pieces_state}")
+
+        active_cells = play_state.get("active_cells")
+        if active_cells is not None:
+            self.last_active_cells = active_cells
+
+        return True
+
+    def _update_queue_pieces(self, img):
+        play_state = self._scan_play_state(img)
+        if play_state is None:
+            return
+        queue = play_state.get("queue_pieces", [])
+        if queue:
+            self.queue_pieces_state = queue
+            print(f"Queue(bottom->top)={self.queue_pieces_state}")
+
+    def _apply_internal_drop(
+        self,
+        board: np.ndarray,
+        piece_name: str,
+        rotation: int,
+        target_col: int,
+        apply: bool = True,
+    ):
+        shape = PIECES[piece_name][rotation]
+        result = simulate_drop(board, shape, target_col)
+        if result is None:
+            print("[Board] Internal drop failed; keeping previous board state.")
+            return None
+        if apply:
+            self.internal_board = result["board"]
+            self._log_internal_board()
+        return result
+
+    def _can_place(self, board: np.ndarray, shape, row: int, col: int) -> bool:
+        for row_offset, col_offset in shape:
+            r = row + row_offset
+            c = col + col_offset
+            if r < 0 or r >= BOARD_ROWS or c < 0 or c >= BOARD_COLS:
+                return False
+            if board[r, c]:
+                return False
+        return True
+
+    def _is_move_feasible(
+        self,
+        board: np.ndarray,
+        piece_name: str,
+        from_rotation: int,
+        from_col: int,
+        from_row: int,
+        target_rotation: int,
+        target_col: int,
+    ) -> bool:
+        rotation_count = len(PIECES[piece_name])
+        clockwise_steps = (target_rotation - from_rotation) % rotation_count
+        counterclockwise_steps = (from_rotation - target_rotation) % rotation_count
+
+        if clockwise_steps <= counterclockwise_steps:
+            step = 1
+            steps = clockwise_steps
+        else:
+            step = -1
+            steps = counterclockwise_steps
+
+        cur_rotation = from_rotation
+        for _ in range(steps):
+            cur_rotation = (cur_rotation + step) % rotation_count
+            if not self._can_place(
+                board, PIECES[piece_name][cur_rotation], from_row, from_col
+            ):
+                return False
+
+        cur_col = from_col
+        delta = target_col - from_col
+        move_step = 1 if delta > 0 else -1 if delta < 0 else 0
+        for _ in range(abs(delta)):
+            cur_col += move_step
+            if not self._can_place(
+                board, PIECES[piece_name][target_rotation], from_row, cur_col
+            ):
+                return False
+
+        return True
 
     def _classify_scene(self, img, play_state=None):
         return self.scene_gate.classify_scene(img, play_state)
@@ -460,7 +610,6 @@ class TetrisGamePlayer:
         self.combo_count = 0
         self.last_clear_time = 0
         self.total_lines_cleared = 0
-        self.needs_state_update = True
         self.current_piece_name = None
 
         while time.time() - round_start < 900:
@@ -479,7 +628,10 @@ class TetrisGamePlayer:
             if scene_locked and now < scene_lock_until:
                 if self.current_piece_name is not None:
                     scene_lock_until = now + self._SCENE_LOCK_SEC
-                elif play_state_for_scene is not None and play_state_for_scene["piece_state"] is not None:
+                elif (
+                    play_state_for_scene is not None
+                    and play_state_for_scene["piece_state"] is not None
+                ):
                     scene_lock_until = now + self._SCENE_LOCK_SEC
                 else:
                     scene_locked = False
@@ -501,10 +653,12 @@ class TetrisGamePlayer:
 
                 if scene_name == "game_idle":
                     self.last_active_cells = None
-                    if play_state_for_scene is not None and play_state_for_scene["piece_state"] is not None:
+                    if (
+                        play_state_for_scene is not None
+                        and play_state_for_scene["piece_state"] is not None
+                    ):
                         scene_locked = True
                         scene_lock_until = now + self._SCENE_LOCK_SEC
-                        self.needs_state_update = True
                     else:
                         if not self._sleep_with_stop(tasker, 0.15):
                             return False
@@ -524,7 +678,6 @@ class TetrisGamePlayer:
                     if result["name"] in ("game_active", "game_idle"):
                         scene_locked = True
                         scene_lock_until = time.time() + self._SCENE_LOCK_SEC
-                        self.needs_state_update = True
                         continue
                     print(f"Unexpected scene after loading: {result['name']}")
                     return False
@@ -549,7 +702,6 @@ class TetrisGamePlayer:
                         self.last_active_cells = None
                         scene_locked = True
                         scene_lock_until = now + self._SCENE_LOCK_SEC
-                        self.needs_state_update = True
                     else:
                         self.last_active_cells = None
                         if non_active_since is None:
@@ -565,7 +717,6 @@ class TetrisGamePlayer:
                             non_active_since = None
                             last_piece_signature = None
                             scene_locked = False
-                            self.needs_state_update = True
                             if not self._sleep_with_stop(tasker, 0.4):
                                 return False
                             continue
@@ -574,27 +725,29 @@ class TetrisGamePlayer:
                             return False
                         continue
 
-            if self.needs_state_update:
-                if not self._update_game_state(img):
-                    if not scene_locked:
-                        if not self._sleep_with_stop(tasker, 0.08):
-                            return False
-                    else:
-                        if not self._sleep_with_stop(tasker, 0.04):
-                            return False
+            if self.current_piece_name is None:
+                if not self._update_active_piece_state(img):
+                    if not self._sleep_with_stop(tasker, 0.04):
+                        return False
                     continue
-                self.needs_state_update = False
+
+                print(
+                    f"[NewPiece] First or recovered piece: {self.current_piece_name}, standardizing position"
+                )
+                for _ in range(10):
+                    self._tap_key(controller, VK_A, hold=0.03)
+                    time.sleep(0.01)
+
                 scene_locked = True
                 scene_lock_until = time.time() + self._SCENE_LOCK_SEC
 
-            if self.current_piece_name is None:
-                if not self._sleep_with_stop(tasker, 0.04):
-                    return False
-                continue
-
             non_active_since = None
 
-            current_signature = (self.current_piece_name, self.current_rotation, self.current_col)
+            current_signature = (
+                self.current_piece_name,
+                self.current_rotation,
+                self.current_col,
+            )
             if current_signature == last_piece_signature:
                 skip_count += 1
                 if skip_count >= 10:
@@ -659,20 +812,39 @@ class TetrisGamePlayer:
                 )
             )
 
+            planned_result = self._apply_internal_drop(
+                settled_board,
+                self.current_piece_name,
+                best_move["rotation"],
+                best_move["target_col"],
+                apply=False,
+            )
+
+            self._rotate_and_standardize(controller, best_move["rotation"])
+
             self._apply_move_no_feedback(
                 controller, best_move["rotation"], best_move["target_col"]
             )
+            next_piece_info = self._detect_next_piece(controller, tasker)
+            if next_piece_info is None:
+                return False
 
-            self._wait_for_next_piece(controller, tasker)
+            if planned_result is not None:
+                self.internal_board = planned_result["board"]
+                self._log_internal_board()
 
-            if best_move.get("lines_cleared", 0) > 0:
+            lines_cleared = best_move.get("lines_cleared", 0)
+            if planned_result is not None:
+                lines_cleared = planned_result.get("lines_cleared", lines_cleared)
+
+            if lines_cleared > 0:
                 now = time.time()
                 if now - self.last_clear_time < 3.0:
                     self.combo_count += 1
                 else:
                     self.combo_count = 1
                 self.last_clear_time = now
-                self.total_lines_cleared += best_move["lines_cleared"]
+                self.total_lines_cleared += lines_cleared
 
                 if best_move.get("is_t_spin"):
                     print(f"[Special] T-SPIN detected! Combo={self.combo_count}")
@@ -683,9 +855,17 @@ class TetrisGamePlayer:
                 if time.time() - self.last_clear_time > 5.0:
                     self.combo_count = 0
 
-            self.needs_state_update = True
-            self.current_piece_name = None
+            self.current_piece_name = next_piece_info["piece"]
+            self.current_rotation = next_piece_info["rotation"]
+            self.current_col = next_piece_info["col"]
+            self.current_row = next_piece_info["row"]
+            self.current_cells = next_piece_info["cells"]
+            self.last_active_cells = next_piece_info["cells"]
             last_piece_signature = None
+
+            img2 = self._safe_get_image(controller)
+            if img2 is not None:
+                self._update_queue_pieces(img2)
 
             if not self._sleep_with_stop(tasker, 0.04):
                 return False
@@ -906,7 +1086,15 @@ class TetrisGamePlayer:
                 is_t_spin = False
                 if depth == 0 and piece_name == "T":
                     from ..utils.board import detect_t_spin
-                    t_spin_result = detect_t_spin(board, piece_name, rotation_index, target_col, result["row"])
+
+                    t_spin_result = detect_t_spin(
+                        board,
+                        piece_name,
+                        rotation_index,
+                        target_col,
+                        result["row"],
+                        was_rotation_move=False,
+                    )
                     is_t_spin = t_spin_result["is_t_spin"]
 
                 next_combo = combo_count + 1 if result["lines_cleared"] > 0 else 0
@@ -920,7 +1108,10 @@ class TetrisGamePlayer:
                     )
                 else:
                     from ..utils.board import evaluate_board_fast
-                    eval_score = evaluate_board_fast(result["board"], result["lines_cleared"], combo_count=next_combo)
+
+                    eval_score = evaluate_board_fast(
+                        result["board"], result["lines_cleared"], combo_count=next_combo
+                    )
 
                 candidates.append(
                     {
@@ -959,7 +1150,10 @@ class TetrisGamePlayer:
                     future_weight = 0.7 if next_combo > 0 else 0.5
                     if candidate.get("is_t_spin"):
                         future_weight = 0.8
-                    total_score = candidate["score"] + future_value * future_weight * depth_discount
+                    total_score = (
+                        candidate["score"]
+                        + future_value * future_weight * depth_discount
+                    )
 
             enriched = dict(candidate)
             enriched["total_score"] = total_score
@@ -997,19 +1191,42 @@ class TetrisGamePlayer:
         for rotation_index, shape in enumerate(PIECES[piece_name]):
             width = max(col for _, col in shape) + 1
             for target_col in range(0, BOARD_COLS - width + 1):
+                if not self._is_move_feasible(
+                    board,
+                    piece_name,
+                    piece_state["rotation"],
+                    piece_state["col"],
+                    piece_state["row"],
+                    rotation_index,
+                    target_col,
+                ):
+                    continue
                 result = simulate_drop(board, shape, target_col)
                 if result is None:
                     continue
 
                 is_t_spin = False
                 from ..utils.board import detect_t_spin
+
                 if piece_name == "T":
-                    t_spin_result = detect_t_spin(board, piece_name, rotation_index, target_col, result["row"])
+                    rot_dist = rotation_distance(
+                        piece_name, piece_state["rotation"], rotation_index
+                    )
+                    t_spin_result = detect_t_spin(
+                        board,
+                        piece_name,
+                        rotation_index,
+                        target_col,
+                        result["row"],
+                        was_rotation_move=rot_dist > 0,
+                    )
                     is_t_spin = t_spin_result["is_t_spin"]
 
                 future_bonus = 0.0
                 if future_queue:
-                    next_combo = self.combo_count + 1 if result["lines_cleared"] > 0 else 0
+                    next_combo = (
+                        self.combo_count + 1 if result["lines_cleared"] > 0 else 0
+                    )
                     future_move = self._search_best_queue_move(
                         result["board"],
                         future_queue,
@@ -1027,7 +1244,9 @@ class TetrisGamePlayer:
                     result["board"],
                     result["lines_cleared"],
                     dynamic_weights=True,
-                    combo_count=self.combo_count + 1 if result["lines_cleared"] > 0 else 0,
+                    combo_count=(
+                        self.combo_count + 1 if result["lines_cleared"] > 0 else 0
+                    ),
                     is_t_spin=is_t_spin,
                 )
 
