@@ -13,39 +13,16 @@ from custom.action.SoundTrigger.SoundListener import Ear
 
 logger = get_logger(__name__)
 
-_stop_event = threading.Event()
-
-
-def _stopped():
-    return _stop_event.is_set()
-
-
-def _reset():
-    _stop_event.clear()
-
-
-def _set():
-    _stop_event.set()
-
 
 class Ctx:
-    _inst = None
-    _lock = threading.Lock()
-
-    def __new__(cls):
-        if not cls._inst:
-            with cls._lock:
-                if not cls._inst:
-                    cls._inst = super().__new__(cls)
-        return cls._inst
-
     def __init__(self):
-        if hasattr(self, "_ok"):
-            return
-        self._ok = True
+        self._stop_event = threading.Event()
         self.ear = None
         self.dodger = None
         self.active = False
+
+    def _stopped(self):
+        return self._stop_event.is_set()
 
     def setup(self, controller, threshold=0.13, counter_threshold=0.12):
         if self.active:
@@ -63,16 +40,16 @@ class Ctx:
             counter_path=counter,
             threshold=threshold,
             counter_threshold=counter_threshold,
-            stop_check=_stopped,
+            stop_check=self._stopped,
         )
-        self.dodger = Dodger(controller=controller, stop_check=_stopped)
+        self.dodger = Dodger(controller=controller, stop_check=self._stopped)
         self.ear.on_dodge = self._on_dodge
         self.ear.on_counter = self._on_counter
         self.active = True
         logger.info("Ctx initialized")
 
     def enter(self):
-        _reset()
+        self._stop_event.clear()
         if not self.active or not self.ear:
             return False
         self.ear.start()
@@ -80,7 +57,7 @@ class Ctx:
         return True
 
     def exit(self):
-        _set()
+        self._stop_event.set()
         if self.ear:
             self.ear.stop()
             self.ear = None
@@ -89,13 +66,13 @@ class Ctx:
         logger.info("Ctx exited")
 
     def _on_dodge(self):
-        if _stopped():
+        if self._stopped():
             return
         if self.dodger:
             threading.Thread(target=self.dodger.dodge, daemon=True).start()
 
     def _on_counter(self):
-        if _stopped():
+        if self._stopped():
             return
         if self.dodger:
             threading.Thread(target=self.dodger.counter, daemon=True).start()
@@ -116,8 +93,10 @@ class SoundDodgeAction(CustomAction):
                 p = json.loads(argv.custom_action_param)
                 threshold = float(p.get("threshold", 0.13))
                 counter_threshold = float(p.get("counter_attack_threshold", 0.12))
-            except Exception:
-                pass
+            except (json.JSONDecodeError, ValueError, TypeError) as e:
+                logger.warning(
+                    f"Invalid custom_action_param: {argv.custom_action_param!r}, error: {e}. Using defaults."
+                )
 
         ctx = Ctx()
         try:

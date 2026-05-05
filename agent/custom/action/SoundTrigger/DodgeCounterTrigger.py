@@ -12,6 +12,7 @@ def _log():
     global logger
     if logger is None:
         from custom.action.Common.logger import get_logger
+
         logger = get_logger(__name__)
     return logger
 
@@ -91,7 +92,9 @@ class Dodger:
     def _default_counter(self):
         key = random.choice([0x31, 0x32, 0x33, 0x34])
         key_name = chr(key)
-        _log().info(f"执行按键: {key_name}按下 -> {key_name}松开 -> 左Shift按下 -> 左Shift松开")
+        _log().info(
+            f"执行按键: {key_name}按下 -> {key_name}松开 -> 左Shift按下 -> 左Shift松开"
+        )
         self._click_key(key)
         time.sleep(0.02)
         self._click_key(VK_SHIFT)
