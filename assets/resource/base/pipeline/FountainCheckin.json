@@ -60,8 +60,9 @@
         "action": "Click",
         "post_delay": 2000,
         "next": [
-            "__ScenePrivateAnyExit",
-            "FountainCheckinExit"
+            "FountainSkipStoryDialog",
+            "FountainSkipStoryDialogConfirm",
+            "FountainCheckinIfExit"
         ]
     },
     "FountainSkipStory": {
