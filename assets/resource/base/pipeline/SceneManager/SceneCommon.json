@@ -21,5 +21,19 @@
             "time": 600
         },
         "post_delay": 0
+    },
+    "__ScenePrivateLoading":{
+        "desc":"判断当前在加载场景中",
+        "recognition": "TemplateMatch",
+        "target":[22,304,1235,131],
+        "template": [
+            "Common/Scene/SceneLoading.png"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "[JumpBack]__ScenePrivateLoading",
+            "__ScenePrivateNextTrue"
+        ]
     }
 }
