@@ -91,6 +91,8 @@ class SceneGate:
             "Z": self._make_preview_template(((0, 0), (0, 1), (1, 1), (1, 2))),
             "J": self._make_preview_template(((0, 0), (1, 0), (1, 1), (1, 2))),
             "L": self._make_preview_template(((0, 2), (1, 0), (1, 1), (1, 2))),
+            "O": self._make_preview_template(((0, 0), (0, 1), (1, 0), (1, 1))),
+            "I": self._make_preview_template(((0, 0), (0, 1), (0, 2), (0, 3))),
         }
 
     def _make_preview_template(self, shape):
@@ -454,11 +456,11 @@ class SceneGate:
             return []
 
         hsv = cv2.cvtColor(queue_crop, cv2.COLOR_BGR2HSV)
-        mask = ((hsv[:, :, 1] > 80) & (hsv[:, :, 2] > 120)).astype(np.uint8) * 255
-        kernel = np.ones((2, 2), dtype=np.uint8)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        mask = (hsv[:, :, 2] >= 180).astype(np.uint8) * 255
 
-        component_count, labels, stats, _ = cv2.connectedComponentsWithStats(mask, 8)
+        component_count, labels, stats, _ = cv2.connectedComponentsWithStats(
+            mask, connectivity=4
+        )
         queue_items = []
         for component_id in range(1, component_count):
             x, y, width, height, area = stats[component_id]
@@ -467,21 +469,27 @@ class SceneGate:
             component_mask = (
                 labels[y : y + height, x : x + width] == component_id
             ).astype(np.uint8) * 255
-            piece_name = self._classify_queue_component(component_mask)
+            piece_name = self._classify_queue_component(component_mask, area)
             if piece_name is None:
                 continue
             queue_items.append((y, piece_name))
 
         queue_items.sort(key=lambda item: item[0], reverse=True)
-        return [piece_name for _, piece_name in queue_items]
+        return [piece_name for _, piece_name in queue_items[:6]]
 
-    def _classify_queue_component(self, component_mask: np.ndarray):
+    def _classify_queue_component(self, component_mask: np.ndarray, area: int = 0):
         height, width = component_mask.shape[:2]
         aspect_ratio = width / max(height, 1)
 
         if width >= 50 and height <= 22:
             return "I"
-        if abs(width - height) <= 8 and 20 <= width <= 36 and 20 <= height <= 36:
+        fill_ratio = area / (width * height) if width * height > 0 else 0
+        if (
+            abs(width - height) <= 6
+            and 22 <= width <= 34
+            and 22 <= height <= 34
+            and fill_ratio > 0.72
+        ):
             return "O"
 
         best_piece = None
@@ -505,6 +513,6 @@ class SceneGate:
 
         if best_piece is not None and best_iou >= 0.55:
             return best_piece
-        if aspect_ratio > 1.2:
-            return "T"
+        if best_piece is not None and best_iou >= 0.40 and aspect_ratio > 1.4:
+            return best_piece
         return None

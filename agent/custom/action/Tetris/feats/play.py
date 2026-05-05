@@ -5,14 +5,15 @@ import numpy as np
 from ...Common.utils import get_image
 from ..utils.board import (
     BOARD_COLS,
+    BOARD_REGION,
     BOARD_ROWS,
     DEBUG_BOARD,
+    REAL_BLOCK_VALUE_THRESHOLD,
     extract_board_crop,
     extract_visible_grid,
     identify_active_piece,
     simulate_drop,
     evaluate_board,
-    dump_board_state,
 )
 from ..utils.pieces import PIECES, match_piece_state, rotation_distance
 from ..utils.scene import (
@@ -29,8 +30,6 @@ from ..utils.scene import (
     VK_J,
     VK_K,
     VK_ESC,
-    VK_S,
-    VK_SPACE,
 )
 
 
@@ -42,6 +41,15 @@ class TetrisGamePlayer:
         self.combo_count = 0
         self.last_clear_time = 0
         self.total_lines_cleared = 0
+
+        self.internal_board = np.zeros((BOARD_ROWS, BOARD_COLS), dtype=bool)
+        self.current_piece_name = None
+        self.current_rotation = 0
+        self.current_col = 0
+        self.current_row = 0
+        self.current_cells = None
+        self.queue_pieces_state = []
+        self.needs_state_update = True
 
     def run(self, controller, tasker, mode="single"):
         self.mode = mode
@@ -78,9 +86,13 @@ class TetrisGamePlayer:
             time.sleep(min(0.1, end_at - time.time()))
         return True
 
-    def _wait_for_new_piece(self, controller, tasker, old_piece_name: str, timeout: float = 1.2):
-        start = time.time()
-        while time.time() - start < timeout:
+    def _wait_for_next_piece(self, controller, tasker):
+        import cv2
+        board_h = BOARD_REGION[3]
+        top_height = max(1, int(board_h * 2 / BOARD_ROWS))
+        min_pixels = 20
+
+        while True:
             if tasker.stopping:
                 return False
             img = self._safe_get_image(controller)
@@ -88,19 +100,25 @@ class TetrisGamePlayer:
                 if not self._sleep_with_stop(tasker, 0.05):
                     return False
                 continue
-            play_state = self._scan_play_state(img)
-            if play_state is None or play_state["piece_state"] is None:
+
+            board_crop = extract_board_crop(img)
+            if board_crop is None or board_crop.size == 0:
                 if not self._sleep_with_stop(tasker, 0.05):
                     return False
                 continue
-            new_piece = play_state["piece_state"]["piece"]
-            if new_piece != old_piece_name:
-                print(f"[Landing] New piece detected: {new_piece} (old: {old_piece_name})")
+
+            top_crop = board_crop[:top_height, :, :]
+            if len(top_crop.shape) == 3 and top_crop.shape[2] == 4:
+                top_crop = cv2.cvtColor(top_crop, cv2.COLOR_BGRA2BGR)
+            hsv = cv2.cvtColor(top_crop, cv2.COLOR_BGR2HSV)
+            bright_pixels = int(np.count_nonzero(hsv[:, :, 2] >= REAL_BLOCK_VALUE_THRESHOLD))
+
+            if bright_pixels >= min_pixels:
+                print(f"[NewPiece] Block detected in top region ({bright_pixels} px), new piece spawned")
                 return True
+
             if not self._sleep_with_stop(tasker, 0.05):
                 return False
-        print(f"[Landing] Wait for new piece timed out after {timeout}s")
-        return True
 
     def _tap_key(self, controller, key_code: int, hold: float = 0.03):
         controller.post_key_down(key_code)
@@ -159,59 +177,70 @@ class TetrisGamePlayer:
             "queue_pieces": queue_pieces,
         }
 
-    def _diagnose_move_failure(self, settled_board, piece_state, best_move, attempt_num):
-        """诊断移动失败原因，输出详细调试信息"""
-        piece_name = piece_state["piece"]
-        target_rotation = best_move["rotation"]
-        target_col = best_move["target_col"]
-        current_col = piece_state["col"]
-        current_rotation = piece_state["rotation"]
+    def _update_game_state(self, img):
+        board_crop = extract_board_crop(img)
+        if board_crop is None or board_crop.size == 0:
+            return False
 
-        print(f"[MoveDiag] === 诊断开始 (attempt #{attempt_num}) ===")
-        print(f"[MoveDiag] Piece={piece_name} current_rot={current_rotation} current_col={current_col}")
-        print(f"[MoveDiag] Target: rot={target_rotation} col={target_col}")
+        grid = extract_visible_grid(board_crop, debug=DEBUG_BOARD)
+        active_cells = identify_active_piece(grid, prefer_cells=None)
 
-        # 检查每个旋转状态的 drop 结果
-        from ..utils.pieces import PIECES
-        shapes = PIECES[piece_name]
-        for rot_idx, shape in enumerate(shapes):
-            width = max(col for _, col in shape) + 1
-            for tcol in range(0, BOARD_COLS - width + 1):
-                result = simulate_drop(settled_board, shape, tcol)
-                if result is None:
-                    # 诊断碰撞原因 - 使用 simulate_drop 的逻辑检查实际落点
-                    collision_cells = []
-                    shape_height = max(row for row, _ in shape) + 1
-                    # 找到实际会碰撞的行
-                    for test_row in range(BOARD_ROWS):
-                        collides = False
-                        for row_offset, col_offset in shape:
-                            r = test_row + row_offset
-                            c = tcol + col_offset
-                            if r >= BOARD_ROWS or c < 0 or c >= BOARD_COLS:
-                                collides = True
-                                collision_cells.append(f"({r},{c})OUT_OF_BOUNDS")
-                                break
-                            if r >= 0 and settled_board[r, c]:
-                                collides = True
-                                collision_cells.append(f"({r},{c})BLOCKED")
-                                break
-                        if collides:
-                            break
-                    if rot_idx == target_rotation and tcol == target_col:
-                        print(f"[MoveDiag] TARGET rot={rot_idx} col={tcol}: COLLISION at row~{test_row} {collision_cells}")
-                elif rot_idx == target_rotation and tcol == target_col:
-                    print(f"[MoveDiag] TARGET rot={rot_idx} col={tcol}: OK score={result['score']:.2f} land_row={result['row']}")
+        if active_cells is None:
+            return False
 
-        # dump 棋盘状态
-        board_content = dump_board_state(
-            settled_board,
-            active_cells=piece_state["cells"],
-            piece_state=piece_state,
-            filepath="tetris_debug_move_fail.txt",
+        piece_state = match_piece_state(active_cells)
+        if piece_state is None:
+            return False
+
+        self.internal_board = grid.copy()
+        for row, col in active_cells:
+            self.internal_board[row, col] = False
+
+        self.current_piece_name = piece_state["piece"]
+        self.current_rotation = piece_state["rotation"]
+        self.current_col = piece_state["col"]
+        self.current_row = piece_state["row"]
+        self.current_cells = piece_state["cells"]
+
+        self.queue_pieces_state = self.scene_gate.read_piece_queue(img)
+        if self.queue_pieces_state:
+            print(f"Queue(bottom->top)={self.queue_pieces_state}")
+
+        self.last_active_cells = active_cells
+        return True
+
+    def _apply_move_no_feedback(self, controller, target_rotation, target_col):
+        rotation_count = len(PIECES[self.current_piece_name])
+
+        clockwise_steps = (target_rotation - self.current_rotation) % rotation_count
+        counterclockwise_steps = (self.current_rotation - target_rotation) % rotation_count
+
+        if clockwise_steps <= counterclockwise_steps:
+            for _ in range(clockwise_steps):
+                self._tap_key(controller, VK_K, hold=0.03)
+                time.sleep(0.03)
+                self.current_rotation = (self.current_rotation + 1) % rotation_count
+        else:
+            for _ in range(counterclockwise_steps):
+                self._tap_key(controller, VK_J, hold=0.03)
+                time.sleep(0.03)
+                self.current_rotation = (self.current_rotation - 1) % rotation_count
+
+        col_diff = target_col - self.current_col
+        if col_diff > 0:
+            for _ in range(col_diff):
+                self._tap_key(controller, VK_D, hold=0.03)
+                time.sleep(0.03)
+                self.current_col += 1
+        elif col_diff < 0:
+            for _ in range(-col_diff):
+                self._tap_key(controller, VK_A, hold=0.03)
+                time.sleep(0.03)
+                self.current_col -= 1
+
+        print(
+            f"[ApplyMove] piece={self.current_piece_name} rot={self.current_rotation} col={self.current_col}"
         )
-        print(f"[MoveDiag] Board state:\n{board_content}")
-        print(f"[MoveDiag] === 诊断结束 ===")
 
     def _classify_scene(self, img, play_state=None):
         return self.scene_gate.classify_scene(img, play_state)
@@ -423,17 +452,16 @@ class TetrisGamePlayer:
     def _play_from_game(self, controller, tasker):
         last_piece_signature = None
         skip_count = 0
-        move_fail_count = 0
         round_start = time.time()
         non_active_since = None
         scene_lock_until = time.time() + self._SCENE_LOCK_SEC
         scene_locked = True
-        last_piece_name = None
 
         self.combo_count = 0
         self.last_clear_time = 0
         self.total_lines_cleared = 0
-        self.last_hard_drop_time = 0
+        self.needs_state_update = True
+        self.current_piece_name = None
 
         while time.time() - round_start < 900:
             if tasker.stopping:
@@ -446,16 +474,18 @@ class TetrisGamePlayer:
                 continue
 
             now = time.time()
-            play_state = self._scan_play_state(img)
+            play_state_for_scene = self._scan_play_state(img)
 
             if scene_locked and now < scene_lock_until:
-                if play_state is not None and play_state["piece_state"] is not None:
+                if self.current_piece_name is not None:
+                    scene_lock_until = now + self._SCENE_LOCK_SEC
+                elif play_state_for_scene is not None and play_state_for_scene["piece_state"] is not None:
                     scene_lock_until = now + self._SCENE_LOCK_SEC
                 else:
                     scene_locked = False
 
             if not scene_locked:
-                scene = self._classify_scene(img, play_state)
+                scene = self._classify_scene(img, play_state_for_scene)
                 scene_name = scene["name"]
 
                 if scene_name == "exit":
@@ -471,9 +501,10 @@ class TetrisGamePlayer:
 
                 if scene_name == "game_idle":
                     self.last_active_cells = None
-                    if play_state is not None and play_state["piece_state"] is not None:
+                    if play_state_for_scene is not None and play_state_for_scene["piece_state"] is not None:
                         scene_locked = True
                         scene_lock_until = now + self._SCENE_LOCK_SEC
+                        self.needs_state_update = True
                     else:
                         if not self._sleep_with_stop(tasker, 0.15):
                             return False
@@ -493,6 +524,7 @@ class TetrisGamePlayer:
                     if result["name"] in ("game_active", "game_idle"):
                         scene_locked = True
                         scene_lock_until = time.time() + self._SCENE_LOCK_SEC
+                        self.needs_state_update = True
                         continue
                     print(f"Unexpected scene after loading: {result['name']}")
                     return False
@@ -511,12 +543,13 @@ class TetrisGamePlayer:
                 ):
                     if (
                         scene_name == "game_active"
-                        and play_state is not None
-                        and play_state["piece_state"] is not None
+                        and play_state_for_scene is not None
+                        and play_state_for_scene["piece_state"] is not None
                     ):
                         self.last_active_cells = None
                         scene_locked = True
                         scene_lock_until = now + self._SCENE_LOCK_SEC
+                        self.needs_state_update = True
                     else:
                         self.last_active_cells = None
                         if non_active_since is None:
@@ -532,6 +565,7 @@ class TetrisGamePlayer:
                             non_active_since = None
                             last_piece_signature = None
                             scene_locked = False
+                            self.needs_state_update = True
                             if not self._sleep_with_stop(tasker, 0.4):
                                 return False
                             continue
@@ -540,23 +574,27 @@ class TetrisGamePlayer:
                             return False
                         continue
 
-            if play_state is None or play_state["piece_state"] is None:
-                if not scene_locked:
-                    if not self._sleep_with_stop(tasker, 0.08):
-                        return False
-                else:
-                    if not self._sleep_with_stop(tasker, 0.04):
-                        return False
+            if self.needs_state_update:
+                if not self._update_game_state(img):
+                    if not scene_locked:
+                        if not self._sleep_with_stop(tasker, 0.08):
+                            return False
+                    else:
+                        if not self._sleep_with_stop(tasker, 0.04):
+                            return False
+                    continue
+                self.needs_state_update = False
+                scene_locked = True
+                scene_lock_until = time.time() + self._SCENE_LOCK_SEC
+
+            if self.current_piece_name is None:
+                if not self._sleep_with_stop(tasker, 0.04):
+                    return False
                 continue
 
             non_active_since = None
 
-            grid = play_state["grid"]
-            active_cells = play_state["active_cells"]
-            piece_state = play_state["piece_state"]
-            queue_pieces = play_state["queue_pieces"]
-
-            current_signature = (piece_state["piece"], piece_state["rotation"], piece_state["col"])
+            current_signature = (self.current_piece_name, self.current_rotation, self.current_col)
             if current_signature == last_piece_signature:
                 skip_count += 1
                 if skip_count >= 10:
@@ -571,22 +609,23 @@ class TetrisGamePlayer:
                     continue
 
             skip_count = 0
-            scene_locked = True
             scene_lock_until = time.time() + self._SCENE_LOCK_SEC
 
             decision_start = time.time()
 
-            settled_board = grid.copy()
-            for row, col in active_cells:
-                settled_board[row, col] = False
+            piece_state = {
+                "piece": self.current_piece_name,
+                "rotation": self.current_rotation,
+                "col": self.current_col,
+                "row": self.current_row,
+                "cells": self.current_cells,
+            }
+            settled_board = self.internal_board.copy()
 
-            if queue_pieces:
-                print(f"Queue(bottom->top)={queue_pieces}")
-
-            if queue_pieces:
-                planning_queue = [piece_state["piece"], *queue_pieces[:5]]
+            if self.queue_pieces_state:
+                planning_queue = [self.current_piece_name, *self.queue_pieces_state[:5]]
             else:
-                planning_queue = [piece_state["piece"]]
+                planning_queue = [self.current_piece_name]
 
             planning_queue = planning_queue[:6]
 
@@ -596,7 +635,7 @@ class TetrisGamePlayer:
                 planning_queue,
             )
             if best_move is None:
-                best_move = self._find_best_move(settled_board, piece_state["piece"])
+                best_move = self._find_best_move(settled_board, self.current_piece_name)
             if best_move is None:
                 print("No valid move found, waiting for next stable frame.")
                 if not self._sleep_with_stop(tasker, 0.06):
@@ -607,63 +646,47 @@ class TetrisGamePlayer:
             if decision_time > 0.3:
                 print(f"[Perf] Decision took {decision_time:.3f}s")
 
-            now = time.time()
-            time_since_last_drop = now - self.last_hard_drop_time
-            if time_since_last_drop < 0.8:
-                wait_time = 0.8 - time_since_last_drop
-                print(f"[RateLimit] Waiting {wait_time:.2f}s before next hard drop")
-                if not self._sleep_with_stop(tasker, wait_time):
-                    return False
-
             print(
                 "Piece=%s rot=%s col=%s -> target_rot=%s target_col=%s score=%.2f penalty=%.2f"
                 % (
-                    piece_state["piece"],
-                    piece_state["rotation"],
-                    piece_state["col"],
+                    self.current_piece_name,
+                    self.current_rotation,
+                    self.current_col,
                     best_move["rotation"],
                     best_move["target_col"],
                     best_move.get("total_score", best_move["score"]),
                     best_move.get("execution_penalty", 0.0),
                 )
             )
-            move_applied = self._apply_move_with_feedback(
-                controller, tasker, piece_state, best_move
+
+            self._apply_move_no_feedback(
+                controller, best_move["rotation"], best_move["target_col"]
             )
-            if move_applied:
-                last_piece_name = piece_state["piece"]
-                self._wait_for_new_piece(controller, tasker, last_piece_name)
-                self.last_hard_drop_time = time.time()
-                last_piece_signature = (piece_state["piece"], piece_state["rotation"], piece_state["col"])
-                move_fail_count = 0
 
-                if best_move.get("lines_cleared", 0) > 0:
-                    now = time.time()
-                    if now - self.last_clear_time < 3.0:
-                        self.combo_count += 1
-                    else:
-                        self.combo_count = 1
-                    self.last_clear_time = now
-                    self.total_lines_cleared += best_move["lines_cleared"]
+            self._wait_for_next_piece(controller, tasker)
 
-                    if best_move.get("is_t_spin"):
-                        print(f"[Special] T-SPIN detected! Combo={self.combo_count}")
-                    if self.combo_count > 1:
-                        print(f"[Special] COMBO x{self.combo_count}!")
-                    print(f"[Stats] Total lines: {self.total_lines_cleared}")
+            if best_move.get("lines_cleared", 0) > 0:
+                now = time.time()
+                if now - self.last_clear_time < 3.0:
+                    self.combo_count += 1
                 else:
-                    if time.time() - self.last_clear_time > 5.0:
-                        self.combo_count = 0
+                    self.combo_count = 1
+                self.last_clear_time = now
+                self.total_lines_cleared += best_move["lines_cleared"]
+
+                if best_move.get("is_t_spin"):
+                    print(f"[Special] T-SPIN detected! Combo={self.combo_count}")
+                if self.combo_count > 1:
+                    print(f"[Special] COMBO x{self.combo_count}!")
+                print(f"[Stats] Total lines: {self.total_lines_cleared}")
             else:
-                move_fail_count += 1
-                print(
-                    "Move did not reach target position, retrying with a fresh board state."
-                )
-                # 连续失败3次时输出诊断信息
-                if move_fail_count >= 3:
-                    self._diagnose_move_failure(
-                        settled_board, piece_state, best_move, move_fail_count
-                    )
+                if time.time() - self.last_clear_time > 5.0:
+                    self.combo_count = 0
+
+            self.needs_state_update = True
+            self.current_piece_name = None
+            last_piece_signature = None
+
             if not self._sleep_with_stop(tasker, 0.04):
                 return False
 
@@ -1032,172 +1055,3 @@ class TetrisGamePlayer:
                     best_move = move
 
         return best_move
-
-    def _apply_move_with_feedback(self, controller, tasker, piece_state, best_move):
-        piece_name = piece_state["piece"]
-        rotation_count = len(PIECES[piece_name])
-        target_rotation = best_move["rotation"]
-        target_col = best_move["target_col"]
-        deadline = time.time() + 3.0
-        hard_drop_sent = False
-        hard_drop_method = None  # "space" or "button"
-        hard_drop_deadline = None  # hard drop 阶段的独立超时
-        post_drop_deadline = None
-        space_drop_attempt_time = None
-
-        expected_rot_change = False
-        expected_col_change = False
-        last_rotation = piece_state["rotation"]
-        last_col = piece_state["col"]
-        last_action_time = 0.0
-
-        FEEDBACK_TIMEOUT = 0.50  # 反馈超时时间
-
-        while time.time() < deadline or (hard_drop_sent and time.time() < hard_drop_deadline):
-            if tasker.stopping:
-                return False
-
-            img = self._safe_get_image(controller)
-            if img is None:
-                if not self._sleep_with_stop(tasker, 0.04):
-                    return False
-                continue
-
-            play_state = self._scan_play_state(img)
-            scene = self._classify_scene(img, play_state)
-            scene_name = scene["name"]
-
-            if hard_drop_sent:
-                if scene_name in ("exit", "game_idle"):
-                    return True
-                if play_state is None or play_state["piece_state"] is None:
-                    if (
-                        post_drop_deadline is not None
-                        and time.time() >= post_drop_deadline
-                    ):
-                        return True
-                    if not self._sleep_with_stop(tasker, 0.04):
-                        return False
-                    continue
-                # SPACE 发送后方块仍在 → 尝试点击 drop 按钮
-                if hard_drop_method == "space" and space_drop_attempt_time is not None:
-                    if time.time() - space_drop_attempt_time >= 0.50:
-                        print("[KeyInput] SPACE drop failed, trying drop button click")
-                        found, score, dx, dy = self.scene_gate._find_drop_button(img)
-                        if found:
-                            click_x = int(dx + self.scene_gate.drop_tpl.shape[1] / 2)
-                            click_y = int(dy + self.scene_gate.drop_tpl.shape[0] / 2)
-                            self._click_point(controller, click_x, click_y)
-                            print(f"[KeyInput] Drop button clicked at ({click_x},{click_y}) score={score:.2f}")
-                            hard_drop_method = "button"
-                            space_drop_attempt_time = None
-                            post_drop_deadline = time.time() + 0.9
-                            if not self._sleep_with_stop(tasker, 0.10):
-                                return False
-                            continue
-                        else:
-                            print("[KeyInput] Drop button not found, retrying SPACE")
-                            self._tap_key(controller, VK_SPACE, hold=0.06)
-                            space_drop_attempt_time = time.time()
-                            if not self._sleep_with_stop(tasker, 0.08):
-                                return False
-                            continue
-            else:
-                if scene_name in ("world_prompt", "prepare_one", "prepare_two", "exit"):
-                    return False
-                if scene_name not in ("game_active", "game_idle") or play_state is None:
-                    if not self._sleep_with_stop(tasker, 0.04):
-                        return False
-                    continue
-
-            current_piece_state = play_state["piece_state"]
-            if current_piece_state is None:
-                if hard_drop_sent:
-                    return True
-                if not self._sleep_with_stop(tasker, 0.04):
-                    return False
-                continue
-
-            if current_piece_state["piece"] != piece_name:
-                return True
-
-            current_rotation = current_piece_state["rotation"]
-            current_col = current_piece_state["col"]
-
-            if expected_rot_change and current_rotation == last_rotation:
-                if time.time() - last_action_time < FEEDBACK_TIMEOUT:
-                    if not self._sleep_with_stop(tasker, 0.04):
-                        return False
-                    continue
-                print(f"[KeyFeedback] ROTATION FAILED: still at rot={current_rotation} after {FEEDBACK_TIMEOUT}s")
-                return False
-
-            if expected_col_change and current_col == last_col:
-                if time.time() - last_action_time < FEEDBACK_TIMEOUT:
-                    if not self._sleep_with_stop(tasker, 0.04):
-                        return False
-                    continue
-                print(f"[KeyFeedback] MOVEMENT FAILED: still at col={current_col} after {FEEDBACK_TIMEOUT}s (expected col change)")
-                return False
-
-            expected_rot_change = False
-            expected_col_change = False
-            last_rotation = current_rotation
-            last_col = current_col
-
-            if current_rotation == target_rotation and current_col == target_col:
-                if not hard_drop_sent:
-                    print(f"[KeyInput] HARD DROP: piece at target rot={current_rotation} col={current_col}")
-                    self._tap_key(controller, VK_SPACE, hold=0.06)
-                    hard_drop_sent = True
-                    hard_drop_method = "space"
-                    hard_drop_deadline = time.time() + 3.0
-                    space_drop_attempt_time = time.time()
-                    post_drop_deadline = time.time() + 1.5
-                    if not self._sleep_with_stop(tasker, 0.10):
-                        return False
-                    continue
-                if post_drop_deadline is not None and time.time() >= post_drop_deadline:
-                    return True
-                if not self._sleep_with_stop(tasker, 0.04):
-                    return False
-                continue
-
-            clockwise_steps = (target_rotation - current_rotation) % rotation_count
-            counterclockwise_steps = (
-                current_rotation - target_rotation
-            ) % rotation_count
-
-            if current_rotation != target_rotation:
-                correction_key = (
-                    VK_K if clockwise_steps <= counterclockwise_steps else VK_J
-                )
-                key_name = "K(clockwise)" if correction_key == VK_K else "J(counter)"
-                print(f"[KeyInput] ROTATE: {key_name} current_rot={current_rotation} -> target_rot={target_rotation}")
-                self._tap_key(controller, correction_key, hold=0.05)
-                last_action_time = time.time()
-                expected_rot_change = True
-                if not self._sleep_with_stop(tasker, 0.08):
-                    return False
-                continue
-
-            if current_col != target_col:
-                if (current_col == 0 and target_col < current_col) or (
-                    current_col == BOARD_COLS - 1 and target_col > current_col
-                ):
-                    print(f"[KeyInput] BOUNDARY BLOCKED: current_col={current_col} target_col={target_col} BOARD_COLS={BOARD_COLS}")
-                    return False
-                correction_key = VK_D if current_col < target_col else VK_A
-                key_name = "D(right)" if correction_key == VK_D else "A(left)"
-                print(f"[KeyInput] MOVE: {key_name} current_col={current_col} -> target_col={target_col}")
-                self._tap_key(controller, correction_key, hold=0.05)
-                last_action_time = time.time()
-                expected_col_change = True
-                if not self._sleep_with_stop(tasker, 0.08):
-                    return False
-                continue
-
-            if not self._sleep_with_stop(tasker, 0.04):
-                return False
-
-        return False

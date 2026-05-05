@@ -4,7 +4,7 @@ import numpy as np
 
 from .pieces import PIECES
 
-BOARD_REGION = [473, 50, 294, 587]
+BOARD_REGION = [472, 50, 296, 587]
 BOARD_COLS = 10
 BOARD_ROWS = 20
 GRID_LEFT = 17
@@ -14,8 +14,7 @@ GRID_BOTTOM = 582
 CELL_WIDTH = (GRID_RIGHT - GRID_LEFT) / BOARD_COLS
 CELL_HEIGHT = (GRID_BOTTOM - GRID_TOP) / BOARD_ROWS
 
-REAL_BLOCK_VALUE_THRESHOLD = 160
-REAL_BLOCK_SATURATION_THRESHOLD = 80
+REAL_BLOCK_VALUE_THRESHOLD = 180
 
 DEBUG_BOARD = False  # 设为 True 启用棋盘识别调试输出
 
@@ -193,7 +192,37 @@ def calculate_edge_height_penalty(heights: list[int]):
     return float(heights[0] * heights[0] + heights[-1] * heights[-1])
 
 
-def detect_t_spin(board: np.ndarray, piece_name: str, rotation: int, target_col: int, drop_row: int, was_rotation_move: bool = True) -> dict:
+def calculate_center_stack_penalty(heights: list[int]):
+    center_cols = heights[3:7]
+    avg_center = sum(center_cols) / 4.0
+    edge_avg = (
+        (sum(heights[:3]) + sum(heights[7:])) / 6.0 if len(heights) >= 10 else 0.0
+    )
+    surplus = max(0.0, avg_center - edge_avg)
+    if surplus <= 2:
+        return 0.0
+    return float(surplus * surplus)
+
+
+def calculate_horizontal_balance_penalty(heights: list[int]):
+    import math
+
+    n = len(heights)
+    if n == 0 or all(h == 0 for h in heights):
+        return 0.0
+    mean = sum(heights) / n
+    variance = sum((h - mean) ** 2 for h in heights) / n
+    return float(math.sqrt(variance))
+
+
+def detect_t_spin(
+    board: np.ndarray,
+    piece_name: str,
+    rotation: int,
+    target_col: int,
+    drop_row: int,
+    was_rotation_move: bool = True,
+) -> dict:
     if piece_name != "T":
         return {"is_t_spin": False, "is_mini": False}
 
@@ -216,18 +245,33 @@ def detect_t_spin(board: np.ndarray, piece_name: str, rotation: int, target_col:
     for row_offset, col_offset in front_corner_offsets[rotation]:
         r = drop_row + row_offset
         c = target_col + col_offset
-        if r < 0 or r >= BOARD_ROWS or c < 0 or c >= BOARD_COLS or (0 <= r < BOARD_ROWS and 0 <= c < BOARD_COLS and board[r, c]):
+        if (
+            r < 0
+            or r >= BOARD_ROWS
+            or c < 0
+            or c >= BOARD_COLS
+            or (0 <= r < BOARD_ROWS and 0 <= c < BOARD_COLS and board[r, c])
+        ):
             front_corners_blocked += 1
 
     back_corners_blocked = 0
     for row_offset, col_offset in back_corner_offsets[rotation]:
         r = drop_row + row_offset
         c = target_col + col_offset
-        if r < 0 or r >= BOARD_ROWS or c < 0 or c >= BOARD_COLS or (0 <= r < BOARD_ROWS and 0 <= c < BOARD_COLS and board[r, c]):
+        if (
+            r < 0
+            or r >= BOARD_ROWS
+            or c < 0
+            or c >= BOARD_COLS
+            or (0 <= r < BOARD_ROWS and 0 <= c < BOARD_COLS and board[r, c])
+        ):
             back_corners_blocked += 1
 
     if was_rotation_move:
-        is_t_spin = front_corners_blocked >= 2 and (front_corners_blocked + back_corners_blocked) >= 3
+        is_t_spin = (
+            front_corners_blocked >= 2
+            and (front_corners_blocked + back_corners_blocked) >= 3
+        )
         is_mini = not is_t_spin and front_corners_blocked >= 2
     else:
         is_t_spin = False
@@ -279,6 +323,8 @@ def evaluate_board(
     row_transitions, col_transitions = calculate_transitions(board)
     well_penalty = calculate_well_penalty(heights)
     open_well_reward = calculate_open_well_reward(heights)
+    center_stack_penalty = calculate_center_stack_penalty(heights)
+    horizontal_balance_penalty = calculate_horizontal_balance_penalty(heights)
 
     aggregate_height = sum(heights)
     bumpiness = sum(
@@ -297,6 +343,8 @@ def evaluate_board(
             transitions_weight = 2.5
             well_weight = 2.8
             open_well_weight = 1.5
+            center_stack_weight = 0.5
+            balance_weight = 0.3
         elif avg_height < 14:
             lines_weight = 34.18
             holes_weight = 38.99
@@ -305,6 +353,8 @@ def evaluate_board(
             transitions_weight = 3.21
             well_weight = 3.38
             open_well_weight = 1.0
+            center_stack_weight = 1.5
+            balance_weight = 0.8
         else:
             lines_weight = 28.0
             holes_weight = 52.0
@@ -313,6 +363,8 @@ def evaluate_board(
             transitions_weight = 4.0
             well_weight = 4.5
             open_well_weight = 0.5
+            center_stack_weight = 3.0
+            balance_weight = 1.5
 
         if occupancy > 0.45:
             holes_weight *= 1.3
@@ -325,6 +377,8 @@ def evaluate_board(
         transitions_weight = 3.21
         well_weight = 3.38
         open_well_weight = 1.0
+        center_stack_weight = 1.5
+        balance_weight = 0.8
 
     score = (
         lines_cleared * lines_weight
@@ -336,6 +390,8 @@ def evaluate_board(
         - col_transitions * (transitions_weight * 2.9)
         - well_penalty * well_weight
         + open_well_reward * open_well_weight
+        - center_stack_penalty * center_stack_weight
+        - horizontal_balance_penalty * balance_weight
     )
 
     if combo_count > 1:
@@ -355,6 +411,8 @@ def evaluate_board_fast(board: np.ndarray, lines_cleared: int, combo_count: int 
     bumpiness = sum(
         abs(heights[idx] - heights[idx + 1]) for idx in range(len(heights) - 1)
     )
+    center_stack_penalty = calculate_center_stack_penalty(heights)
+    balance_penalty = calculate_horizontal_balance_penalty(heights)
 
     score = (
         lines_cleared * 35.0
@@ -362,6 +420,8 @@ def evaluate_board_fast(board: np.ndarray, lines_cleared: int, combo_count: int 
         - holes * 40.0
         - hard_holes * 20.0
         - bumpiness * 1.5
+        - center_stack_penalty * 1.5
+        - balance_penalty * 0.8
     )
 
     if combo_count > 1:
@@ -427,7 +487,9 @@ def simulate_drop(board: np.ndarray, shape, target_col: int):
                 rotation = rot_idx
                 break
         if rotation is not None:
-            t_spin_result = detect_t_spin(board, "T", rotation, target_col, drop_row)
+            t_spin_result = detect_t_spin(
+                board, "T", rotation, target_col, drop_row, was_rotation_move=False
+            )
             is_t_spin = t_spin_result["is_t_spin"]
             is_mini = t_spin_result["is_mini"]
 
@@ -460,8 +522,8 @@ def extract_visible_grid(board_crop, debug=False):
         for col in range(BOARD_COLS):
             center_x = GRID_LEFT + (col + 0.5) * CELL_WIDTH
             center_y = GRID_TOP + (row + 0.5) * CELL_HEIGHT
-            patch_half_width = CELL_WIDTH * 0.18
-            patch_half_height = CELL_HEIGHT * 0.18
+            patch_half_width = CELL_WIDTH * 0.24
+            patch_half_height = CELL_HEIGHT * 0.24
             x1 = max(0, int(center_x - patch_half_width))
             x2 = min(board_crop.shape[1], int(center_x + patch_half_width))
             y1 = max(0, int(center_y - patch_half_height))
@@ -473,12 +535,7 @@ def extract_visible_grid(board_crop, debug=False):
             v_mean = float(np.mean(hsv_patch[:, :, 2]))
             s_mean = float(np.mean(hsv_patch[:, :, 1]))
 
-            # The background grids and shadows possess very low saturation and lower values.
-            # Real blocks are bright (V>155) and colorful (S>80).
-            if (
-                v_mean >= REAL_BLOCK_VALUE_THRESHOLD
-                and s_mean >= REAL_BLOCK_SATURATION_THRESHOLD
-            ):
+            if v_mean >= REAL_BLOCK_VALUE_THRESHOLD:
                 grid[row, col] = True
 
             if debug:
@@ -489,9 +546,7 @@ def extract_visible_grid(board_crop, debug=False):
         borderline = [
             (r, c, v, s, f)
             for r, c, v, s, f in debug_cells
-            if not f
-            and v >= REAL_BLOCK_VALUE_THRESHOLD * 0.85
-            and s >= REAL_BLOCK_SATURATION_THRESHOLD * 0.85
+            if not f and v >= REAL_BLOCK_VALUE_THRESHOLD * 0.85
         ]
         if filled:
             print(f"[BoardDebug] filled cells ({len(filled)}):")
@@ -505,7 +560,9 @@ def extract_visible_grid(board_crop, debug=False):
     return grid
 
 
-def dump_board_state(grid, active_cells=None, piece_state=None, filepath="tetris_debug.txt"):
+def dump_board_state(
+    grid, active_cells=None, piece_state=None, filepath="tetris_debug.txt"
+):
     """将棋盘状态写入调试文件"""
     import os
 
@@ -542,7 +599,9 @@ def dump_board_state(grid, active_cells=None, piece_state=None, filepath="tetris
     lines.append(f"Column heights: {heights}")
     lines.append(f"Aggregate height: {sum(heights)}")
     holes, hole_depth, covered_holes, hard_holes = calculate_holes(grid)
-    lines.append(f"Holes: {holes}, depth: {hole_depth}, covered: {covered_holes}, hard: {hard_holes}")
+    lines.append(
+        f"Holes: {holes}, depth: {hole_depth}, covered: {covered_holes}, hard: {hard_holes}"
+    )
 
     content = "\n".join(lines)
 
