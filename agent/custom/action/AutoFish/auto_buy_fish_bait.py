@@ -63,9 +63,9 @@ class AutoBuyFishBait(CustomAction):
             find_bait_attempt += 1
             img = get_image(controller)
             found_bait, prob, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, found_bait_threshold)
-            logger.debug(f"  第 {find_bait_attempt} 次尝试定位鱼饵: 匹配度={prob:.2f}, 阈值={found_bait_threshold}")
+            logger.debug(f"第 {find_bait_attempt} 次尝试定位鱼饵: 匹配度={prob:.2f}, 阈值={found_bait_threshold}")
             if found_bait:
-                logger.info(f"  鱼饵已定位 ({x+15},{y+5}), 点击中")
+                logger.info(f"鱼饵已定位 ({x+15},{y+5}), 点击中")
                 for _ in range(3):
                     click_rect(controller, [x, y, 30, 10])
                     time.sleep(0.1)
@@ -76,10 +76,10 @@ class AutoBuyFishBait(CustomAction):
                     time.sleep(0.5)
                     break
                 else:
-                    logger.warning("  鱼饵已找到但点击未生效，重试...")
+                    logger.warning("鱼饵已找到但点击未生效，重试...")
                     time.sleep(1)
             else:
-                logger.warning(f"  鱼店中未找到鱼饵 (第 {find_bait_attempt} 次)，刷新店铺后重试")
+                logger.warning(f"鱼店中未找到鱼饵 (第 {find_bait_attempt} 次)，刷新店铺后重试")
                 controller.post_click_key(KEY_R).wait()
                 time.sleep(1)
                 continue
@@ -90,16 +90,16 @@ class AutoBuyFishBait(CustomAction):
             select_max_attempt += 1
             img = get_image(controller)
             found_select_max, prob, _, _ = match_template_in_region(img, select_max_region, self.select_max_template, match_threshold)
-            logger.debug(f"  第 {select_max_attempt} 次查找“最大数量”按钮: 匹配度={prob:.2f}")
+            logger.debug(f"第 {select_max_attempt} 次查找“最大数量”按钮: 匹配度={prob:.2f}")
             if found_select_max:
-                logger.info("  已找到“最大数量”按钮，点击中")
+                logger.info("已找到“最大数量”按钮，点击中")
                 for _ in range(5):
                     click_rect(controller, select_max_region, 0.3)
                     time.sleep(0.1)
                 time.sleep(1)
                 break
             else:
-                logger.debug("  未找到“最大数量”按钮，重试...")
+                logger.debug("未找到“最大数量”按钮，重试...")
                 time.sleep(1)
 
         logger.info("步骤 3/4: 点击“购买”")
@@ -109,14 +109,14 @@ class AutoBuyFishBait(CustomAction):
             img = get_image(controller)
             found_buy, _, _, _ = match_template_in_region(img, buy_region, self.buy_template, match_threshold)
             if found_buy:
-                logger.info("  已找到“购买”按钮，点击中")
+                logger.info("已找到“购买”按钮，点击中")
                 for _ in range(3):
                     click_rect(controller, buy_region, 0.3)
                     time.sleep(0.1)
                 time.sleep(0.5)
                 break
             else:
-                logger.debug(f"  未找到“购买”按钮 (第 {buy_attempt} 次)，重试...")
+                logger.debug(f"未找到“购买”按钮 (第 {buy_attempt} 次)，重试...")
                 time.sleep(1)
 
         confirm_attempt = 0
@@ -125,14 +125,14 @@ class AutoBuyFishBait(CustomAction):
             img = get_image(controller)
             found_buy_confirm, _, _, _ = match_template_in_region(img, buy_confirm_region, self.buy_confirm_template, match_threshold)
             if found_buy_confirm:
-                logger.info("  已找到“确认购买”按钮，点击中")
+                logger.info("已找到“确认购买”按钮，点击中")
                 for _ in range(3):
                     click_rect(controller, buy_confirm_region)
                     time.sleep(0.1)
                 time.sleep(0.5)
                 break
             else:
-                logger.debug(f"  未找到“确认购买”按钮 (第 {confirm_attempt} 次)，重试...")
+                logger.debug(f"未找到“确认购买”按钮 (第 {confirm_attempt} 次)，重试...")
                 time.sleep(1)
 
         logger.info("步骤 4/4: 等待购买成功提示")
@@ -148,7 +148,7 @@ class AutoBuyFishBait(CustomAction):
                 controller.post_click_key(KEY_ESC).wait()
                 break
             else:
-                logger.debug(f"  未检测到购买成功 (第 {success_attempt} 次)，继续等待...")
+                logger.debug(f"未检测到购买成功 (第 {success_attempt} 次)，继续等待...")
                 time.sleep(1)
 
         return CustomAction.RunResult(success=True)

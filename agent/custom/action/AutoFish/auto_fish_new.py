@@ -61,13 +61,13 @@ class AutoFishNew(CustomAction):
                 img, success_region, self.success_catch_template, 0.7
             )
             if wait_frame > 300:
-                logger.warning(f"  等待鱼上钩超时 (f={wait_frame})，结束本次钓鱼")
+                logger.warning(f"等待鱼上钩超时 (f={wait_frame})，结束本次钓鱼")
                 break
             if m_catch:
                 controller.post_key_down(KEY_F)
                 time.sleep(0.1)
                 controller.post_key_up(KEY_F)
-                logger.info(f"  鱼已上钩！(f={wait_frame}, score={catch_score:.3f})")
+                logger.info(f"鱼已上钩！(f={wait_frame}, score={catch_score:.3f})")
                 break
 
         logger.info("阶段 2/2: 进入控条小游戏")
@@ -128,7 +128,7 @@ class AutoFishNew(CustomAction):
                     set_ad_key(None)
                     controller.post_key_up(KEY_F)
                     logger.info(
-                        f"  滑块连续 {slider_miss_count} 帧丢失，本次钓鱼结束 (success)"
+                        f"滑块连续 {slider_miss_count} 帧丢失，本次钓鱼结束 (success)"
                     )
                     return CustomAction.RunResult(success=True)
                 x_slider = last_x_slider
@@ -138,7 +138,7 @@ class AutoFishNew(CustomAction):
                 controller.post_key_up(KEY_A)
                 controller.post_key_up(KEY_D)
                 controller.post_key_up(KEY_F)
-                logger.warning(f"  控条阶段超时 (f={frame})，本次钓鱼结束 (failure)")
+                logger.warning(f"控条阶段超时 (f={frame})，本次钓鱼结束 (failure)")
                 return CustomAction.RunResult(success=False)
 
             if m_left and m_right:
@@ -166,7 +166,7 @@ class AutoFishNew(CustomAction):
             if frame % 30 == 0 or current_ad_key != prev_key:
                 key_name = {None: "-", KEY_A: "A", KEY_D: "D"}.get(current_ad_key, "?")
                 logger.debug(
-                    f"  f={frame} slider(x={x_slider:.0f} s={slider_score:.2f}) "
+                    f"f={frame} slider(x={x_slider:.0f} s={slider_score:.2f}) "
                     f"L({m_left} s={left_score:.2f}) R({m_right} s={right_score:.2f}) "
                     f"bar_w={last_bar_width:.0f} target={target:.0f} offset={offset:+.0f} key={key_name}"
                 )

@@ -68,7 +68,7 @@ class AutoSellFish(CustomAction):
                     break
                 time.sleep(1)
             else:
-                logger.debug(f"  未找到卖鱼选项 (第 {sell_option_attempt} 次)，按 Q 后重试")
+                logger.debug(f"未找到卖鱼选项 (第 {sell_option_attempt} 次)，按 Q 后重试")
                 controller.post_click_key(KEY_Q).wait()
                 time.sleep(1)
 
@@ -78,7 +78,7 @@ class AutoSellFish(CustomAction):
         for check_n in range(1, 6):
             img = get_image(controller)
             found_no_fish_to_sell, prob, _, _ = match_template_in_region(img, no_fish_to_sell_region, self.no_fish_to_sell_template, 0.8)
-            logger.debug(f"  第 {check_n}/5 次检查“无鱼可卖”: 匹配度={prob:.2f}")
+            logger.debug(f"第 {check_n}/5 次检查“无鱼可卖”: 匹配度={prob:.2f}")
             time.sleep(0.1)
             if found_no_fish_to_sell:
                 logger.info("无鱼可卖，关闭店铺")
@@ -94,7 +94,7 @@ class AutoSellFish(CustomAction):
             img = get_image(controller)
             found_sell_button, _, _, _ = match_template_in_region(img, sell_button_region, self.sell_button_template, 0.8)
             if found_sell_button:
-                logger.info("  已找到“卖出”按钮，点击中")
+                logger.info("已找到“卖出”按钮，点击中")
                 confirm_attempt = 0
                 while True:
                     confirm_attempt += 1
@@ -104,7 +104,7 @@ class AutoSellFish(CustomAction):
                     found_confirm_sell, _, _, _ = match_template_in_region(img, confirm_sell_region, self.confirm_sell_template, 0.8)
                     sell_fail, _, _, _ = match_template_in_region(img, sell_fail_region, self.sell_fail_template, 0.8)
                     if found_confirm_sell:
-                        logger.info(f"  已找到“确认卖出”按钮 (第 {confirm_attempt} 次)，确认中")
+                        logger.info(f"已找到“确认卖出”按钮 (第 {confirm_attempt} 次)，确认中")
                         click_rect(controller, confirm_sell_region, 0.2)
                         time.sleep(0.5)
                         break
@@ -116,7 +116,7 @@ class AutoSellFish(CustomAction):
                         time.sleep(0.1)
                 break
             else:
-                logger.debug(f"  未找到“卖出”按钮 (第 {sell_button_attempt} 次)")
+                logger.debug(f"未找到“卖出”按钮 (第 {sell_button_attempt} 次)")
                 time.sleep(0.1)
 
         success_attempt = 0
@@ -131,7 +131,7 @@ class AutoSellFish(CustomAction):
                 controller.post_click_key(KEY_ESC).wait()
                 break
             else:
-                logger.debug(f"  未检测到卖出成功 (第 {success_attempt} 次)，继续等待...")
+                logger.debug(f"未检测到卖出成功 (第 {success_attempt} 次)，继续等待...")
                 time.sleep(1)
 
         logger.info("卖鱼流程完成")

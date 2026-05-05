@@ -96,26 +96,26 @@ class AutoFish(CustomAction):
 
                 m_settle, _, _, _ = match_template_in_region(img, settlement_region, self.settlement_template, 0.8)
                 if m_settle:
-                    logger.info("  检查阶段检测到结算页，按 ESC 关闭")
+                    logger.info("检查阶段检测到结算页，按 ESC 关闭")
                     press_esc()
                     wait_until_settlement_disappears()
                     continue
 
                 m_game, game_prob, _, _ = match_template_in_region(img, fish_game_sign_region_2, self.fish_game_sign_template, 0.6, green_mask=True)
-                logger.debug(f"  第 {attempt}/10 次检测钓鱼小游戏: 匹配度={game_prob:.2f}")
+                logger.debug(f"第 {attempt}/10 次检测钓鱼小游戏: 匹配度={game_prob:.2f}")
                 if m_game:
                     return True
 
                 m_prepare, _, x, y = match_template_in_region(img, prepare_region, self.prepare_start_template, 0.7)
                 if m_prepare:
-                    logger.info("  位于钓鱼准备界面，点击开始")
+                    logger.info("位于钓鱼准备界面，点击开始")
                     controller.post_click(x + 15, y + 15)
                     time.sleep(1.5)
                     return True
 
                 time.sleep(0.1)
 
-            logger.error("  10 次检测后仍未进入钓鱼小游戏或准备界面，退出本次钓鱼")
+            logger.error("10 次检测后仍未进入钓鱼小游戏或准备界面，退出本次钓鱼")
             return False
 
         for i in range(fishing_count):
@@ -131,7 +131,7 @@ class AutoFish(CustomAction):
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
                 cast_n += 1
-                logger.info(f"  [循环 {i + 1}/{fishing_count}] 第 {cast_n} 次抛竿尝试")
+                logger.info(f"[循环 {i + 1}/{fishing_count}] 第 {cast_n} 次抛竿尝试")
                 for _ in range(5):
                     controller.post_key_down(KEY_F)
                     time.sleep(0.1)
@@ -140,14 +140,14 @@ class AutoFish(CustomAction):
                 for bait_check_n in range(1, 6):
                     img = get_image(controller)
                     m_need_bait, prob, _, _ = match_template_in_region(img, need_bait_region, self.need_bait_template, 0.7)
-                    logger.debug(f"  第 {bait_check_n}/5 次检查鱼饵: 匹配度={prob:.2f}")
+                    logger.debug(f"第 {bait_check_n}/5 次检查鱼饵: 匹配度={prob:.2f}")
                     if m_need_bait:
-                        logger.error("  鱼饵不足，停止钓鱼")
+                        logger.error("鱼饵不足，停止钓鱼")
                         return CustomAction.RunResult(success=False)
 
                     time.sleep(0.1)
 
-                logger.info("  抛竿中...")
+                logger.info("抛竿中...")
 
                 wait_start = time.time()
                 m_settle_unexpected = False
@@ -158,7 +158,7 @@ class AutoFish(CustomAction):
                         return CustomAction.RunResult(success=False)
 
                     if time.time() - wait_start > 30:
-                        logger.warning("  等待鱼上钩超时 (30s)，重新抛竿")
+                        logger.warning("等待鱼上钩超时 (30s)，重新抛竿")
                         timeout_triggered = True
                         break
 
@@ -167,7 +167,7 @@ class AutoFish(CustomAction):
 
                     m_settle_unexpected, _, _, _ = match_template_in_region(img, settlement_region, self.settlement_template, 0.8)
                     if m_settle_unexpected:
-                        logger.warning("  等待上钩时检测到结算页，清理后重试")
+                        logger.warning("等待上钩时检测到结算页，清理后重试")
                         break
 
                     m_catch, _, _, _ = match_template_in_region(img, success_region, self.success_catch_template, 0.7)
@@ -175,7 +175,7 @@ class AutoFish(CustomAction):
                         controller.post_key_down(KEY_F)
                         time.sleep(0.1)
                         controller.post_key_up(KEY_F)
-                        logger.info(f"  鱼已上钩！(等待 {time.time() - wait_start:.1f}s)")
+                        logger.info(f"鱼已上钩！(等待 {time.time() - wait_start:.1f}s)")
                         break
                 
                 if m_settle_unexpected or timeout_triggered:
@@ -214,11 +214,11 @@ class AutoFish(CustomAction):
                     if frame % 10 == 0:
                         m_settle, _, _, _ = match_template_in_region(img, settlement_region, self.settlement_template, 0.8)
                         if m_settle:
-                            logger.info(f"  鱼已钓上！(控条 {frame} 帧, {time.time() - start_time:.1f}s)")
+                            logger.info(f"鱼已钓上！(控条 {frame} 帧, {time.time() - start_time:.1f}s)")
                             break
                         m_escape, _, _, _ = match_template_in_region(img, escape_region, self.escape_template, 0.8)
                         if m_escape:
-                            logger.warning(f"  鱼脱钩，重新抛竿 (控条 {frame} 帧)")
+                            logger.warning(f"鱼脱钩，重新抛竿 (控条 {frame} 帧)")
                             break
 
                     m_left, _, x_left, _ = match_template_in_region(img, game_region, self.valid_region_left_template, 0.7)
@@ -281,7 +281,7 @@ class AutoFish(CustomAction):
                     continue  
                 break  
 
-            logger.info(f"  本次钓鱼完成 (共 {cast_n} 次抛竿尝试)")
+            logger.info(f"本次钓鱼完成 (共 {cast_n} 次抛竿尝试)")
 
             match_settle = False
             wait_settlement_start = time.time()
@@ -293,21 +293,21 @@ class AutoFish(CustomAction):
                 settle_check_n += 1
                 img = get_image(controller)
                 match_settle, settle_prob, _, _ = match_template_in_region(img, settlement_region, self.settlement_template, 0.8)
-                logger.debug(f"  第 {settle_check_n} 次检测结算页: 匹配度={settle_prob:.2f}")
+                logger.debug(f"第 {settle_check_n} 次检测结算页: 匹配度={settle_prob:.2f}")
                 if match_settle:
-                    logger.info("  检测到结算页")
+                    logger.info("检测到结算页")
                     break
                 time.sleep(0.05)
 
             if match_settle:
-                logger.info("  关闭结算页...")
+                logger.info("关闭结算页...")
                 for _ in range(5):
                     press_esc()
                     if wait_until_settlement_disappears():
-                        logger.info("  结算页已关闭")
+                        logger.info("结算页已关闭")
                         break
             else:
-                logger.warning("  未检测到结算页，直接继续下一次")
+                logger.warning("未检测到结算页，直接继续下一次")
 
         logger.info(f"全部钓鱼任务完成 (共 {fishing_count} 次)")
         return CustomAction.RunResult(success=True)
