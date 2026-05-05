@@ -23,27 +23,22 @@
         ]
     },
     "MakeCoffeeOneOneEnter": {
-        "desc": "等待店长特供入口并按 F 进入",
+        "desc": "等待店长特供入口并点击进入",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "roi": [
                     0,
                     0,
-                    1280,
-                    720
+                    240,
+                    80
                 ],
                 "template": "auto_make_coffee/enter.png",
                 "threshold": 0.8
             }
         },
         "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": [
-                    70
-                ]
-            }
+            "type": "Click"
         },
         "post_delay": 1000,
         "next": [
@@ -135,13 +130,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    326,
-                    483,
-                    205,
-                    101
+                    306,
+                    463,
+                    245,
+                    141
                 ],
                 "template": "auto_make_coffee/food_1_ready_2.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
@@ -169,13 +164,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    179,
-                    478,
-                    160,
-                    110
+                    159,
+                    458,
+                    200,
+                    150
                 ],
                 "template": "auto_make_coffee/food_1_ready_3.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
@@ -219,13 +214,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    723,
-                    595,
-                    250,
-                    125
+                    703,
+                    575,
+                    290,
+                    145
                 ],
                 "template": "auto_make_coffee/food_2_ready_2.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
@@ -253,13 +248,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    536,
-                    474,
-                    210,
-                    115
+                    516,
+                    454,
+                    250,
+                    155
                 ],
                 "template": "auto_make_coffee/food_2_ready_3.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
@@ -303,13 +298,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    3,
-                    492,
-                    182,
-                    85
+                    0,
+                    472,
+                    205,
+                    125
                 ],
                 "template": "auto_make_coffee/food_3_ready_2.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
@@ -337,13 +332,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    171,
-                    475,
-                    174,
-                    115
+                    151,
+                    455,
+                    214,
+                    155
                 ],
                 "template": "auto_make_coffee/food_3_ready_3.png",
-                "threshold": 0.8
+                "threshold": 0.6
             }
         },
         "next": [
