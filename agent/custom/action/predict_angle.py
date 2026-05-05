@@ -48,6 +48,7 @@ class PredictAngle(CustomAction):
 
         while True:
             if context.tasker.stopping:
+                cv2.destroyAllWindows()
                 break
 
             img_original = controller.post_screencap().wait().get()[..., ::-1]

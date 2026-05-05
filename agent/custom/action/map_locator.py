@@ -19,7 +19,7 @@ class MapLocator(CustomAction):
     if Path.exists(abs_path / "assets"):
         default_big_map = abs_path / f"assets/resource/base/image/map/{map_name}"
     else:
-        default_big_map = abs_path / f"map/resource/base/image/{map_name}"
+        default_big_map = abs_path / f"resource/base/image/map/{map_name}"
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         print("=== Map Locator Test Started ===")
@@ -113,6 +113,7 @@ class MapLocator(CustomAction):
 
         while True:
             if context.tasker.stopping:
+                cv2.destroyAllWindows()
                 break
 
             loop_start = time.perf_counter()
@@ -301,7 +302,7 @@ class MapLocator(CustomAction):
             cv2.imshow("map_locator_test", np.concatenate([mini_view, map_view], axis=1))
             if cv2.waitKey(1) & 0xFF == ord("q"):
                 break
-
+            
             sleep_time = frame_interval - (time.perf_counter() - loop_start)
             if sleep_time > 0:
                 time.sleep(sleep_time)

@@ -19,7 +19,7 @@ class MapLocatorPyramid(CustomAction):
     if Path.exists(abs_path / "assets"):
         default_big_map = abs_path / f"assets/resource/base/image/map/{map_name}"
     else:
-        default_big_map = abs_path / f"map/resource/base/image/{map_name}"
+        default_big_map = abs_path / f"resource/base/image/map/{map_name}"
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         print("=== Map Locator Pyramid Started ===")
@@ -174,6 +174,7 @@ class MapLocatorPyramid(CustomAction):
         
         while True:
             if context.tasker.stopping:
+                cv2.destroyAllWindows()
                 break
 
             loop_start = time.perf_counter()
