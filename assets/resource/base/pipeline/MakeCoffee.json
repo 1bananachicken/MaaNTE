@@ -101,10 +101,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    450,
-                    0,
-                    400,
-                    90
+                    586,
+                    43,
+                    105,
+                    25
                 ],
                 "template": "auto_make_coffee/timer.png",
                 "threshold": 0.8
@@ -135,10 +135,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    390,
-                    610,
-                    210,
-                    105
+                    326,
+                    483,
+                    205,
+                    101
                 ],
                 "template": "auto_make_coffee/food_1_ready_2.png",
                 "threshold": 0.8
@@ -169,10 +169,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    315,
-                    485,
-                    230,
-                    115
+                    189,
+                    488,
+                    140,
+                    91
                 ],
                 "template": "auto_make_coffee/food_1_ready_3.png",
                 "threshold": 0.8
@@ -219,10 +219,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    560,
-                    595,
-                    260,
-                    125
+                    744,
+                    624,
+                    208,
+                    95
                 ],
                 "template": "auto_make_coffee/food_2_ready_2.png",
                 "threshold": 0.8
@@ -253,10 +253,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    525,
-                    485,
-                    240,
-                    115
+                    547,
+                    484,
+                    188,
+                    96
                 ],
                 "template": "auto_make_coffee/food_2_ready_3.png",
                 "threshold": 0.8
@@ -303,10 +303,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    0,
-                    605,
-                    190,
-                    115
+                    3,
+                    492,
+                    182,
+                    85
                 ],
                 "template": "auto_make_coffee/food_3_ready_2.png",
                 "threshold": 0.8
@@ -337,10 +337,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    170,
-                    480,
-                    180,
-                    125
+                    189,
+                    488,
+                    138,
+                    89
                 ],
                 "template": "auto_make_coffee/food_3_ready_3.png",
                 "threshold": 0.8
@@ -371,10 +371,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    0,
-                    0,
-                    80,
-                    80
+                    14,
+                    13,
+                    33,
+                    31
                 ],
                 "template": "auto_make_coffee/exit.png",
                 "threshold": 0.8
