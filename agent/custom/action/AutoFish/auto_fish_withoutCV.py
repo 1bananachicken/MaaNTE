@@ -5,9 +5,9 @@ from maa.context import Context
 import time
 import json
 
-from ..Common.logger import get_logger
+from utils.logger import logger
 
-logger = get_logger("auto_fish_without_cv")
+logger = logger("auto_fish_without_cv")
 
 # 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
 CURSOR_PX_PER_SEC = 168
@@ -39,7 +39,7 @@ class AutoFishWithoutCV(CustomAction):
             except Exception:
                 pass
 
-        logger.info("钓鱼开始：进入控条阶段（绿条/光标对齐）")
+        logger.debug("钓鱼开始：进入控条阶段（绿条/光标对齐）")
         # 钓鱼阶段
         while not context.tasker.stopping:
             image = context.tasker.controller.post_screencap().wait().get()
@@ -62,7 +62,7 @@ class AutoFishWithoutCV(CustomAction):
                 )
 
                 if max_try_item <= 0:
-                    logger.error("尝试次数用尽，控条失败")
+                    logger.warning("尝试次数用尽，控条失败")
                     return CustomAction.RunResult(success=True)
                 continue
 
@@ -103,5 +103,5 @@ class AutoFishWithoutCV(CustomAction):
                     },
                 )
 
-        logger.info("任务结束（success=True）")
+        logger.debug("任务结束（success=True）")
         return CustomAction.RunResult(success=True)

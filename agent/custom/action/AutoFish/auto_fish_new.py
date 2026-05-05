@@ -41,22 +41,8 @@ class AutoFishNew(CustomAction):
         KEY_A = 65
         KEY_D = 68
 
-        success_region = [350, 150, 580, 50]
         game_region = [395, 40, 490, 20]
         deadzone = 15
-
-        # --- 等待鱼上钩 ---
-        logger.info("等鱼上钩中")
-
-        wait_frame = 0
-        while not context.tasker.stopping:
-            time.sleep(0.001)
-            img = get_image(controller)
-            wait_frame += 1
-
-            if wait_frame > 300:
-                logger.info(f"钓鱼超时")
-                break
 
         # --- 小游戏 ---
         frame = 0
@@ -65,6 +51,7 @@ class AutoFishNew(CustomAction):
         last_target = (game_region[0] + game_region[2]) / 2
         last_x_slider = last_target
         slider_miss_count = 0
+        time_last = time.time()
 
         def set_ad_key(key):
             nonlocal current_ad_key
@@ -78,7 +65,12 @@ class AutoFishNew(CustomAction):
 
         while not context.tasker.stopping:
             time.sleep(0.001)
+            time_start = time.time()
             img = get_image(controller)
+            logger.debug(
+                f"loop once time: {time.time()-time_last}, screen cap time: {time.time()-time_start}"
+            )
+            time_last = time.time()
             frame += 1
 
             m_left, left_score, x_left, _ = match_template_in_region(
