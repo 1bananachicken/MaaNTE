@@ -3,7 +3,7 @@
         "desc": "处理登录界面",
         "recognition": {
             "type": "Or",
-            "param":{
+            "param": {
                 "any_of": [
                     "__ScenePrivateCloseLoginAnnouncement",
                     "__ScenePriviteLoginExitButton"
@@ -16,8 +16,8 @@
             "__ScenePrivateLogin"
         ]
     },
-    "__ScenePriviteLoginExitButton":{
-        "desc":"登陆界面退出按钮",
+    "__ScenePriviteLoginExitButton": {
+        "desc": "登录界面退出按钮",
         "recognition": "TemplateMatch",
         "roi": [
             0,
@@ -31,7 +31,6 @@
         "green_mask": true,
         "pre_delay": 0,
         "post_delay": 0
-
     },
     "__ScenePrivateLoginContinue": {
         "desc": "等待登录页面出现按钮继续",
@@ -86,7 +85,7 @@
             "type": "Click"
         }
     },
-    "__ScenePrivateCloseAnnouncementButton":{
+    "__ScenePrivateCloseAnnouncementButton": {
         "recognition": "TemplateMatch",
         "roi": [
             1090,
@@ -115,7 +114,7 @@
                 "expected": [
                     "异晶开采凭证",
                     "剩余天数",
-                    "今日奖励"  // zh-cn
+                    "今日奖励" // zh-cn
                 ]
             }
         },
@@ -125,10 +124,15 @@
             27
         ]
     },
-    "__ScenePrivateLoginLoading":{
-        "desc":"判断正在登录加载界面",
+    "__ScenePrivateLoginLoading": {
+        "desc": "判断正在登录加载界面",
         "recognition": "OCR",
-        "roi": [1158,644,101,49],
+        "roi": [
+            1158,
+            644,
+            101,
+            49
+        ],
         "expected": [
             "%"
         ],
