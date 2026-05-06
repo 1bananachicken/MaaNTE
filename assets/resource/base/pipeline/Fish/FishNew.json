@@ -202,12 +202,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "duration": 2
-            }
-        },
+        "action": "Click",
         "post_wait_freezes": 500,
         "focus": {
             "Node.Action.Succeeded": "选择万能鱼饵"
@@ -238,6 +233,7 @@
         "post_wait_freezes": 2000
     },
     "FishNewBaitExit": {
+        "desc": "未开启自动买鱼饵，尝试前往卖鱼",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -309,12 +305,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "duration": 2
-            }
-        },
+        "action": "Click",
         "post_wait_freezes": {
             "target": [
                 26,
@@ -369,12 +360,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "duration": 2
-            }
-        },
+        "action": "Click",
         "next": [
             "[Anchor]FishNewRestart"
         ]
@@ -392,8 +378,7 @@
             "Fish/FishStoreGeneralBait.png"
         ],
         "threshold": 0.8,
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "FishNewStoreChooseMaxSuccess",
             "[JumpBack]FishNewStoreChooseMax"
@@ -444,13 +429,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "duration": 2,
-                "pressure": 10
-            }
-        }
+        "action": "Click"
     },
     "FishNewStoreChooseMaxSuccess": {
         "desc": "确认选中最大或鱼鳞币不足",
@@ -485,12 +464,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "duration": 2
-            }
-        },
+        "action": "Click",
         "next": [
             "FishNewConfirmBuyBait",
             "FishNewSellFishEntrance"
@@ -514,12 +488,7 @@
             }
         },
         "pre_delay": 500,
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "duration": 2
-            }
-        },
+        "action": "Click",
         "next": [
             "FishNewStoreContinue"
         ]
@@ -554,7 +523,7 @@
         ]
     },
     "FishNewExitStore": {
-        "desc": "退出渔具商店继续选择鱼饵",
+        "desc": "退出渔具商店重新开始钓鱼",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -684,8 +653,7 @@
         "expected": [
             "收购"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "post_wait_freezes": 200,
         "next": [
             "FishNewFishingMasterPage1Submit1"
@@ -703,8 +671,7 @@
         "expected": [
             "快捷提交"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "[JumpBack]FishNewFishingMasterContinue",
             "FishNewFishingMasterPage1Sell2"
@@ -722,8 +689,7 @@
         "expected": [
             "收购"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "post_wait_freezes": 200,
         "next": [
             "FishNewFishingMasterPage1Submit2"
@@ -741,8 +707,7 @@
         "expected": [
             "快捷提交"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "[JumpBack]FishNewFishingMasterContinue",
             "FishNewFishingMasterPage1Sell3"
@@ -760,8 +725,7 @@
         "expected": [
             "收购"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "post_wait_freezes": 200,
         "next": [
             "FishNewFishingMasterPage1Submit3"
@@ -779,8 +743,7 @@
         "expected": [
             "快捷提交"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "[JumpBack]FishNewFishingMasterContinue",
             "FishNewFishingMasterSwitchToPage2"
@@ -788,7 +751,7 @@
     },
     "FishNewFishingMasterContinue": {
         "desc": "海上钓客界面点击空白处关闭",
-        "pre_wait_freezes": 200,
+        "pre_delay": 500,
         "recognition": "OCR",
         "roi": [
             555,
@@ -816,8 +779,7 @@
         "template": [
             "Fish/FishSellFishPage2.png"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "pre_wait_freezes": 200,
         "post_wait_freezes": 200,
         "next": [
@@ -837,9 +799,8 @@
         "expected": [
             "出售"
         ],
-        "action": "LongPress",
-        "duration": 2,
-        "post_wait_freezes": 200,
+        "action": "Click",
+        "post_wait_freezes": 1000,
         "next": [
             "FishNewConfirmSellFish"
         ]
@@ -861,12 +822,7 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "duration": 2
-            }
-        },
+        "action": "Click",
         "next": [
             "[JumpBack]FishNewFishingMasterContinue",
             "FishNewFishingMasterExit"
