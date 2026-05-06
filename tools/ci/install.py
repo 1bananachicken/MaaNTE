@@ -105,7 +105,7 @@ def install_agent():
     elif sys.platform.startswith("darwin"):
         interface["agent"]["child_exec"] = r"./python/bin/python3"
     elif sys.platform.startswith("linux"):
-        interface["agent"]["child_exec"] = r"python3"
+        interface["agent"]["child_exec"] = r"./python/bin/python3"
 
     interface["agent"]["child_args"] = ["-u", r"./agent/main.py"]
 

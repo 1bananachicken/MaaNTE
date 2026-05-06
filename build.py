@@ -117,6 +117,18 @@ def get_platform():
     return os_type, os_arch, platform_tag
 
 
+def _maa_arch(os_arch):
+    """MaaFramework 在不同平台用不同 arch 命名"""
+    os_type = platform.system()
+    if os_type == "Windows":
+        return "x86_64" if os_arch in ("AMD64", "x86_64") else "arm64"
+    if os_type == "Linux":
+        return "x86_64" if os_arch == "x86_64" else "aarch64"
+    if os_type == "Darwin":
+        return "x86_64" if os_arch == "x86_64" else "arm64"
+    raise RuntimeError(f"不支持的操作系统: {os_type}")
+
+
 # ========== 各步骤 ==========
 
 def step_setup_python(os_type, os_arch):
@@ -246,10 +258,16 @@ def step_download_maa_framework(os_arch):
         print(f"  {DEPS_DIR}/bin 已存在，跳过下载（如需重新下载请删除 {DEPS_DIR}）")
         return
 
-    arch_str = "x86_64" if os_arch in ("AMD64", "x86_64") else "arm64"
+    os_type = platform.system()
+    platform_slug = {"Windows": "win", "Linux": "linux", "Darwin": "macos"}.get(
+        os_type
+    )
+    if not platform_slug:
+        raise RuntimeError(f"不支持的操作系统: {os_type}")
+    arch_str = _maa_arch(os_arch)
     url = (
         f"https://github.com/MaaXYZ/MaaFramework/releases/download/"
-        f"{MAA_FRAMEWORK_VERSION}/MAA-win-{arch_str}-{MAA_FRAMEWORK_VERSION}.zip"
+        f"{MAA_FRAMEWORK_VERSION}/MAA-{platform_slug}-{arch_str}-{MAA_FRAMEWORK_VERSION}.zip"
     )
     zip_path = ROOT / f"maa-framework-{arch_str}.zip"
     download(url, zip_path)
@@ -269,16 +287,24 @@ def step_download_mfa(os_arch, platform_tag):
         print(f"  {MFA_DIR} 已存在，跳过下载（如需重新下载请删除该目录）")
         return
 
-    mfa_tag = "x64" if os_arch in ("AMD64", "x86_64") else "arm64"
+    os_type = platform.system()
+    platform_slug = {"Windows": "win", "Linux": "linux", "Darwin": "osx"}.get(
+        os_type
+    )
+    if not platform_slug:
+        raise RuntimeError(f"不支持的操作系统: {os_type}")
+    ext = "zip" if os_type == "Windows" else "tar.gz"
+    mfa_arch = "x64" if os_arch in ("AMD64", "x86_64") else "arm64"
+
     url = (
         f"https://github.com/MaaXYZ/MFAAvalonia/releases/download/"
-        f"{MFAA_VERSION}/MFAAvalonia-{MFAA_VERSION}-win-{mfa_tag}.zip"
+        f"{MFAA_VERSION}/MFAAvalonia-{MFAA_VERSION}-{platform_slug}-{mfa_arch}.{ext}"
     )
-    zip_path = ROOT / f"mfa-{mfa_tag}.zip"
-    download(url, zip_path)
+    archive_path = ROOT / f"mfa-{mfa_arch}.{ext}"
+    download(url, archive_path)
     MFA_DIR.mkdir(parents=True, exist_ok=True)
-    shutil.unpack_archive(zip_path, MFA_DIR)
-    zip_path.unlink()
+    shutil.unpack_archive(archive_path, MFA_DIR)
+    archive_path.unlink()
     print(f"  MFAAvalonia 解压完成 -> {MFA_DIR}")
 
 
@@ -344,15 +370,31 @@ def step_copy_mfa():
         else:
             shutil.copy2(src, dst)
 
-    # 重命名 exe
-    exe_path = INSTALL_DIR / "MFAAvalonia.exe"
-    target_path = INSTALL_DIR / "MaaNTE.exe"
+    # 重命名入口二进制（Windows only；Linux AppHost 内嵌原始名称，不可改名）
+    os_type = platform.system()
+    if os_type == "Windows":
+        exe_path = INSTALL_DIR / "MFAAvalonia.exe"
+        target_path = INSTALL_DIR / "MaaNTE.exe"
+    else:
+        exe_path = INSTALL_DIR / "MFAAvalonia"
+        target_path = None
+
     if exe_path.exists():
-        exe_path.rename(target_path)
-        print(f"  重命名: {exe_path.name} -> {target_path.name}")
-    elif (INSTALL_DIR / "MFAAvalonia").exists():
-        (INSTALL_DIR / "MFAAvalonia").rename(INSTALL_DIR / "MaaNTE")
-        print("  重命名: MFAAvalonia -> MaaNTE")
+        if os_type == "Windows":
+            exe_path.rename(target_path)
+            print(f"  重命名: {exe_path.name} -> {target_path.name}")
+        else:
+            exe_path.chmod(0o755)
+            print(f"  设置可执行权限: {exe_path.name}")
+
+    # 同步重命名 .runtimeconfig.json 和 .deps.json（Windows only）
+    if os_type == "Windows":
+        for suffix in (".runtimeconfig.json", ".deps.json"):
+            src_cfg = INSTALL_DIR / f"MFAAvalonia{suffix}"
+            dst_cfg = INSTALL_DIR / f"MaaNTE{suffix}"
+            if src_cfg.exists():
+                src_cfg.rename(dst_cfg)
+                print(f"  重命名: {src_cfg.name} -> {dst_cfg.name}")
 
     # 删除 MFA 自带 Assets
     assets_path = INSTALL_DIR / "Assets"

@@ -1,0 +1,74 @@
+# Maintainer: MaaNTE contributors
+pkgname=maante
+pkgver=0.0.4
+pkgrel=1
+pkgdesc="MAA异环小助手 - MaaFramework驱动的自动化工具"
+arch=('x86_64')
+options=('!strip')
+url="https://github.com/1bananachicken/MaaNTE"
+license=('LGPL-3.0-only')
+depends=('android-tools' 'python' 'dotnet-runtime>=10.0.0')
+makedepends=('git')
+source=("git+${url}.git#branch=dev")
+sha256sums=('SKIP')
+
+prepare() {
+    cd "$srcdir/MaaNTE"
+    git submodule update --init --recursive 2>/dev/null || true
+}
+
+build() {
+    cd "$srcdir/MaaNTE"
+    python build.py --skip-icon --skip-package
+}
+
+package() {
+    install -dm755 "$pkgdir/opt/maante"
+    cp -a "$srcdir/MaaNTE/install/." "$pkgdir/opt/maante/"
+
+    # 移除 Windows 专用文件
+    find "$pkgdir/opt/maante" -name "*.bat" -delete
+
+    # 预创建运行时可写目录及配置文件
+    install -dm777 "$pkgdir/opt/maante/config"
+    install -dm777 "$pkgdir/opt/maante/logs"
+    install -dm777 "$pkgdir/opt/maante/debug"
+    install -dm777 "$pkgdir/opt/maante/backup"
+    install -dm777 "$pkgdir/opt/maante/temp"
+    touch "$pkgdir/opt/maante/appsettings.json"
+    chmod 666 "$pkgdir/opt/maante/appsettings.json"
+
+    # 动态库路径
+    install -Dm644 /dev/stdin \
+        "$pkgdir/etc/ld.so.conf.d/maante.conf" \
+        <<< '/opt/maante/runtimes/linux-x64/native'
+
+    # /usr/bin wrapper
+    install -Dm755 /dev/stdin "$pkgdir/usr/bin/maante" <<'WRAPPER'
+#!/bin/bash
+cd /opt/maante
+exec ./MFAAvalonia "$@"
+WRAPPER
+
+    # .desktop 入口
+    install -Dm644 /dev/stdin \
+        "$pkgdir/usr/share/applications/maante.desktop" <<'DESKTOP'
+[Desktop Entry]
+Name=MaaNTE
+GenericName=MAA异环小助手
+Exec=/usr/bin/maante
+Icon=maante
+Type=Application
+Categories=Game;Utility;
+Terminal=false
+DESKTOP
+
+    # 图标
+    if [[ -f "$pkgdir/opt/maante/assets/logo.png" ]]; then
+        install -Dm644 "$pkgdir/opt/maante/assets/logo.png" \
+            "$pkgdir/usr/share/pixmaps/maante.png"
+    elif [[ -f "$pkgdir/opt/maante/logo.ico" ]]; then
+        install -Dm644 "$pkgdir/opt/maante/logo.ico" \
+            "$pkgdir/usr/share/pixmaps/maante.ico"
+    fi
+}
