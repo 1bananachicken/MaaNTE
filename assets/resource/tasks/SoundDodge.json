@@ -1,0 +1,114 @@
+{
+    "task": [
+        {
+            "name": "音频闪避",
+            "entry": "SoundDodgeMain",
+            "description": "基于音频识别的自动闪避与反击，需要[color:red]“桌面端-前台”[/color]控制器",
+            "option": [
+                "SoundDodgeEnable",
+                "SoundDodgeAllAttacks",
+                "SoundDodgeThreshold",
+                "SoundCounterThreshold"
+            ],
+            "controller": [
+                "Win32-Front"
+            ]
+        }
+    ],
+    "option": {
+        "SoundDodgeEnable": {
+            "type": "switch",
+            "label": "启用音频闪避",
+            "description": "开启后通过识别游戏音效自动触发闪避",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {}
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "SoundDodgeMain": {
+                            "custom_action_param": {
+                                "enable_sound_trigger": false
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "SoundDodgeAllAttacks": {
+            "type": "switch",
+            "label": "仅闪避模式",
+            "description": "开启后只执行闪避，不执行反击",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "仅闪避",
+                    "pipeline_override": {
+                        "SoundDodgeMain": {
+                            "custom_action_param": {
+                                "dodge_all_attacks": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "闪避+反击",
+                    "pipeline_override": {
+                        "SoundDodgeMain": {
+                            "custom_action_param": {
+                                "dodge_all_attacks": false
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "SoundDodgeThreshold": {
+            "type": "input",
+            "label": "闪避阈值",
+            "description": "闪避音效识别阈值，范围 0.0-1.0，越低越敏感",
+            "inputs": [
+                {
+                    "name": "threshold",
+                    "default": "0.13",
+                    "pipeline_type": "string",
+                    "verify": "^0\\.\\d+$|^1\\.0*$"
+                }
+            ],
+            "pipeline_override": {
+                "SoundDodgeMain": {
+                    "custom_action_param": {
+                        "threshold": "{threshold}"
+                    }
+                }
+            }
+        },
+        "SoundCounterThreshold": {
+            "type": "input",
+            "label": "反击阈值",
+            "description": "反击音效识别阈值，范围 0.0-1.0，越低越敏感",
+            "inputs": [
+                {
+                    "name": "counter_threshold",
+                    "default": "0.12",
+                    "pipeline_type": "string",
+                    "verify": "^0\\.\\d+$|^1\\.0*$"
+                }
+            ],
+            "pipeline_override": {
+                "SoundDodgeMain": {
+                    "custom_action_param": {
+                        "counter_attack_threshold": "{counter_threshold}"
+                    }
+                }
+            }
+        }
+    }
+}

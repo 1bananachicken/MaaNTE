@@ -1,6 +1,11 @@
-maafw==v5.10.2
+maafw==v5.10.4
 loguru
 pillow
 pytz
 requests
 opencv-python
+librosa
+numpy
+scipy
+scikit-learn
+soundcard

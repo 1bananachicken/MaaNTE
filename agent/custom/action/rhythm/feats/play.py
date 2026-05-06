@@ -15,6 +15,7 @@ from ..utils.config import load_rhythm_config
 from ..utils.lanes import build_lane_layout, LaneLayout
 from ..utils.detector import DrumDetector
 from ..utils.assets import list_scene_templates, read_image
+from ..utils.presence import SceneGate, STATE_PLAYING
 
 
 logger = logging.getLogger(__name__)
@@ -105,6 +106,8 @@ class AutoRhythmPlay(CustomAction):
         if not drum_available:
             logger.warning("鼓面模板缺失，演奏检测不可用")
 
+        scene_gate = SceneGate(cfg)
+
         logger.info(
             "演奏开始 | FPS=%d | 鼓面检测=%s | 场景冷却=%.1fs(音符命中重置)",
             target_fps, drum_available, scene_lock_sec,
@@ -158,6 +161,13 @@ class AutoRhythmPlay(CustomAction):
                     _press_keys(controller, triggered_lanes, key_hold_sec)
 
             if now >= scene_lock_until:
+                gate_state, _ = scene_gate.step(frame)
+                if gate_state != STATE_PLAYING:
+                    logger.info(
+                        "演奏结束 (帧#%d, 耗时%.1f秒, 冷却锁过期，场景识别=%s)",
+                        frame_count, elapsed_total, gate_state,
+                    )
+                    return CustomAction.RunResult(success=True)
                 if not _is_still_playing(frame, playing_tpl):
                     logger.info(
                         "演奏结束 (帧#%d, 耗时%.1f秒, 冷却锁过期，识别为非playing)",
