@@ -1,0 +1,12 @@
+{
+    "task": [
+        {
+            "name": "喷泉打卡",
+            "entry": "FountainCheckinEntrance",
+            "description": "识别并点击喷泉打卡按钮。",
+            "controller": [
+                "Win32-Front"
+            ]
+        }
+    ]
+}
