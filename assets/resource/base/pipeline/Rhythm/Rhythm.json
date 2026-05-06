@@ -25,7 +25,12 @@
             "RhythmSceneOnPlaying"
         ],
         "pre_wait_freezes": {
-            "target": [0, 0, 100, 100],
+            "target": [
+                0,
+                0,
+                100,
+                100
+            ],
             "time": 500,
             "timeout": 10000
         },
@@ -35,8 +40,6 @@
     },
     "RhythmPlaying": {
         "desc": "演奏主流程 - 鼓面检测紧凑循环",
-        "anchor": "RhythmLoopPoint",
-        "max_hit": 999,
         "action": "Custom",
         "custom_action": "auto_rhythm_play",
         "custom_action_param": {},
@@ -52,7 +55,7 @@
         "next": [
             "RhythmOnResults",
             "RhythmOnSongSelect",
-            "[Anchor]RhythmLoopPoint"
+            "RhythmCheckVitality"
         ]
     },
     "RhythmOnResults": {
@@ -89,7 +92,9 @@
         "action": {
             "type": "ClickKey",
             "param": {
-                "key": [27]
+                "key": [
+                    27
+                ]
             }
         },
         "post_delay": 800,

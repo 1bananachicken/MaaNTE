@@ -1,7 +1,7 @@
 {
     "task": [
         {
-            "name": "自动演奏",
+            "name": "超强音",
             "entry": "RhythmEntrance",
             "option": [
                 "自动选曲",
