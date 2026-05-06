@@ -1,0 +1,9 @@
+{
+    "task": [
+        {
+            "name": "粉爪快速拾取 (按住F触发)",
+            "entry": "AutoFScroll",
+            "description": "开启后将一直F+滚轮极速拾取（按住F触发）"
+        }
+    ]
+}
