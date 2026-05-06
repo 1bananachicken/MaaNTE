@@ -38,9 +38,31 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 >
 > Official Bilibili account: [MaaNTE-Official](https://space.bilibili.com/3546893080594665)
 >
-> QQ Group 1: 1103323319
+> QQ Group 1: 1103323319 (Full)
 >
-> If Group 1 is full, please join Group 2: 1101147419
+> QQ Group 2: 1101147419 (Full)
+>
+> QQ Group 3: 1075143235
+
+> [!Caution]
+>
+> Recently, a large number of accounts have been redistributing this software, even impersonating official accounts. Software obtained through unofficial channels **may contain viruses** and is generally not the latest version. Please verify carefully.
+
+# Disclaimer and Risk Notice
+
+> [!Note]
+>
+> This software is a third-party tool designed to simplify gameplay in *Neverness to Everness* by simulating regular interaction actions. This project complies with relevant laws and regulations. It aims to reduce repetitive operations for users, does not disrupt game balance or provide unfair advantages, and will never modify any game files or data.
+>
+> This project is open-source, free, and intended for learning and exchange purposes only. Commercial or profit-driven use is prohibited. The development team reserves the right of final interpretation of this project. Any issues arising from the use of this software are unrelated to this project and its developers.
+
+> [!Caution]
+>
+> According to the [*Neverness to Everness* Fair Play Declaration](https://yh.wanmei.com/news/gamebroad/20260202/260701.html):
+>
+> The use of any third-party tools to undermine game fairness is strictly prohibited. We will crack down on the use of cheats, speed hacks, exploit tools, macro scripts, and other unauthorized tools. These behaviors include, but are not limited to, auto-afk, skill acceleration, invincibility mode, teleportation, and modification of game data. Once verified, we will take measures including but not limited to deducting illicit gains, freezing game accounts, and permanently banning game accounts, depending on the severity and frequency of violations.
+>
+> **You should fully understand and voluntarily bear all risks that may arise from using this tool.**
 
 ## ✨ Features
 
@@ -51,6 +73,14 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
   - 🔨 Chase away all customers
 - 💰 Auto Collect One Coffee House Revenue
   - 📦 Auto Restock
+- 💎 Auto Claim Rewards
+  - 🎁 Activity Points
+  - 📅 Cycle Bounty
+- 🕛 Real-time Assistance
+  - 🗼 Auto Teleport
+  - ⏩ Auto Skip Story
+- ⚔️ Auto Dodge
+  - 🛡️ Audio-based auto dodge/counter
 
 ## ❓FAQ
 
@@ -58,19 +88,9 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 
 - Regular users please download the release version. Only clone the repository if you plan to develop.
 
-### 🤔 Fishing doesn't work?
-
-- Run as administrator?
-- Is the game resolution set to 1280×720?
-- Is Auto Fishing checked?
-- Do not place the program under a path containing Chinese characters.
-- Disable your antivirus software.
-
 ## 💡Notes
 
 The game must run in windowed mode at 1280×720 resolution. The new fishing algorithm supports 120 FPS.
-
-Auto Make Coffee requires setting the mouse input method to `Seize`, which will temporarily take control of your mouse. (A non‑seizing method is being tested and will be released in a beta version first.)
 
 ## 💻Development Guide
 
@@ -117,12 +137,12 @@ For more development documentation, refer to the [M9A documentation site](https:
   Assistant for Reverse: 1999.
 - [MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia)
   A general-purpose GUI solution for MaaFramework built with Avalonia UI.
-  
+
 ### ❤️Contributors
 
 Thanks to all the developers who participated in testing and development (´▽`ʃ♡ƪ)
 
-[![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=105&columns=15)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
+[![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=200&columns=15)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
 
 ## Promotion
 

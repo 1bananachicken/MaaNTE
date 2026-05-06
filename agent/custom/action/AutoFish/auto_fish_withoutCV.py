@@ -7,8 +7,6 @@ import json
 
 from utils.logger import logger
 
-logger = logger("auto_fish_without_cv")
-
 # 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
 CURSOR_PX_PER_SEC = 168
 
