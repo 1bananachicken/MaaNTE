@@ -14,13 +14,18 @@
             "freq": 2
         }
     },
-    "MakeCoffeeOneOneRound": {
-        "desc": "刷 1-1 单轮入口；循环次数由 MakeCoffeeLoopTime 覆盖 max_hit",
+    "MakeCoffeeOneOneLoopGate": {
+        "desc": "刷 1-1 大循环次数门控；循环次数由 MakeCoffeeLoopTime 覆盖 max_hit",
         "max_hit": 1,
         "next": [
+            "MakeCoffeeOneOneRound"
+        ]
+    },
+    "MakeCoffeeOneOneRound": {
+        "desc": "刷 1-1 单轮入口",
+        "next": [
             "MakeCoffeeOneOneEnter",
-            "MakeCoffeeOneOneScrollToEnter",
-            "MakeCoffeeTaskExit"
+            "MakeCoffeeOneOneScrollToEnter"
         ]
     },
     "MakeCoffeeOneOneEnter": {
@@ -521,11 +526,12 @@
         },
         "post_delay": 1000,
         "next": [
-            "MakeCoffeeOneOneRound",
+            "MakeCoffeeOneOneLoopGate",
             "MakeCoffeeTaskExit"
         ]
     },
     "MakeCoffeeTaskExit": {
-        "desc": "自动做咖啡任务结束"
+        "desc": "自动做咖啡任务结束",
+        "action": "StopTask"
     }
 }

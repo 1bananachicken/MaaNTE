@@ -33,7 +33,7 @@
                     "pipeline_override": {
                         "AutoMakeCoffee": {
                             "next": [
-                                "MakeCoffeeOneOneRound"
+                                "MakeCoffeeOneOneLoopGate"
                             ]
                         }
                     }
@@ -59,7 +59,7 @@
                         "freq": 2
                     }
                 },
-                "MakeCoffeeOneOneRound": {
+                "MakeCoffeeOneOneLoopGate": {
                     "max_hit": "{循环次数}"
                 }
             }
