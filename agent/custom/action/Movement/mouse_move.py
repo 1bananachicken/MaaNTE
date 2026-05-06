@@ -21,8 +21,8 @@ class MouseMoveAction(CustomAction):
             except Exception:
                 pass
 
-        dx = params.get("dx", 0)
-        dy = params.get("dy", 0)
+        dx = int(params.get("dx", 0))
+        dy = int(params.get("dy", 0))
         steps = params.get("steps", 30)
         step_delay = params.get("step_delay", 0.03)
         align = params.get("align", True)
@@ -30,18 +30,36 @@ class MouseMoveAction(CustomAction):
         if steps < 1:
             steps = 1
 
-        step_x = dx // steps
-        step_y = dy // steps
+        step_x = dx / steps
+        step_y = dy / steps
 
-        for _ in range(steps):
+        moved_x = 0
+        moved_y = 0
+        for i in range(steps):
             if context.tasker.stopping:
                 return CustomAction.RunResult(success=False)
-            controller.post_relative_move(step_x, step_y).wait()
+            target_x = int(round(step_x * (i + 1)))
+            target_y = int(round(step_y * (i + 1)))
+            delta_x = target_x - moved_x
+            delta_y = target_y - moved_y
+            if delta_x != 0 or delta_y != 0:
+                controller.post_relative_move(delta_x, delta_y).wait()
+            moved_x = target_x
+            moved_y = target_y
             time.sleep(step_delay)
 
+        remainder_x = dx - moved_x
+        remainder_y = dy - moved_y
+        if remainder_x != 0 or remainder_y != 0:
+            controller.post_relative_move(remainder_x, remainder_y).wait()
+
         if align and (dx != 0 or dy != 0):
+            if context.tasker.stopping:
+                return CustomAction.RunResult(success=False)
             controller.post_key_down(_KEY_W).wait()
             time.sleep(_ALIGN_DURATION)
             controller.post_key_up(_KEY_W).wait()
+            if context.tasker.stopping:
+                return CustomAction.RunResult(success=False)
 
         return CustomAction.RunResult(success=True)

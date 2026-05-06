@@ -21,7 +21,10 @@ class CharacterMoveAction(CustomAction):
                 pass
 
         key = params.get("key", None)
-        duration = float(params.get("duration", 0.0))
+        try:
+            duration = float(params.get("duration", 0.0))
+        except (TypeError, ValueError):
+            duration = 0.0
 
         vk = _KEY_MAP.get(str(key).upper()) if key else None
         if vk and duration > 0:
