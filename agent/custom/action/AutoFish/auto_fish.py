@@ -308,7 +308,7 @@ class AutoFish(CustomAction):
 
             match_settle = False
             wait_settlement_start = time.time()
-            while time.time() - wait_settlement_start < 5:
+            while time.time() - wait_settlement_start < 10:
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
 
