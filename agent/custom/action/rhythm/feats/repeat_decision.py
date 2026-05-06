@@ -217,6 +217,6 @@ class AutoRhythmRepeatDecision(CustomAction):
             _vitality_cost = None
             context.override_next("RhythmRepeatCheck", ["RhythmExit"])
         else:
-            context.override_next("RhythmRepeatCheck", ["[Anchor]RhythmLoopPoint"])
+            context.override_next("RhythmRepeatCheck", ["RhythmSelectSong"])
 
         return CustomAction.RunResult(success=True)
