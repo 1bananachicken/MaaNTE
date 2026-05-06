@@ -37,8 +37,6 @@ class DrumDetector:
             img = read_image(path)
             if img is not None:
                 cache[idx] = img
-                th, tw = img.shape[:2]
-                logger.info("已加载鼓面模板: %s (%dx%d)", path.name, tw, th)
 
         loaded_count = len(cache)
         if loaded_count == 0:
@@ -123,12 +121,6 @@ class DrumDetector:
         roi = frame_bgr[ry0:ry1, rx0:rx1]
         result = cv2.matchTemplate(roi, tpl, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, _ = cv2.minMaxLoc(result)
-
-        # logger.debug(
-        #     "轨道 %s: max_val=%.3f, threshold=%.3f, triggered=%s, roi_size=(%dx%d)",
-        #     _LANE_NAMES[lane_idx], max_val, self._thresholds[lane_idx],
-        #     max_val >= self._thresholds[lane_idx], roi.shape[1], roi.shape[0]
-        # )
 
         if max_val >= self._thresholds[lane_idx]:
             return True, float(max_val)
