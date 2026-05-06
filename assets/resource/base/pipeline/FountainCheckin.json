@@ -1,0 +1,191 @@
+{
+    "FountainCheckinEntrance": {
+        "desc": "喷泉打卡入口",
+        "next": [
+            "FountainFindButton",
+            "FountainCheckinExit"
+        ]
+    },
+    "FountainFindButton": {
+        "desc": "识别喷泉打卡按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    765,
+                    373,
+                    210,
+                    40
+                ],
+                "template": [
+                    "auto_fountain_checkin/find_fountain_button.png"
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": "ClickKey",
+        "key": 70,
+        "post_delay": 500,
+        "next": [
+            "FountainWaitAnimation"
+        ]
+    },
+    "FountainWaitAnimation": {
+        "desc": "等待动画结束，轮询许愿选项",
+        "next": [
+            "FountainMakeWish",
+            "FountainSkipStory",
+            "FountainSkipStoryDialog",
+            "FountainCheckinIfExit"
+        ],
+        "timeout": 5000
+    },
+    "FountainMakeWish": {
+        "desc": "识别许愿选项并按F",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    871,
+                    415,
+                    239,
+                    49
+                ],
+                "template": [
+                    "auto_fountain_checkin/fountain_make_wish.png"
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": "Click",
+        "post_delay": 2000,
+        "next": [
+            "FountainCheckinAnyExit",
+            "FountainSkipStoryDialog",
+            "FountainSkipStoryDialogConfirm",
+            "FountainCheckinIfExit"
+        ]
+    },
+    "FountainSkipStory": {
+        "desc": "长时间未识别到许愿选项，尝试跳过剧情",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1218,
+                    24,
+                    39,
+                    37
+                ],
+                "template": [
+                    "realtime_assist/skip_story_btn.png"
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 0,
+        "next": [
+            "FountainCheckinAnyExit",
+            "FountainSkipStoryDialog",
+            "FountainWaitAnimation"
+        ]
+    },
+    "FountainSkipStoryDialog": {
+        "desc": "跳过剧情对话框",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "realtime_assist/skip_story_dialog.png"
+                ],
+                "roi": [
+                    420,
+                    275,
+                    450,
+                    50
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": "DoNothing",
+        "post_delay": 0,
+        "next": [
+            "FountainSkipStoryDialogConfirm",
+            "FountainWaitAnimation"
+        ]
+    },
+    "FountainSkipStoryDialogConfirm": {
+        "desc": "确认跳过剧情对话框确认按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "realtime_assist/skip_story_dialog_confirm.png",
+                "roi": [
+                    700,
+                    410,
+                    250,
+                    70
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 300,
+        "next": [
+            "FountainCheckinIfExit",
+            "FountainWaitAnimation"
+        ]
+    },
+    "FountainCheckinAnyExit": {
+        "desc": "Esc退出",
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 27 // ESC
+            }
+        },
+        "post_wait_freezes": {
+            "target": [
+                0,
+                0,
+                100,
+                100
+            ],
+            "time": 600
+        },
+        "post_delay": 0,
+        "next": [
+            "FountainCheckinIfExit"
+        ]
+    },
+    "FountainCheckinIfExit": {
+        "desc": "识别喷泉打卡按钮，判断是否已退出",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    765,
+                    373,
+                    210,
+                    40
+                ],
+                "template": [
+                    "auto_fountain_checkin/find_fountain_button.png"
+                ],
+                "threshold": 0.7
+            }
+        },
+        "next": [
+            "FountainCheckinExit"
+        ]
+    },
+    "FountainCheckinExit": {
+        "desc": "喷泉打卡任务出口"
+    }
+}
