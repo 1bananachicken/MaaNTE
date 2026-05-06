@@ -35,8 +35,12 @@ package() {
     install -dm777 "$pkgdir/opt/maante/debug"
     install -dm777 "$pkgdir/opt/maante/backup"
     install -dm777 "$pkgdir/opt/maante/temp"
-    touch "$pkgdir/opt/maante/appsettings.json"
+    echo '{}' > "$pkgdir/opt/maante/appsettings.json"
     chmod 666 "$pkgdir/opt/maante/appsettings.json"
+
+    # MaaAgentBinary 需要运行时写入（根目录和 libs 下都可能存在）
+    chmod -R 777 "$pkgdir/opt/maante/MaaAgentBinary" 2>/dev/null || true
+    chmod -R 777 "$pkgdir/opt/maante/libs/MaaAgentBinary" 2>/dev/null || true
 
     # 动态库路径
     install -Dm644 /dev/stdin \
