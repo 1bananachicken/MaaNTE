@@ -19,6 +19,9 @@
         },
         "pre_delay": 0,
         "post_delay": 0,
+        "focus": {
+            "Node.Action.Starting": "钓鱼流程开始"
+        },
         "next": [
             "FishNewCast",
             "FishNewOpenFishMaster"

@@ -5,6 +5,10 @@
         "custom_action_param": {
             "count": 1,
             "freq": 2
+        },
+        "focus": {
+            "Node.Action.Starting": "开始做咖啡",
+            "Node.Action.Succeeded": "做咖啡任务完成"
         }
     }
 }

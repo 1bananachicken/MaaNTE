@@ -8,6 +8,11 @@ import random
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+from .Common.logger import get_logger
+from .Common.progress import ProgressReporter
+
+logger = get_logger("auto_make_coffee")
+progress = ProgressReporter("做咖啡", logger)
 
 def get_image(controller):
     job = controller.post_screencap()
@@ -68,7 +73,7 @@ class AutoMakeCoffee(CustomAction):
         self.claim_template = cv2.imread(str(claim_img), cv2.IMREAD_COLOR)
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
-        print("=== Auto Make Coffee Action Started ===")
+        logger.info("=== Auto Make Coffee Action Started ===")
         controller = context.tasker.controller
         make_count = 10
         check_freq = 0.5
@@ -79,9 +84,9 @@ class AutoMakeCoffee(CustomAction):
                 check_freq = params.get("freq", 0.5)
             except:
                 pass
-                
+
         KEY_F = 70
-        
+
         # Coordinates mapped from auto_make_coffee.json [x, y, w, h]
         select_level_target = [18, 230, 188, 66]
         click_roi = [28, 272, 65, 56]
@@ -89,67 +94,67 @@ class AutoMakeCoffee(CustomAction):
         star_roi = [1204, 109, 29, 27]
         exit_roi = [11, 12, 38, 37]
         claim_roi = [681, 539, 187, 38]
-        
+
         for count in range(make_count):
-            if context.tasker.stopping:  
+            if context.tasker.stopping:
                 return CustomAction.RunResult(success=False)
-            print(f"=== Making Coffee {count + 1}/{make_count} ===")
+            progress.report_count(count + 1, make_count)
 
             # Step 1: 选择关卡
-            print("Tapping on select level...")
+            logger.info("Tapping on select level...")
             click_rect(controller, select_level_target)
             time.sleep(1)
-            
+
             # Step 2: 开始营业
-            print("Waiting for start business button...")
+            logger.info("Waiting for start business button...")
             while True:
-                if context.tasker.stopping:  
+                if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
                 img = get_image(controller)
                 match_start, _, match_x, match_y = match_template_in_region(img, start_roi, self.start_template, 0.8)
                 if match_start:
-                    print("Found 'start.png', clicking...")
+                    logger.info("Found 'start.png', clicking...")
                     click_rect(controller, [match_x, match_y, self.start_template.shape[1], self.start_template.shape[0]])
                     time.sleep(3) # Post delay from JSON: 3000ms
                     break
                 time.sleep(check_freq)
 
             # Step 3: 达成营业额
-            print("Waiting for star to reach sales goal...")
+            logger.info("Waiting for star to reach sales goal...")
             while True:
-                if context.tasker.stopping:  
+                if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
                 click_rect(controller, click_roi)
                 img = get_image(controller)
                 match_star, _, _, _ = match_template_in_region(img, star_roi, self.star_template, 0.9)
                 if match_star:
-                    print("Found 'star.png', clicking target...")
+                    logger.info("Found 'star.png', clicking target...")
                     click_rect(controller, exit_roi)
                     time.sleep(1)
                     break
                 time.sleep(2)
 
             # Step 4: 点击领取
-            print("Waiting to claim reward...")
+            logger.info("Waiting to claim reward...")
             while True:
-                if context.tasker.stopping:  
+                if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
                 img = get_image(controller)
                 match_claim, _, match_x, match_y = match_template_in_region(img, claim_roi, self.claim_template, 0.8)
                 if match_claim:
-                    print("Found 'claim.png', clicking...")
+                    logger.info("Found 'claim.png', clicking...")
                     click_rect(controller, [match_x, match_y, self.claim_template.shape[1], self.claim_template.shape[0]])
                     time.sleep(1)
                     break
                 time.sleep(check_freq)
-            
-            print("Round finished. Pressing 'F' to continue...")
+
+            logger.info("Round finished. Pressing 'F' to continue...")
             controller.post_key_down(KEY_F)
             time.sleep(0.1)
             controller.post_key_up(KEY_F)
-            
+
             time.sleep(2)
-            print("Current iteration finished.\n")
-            
-        print("All coffee tasks complete.")
+            logger.info("Current iteration finished.")
+
+        logger.info("All coffee tasks complete.")
         return CustomAction.RunResult(success=True)

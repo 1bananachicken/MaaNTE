@@ -37,6 +37,11 @@
             "pipeline_override": {
                 "FishStart": {
                     "max_hit": "{max_hit}"
+                },
+                "FishGameStart": {
+                    "custom_action_param": {
+                        "loop_count": "{max_hit}"
+                    }
                 }
             }
         },
