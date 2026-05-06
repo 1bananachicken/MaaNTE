@@ -82,7 +82,7 @@ class AutoMakeCoffee(CustomAction):
                 params = json.loads(argv.custom_action_param)
                 make_count = params.get("count", 10)
                 check_freq = params.get("freq", 0.5)
-            except:
+            except (json.JSONDecodeError, TypeError):
                 pass
 
         KEY_F = 70

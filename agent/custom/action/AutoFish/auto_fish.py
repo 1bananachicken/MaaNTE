@@ -61,7 +61,7 @@ class AutoFish(CustomAction):
                 fishing_count = params.get("count", 10)
                 loop_count = params.get("loop_count", 0)
                 check_freq = params.get("freq", 0.001)
-            except:
+            except (json.JSONDecodeError, TypeError):
                 pass
 
         KEY_A = 65
@@ -122,7 +122,7 @@ class AutoFish(CustomAction):
                     0.6,
                     green_mask=True,
                 )
-                logger.info(f"  Checking for FishGame screen, probability: {game_prob:.2f}")
+                logger.debug(f"  Checking for FishGame screen, probability: {game_prob:.2f}")
                 if m_game:
                     return True
 
@@ -164,7 +164,7 @@ class AutoFish(CustomAction):
                     m_need_bait, prob, _, _ = match_template_in_region(
                         img, need_bait_region, self.need_bait_template, 0.7
                     )
-                    logger.info(f"  Checking for bait, probability: {prob:.2f}")
+                    logger.debug(f"  Checking for bait, probability: {prob:.2f}")
                     if m_need_bait:
                         logger.info("  Need bait! Stopping fishing.")
                         return CustomAction.RunResult(success=False)
@@ -326,7 +326,7 @@ class AutoFish(CustomAction):
                 match_settle, settle_prob, _, _ = match_template_in_region(
                     img, settlement_region, self.settlement_template, 0.8
                 )
-                logger.info(
+                logger.debug(
                     f"  Checking for settlement screen, probability: {settle_prob:.2f}"
                 )
                 if match_settle:
