@@ -17,7 +17,11 @@
         "desc": "泯除方块游戏流程（场景导航+AI对局）",
         "action": "Custom",
         "custom_action": "auto_tetris",
-        "custom_action_param": {},
+        "custom_action_param": {
+            "mode": "single",
+            "repeat": false,
+            "repeat_count": 1
+        },
         "next": [
             "TetrisExit"
         ],

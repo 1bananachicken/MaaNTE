@@ -7,7 +7,7 @@ import numpy as np
 from ...Common.utils import get_image, match_template_in_region
 
 WORLD_SCENE_MARKER_REGION = [174, 8, 55, 72]
-PREPARE_ONE_SCENE_MARKER_REGION = [811, 149, 419, 168]
+PREPARE_ONE_SCENE_MARKER_REGION = [779, 151, 245, 366]
 PREPARE_TWO_SCENE_MARKER_REGION = [809, 142, 422, 499]
 GAME_SCENE_MARKER_REGION = [17, 90, 177, 79]
 WORLD_TO_PREPARE_REGION = [775, 359, 94, 69]
@@ -15,7 +15,8 @@ WORLD_TO_PREPARE_FALLBACK_REGION = [700, 315, 240, 170]
 PREPARE_ONE_REGION = [831, 176, 371, 136]
 PREPARE_TWO_REGION = [1029, 650, 184, 48]
 EXIT_REGION = [536, 601, 197, 39]
-MULTIPLE_REGION = [825, 39, 130, 130]
+MULTIPLE_REGION = [779, 151, 245, 366]
+MATCHING_REGION = [403, 18, 179, 112]
 LOADING_REGION = [1167, 638, 100, 70]
 RETURN_REGION = [1195, 16, 50, 50]
 
@@ -35,6 +36,7 @@ VK_W = 87
 
 
 DROP_BUTTON_REGION = [270, 425, 92, 97]
+MATCHEND_REGION = [355, 11, 354, 122]
 
 
 def _find_image_root() -> Path:
@@ -84,6 +86,8 @@ class SceneGate:
         self.loading_tpl = _read_image("loading.png")
         self.return_tpl = _read_image("return.png")
         self.drop_tpl = _read_image("drop.png")
+        self.matchend_tpl = _read_image("Matchend.png")
+        self.matching_tpl = _read_image("matching.png")
 
         self.active_piece_templates = self._load_block_templates("blocks/active")
         self.queue_piece_templates = self._load_block_templates("blocks/queue")
@@ -337,6 +341,16 @@ class SceneGate:
             attempts=((0.78, False), (0.74, True)),
         )
 
+    def _find_matching(self, img):
+        if self.matching_tpl is None:
+            return False, 0.0, 0, 0
+        return self._match_template_region(
+            img,
+            MATCHING_REGION,
+            self.matching_tpl,
+            0.75,
+        )
+
     def _find_return_button(self, img):
         if self.return_tpl is None:
             return False, 0.0, 0, 0
@@ -355,6 +369,16 @@ class SceneGate:
             DROP_BUTTON_REGION,
             self.drop_tpl,
             0.70,
+        )
+
+    def _find_matchend(self, img):
+        if self.matchend_tpl is None:
+            return False, 0.0, 0, 0
+        return self._match_template_region(
+            img,
+            MATCHEND_REGION,
+            self.matchend_tpl,
+            0.75,
         )
 
     def classify_scene(self, img, play_state=None):
@@ -383,6 +407,37 @@ class SceneGate:
                 "x": x,
                 "y": y,
                 "template": self.exit_tpl,
+                "play_state": play_state,
+            }
+
+        if play_state is not None and play_state.get("piece_state") is not None:
+            return {
+                "name": "game_active",
+                "score": 1.0,
+                "x": 0,
+                "y": 0,
+                "template": None,
+                "play_state": play_state,
+            }
+
+        matched, score, x, y = self._find_game_scene_marker(img)
+        if matched:
+            return {
+                "name": "game_idle",
+                "score": score,
+                "x": x,
+                "y": y,
+                "template": self.game_scene_marker,
+                "play_state": play_state,
+            }
+
+        if looks_like_game_scene(img, play_state):
+            return {
+                "name": "game_idle",
+                "score": 1.0,
+                "x": 0,
+                "y": 0,
+                "template": None,
                 "play_state": play_state,
             }
 
@@ -485,37 +540,6 @@ class SceneGate:
                 "x": x,
                 "y": y,
                 "template": template,
-                "play_state": play_state,
-            }
-
-        if play_state is not None and play_state.get("piece_state") is not None:
-            return {
-                "name": "game_active",
-                "score": 1.0,
-                "x": 0,
-                "y": 0,
-                "template": None,
-                "play_state": play_state,
-            }
-
-        matched, score, x, y = self._find_game_scene_marker(img)
-        if matched:
-            return {
-                "name": "game_idle",
-                "score": score,
-                "x": x,
-                "y": y,
-                "template": self.game_scene_marker,
-                "play_state": play_state,
-            }
-
-        if looks_like_game_scene(img, play_state):
-            return {
-                "name": "game_idle",
-                "score": 1.0,
-                "x": 0,
-                "y": 0,
-                "template": None,
                 "play_state": play_state,
             }
 

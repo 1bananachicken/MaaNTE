@@ -20,6 +20,7 @@ from ..utils.scene import (
     SceneGate,
     EXIT_REGION,
     LOADING_REGION,
+    MATCHEND_REGION,
     RETURN_REGION,
     PREPARE_ONE_CLICK_POINT,
     PREPARE_ONE_MULTI_CLICK_POINT,
@@ -53,8 +54,23 @@ class TetrisGamePlayer:
 
         self.new_piece_roi = (474, 50, 295, 60)
 
+    def reset(self):
+        self.last_active_cells = None
+        self.combo_count = 0
+        self.last_clear_time = 0
+        self.total_lines_cleared = 0
+        self.drop_ready_hits = 0
+        self.internal_board = np.zeros((BOARD_ROWS, BOARD_COLS), dtype=bool)
+        self.current_piece_name = None
+        self.current_rotation = 0
+        self.current_col = 0
+        self.current_row = 0
+        self.current_cells = None
+        self.queue_pieces_state = []
+
     def run(self, controller, tasker, mode="single"):
         self.mode = mode
+        self.reset()
         print(f"=== Auto Tetris Started | mode={self.mode} ===")
 
         initial_scene = self._detect_initial_scene(controller, tasker)
@@ -97,6 +113,10 @@ class TetrisGamePlayer:
                 if not self._sleep_with_stop(tasker, 0.05):
                     return None
                 continue
+
+            if self._is_result_screen(img):
+                print("Result screen detected while waiting for next piece.")
+                return "result"
 
             if not self._is_drop_ready(img):
                 if not self._sleep_with_stop(tasker, 0.05):
@@ -215,6 +235,57 @@ class TetrisGamePlayer:
         else:
             self.drop_ready_hits = 0
         return self.drop_ready_hits >= 2
+
+    def _is_result_screen(self, img) -> bool:
+        matched, score, _, _ = self.scene_gate._find_matchend(img)
+        return matched
+
+    def _wait_for_loading_end(self, controller, tasker, timeout_seconds=30.0) -> str:
+        deadline = time.time() + timeout_seconds
+        while time.time() < deadline:
+            if tasker.stopping:
+                return "stopped"
+            img = self._safe_get_image(controller)
+            if img is None:
+                if not self._sleep_with_stop(tasker, 0.05):
+                    return "stopped"
+                continue
+
+            world_matched, _, _, _ = self.scene_gate._find_world_prompt(img)
+            drop_matched, _, _, _ = self.scene_gate._find_drop_button(img)
+            game_matched, _, _, _ = self.scene_gate._find_game_scene_marker(img)
+            loading_matched, _, _, _ = self.scene_gate._find_loading(img)
+
+            if world_matched:
+                return "world"
+            if drop_matched or game_matched:
+                return "play"
+            if loading_matched:
+                if not self._sleep_with_stop(tasker, 0.05):
+                    return "stopped"
+                continue
+            if not self._sleep_with_stop(tasker, 0.05):
+                return "stopped"
+        print("Loading wait timed out.")
+        return "timeout"
+
+    def _wait_for_matching_end(self, controller, tasker, timeout_seconds=90.0) -> bool:
+        deadline = time.time() + timeout_seconds
+        while time.time() < deadline:
+            if tasker.stopping:
+                return False
+            img = self._safe_get_image(controller)
+            if img is None:
+                if not self._sleep_with_stop(tasker, 1.0):
+                    return False
+                continue
+            matched, _, _, _ = self.scene_gate._find_matching(img)
+            if not matched:
+                return True
+            if not self._sleep_with_stop(tasker, 1.0):
+                return False
+        print("Matching wait timed out.")
+        return False
 
     def _log_internal_board(self):
         rows = []
@@ -451,6 +522,9 @@ class TetrisGamePlayer:
                     return None
                 continue
 
+            if self._is_result_screen(img):
+                return {"name": "result"}
+
             play_state = self._scan_play_state(img)
             scene = self._classify_scene(img, play_state)
             scene_name = scene["name"]
@@ -483,20 +557,24 @@ class TetrisGamePlayer:
 
         if scene_name == "loading":
             print("Waiting for loading screen to finish...")
-            result = self._wait_for_scene_names(
-                controller,
-                tasker,
-                {"game_active", "game_idle", "world_prompt", "world_no_prompt", "exit"},
-                timeout_seconds=30.0,
-            )
-            if result is None:
-                print("Loading wait timed out.")
+            result = self._wait_for_loading_end(controller, tasker)
+            if result == "play":
+                print("Play detected during loading, starting game immediately...")
+                return self._play_from_game(controller, tasker, skip_scene_init=True)
+            elif result == "world":
+                print("World detected during loading, continuing navigation...")
+            elif result == "stopped":
                 return False
-            scene_name = result["name"]
+            img = self._safe_get_image(controller)
+            if img is None:
+                return False
+            play_state = self._scan_play_state(img)
+            scene = self._classify_scene(img, play_state)
+            scene_name = scene["name"]
             if scene_name in ("game_active", "game_idle"):
                 return self._play_from_game(controller, tasker)
             if scene_name in ("world_prompt", "world_no_prompt"):
-                scene = result
+                pass
 
         if scene_name == "exit":
             print(f"Exit scene at start, clicking exit. score={scene['score']:.2f}")
@@ -567,12 +645,20 @@ class TetrisGamePlayer:
         if scene_name == "prepare_two":
             print(f"Start-match scene, clicking. score={scene['score']:.2f}")
             self._click_point(controller, *PREPARE_TWO_CLICK_POINT)
+
+            if self.mode == "multiple":
+                print("Multiple mode: waiting for matching to complete...")
+                if not self._sleep_with_stop(tasker, 1.0):
+                    return False
+                if not self._wait_for_matching_end(controller, tasker):
+                    return False
+
             expected_after_start = {"game_active", "game_idle", "exit", "loading"}
             result = self._wait_for_scene_names(
                 controller,
                 tasker,
                 expected_after_start,
-                timeout_seconds=12.0,
+                timeout_seconds=60.0,
             )
             if result is None:
                 return False
@@ -580,16 +666,20 @@ class TetrisGamePlayer:
 
             if scene_name == "loading":
                 print("Loading after match, waiting...")
-                result = self._wait_for_scene_names(
-                    controller,
-                    tasker,
-                    {"game_active", "game_idle", "world_prompt", "world_no_prompt"},
-                    timeout_seconds=30.0,
-                )
-                if result is None:
-                    print("Loading wait timed out.")
+                result = self._wait_for_loading_end(controller, tasker)
+                if result == "play":
+                    print("Play detected during loading, starting game immediately...")
+                    return self._play_from_game(controller, tasker, skip_scene_init=True)
+                elif result == "world":
+                    print("World detected during loading after match, continuing navigation...")
+                elif result == "stopped":
                     return False
-                scene_name = result["name"]
+                img = self._safe_get_image(controller)
+                if img is None:
+                    return False
+                play_state = self._scan_play_state(img)
+                scene = self._classify_scene(img, play_state)
+                scene_name = scene["name"]
 
         if scene_name in ("game_active", "game_idle"):
             return self._play_from_game(controller, tasker)
@@ -599,18 +689,22 @@ class TetrisGamePlayer:
 
     _SCENE_LOCK_SEC = 3.0
 
-    def _play_from_game(self, controller, tasker):
+    def _play_from_game(self, controller, tasker, skip_scene_init=False):
         last_piece_signature = None
         skip_count = 0
         round_start = time.time()
         non_active_since = None
         scene_lock_until = time.time() + self._SCENE_LOCK_SEC
         scene_locked = True
+        last_result_check = time.time()
 
         self.combo_count = 0
         self.last_clear_time = 0
         self.total_lines_cleared = 0
         self.current_piece_name = None
+
+        if skip_scene_init:
+            print("[Play] Skipping scene init, scanning for piece immediately...")
 
         while time.time() - round_start < 900:
             if tasker.stopping:
@@ -625,13 +719,26 @@ class TetrisGamePlayer:
             now = time.time()
             play_state_for_scene = self._scan_play_state(img)
 
-            if scene_locked and now < scene_lock_until:
-                if self.current_piece_name is not None:
-                    scene_lock_until = now + self._SCENE_LOCK_SEC
-                elif (
-                    play_state_for_scene is not None
-                    and play_state_for_scene["piece_state"] is not None
-                ):
+            if now - last_result_check >= 5.0:
+                last_result_check = now
+                if self._is_result_screen(img):
+                    print("Result screen detected, match ended.")
+                    return True
+
+            if scene_locked:
+                if now < scene_lock_until:
+                    if self.current_piece_name is not None:
+                        scene_lock_until = now + self._SCENE_LOCK_SEC
+                    elif (
+                        play_state_for_scene is not None
+                        and play_state_for_scene["piece_state"] is not None
+                    ):
+                        scene_lock_until = now + self._SCENE_LOCK_SEC
+                    elif skip_scene_init:
+                        scene_lock_until = now + self._SCENE_LOCK_SEC
+                    else:
+                        scene_locked = False
+                elif skip_scene_init:
                     scene_lock_until = now + self._SCENE_LOCK_SEC
                 else:
                     scene_locked = False
@@ -667,20 +774,20 @@ class TetrisGamePlayer:
                 elif scene_name == "loading":
                     self.last_active_cells = None
                     print("Loading detected during play, waiting...")
-                    result = self._wait_for_scene_names(
-                        controller,
-                        tasker,
-                        {"game_active", "game_idle", "world_prompt", "world_no_prompt"},
-                        timeout_seconds=30.0,
-                    )
-                    if result is None:
-                        return False
-                    if result["name"] in ("game_active", "game_idle"):
+                    result = self._wait_for_loading_end(controller, tasker)
+                    if result == "play":
+                        print("Play detected during loading, continuing game...")
                         scene_locked = True
                         scene_lock_until = time.time() + self._SCENE_LOCK_SEC
                         continue
-                    print(f"Unexpected scene after loading: {result['name']}")
-                    return False
+                    elif result == "world":
+                        print("World detected during play loading, round ended.")
+                        return False
+                    elif result == "stopped":
+                        return False
+                    scene_locked = True
+                    scene_lock_until = time.time() + self._SCENE_LOCK_SEC
+                    continue
 
                 elif scene_name == "world_no_prompt":
                     self.last_active_cells = None
@@ -732,11 +839,8 @@ class TetrisGamePlayer:
                     continue
 
                 print(
-                    f"[NewPiece] First or recovered piece: {self.current_piece_name}, standardizing position"
+                    f"[NewPiece] First or recovered piece: {self.current_piece_name}"
                 )
-                for _ in range(10):
-                    self._tap_key(controller, VK_A, hold=0.03)
-                    time.sleep(0.01)
 
                 scene_locked = True
                 scene_lock_until = time.time() + self._SCENE_LOCK_SEC
@@ -828,6 +932,9 @@ class TetrisGamePlayer:
             next_piece_info = self._detect_next_piece(controller, tasker)
             if next_piece_info is None:
                 return False
+            if next_piece_info == "result":
+                print("Result screen detected, match ended.")
+                return True
 
             if planned_result is not None:
                 self.internal_board = planned_result["board"]
@@ -931,13 +1038,20 @@ class TetrisGamePlayer:
 
         if scene_name == "loading":
             print("Recovery: loading screen, waiting...")
-            result = self._wait_for_scene_names(
-                controller,
-                tasker,
-                {"game_active", "game_idle", "world_prompt", "world_no_prompt"},
-                timeout_seconds=30.0,
-            )
-            return result is not None and result["name"] in ("game_active", "game_idle")
+            result = self._wait_for_loading_end(controller, tasker)
+            if result == "play":
+                print("Play detected during loading, recovery complete.")
+                return True
+            elif result == "world":
+                print("World detected during loading, recovery failed.")
+                return False
+            elif result == "stopped":
+                return False
+            img = self._safe_get_image(controller)
+            if img is None:
+                return False
+            scene = self._classify_scene(img)
+            return scene["name"] in ("game_active", "game_idle")
 
         if scene_name == "game_idle":
             return self._sleep_with_stop(tasker, 0.08)
@@ -990,6 +1104,20 @@ class TetrisGamePlayer:
                 ):
                     return True
                 continue
+
+            if scene["name"] == "loading":
+                print("Loading detected while returning to world, waiting...")
+                result = self._wait_for_loading_end(controller, tasker)
+                if result == "play":
+                    continue
+                if result == "world":
+                    print("World detected during loading, waiting for scene stabilization...")
+                    if not self._sleep_with_stop(tasker, 3.0):
+                        return False
+                    return True
+                if result == "timeout":
+                    continue
+                return False
 
             self._press_escape(controller)
             if not self._sleep_with_stop(tasker, 0.8):

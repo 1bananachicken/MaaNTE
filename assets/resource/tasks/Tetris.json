@@ -3,6 +3,7 @@
         {
             "name": "泯除方块",
             "entry": "TetrisEntrance",
+            "description": "[color:red]该任务功能中游戏内棋盘完全由内部ai自主维护，而非获取屏幕图像，在运行该任务时请不要对游戏画面进行操作，以免ai决策与实际游戏状态不符",
             "option": [
                 "TetrisMatchMode"
             ]
@@ -17,27 +18,135 @@
                 {
                     "name": "Single",
                     "label": "单人模式",
+                    "option": [
+                        "TetrisAutoRepeat_Single"
+                    ]
+                },
+                {
+                    "name": "Multiple",
+                    "label": "多人模式",
+                    "option": [
+                        "TetrisAutoRepeat_Multiple"
+                    ]
+                }
+            ],
+            "default_case": "Single"
+        },
+        "TetrisAutoRepeat_Single": {
+            "type": "switch",
+            "label": "自动连打",
+            "description": "启用后自动重复多轮，关闭则仅进行一轮",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "option": [
+                        "TetrisRepeatCount_Single"
+                    ],
                     "pipeline_override": {
                         "TetrisGamePlay": {
                             "custom_action_param": {
-                                "mode": "single"
+                                "mode": "single",
+                                "repeat": true
                             }
                         }
                     }
                 },
                 {
-                    "name": "Multiple",
-                    "label": "多人模式",
+                    "name": "No",
+                    "label": "关闭",
                     "pipeline_override": {
                         "TetrisGamePlay": {
                             "custom_action_param": {
-                                "mode": "multiple"
+                                "mode": "single",
+                                "repeat": false
                             }
                         }
                     }
                 }
             ],
-            "default_case": "Single"
+            "default_case": "No"
+        },
+        "TetrisAutoRepeat_Multiple": {
+            "type": "switch",
+            "label": "自动连打",
+            "description": "启用后自动重复多轮，关闭则仅进行一轮",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "option": [
+                        "TetrisRepeatCount_Multiple"
+                    ],
+                    "pipeline_override": {
+                        "TetrisGamePlay": {
+                            "custom_action_param": {
+                                "mode": "multiple",
+                                "repeat": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "TetrisGamePlay": {
+                            "custom_action_param": {
+                                "mode": "multiple",
+                                "repeat": false
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
+        },
+        "TetrisRepeatCount_Single": {
+            "type": "input",
+            "label": "连打轮数",
+            "description": "自动连打轮数",
+            "inputs": [
+                {
+                    "name": "repeat_count",
+                    "label": "轮数",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "TetrisGamePlay": {
+                    "custom_action_param": {
+                        "mode": "single",
+                        "repeat": true,
+                        "repeat_count": "{repeat_count}"
+                    }
+                }
+            }
+        },
+        "TetrisRepeatCount_Multiple": {
+            "type": "input",
+            "label": "连打轮数",
+            "description": "自动连打轮数",
+            "inputs": [
+                {
+                    "name": "repeat_count",
+                    "label": "轮数",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "TetrisGamePlay": {
+                    "custom_action_param": {
+                        "mode": "multiple",
+                        "repeat": true,
+                        "repeat_count": "{repeat_count}"
+                    }
+                }
+            }
         }
     }
 }
