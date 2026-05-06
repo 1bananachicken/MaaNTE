@@ -4,23 +4,11 @@ import time
 import warnings
 from typing import Callable, Optional
 
+import librosa
 import numpy as np
+import soundcard as sc
 
 warnings.filterwarnings("ignore", message="data discontinuity in recording")
-
-try:
-    import librosa
-
-    HAS_LIBROSA = True
-except ImportError:
-    HAS_LIBROSA = False
-
-try:
-    import soundcard as sc
-
-    HAS_SOUNDCARD = True
-except ImportError:
-    HAS_SOUNDCARD = False
 
 logger = None
 
@@ -88,9 +76,6 @@ class Ear:
         if os.path.exists(cache) and os.path.getmtime(cache) > os.path.getmtime(path):
             return np.load(cache)
 
-        if not HAS_LIBROSA:
-            raise ImportError("librosa not available")
-
         wav, _ = librosa.load(path, sr=self.sr)
         wav = self._filt(wav)
         np.save(cache, wav)
@@ -135,20 +120,11 @@ class Ear:
         _log().info("Ear stopped")
 
     def _open_device(self):
-        if not HAS_SOUNDCARD:
-            raise ImportError("soundcard not available")
-
         speaker = sc.default_speaker()
         mic = sc.get_microphone(id=str(speaker.name), include_loopback=True)
         return mic.recorder(samplerate=self.sr, channels=self.ch)
 
     def _loop(self):
-        import sys
-
-        if sys.platform != "win32":
-            _log().error("Audio loopback only supported on Windows")
-            return
-
         rec = None
         try:
             import ctypes

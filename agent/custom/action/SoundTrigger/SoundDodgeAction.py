@@ -84,7 +84,6 @@ class SoundDodgeAction(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         logger.info("=== Sound Dodge Started ===")
-        ctrl = context.tasker.controller
 
         threshold = 0.13
         counter_threshold = 0.12
@@ -100,7 +99,11 @@ class SoundDodgeAction(CustomAction):
 
         ctx = Ctx()
         try:
-            ctx.setup(ctrl, threshold=threshold, counter_threshold=counter_threshold)
+            ctx.setup(
+                context.tasker.controller,
+                threshold=threshold,
+                counter_threshold=counter_threshold,
+            )
             if not ctx.enter():
                 return CustomAction.RunResult(success=False)
 

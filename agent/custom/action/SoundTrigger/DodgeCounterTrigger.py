@@ -12,7 +12,6 @@ def _log():
     global logger
     if logger is None:
         from custom.action.Common.logger import get_logger
-
         logger = get_logger(__name__)
     return logger
 
@@ -80,11 +79,9 @@ class Dodger:
     def _click_key(self, key):
         if self.controller:
             self.controller.post_click_key(key)
-        else:
-            _log().warning("No controller, skip key click")
 
     def _default_dodge(self):
-        _log().info("执行按键: 左Shift按下 -> 左Shift松开")
+        _log().info("执行按键: 左Shift按下 -> 左Shift释放")
         self._click_key(VK_SHIFT)
         time.sleep(0.1 + random.random() * 0.2)
         self._click_key(VK_SHIFT)
@@ -92,9 +89,7 @@ class Dodger:
     def _default_counter(self):
         key = random.choice([0x31, 0x32, 0x33, 0x34])
         key_name = chr(key)
-        _log().info(
-            f"执行按键: {key_name}按下 -> {key_name}松开 -> 左Shift按下 -> 左Shift松开"
-        )
+        _log().info(f"执行按键: {key_name}按下 -> {key_name}释放 -> 左Shift按下 -> 左Shift释放")
         self._click_key(key)
         time.sleep(0.02)
         self._click_key(VK_SHIFT)
