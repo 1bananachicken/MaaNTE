@@ -32,12 +32,29 @@ _DEFAULT_CONFIG: dict[str, Any] = {
         "playing_match_threshold": 0.75,
         "match_vote_min": 1,
         "playing_check_interval": 5,
-        "scene_lock_timeout_sec": 1.5,
         "song_select_to_playing_lock_sec": 8.0,
+        "template_roi": {
+            "song_select": {
+                "logo": [0, 0, 80, 80],
+                "level": [1013, 184, 87, 58],
+                "start": [925, 641, 279, 44]
+            },
+            "playing": {
+                "pause": [0, 0, 96, 96],
+                "rate": [1076, 0, 95, 171],
+                "score": [1076, 0, 95, 171]
+            },
+            "results": {
+                "max_combo": [241, 496, 800, 70],
+                "rate": [241, 496, 800, 70],
+                "score": [241, 496, 800, 70]
+            }
+        },
     },
     "song_select": {
         "enabled": False,
         "song_name": "",
+        "song_list_roi": [47, 117, 550, 510],
         "scroll_area_x_frac": 0.25,
         "scroll_area_y_frac": 0.50,
         "scroll_delta": -1,
@@ -46,11 +63,22 @@ _DEFAULT_CONFIG: dict[str, Any] = {
         "start_match_threshold": 0.75,
         "click_delay_sec": 0.5,
         "start_delay_sec": 0.8,
+        "scroll_settle_delay_sec": 0.4,
+        "click_reverify_threshold": 0.70,
+        "max_click_reverify_retries": 2,
     },
     "auto_repeat": {
         "enabled": False,
         "count": 5,
         "dismiss_delay_sec": 0.8,
+    },
+    "vitality_detect": {
+        "enabled": True,
+        "roi": [544, 622, 184, 46],
+        "cost_pattern": "(\\d+)",
+        "min_confirm_reads": 2,
+        "confirm_interval_sec": 0.3,
+        "vitality_threshold": 1,
     },
     "keys": {
         "press_delay_sec": 0.0,

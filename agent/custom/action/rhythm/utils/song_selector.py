@@ -74,6 +74,11 @@ class SongSelector:
         self._song_select_enabled = bool(sc.get("enabled", False))
         self._auto_select = bool(sc.get("auto_select", False))
         self._song_name = str(sc.get("song_name", ""))
+        song_list_roi_list = sc.get("song_list_roi", [47, 117, 550, 510])
+        if isinstance(song_list_roi_list, list) and len(song_list_roi_list) == 4:
+            self._song_list_roi = tuple(int(v) for v in song_list_roi_list)
+        else:
+            self._song_list_roi = (47, 117, 550, 510)
         self._scroll_area_x_frac = float(sc.get("scroll_area_x_frac", 0.25))
         self._scroll_area_y_frac = float(sc.get("scroll_area_y_frac", 0.50))
         self._scroll_delta = int(sc.get("scroll_delta", -3))
@@ -83,6 +88,9 @@ class SongSelector:
         self._start_delay = float(sc.get("start_delay_sec", 0.8))
         self._start_match_threshold = float(sc.get("start_match_threshold", 0.75))
         self._max_start_retries = max(1, int(sc.get("max_start_retries", 5)))
+        self._scroll_settle_delay = float(sc.get("scroll_settle_delay_sec", 0.4))
+        self._click_reverify_threshold = float(sc.get("click_reverify_threshold", 0.70))
+        self._max_click_reverify_retries = max(1, int(sc.get("max_click_reverify_retries", 2)))
 
         self._template: NDArray[np.uint8] | None = None
         self._start_template: NDArray[np.uint8] | None = None
@@ -93,6 +101,8 @@ class SongSelector:
         self._start_retry_count: int = 0
         self._consecutive_down_fails: int = 0
         self._one_time_ds: int | None = None
+        self._post_scroll_time: float = 0.0
+        self._click_reverify_retries: int = 0
 
         self._start_template = self._load_start_template()
 
@@ -133,6 +143,8 @@ class SongSelector:
         self._start_retry_count = 0
         self._consecutive_down_fails = 0
         self._one_time_ds = None
+        self._post_scroll_time = 0.0
+        self._click_reverify_retries = 0
 
     @property
     def state(self) -> str:
@@ -154,11 +166,14 @@ class SongSelector:
             self._scroll_attempts = 0
 
         if self._state == _SEL_SEARCHING:
-            match = self._find_template(frame_bgr, self._template, self._match_threshold)
+            if self._scroll_attempts > 0 and now - self._post_scroll_time < self._scroll_settle_delay:
+                return {"state": self._state, "action": "settling", "scroll_attempts": self._scroll_attempts}
+            match = self._find_template(frame_bgr, self._template, self._match_threshold, self._song_list_roi)
             if match is not None:
                 self._match_loc = match
                 self._consecutive_down_fails = 0
                 self._one_time_ds = None
+                self._click_reverify_retries = 0
                 self._state = _SEL_CLICKING_SONG
                 logger.info(
                     "歌曲模板匹配成功: 位置=(%d,%d), 将点击选中",
@@ -188,27 +203,49 @@ class SongSelector:
             else:
                 self._consecutive_down_fails += 1
             if scroll_func is not None:
-                sx = int(self._scroll_area_x_frac * w)
-                sy = int(self._scroll_area_y_frac * h)
+                sx = self._song_list_roi[0] + self._song_list_roi[2] // 2
+                sy = self._song_list_roi[1] + self._song_list_roi[3] // 2
                 scroll_func(sx, sy, direction)
             self._scroll_attempts += 1
             self._last_action_time = now
+            self._post_scroll_time = time.perf_counter()
             self._state = _SEL_SEARCHING
-            logger.debug("滚动搜索: 第 %d 次 (方向=%d)", self._scroll_attempts, direction)
+            logger.debug("滚动搜索: 第 %d 次 (方向=%d), 等待%.2fs稳定",
+                         self._scroll_attempts, direction, self._scroll_settle_delay)
             return {"state": self._state, "action": "scroll", "scroll_attempts": self._scroll_attempts}
 
         if self._state == _SEL_CLICKING_SONG:
             if now - self._last_action_time < self._click_delay:
                 return {"state": self._state, "action": "waiting"}
-            if self._match_loc is not None:
-                mx, my = self._match_loc
-                controller.post_click(mx, my).wait()
-                self._last_action_time = now
-                self._start_retry_count = 0
-                self._state = _SEL_CLICKING_START
-                logger.info("已点击目标歌曲位置 (%d,%d)，等待后点击开始演奏", mx, my)
-            else:
-                self._state = _SEL_SEARCHING
+            current_match = self._find_template(frame_bgr, self._template, self._click_reverify_threshold, self._song_list_roi)
+            if current_match is None:
+                self._click_reverify_retries += 1
+                if self._click_reverify_retries < self._max_click_reverify_retries:
+                    logger.warning(
+                        "点击前重验证失败 (%d/%d)，歌单可能已回滚，重新搜索",
+                        self._click_reverify_retries, self._max_click_reverify_retries,
+                    )
+                    self._last_action_time = now
+                    self._post_scroll_time = 0.0
+                    self._state = _SEL_SEARCHING
+                    return {"state": self._state, "action": "reverify_fail"}
+                else:
+                    logger.warning(
+                        "重验证 %d 次均失败，回退到滚动搜索",
+                        self._click_reverify_retries,
+                    )
+                    self._click_reverify_retries = 0
+                    self._last_action_time = now
+                    self._post_scroll_time = 0.0
+                    self._state = _SEL_SEARCHING
+                    return {"state": self._state, "action": "reverify_fail"}
+            self._match_loc = current_match
+            mx, my = current_match
+            controller.post_click(mx, my).wait()
+            self._last_action_time = now
+            self._start_retry_count = 0
+            self._state = _SEL_CLICKING_START
+            logger.info("已点击目标歌曲位置 (%d,%d)，等待后点击开始演奏", mx, my)
             return {"state": self._state, "action": "click_song"}
 
         if self._state == _SEL_CLICKING_START:
@@ -250,15 +287,28 @@ class SongSelector:
         frame_bgr: NDArray[np.uint8],
         tpl: NDArray[np.uint8],
         threshold: float,
+        roi: tuple[int, int, int, int] | None = None,
     ) -> tuple[int, int] | None:
         th, tw = tpl.shape[:2]
         fh, fw = frame_bgr.shape[:2]
         if th > fh or tw > fw:
             return None
-        result = cv2.matchTemplate(frame_bgr, tpl, cv2.TM_CCOEFF_NORMED)
+        search_area = frame_bgr
+        offset_x, offset_y = 0, 0
+        if roi is not None:
+            rx, ry, rw, rh = roi
+            rx = max(0, min(rx, fw))
+            ry = max(0, min(ry, fh))
+            rw = min(rw, fw - rx)
+            rh = min(rh, fh - ry)
+            if rw < tw or rh < th:
+                return None
+            search_area = frame_bgr[ry:ry + rh, rx:rx + rw]
+            offset_x, offset_y = rx, ry
+        result = cv2.matchTemplate(search_area, tpl, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
         if max_val >= threshold:
-            cx = max_loc[0] + tw // 2
-            cy = max_loc[1] + th // 2
+            cx = max_loc[0] + tw // 2 + offset_x
+            cy = max_loc[1] + th // 2 + offset_y
             return cx, cy
         return None

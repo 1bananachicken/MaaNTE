@@ -1,0 +1,8 @@
+{
+    "AutoFScroll": {
+        "desc": "极速拾取(F+滚轮)",
+        "enabled": true,
+        "action": "Custom",  
+        "custom_action": "auto_f_scroll"
+    }
+}

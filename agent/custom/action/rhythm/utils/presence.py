@@ -48,6 +48,14 @@ class SceneGate:
         self._match_vote_min = max(1, int(sc.get("match_vote_min", 1)))
         self._playing_check_interval = max(1, int(sc.get("playing_check_interval", 5)))
 
+        template_roi_cfg = sc.get("template_roi") or {}
+        self._template_roi: dict[str, dict[str, tuple[int, int, int, int]]] = {}
+        for kind, name_map in template_roi_cfg.items():
+            self._template_roi[kind] = {}
+            for name, roi_list in name_map.items():
+                if isinstance(roi_list, list) and len(roi_list) == 4:
+                    self._template_roi[kind][name] = tuple(int(v) for v in roi_list)
+
         self._song_select_tpls = self._load_scene_templates("song_select")
         self._results_tpls = self._load_scene_templates("results")
         self._playing_tpls = self._load_scene_templates("playing")
@@ -85,7 +93,7 @@ class SceneGate:
                     "armed": True,
                     "state_transitioned": False,
                 }
-            rs_ok, rs_val = self._vote(frame_bgr, self._results_tpls, self._results_thresh)
+            rs_ok, rs_val = self._vote(frame_bgr, self._results_tpls, self._results_thresh, "results")
             if rs_ok:
                 target = STATE_RESULTS
             else:
@@ -95,9 +103,9 @@ class SceneGate:
                     "state_transitioned": False,
                 }
         else:
-            ss_ok, ss_val = self._vote(frame_bgr, self._song_select_tpls, self._song_select_thresh)
-            rs_ok, rs_val = self._vote(frame_bgr, self._results_tpls, self._results_thresh)
-            pl_ok, pl_val = self._vote(frame_bgr, self._playing_tpls, self._playing_thresh)
+            ss_ok, ss_val = self._vote(frame_bgr, self._song_select_tpls, self._song_select_thresh, "song_select")
+            rs_ok, rs_val = self._vote(frame_bgr, self._results_tpls, self._results_thresh, "results")
+            pl_ok, pl_val = self._vote(frame_bgr, self._playing_tpls, self._playing_thresh, "playing")
 
             if ss_ok:
                 target = STATE_SONG_SELECT
@@ -138,6 +146,7 @@ class SceneGate:
         frame_bgr: NDArray[np.uint8],
         templates: list[tuple[str, NDArray[np.uint8]]],
         threshold: float,
+        kind: str = "",
     ) -> tuple[bool, float]:
         if not templates:
             return False, 0.0
@@ -145,11 +154,23 @@ class SceneGate:
         vote_count = 0
         required_votes = min(self._match_vote_min, len(templates))
         fh, fw = frame_bgr.shape[:2]
+        roi_map = self._template_roi.get(kind, {})
         for name, tpl in templates:
             th, tw = tpl.shape[:2]
             if th <= 0 or tw <= 0 or th > fh or tw > fw:
                 continue
-            result = cv2.matchTemplate(frame_bgr, tpl, cv2.TM_CCOEFF_NORMED)
+            roi = roi_map.get(name)
+            search_area = frame_bgr
+            if roi is not None:
+                rx, ry, rw, rh = roi
+                rx = max(0, min(rx, fw))
+                ry = max(0, min(ry, fh))
+                rw = min(rw, fw - rx)
+                rh = min(rh, fh - ry)
+                if rw < tw or rh < th:
+                    continue
+                search_area = frame_bgr[ry:ry + rh, rx:rx + rw]
+            result = cv2.matchTemplate(search_area, tpl, cv2.TM_CCOEFF_NORMED)
             _, max_val, _, _ = cv2.minMaxLoc(result)
             if max_val > best_val:
                 best_val = float(max_val)

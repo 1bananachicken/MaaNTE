@@ -15,6 +15,7 @@ from ..utils.config import load_rhythm_config
 from ..utils.lanes import build_lane_layout, LaneLayout
 from ..utils.detector import DrumDetector
 from ..utils.assets import list_scene_templates, read_image
+from ..utils.presence import SceneGate, STATE_PLAYING
 
 
 logger = logging.getLogger(__name__)
@@ -25,7 +26,6 @@ _VK = {"d": 0x44, "f": 0x46, "j": 0x4A, "k": 0x4B}
 _TIMEOUT_SEC = 600
 _SCENE_LOCK_SEC = 8.0
 _PLAYING_CHECK_THRESHOLD = 0.7
-_MIN_CONFIRM_NOT_PLAYING = 3
 
 
 def _press_keys(controller, lane_indices: list[int], key_hold_sec: float = 0.01):
@@ -100,26 +100,21 @@ class AutoRhythmPlay(CustomAction):
         scene_lock_sec = float(
             cfg.get("scene", {}).get("song_select_to_playing_lock_sec", _SCENE_LOCK_SEC)
         )
-        confirm_not_playing = max(
-            _MIN_CONFIRM_NOT_PLAYING,
-            int(
-                cfg.get("scene", {}).get("state_confirm_frames", _MIN_CONFIRM_NOT_PLAYING)
-            ),
-        )
 
         detector = DrumDetector(cfg)
         drum_available = detector.available
         if not drum_available:
             logger.warning("鼓面模板缺失，演奏检测不可用")
 
+        scene_gate = SceneGate(cfg)
+
         logger.info(
-            "演奏开始 | FPS=%d | 鼓面检测=%s | 场景冷却=%.1fs(音符命中重置) | 退出确认=%d帧",
-            target_fps, drum_available, scene_lock_sec, confirm_not_playing,
+            "演奏开始 | FPS=%d | 鼓面检测=%s | 场景冷却=%.1fs(音符命中重置)",
+            target_fps, drum_available, scene_lock_sec,
         )
 
         start_time = time.perf_counter()
         frame_count = 0
-        not_playing_streak = 0
         cached_layout: LaneLayout | None = None
         cached_layout_size: tuple[int, int] = (0, 0)
         playing_tpl = self._playing_check_template
@@ -163,20 +158,23 @@ class AutoRhythmPlay(CustomAction):
                 triggered_lanes = [i for i, t in enumerate(triggers) if t]
                 if triggered_lanes:
                     scene_lock_until = now + scene_lock_sec
-                    not_playing_streak = 0
                     _press_keys(controller, triggered_lanes, key_hold_sec)
 
             if now >= scene_lock_until:
+                gate_state, _ = scene_gate.step(frame)
+                if gate_state != STATE_PLAYING:
+                    logger.info(
+                        "演奏结束 (帧#%d, 耗时%.1f秒, 冷却锁过期，场景识别=%s)",
+                        frame_count, elapsed_total, gate_state,
+                    )
+                    return CustomAction.RunResult(success=True)
                 if not _is_still_playing(frame, playing_tpl):
-                    not_playing_streak += 1
-                    if not_playing_streak >= confirm_not_playing:
-                        logger.info(
-                            "演奏结束 (帧#%d, 耗时%.1f秒, 连续未匹配%d帧)",
-                            frame_count, elapsed_total, not_playing_streak,
-                        )
-                        return CustomAction.RunResult(success=True)
-                else:
-                    not_playing_streak = 0
+                    logger.info(
+                        "演奏结束 (帧#%d, 耗时%.1f秒, 冷却锁过期，识别为非playing)",
+                        frame_count, elapsed_total,
+                    )
+                    return CustomAction.RunResult(success=True)
+                scene_lock_until = now + scene_lock_sec
 
             elapsed_frame = time.perf_counter() - t0
             if elapsed_frame < frame_interval:
