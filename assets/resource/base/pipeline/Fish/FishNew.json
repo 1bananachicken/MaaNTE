@@ -42,6 +42,7 @@
         "post_delay": 200,
         "next": [
             "FishNewBaitLack",
+            "FishNewFishFull",
             "[JumpBack]FishNewFishHooked"
         ]
     },
@@ -131,6 +132,28 @@
         },
         "next": [
             "FishNewClickBaitChoose"
+        ]
+    },
+    "FishNewFishFull": {
+        "desc": "渔获已满",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    520,
+                    340,
+                    240,
+                    40
+                ],
+                "expected": "渔获已满",
+                "threshold": 0.8
+            }
+        },
+        "focus": {
+            "Node.Action.Succeeded": "渔获已满，尝试前往卖鱼"
+        },
+        "next": [
+            "FishNewOpenFishMaster"
         ]
     },
     "FishNewClickBaitChoose": {
