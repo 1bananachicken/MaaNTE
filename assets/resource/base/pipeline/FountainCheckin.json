@@ -60,7 +60,7 @@
         "action": "Click",
         "post_delay": 2000,
         "next": [
-            "__ScenePrivateAnyExit",
+            "FountainCheckinAnyExit",
             "FountainSkipStoryDialog",
             "FountainSkipStoryDialogConfirm",
             "FountainCheckinIfExit"
@@ -88,6 +88,7 @@
         },
         "post_delay": 0,
         "next": [
+            "FountainCheckinAnyExit",
             "FountainSkipStoryDialog",
             "FountainWaitAnimation"
         ]
@@ -138,6 +139,29 @@
         "next": [
             "FountainCheckinIfExit",
             "FountainWaitAnimation"
+        ]
+    },
+    "FountainCheckinAnyExit": {
+        "desc": "Esc退出",
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 27 // ESC
+            }
+        },
+        "post_wait_freezes": {
+            "target": [
+                0,
+                0,
+                100,
+                100
+            ],
+            "time": 600
+        },
+        "post_delay": 0,
+        "next": [
+            "FountainCheckinIfExit"
         ]
     },
     "FountainCheckinIfExit": {
