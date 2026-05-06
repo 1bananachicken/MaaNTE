@@ -107,10 +107,7 @@
         "desc": "钓鱼任务完成",
         "focus": {
             "Node.Action.Succeeded": "钓鱼任务结束"
-        },
-        "next": [
-            "MouseMoveReset"
-        ]
+        }
     },
     "FishNewBaitLack": {
         "desc": "缺少鱼饵",
@@ -824,7 +821,8 @@
         "pre_wait_freezes": 200,
         "post_wait_freezes": 200,
         "next": [
-            "FishNewFishingMasterPage2Submit"
+            "FishNewFishingMasterPage2Submit",
+            "FishNewSellFishNoFish"
         ]
     },
     "FishNewFishingMasterPage2Submit": {
@@ -890,7 +888,7 @@
             "Node.Action.Succeeded": "无鱼可卖，结束卖鱼"
         },
         "next": [
-            "FishNewFishingMasterExit"
+            "FishNewTaskExit"
         ]
     },
     "FishNewFishingMasterExit": {
@@ -910,7 +908,7 @@
             27 // Esc
         ],
         "next": [
-            "FishNewTaskExit"
+            "[Anchor]FishNewRestart"
         ]
     }
 }
