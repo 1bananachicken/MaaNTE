@@ -74,6 +74,11 @@ class SongSelector:
         self._song_select_enabled = bool(sc.get("enabled", False))
         self._auto_select = bool(sc.get("auto_select", False))
         self._song_name = str(sc.get("song_name", ""))
+        song_list_roi_list = sc.get("song_list_roi", [47, 117, 550, 510])
+        if isinstance(song_list_roi_list, list) and len(song_list_roi_list) == 4:
+            self._song_list_roi = tuple(int(v) for v in song_list_roi_list)
+        else:
+            self._song_list_roi = (47, 117, 550, 510)
         self._scroll_area_x_frac = float(sc.get("scroll_area_x_frac", 0.25))
         self._scroll_area_y_frac = float(sc.get("scroll_area_y_frac", 0.50))
         self._scroll_delta = int(sc.get("scroll_delta", -3))
@@ -163,7 +168,7 @@ class SongSelector:
         if self._state == _SEL_SEARCHING:
             if self._scroll_attempts > 0 and now - self._post_scroll_time < self._scroll_settle_delay:
                 return {"state": self._state, "action": "settling", "scroll_attempts": self._scroll_attempts}
-            match = self._find_template(frame_bgr, self._template, self._match_threshold)
+            match = self._find_template(frame_bgr, self._template, self._match_threshold, self._song_list_roi)
             if match is not None:
                 self._match_loc = match
                 self._consecutive_down_fails = 0
@@ -198,8 +203,8 @@ class SongSelector:
             else:
                 self._consecutive_down_fails += 1
             if scroll_func is not None:
-                sx = int(self._scroll_area_x_frac * w)
-                sy = int(self._scroll_area_y_frac * h)
+                sx = self._song_list_roi[0] + self._song_list_roi[2] // 2
+                sy = self._song_list_roi[1] + self._song_list_roi[3] // 2
                 scroll_func(sx, sy, direction)
             self._scroll_attempts += 1
             self._last_action_time = now
@@ -212,7 +217,7 @@ class SongSelector:
         if self._state == _SEL_CLICKING_SONG:
             if now - self._last_action_time < self._click_delay:
                 return {"state": self._state, "action": "waiting"}
-            current_match = self._find_template(frame_bgr, self._template, self._click_reverify_threshold)
+            current_match = self._find_template(frame_bgr, self._template, self._click_reverify_threshold, self._song_list_roi)
             if current_match is None:
                 self._click_reverify_retries += 1
                 if self._click_reverify_retries < self._max_click_reverify_retries:
@@ -282,15 +287,28 @@ class SongSelector:
         frame_bgr: NDArray[np.uint8],
         tpl: NDArray[np.uint8],
         threshold: float,
+        roi: tuple[int, int, int, int] | None = None,
     ) -> tuple[int, int] | None:
         th, tw = tpl.shape[:2]
         fh, fw = frame_bgr.shape[:2]
         if th > fh or tw > fw:
             return None
-        result = cv2.matchTemplate(frame_bgr, tpl, cv2.TM_CCOEFF_NORMED)
+        search_area = frame_bgr
+        offset_x, offset_y = 0, 0
+        if roi is not None:
+            rx, ry, rw, rh = roi
+            rx = max(0, min(rx, fw))
+            ry = max(0, min(ry, fh))
+            rw = min(rw, fw - rx)
+            rh = min(rh, fh - ry)
+            if rw < tw or rh < th:
+                return None
+            search_area = frame_bgr[ry:ry + rh, rx:rx + rw]
+            offset_x, offset_y = rx, ry
+        result = cv2.matchTemplate(search_area, tpl, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
         if max_val >= threshold:
-            cx = max_loc[0] + tw // 2
-            cy = max_loc[1] + th // 2
+            cx = max_loc[0] + tw // 2 + offset_x
+            cy = max_loc[1] + th // 2 + offset_y
             return cx, cy
         return None
