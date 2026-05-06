@@ -4,3 +4,8 @@ pillow
 pytz
 requests
 opencv-python
+librosa
+numpy
+scipy
+scikit-learn
+soundcard

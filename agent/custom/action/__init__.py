@@ -9,6 +9,7 @@ from .rhythm.feats.select_song import *
 from .Common.click import *
 from .realtime_task import *
 from .AutoFish.auto_fish_withoutCV import *
+from .SoundTrigger.SoundDodgeAction import *
 from .auto_f_scroll import *
 
 __all__ = [
@@ -23,5 +24,6 @@ __all__ = [
     "AutoRhythmSelectSong",
     "RealTimeTaskAction",
     "AutoFishWithoutCV",
+    "SoundDodgeAction",
     "AutoFScroll",
 ]
