@@ -1,10 +1,15 @@
 import json
+import time
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
 from .Tetris.feats.play import TetrisGamePlayer
+
+PREPARE_ONE_CLICK_POINT = (1016, 244)
+PREPARE_ONE_MULTI_CLICK_POINT = (885, 418)
+PREPARE_TWO_CLICK_POINT = (1121, 674)
 
 
 @AgentServer.custom_action("auto_tetris")
@@ -18,12 +23,9 @@ class AutoTetris(CustomAction):
         mode = "single"
         repeat = False
         repeat_count = 1
+        use_all_vitality = False
         if argv.custom_action_param:
             try:
-                print(f"custom_action_param type: {type(argv.custom_action_param)}")
-                print(f"custom_action_param value: {argv.custom_action_param}")
-
-
                 if isinstance(argv.custom_action_param, str):
                     params = json.loads(argv.custom_action_param)
                 elif isinstance(argv.custom_action_param, dict):
@@ -34,79 +36,78 @@ class AutoTetris(CustomAction):
                 mode = params.get("mode", "single")
                 repeat = params.get("repeat", False)
                 repeat_count = int(params.get("repeat_count", 1))
+                use_all_vitality = params.get("use_all_vitality", False)
                 if repeat_count < 1:
                     repeat_count = 1
             except Exception:
                 pass
 
         player = TetrisGamePlayer()
-
-        if not repeat:
-            success = player.run(controller, tasker, mode=mode)
-            return CustomAction.RunResult(success=success)
-
-        initial_scene = player._detect_initial_scene(controller, tasker)
-        if initial_scene is None:
-            print("Cannot detect Tetris initial scene, ending task.")
-            return CustomAction.RunResult(success=False)
-
-        scene_name = initial_scene["name"]
-        print(f"Auto-repeat: initial scene={scene_name}, repeat_count={repeat_count}")
-
-        if scene_name == "world_no_prompt":
-            print(
-                "World scene detected but no Tetris entrance prompt found, ending task."
-            )
-            return CustomAction.RunResult(success=False)
-
-        if scene_name == "unknown":
-            print("Unknown initial scene, ending task.")
-            return CustomAction.RunResult(success=False)
-
-        if scene_name == "result":
-            print("Starting at result screen, dismissing...")
-            player._press_escape(controller)
-            if not player._sleep_with_stop(tasker, 1.0):
-                return CustomAction.RunResult(success=False)
-            if not player._back_to_world_from_anywhere(controller, tasker):
-                print("Failed to dismiss result screen.")
-                return CustomAction.RunResult(success=False)
-            scene_name = "world_prompt"
-
+        player.context = context
         player.mode = mode
+        success = player.play_round(controller, tasker)
+        return CustomAction.RunResult(success=success)
 
-        started_in_game = scene_name in ("game_active", "game_idle")
 
-        if started_in_game:
-            print("Starting in game, playing current round (not counted)...")
-            success = player.run(controller, tasker, mode=mode)
-            if not success:
-                return CustomAction.RunResult(success=False)
-            if tasker.stopping:
-                return CustomAction.RunResult(success=False)
-            if not player._back_to_world_from_anywhere(controller, tasker):
-                print("Failed to return to world after initial play.")
-                return CustomAction.RunResult(success=False)
+@AgentServer.custom_action("tetris_press_f")
+class TetrisPressF(CustomAction):
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
+        controller = context.tasker.controller
+        controller.post_key_down(70)
+        time.sleep(0.05)
+        controller.post_key_up(70)
+        return CustomAction.RunResult(success=True)
 
-        for i in range(repeat_count):
-            if tasker.stopping:
-                return CustomAction.RunResult(success=False)
 
-            print(f"=== Auto-repeat round {i + 1}/{repeat_count} ===")
-            player.reset()
+@AgentServer.custom_action("tetris_click_mode")
+class TetrisClickMode(CustomAction):
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
+        controller = context.tasker.controller
 
-            success = player._navigate_to_game_and_play(controller, tasker)
-            if not success:
-                print(f"Round {i + 1} failed.")
-                return CustomAction.RunResult(success=False)
+        mode = "single"
+        if argv.custom_action_param:
+            try:
+                if isinstance(argv.custom_action_param, str):
+                    params = json.loads(argv.custom_action_param)
+                elif isinstance(argv.custom_action_param, dict):
+                    params = argv.custom_action_param
+                else:
+                    params = {}
+                mode = params.get("mode", "single")
+            except Exception:
+                pass
 
-            if tasker.stopping:
-                return CustomAction.RunResult(success=False)
+        if mode == "multiple":
+            x, y = PREPARE_ONE_MULTI_CLICK_POINT
+        else:
+            x, y = PREPARE_ONE_CLICK_POINT
 
-            if i < repeat_count - 1:
-                if not player._back_to_world_from_anywhere(controller, tasker):
-                    print(f"Failed to return to world after round {i + 1}.")
-                    return CustomAction.RunResult(success=False)
+        controller.post_click(x, y).wait()
+        return CustomAction.RunResult(success=True)
 
-        print(f"=== All {repeat_count} rounds completed ===")
+
+@AgentServer.custom_action("tetris_click_start_match")
+class TetrisClickStartMatch(CustomAction):
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
+        controller = context.tasker.controller
+        x, y = PREPARE_TWO_CLICK_POINT
+        controller.post_click(x, y).wait()
+        return CustomAction.RunResult(success=True)
+
+
+@AgentServer.custom_action("tetris_press_esc")
+class TetrisPressEsc(CustomAction):
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
+        controller = context.tasker.controller
+        controller.post_key_down(27)
+        time.sleep(0.05)
+        controller.post_key_up(27)
         return CustomAction.RunResult(success=True)

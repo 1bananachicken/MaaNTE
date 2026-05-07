@@ -3,30 +3,202 @@
         "desc": "泯除方块入口",
         "action": "DoNothing",
         "next": [
-            "TetrisStart"
+            "TetrisSceneDispatch"
         ]
     },
-    "TetrisStart": {
-        "desc": "泯除方块主流程",
-        "max_hit": 20,
+    "TetrisSceneDispatch": {
+        "desc": "泯除方块 - 场景分发器",
         "next": [
-            "TetrisGamePlay"
+            "[JumpBack]TetrisHandleExit",
+            "[JumpBack]TetrisHandleGameActive",
+            "[JumpBack]TetrisHandleGameIdle",
+            "[JumpBack]TetrisHandleLoading",
+            "[JumpBack]TetrisHandleWorldWithPrompt",
+            "[JumpBack]TetrisHandlePrepareTwo",
+            "[JumpBack]TetrisHandlePrepareOne",
+            "[JumpBack]TetrisHandleWorldNoPrompt",
+            "TetrisExitWithError"
         ]
     },
-    "TetrisGamePlay": {
-        "desc": "泯除方块游戏流程（场景导航+AI对局）",
+    "TetrisHandleExit": {
+        "desc": "泯除方块 - 处理退出按钮场景",
+        "recognition": "And",
+        "all_of": [
+            "TetrisSceneExit"
+        ],
+        "action": "Click",
+        "post_delay": 500,
+        "next": [
+            "[JumpBack]TetrisWaitWorld"
+        ]
+    },
+    "TetrisHandleGameActive": {
+        "desc": "泯除方块 - 检测到游戏中，执行对局",
+        "recognition": "And",
+        "all_of": [
+            "TetrisSceneGameActive"
+        ],
         "action": "Custom",
         "custom_action": "auto_tetris",
         "custom_action_param": {
             "mode": "single",
-            "repeat": false,
-            "repeat_count": 1
+            "repeat": false
         },
         "next": [
+            "[JumpBack]TetrisDismissResult",
             "TetrisExit"
         ],
         "on_error": [
             "TetrisExitWithError"
+        ]
+    },
+    "TetrisHandleGameIdle": {
+        "desc": "泯除方块 - 检测到游戏空闲（等待方块出现）",
+        "recognition": "And",
+        "all_of": [
+            "TetrisSceneGameIdle"
+        ],
+        "pre_delay": 500,
+        "next": [
+            "[JumpBack]TetrisHandleGameActive",
+            "[JumpBack]TetrisSceneDispatch"
+        ]
+    },
+    "TetrisHandleLoading": {
+        "desc": "泯除方块 - 检测到加载界面，等待加载完成",
+        "recognition": "And",
+        "all_of": [
+            "TetrisSceneLoading"
+        ],
+        "pre_delay": 1000,
+        "next": [
+            "[JumpBack]TetrisHandleGameActive",
+            "[JumpBack]TetrisHandleGameIdle",
+            "[JumpBack]TetrisHandleLoading",
+            "[JumpBack]TetrisHandleWorldWithPrompt",
+            "TetrisExitWithError"
+        ]
+    },
+    "TetrisHandleWorldWithPrompt": {
+        "desc": "泯除方块 - 大世界有方块入口，按下F进入",
+        "recognition": "And",
+        "all_of": [
+            "TetrisSceneWorldWithPrompt"
+        ],
+        "action": "Custom",
+        "custom_action": "tetris_press_f",
+        "next": [
+            "[JumpBack]TetrisWaitPrepare"
+        ]
+    },
+    "TetrisHandleWorldNoPrompt": {
+        "desc": "泯除方块 - 大世界无方块入口提示，无法进入",
+        "recognition": "And",
+        "all_of": [
+            "TetrisSceneWorldMarker"
+        ],
+        "next": [
+            "TetrisExitWithError"
+        ]
+    },
+    "TetrisHandlePrepareOne": {
+        "desc": "泯除方块 - 准备界面一，点击模式入口",
+        "recognition": "And",
+        "all_of": [
+            "TetrisScenePrepareOne"
+        ],
+        "action": "Custom",
+        "custom_action": "tetris_click_mode",
+        "custom_action_param": {
+            "mode": "single"
+        },
+        "post_delay": 500,
+        "next": [
+            "[JumpBack]TetrisWaitPrepareTwo"
+        ]
+    },
+    "TetrisHandlePrepareTwo": {
+        "desc": "泯除方块 - 准备界面二，点击开始匹配",
+        "recognition": "And",
+        "all_of": [
+            "TetrisScenePrepareTwo"
+        ],
+        "action": "Custom",
+        "custom_action": "tetris_click_start_match",
+        "post_delay": 1000,
+        "next": [
+            "[JumpBack]TetrisWaitGame"
+        ]
+    },
+    "TetrisHandleMatching": {
+        "desc": "泯除方块 - 匹配中，等待匹配完成",
+        "recognition": "And",
+        "all_of": [
+            "TetrisSceneMatching"
+        ],
+        "pre_delay": 2000,
+        "next": [
+            "[JumpBack]TetrisHandleMatching",
+            "[JumpBack]TetrisHandleGameActive",
+            "[JumpBack]TetrisHandleGameIdle",
+            "[JumpBack]TetrisHandleLoading",
+            "TetrisSceneDispatch"
+        ]
+    },
+    "TetrisWaitWorld": {
+        "desc": "泯除方块 - 等待回到大世界",
+        "next": [
+            "[JumpBack]TetrisHandleWorldWithPrompt",
+            "[JumpBack]TetrisHandleLoading",
+            "[JumpBack]TetrisHandleExit",
+            "TetrisSceneDispatch"
+        ]
+    },
+    "TetrisWaitPrepare": {
+        "desc": "泯除方块 - 等待进入准备界面",
+        "next": [
+            "[JumpBack]TetrisHandlePrepareOne",
+            "[JumpBack]TetrisHandlePrepareTwo",
+            "[JumpBack]TetrisHandleLoading",
+            "[JumpBack]TetrisHandleGameActive",
+            "[JumpBack]TetrisHandleGameIdle",
+            "TetrisSceneDispatch"
+        ]
+    },
+    "TetrisWaitPrepareTwo": {
+        "desc": "泯除方块 - 等待进入准备界面二",
+        "next": [
+            "[JumpBack]TetrisHandlePrepareTwo",
+            "[JumpBack]TetrisHandleGameActive",
+            "[JumpBack]TetrisHandleGameIdle",
+            "[JumpBack]TetrisHandleLoading",
+            "TetrisSceneDispatch"
+        ]
+    },
+    "TetrisWaitGame": {
+        "desc": "泯除方块 - 等待进入游戏",
+        "next": [
+            "[JumpBack]TetrisHandleGameActive",
+            "[JumpBack]TetrisHandleGameIdle",
+            "[JumpBack]TetrisHandleLoading",
+            "[JumpBack]TetrisHandleMatching",
+            "TetrisSceneDispatch"
+        ]
+    },
+    "TetrisDismissResult": {
+        "desc": "泯除方块 - 退出结算界面",
+        "recognition": "And",
+        "all_of": [
+            "TetrisSceneMatchend"
+        ],
+        "action": "Custom",
+        "custom_action": "tetris_press_esc",
+        "post_delay": 1000,
+        "next": [
+            "[JumpBack]TetrisDismissResult",
+            "[JumpBack]TetrisHandleLoading",
+            "[JumpBack]TetrisHandleWorldWithPrompt",
+            "TetrisExit"
         ]
     },
     "TetrisExit": {

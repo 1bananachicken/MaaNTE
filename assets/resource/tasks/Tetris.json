@@ -41,13 +41,18 @@
                     "name": "Yes",
                     "label": "启用",
                     "option": [
-                        "TetrisRepeatCount_Single"
+                        "TetrisConsumeAllVitality_Single"
                     ],
                     "pipeline_override": {
-                        "TetrisGamePlay": {
+                        "TetrisHandleGameActive": {
                             "custom_action_param": {
                                 "mode": "single",
                                 "repeat": true
+                            }
+                        },
+                        "TetrisHandlePrepareOne": {
+                            "custom_action_param": {
+                                "mode": "single"
                             }
                         }
                     }
@@ -56,10 +61,15 @@
                     "name": "No",
                     "label": "关闭",
                     "pipeline_override": {
-                        "TetrisGamePlay": {
+                        "TetrisHandleGameActive": {
                             "custom_action_param": {
                                 "mode": "single",
                                 "repeat": false
+                            }
+                        },
+                        "TetrisHandlePrepareOne": {
+                            "custom_action_param": {
+                                "mode": "single"
                             }
                         }
                     }
@@ -76,13 +86,18 @@
                     "name": "Yes",
                     "label": "启用",
                     "option": [
-                        "TetrisRepeatCount_Multiple"
+                        "TetrisConsumeAllVitality_Multiple"
                     ],
                     "pipeline_override": {
-                        "TetrisGamePlay": {
+                        "TetrisHandleGameActive": {
                             "custom_action_param": {
                                 "mode": "multiple",
                                 "repeat": true
+                            }
+                        },
+                        "TetrisHandlePrepareOne": {
+                            "custom_action_param": {
+                                "mode": "multiple"
                             }
                         }
                     }
@@ -91,10 +106,109 @@
                     "name": "No",
                     "label": "关闭",
                     "pipeline_override": {
-                        "TetrisGamePlay": {
+                        "TetrisHandleGameActive": {
                             "custom_action_param": {
                                 "mode": "multiple",
                                 "repeat": false
+                            }
+                        },
+                        "TetrisHandlePrepareOne": {
+                            "custom_action_param": {
+                                "mode": "multiple"
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
+        },
+        "TetrisConsumeAllVitality_Single": {
+            "type": "switch",
+            "label": "消耗所有活力",
+            "description": "启用后自动识别活力值，活力耗尽时自动停止；关闭则按指定轮数连打",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "TetrisHandleGameActive": {
+                            "custom_action_param": {
+                                "mode": "single",
+                                "repeat": true,
+                                "use_all_vitality": true
+                            }
+                        },
+                        "TetrisHandlePrepareOne": {
+                            "custom_action_param": {
+                                "mode": "single"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "option": [
+                        "TetrisRepeatCount_Single"
+                    ],
+                    "pipeline_override": {
+                        "TetrisHandleGameActive": {
+                            "custom_action_param": {
+                                "mode": "single",
+                                "repeat": true,
+                                "use_all_vitality": false
+                            }
+                        },
+                        "TetrisHandlePrepareOne": {
+                            "custom_action_param": {
+                                "mode": "single"
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
+        },
+        "TetrisConsumeAllVitality_Multiple": {
+            "type": "switch",
+            "label": "消耗所有活力",
+            "description": "启用后自动识别活力值，活力耗尽时自动停止；关闭则按指定轮数连打",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "TetrisHandleGameActive": {
+                            "custom_action_param": {
+                                "mode": "multiple",
+                                "repeat": true,
+                                "use_all_vitality": true
+                            }
+                        },
+                        "TetrisHandlePrepareOne": {
+                            "custom_action_param": {
+                                "mode": "multiple"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "option": [
+                        "TetrisRepeatCount_Multiple"
+                    ],
+                    "pipeline_override": {
+                        "TetrisHandleGameActive": {
+                            "custom_action_param": {
+                                "mode": "multiple",
+                                "repeat": true,
+                                "use_all_vitality": false
+                            }
+                        },
+                        "TetrisHandlePrepareOne": {
+                            "custom_action_param": {
+                                "mode": "multiple"
                             }
                         }
                     }
@@ -116,11 +230,17 @@
                 }
             ],
             "pipeline_override": {
-                "TetrisGamePlay": {
+                "TetrisHandleGameActive": {
                     "custom_action_param": {
                         "mode": "single",
                         "repeat": true,
+                        "use_all_vitality": false,
                         "repeat_count": "{repeat_count}"
+                    }
+                },
+                "TetrisHandlePrepareOne": {
+                    "custom_action_param": {
+                        "mode": "single"
                     }
                 }
             }
@@ -139,11 +259,17 @@
                 }
             ],
             "pipeline_override": {
-                "TetrisGamePlay": {
+                "TetrisHandleGameActive": {
                     "custom_action_param": {
                         "mode": "multiple",
                         "repeat": true,
+                        "use_all_vitality": false,
                         "repeat_count": "{repeat_count}"
+                    }
+                },
+                "TetrisHandlePrepareOne": {
+                    "custom_action_param": {
+                        "mode": "multiple"
                     }
                 }
             }

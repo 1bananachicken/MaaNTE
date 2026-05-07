@@ -32,11 +32,14 @@ from ..utils.scene import (
     VK_K,
     VK_ESC,
 )
+from ..utils.scene_detector import TetrisSceneDetector
 
 
 class TetrisGamePlayer:
     def __init__(self):
         self.scene_gate = SceneGate()
+        self.scene_detector = TetrisSceneDetector()
+        self.context = None
         self.mode = "single"
         self.last_active_cells = None
         self.combo_count = 0
@@ -68,8 +71,9 @@ class TetrisGamePlayer:
         self.current_cells = None
         self.queue_pieces_state = []
 
-    def run(self, controller, tasker, mode="single"):
+    def run(self, controller, tasker, mode="single", context=None):
         self.mode = mode
+        self.context = context
         self.reset()
         print(f"=== Auto Tetris Started | mode={self.mode} ===")
 
@@ -95,6 +99,145 @@ class TetrisGamePlayer:
             return self._play_from_game(controller, tasker)
 
         return self._navigate_to_game_and_play(controller, tasker)
+
+    def play_round(self, controller, tasker) -> bool:
+        self.reset()
+        round_start = time.time()
+        last_piece_signature = None
+        skip_count = 0
+
+        print(f"=== Tetris Round Started | mode={self.mode} ===")
+
+        while time.time() - round_start < 900:
+            if tasker.stopping:
+                return False
+
+            img = self._safe_get_image(controller)
+            if img is None:
+                if not self._sleep_with_stop(tasker, 0.05):
+                    return False
+                continue
+
+            if time.time() - round_start >= 5.0 and self._is_result_screen(img):
+                print("Result screen detected, round ended.")
+                return True
+
+            if self.current_piece_name is None:
+                if not self._update_active_piece_state(img):
+                    if not self._sleep_with_stop(tasker, 0.04):
+                        return False
+                    continue
+                print(f"[NewPiece] First piece: {self.current_piece_name}")
+
+            current_signature = (
+                self.current_piece_name,
+                self.current_rotation,
+                self.current_col,
+            )
+            if current_signature == last_piece_signature:
+                skip_count += 1
+                if skip_count >= 10:
+                    print("Same piece signature repeated too long, forcing re-evaluation.")
+                    last_piece_signature = None
+                    skip_count = 0
+                else:
+                    if not self._sleep_with_stop(tasker, 0.03):
+                        return False
+                    continue
+
+            skip_count = 0
+
+            piece_state = {
+                "piece": self.current_piece_name,
+                "rotation": self.current_rotation,
+                "col": self.current_col,
+                "row": self.current_row,
+                "cells": self.current_cells,
+            }
+            settled_board = self.internal_board.copy()
+
+            if self.queue_pieces_state:
+                planning_queue = [self.current_piece_name, *self.queue_pieces_state[:5]]
+            else:
+                planning_queue = [self.current_piece_name]
+            planning_queue = planning_queue[:6]
+
+            best_move = self._choose_best_current_piece_move(
+                settled_board, piece_state, planning_queue,
+            )
+            if best_move is None:
+                best_move = self._find_best_move(settled_board, self.current_piece_name)
+            if best_move is None:
+                print("No valid move found, waiting.")
+                if not self._sleep_with_stop(tasker, 0.06):
+                    return False
+                continue
+
+            print(
+                "Piece=%s rot=%s col=%s -> target_rot=%s target_col=%s score=%.2f"
+                % (
+                    self.current_piece_name,
+                    self.current_rotation,
+                    self.current_col,
+                    best_move["rotation"],
+                    best_move["target_col"],
+                    best_move.get("total_score", best_move["score"]),
+                )
+            )
+
+            planned_result = self._apply_internal_drop(
+                settled_board, self.current_piece_name,
+                best_move["rotation"], best_move["target_col"], apply=False,
+            )
+
+            self._rotate_and_standardize(controller, best_move["rotation"])
+            self._apply_move_no_feedback(controller, best_move["rotation"], best_move["target_col"])
+
+            next_piece_info = self._detect_next_piece(controller, tasker)
+            if next_piece_info is None:
+                return False
+            if next_piece_info == "result":
+                print("Result screen detected, round ended.")
+                return True
+
+            if planned_result is not None:
+                self.internal_board = planned_result["board"]
+                self._log_internal_board()
+
+            lines_cleared = best_move.get("lines_cleared", 0)
+            if planned_result is not None:
+                lines_cleared = planned_result.get("lines_cleared", lines_cleared)
+
+            if lines_cleared > 0:
+                now = time.time()
+                if now - self.last_clear_time < 3.0:
+                    self.combo_count += 1
+                else:
+                    self.combo_count = 1
+                self.last_clear_time = now
+                self.total_lines_cleared += lines_cleared
+                print(f"[Stats] Lines cleared: {lines_cleared}, Total: {self.total_lines_cleared}")
+            else:
+                if time.time() - self.last_clear_time > 5.0:
+                    self.combo_count = 0
+
+            self.current_piece_name = next_piece_info["piece"]
+            self.current_rotation = next_piece_info["rotation"]
+            self.current_col = next_piece_info["col"]
+            self.current_row = next_piece_info["row"]
+            self.current_cells = next_piece_info["cells"]
+            self.last_active_cells = next_piece_info["cells"]
+            last_piece_signature = None
+
+            img2 = self._safe_get_image(controller)
+            if img2 is not None:
+                self._update_queue_pieces(img2)
+
+            if not self._sleep_with_stop(tasker, 0.04):
+                return False
+
+        print("Tetris round timed out.")
+        return False
 
     def _sleep_with_stop(self, tasker, seconds: float) -> bool:
         end_at = time.time() + seconds
@@ -229,7 +372,11 @@ class TetrisGamePlayer:
         }
 
     def _is_drop_ready(self, img) -> bool:
-        matched, score, _, _ = self.scene_gate._find_drop_button(img)
+        if self.context is not None:
+            result = self.scene_detector.check_drop(self.context, img)
+            matched = result is not None
+        else:
+            matched, score, _, _ = self.scene_gate._find_drop_button(img)
         if matched:
             self.drop_ready_hits = min(self.drop_ready_hits + 1, 3)
         else:
@@ -237,8 +384,10 @@ class TetrisGamePlayer:
         return self.drop_ready_hits >= 2
 
     def _is_result_screen(self, img) -> bool:
-        matched, score, _, _ = self.scene_gate._find_matchend(img)
-        return matched
+        if self.context is None:
+            matched, score, _, _ = self.scene_gate._find_matchend(img)
+            return matched
+        return self.scene_detector.check_matchend(self.context, img) is not None
 
     def _wait_for_loading_end(self, controller, tasker, timeout_seconds=30.0) -> str:
         deadline = time.time() + timeout_seconds
@@ -251,10 +400,16 @@ class TetrisGamePlayer:
                     return "stopped"
                 continue
 
-            world_matched, _, _, _ = self.scene_gate._find_world_prompt(img)
-            drop_matched, _, _, _ = self.scene_gate._find_drop_button(img)
-            game_matched, _, _, _ = self.scene_gate._find_game_scene_marker(img)
-            loading_matched, _, _, _ = self.scene_gate._find_loading(img)
+            if self.context is not None:
+                world_matched = self.scene_detector.check_world_prompt(self.context, img) is not None
+                drop_matched = self.scene_detector.check_drop(self.context, img) is not None
+                game_matched = self.scene_detector.check_game_marker(self.context, img) is not None
+                loading_matched = self.scene_detector.check_loading(self.context, img) is not None
+            else:
+                world_matched, _, _, _ = self.scene_gate._find_world_prompt(img)
+                drop_matched, _, _, _ = self.scene_gate._find_drop_button(img)
+                game_matched, _, _, _ = self.scene_gate._find_game_scene_marker(img)
+                loading_matched, _, _, _ = self.scene_gate._find_loading(img)
 
             if world_matched:
                 return "world"
@@ -279,7 +434,10 @@ class TetrisGamePlayer:
                 if not self._sleep_with_stop(tasker, 1.0):
                     return False
                 continue
-            matched, _, _, _ = self.scene_gate._find_matching(img)
+            if self.context is not None:
+                matched = self.scene_detector.check_matching(self.context, img) is not None
+            else:
+                matched, _, _, _ = self.scene_gate._find_matching(img)
             if not matched:
                 return True
             if not self._sleep_with_stop(tasker, 1.0):
@@ -464,6 +622,8 @@ class TetrisGamePlayer:
         return True
 
     def _classify_scene(self, img, play_state=None):
+        if self.context is not None:
+            return self.scene_detector.classify(self.context, None, play_state, img)
         return self.scene_gate.classify_scene(img, play_state)
 
     def _wait_for_scene_names(
@@ -577,8 +737,8 @@ class TetrisGamePlayer:
                 pass
 
         if scene_name == "exit":
-            print(f"Exit scene at start, clicking exit. score={scene['score']:.2f}")
-            self._click_template(controller, scene["x"], scene["y"], scene["template"])
+            print(f"Exit scene at start, clicking exit.")
+            self._click_point(controller, scene["x"], scene["y"])
             if not self._wait_until_exit_to_world(controller, tasker):
                 return False
             img = self._safe_get_image(controller)
@@ -588,7 +748,7 @@ class TetrisGamePlayer:
             scene_name = scene["name"]
 
         if scene_name == "world_prompt":
-            print(f"World with prompt, pressing F. score={scene['score']:.2f}")
+            print(f"World with prompt, pressing F.")
             self._tap_key(controller, VK_F)
             result = self._wait_for_scene_names(
                 controller,
@@ -602,16 +762,19 @@ class TetrisGamePlayer:
             scene = result
 
         if scene_name == "prepare_two":
-            print(
-                f"Found prepare_two at start, clicking return to re-select mode. score={scene['score']:.2f}"
-            )
+            print("Found prepare_two at start, clicking return to re-select mode.")
             img = self._safe_get_image(controller)
             if img is not None:
-                found, score, rx, ry = self.scene_gate._find_return_button(img)
-                if found:
-                    click_x = int(rx + self.scene_gate.return_tpl.shape[1] / 2)
-                    click_y = int(ry + self.scene_gate.return_tpl.shape[0] / 2)
-                    self._click_point(controller, click_x, click_y)
+                if self.context is not None:
+                    ret = self.scene_detector.check_return(self.context, img)
+                    if ret:
+                        self._click_point(controller, ret["cx"], ret["cy"])
+                else:
+                    found, score, rx, ry = self.scene_gate._find_return_button(img)
+                    if found:
+                        click_x = int(rx + self.scene_gate.return_tpl.shape[1] / 2)
+                        click_y = int(ry + self.scene_gate.return_tpl.shape[0] / 2)
+                        self._click_point(controller, click_x, click_y)
                     result = self._wait_for_scene_names(
                         controller,
                         tasker,
@@ -629,7 +792,7 @@ class TetrisGamePlayer:
                 else PREPARE_ONE_CLICK_POINT
             )
             mode_label = "多人" if self.mode == "multiple" else "单人"
-            print(f"{mode_label}模式入口, clicking. score={scene['score']:.2f}")
+            print(f"{mode_label}模式入口, clicking.")
             self._click_point(controller, *click_point)
             result = self._wait_for_scene_names(
                 controller,
@@ -643,7 +806,7 @@ class TetrisGamePlayer:
             scene = result
 
         if scene_name == "prepare_two":
-            print(f"Start-match scene, clicking. score={scene['score']:.2f}")
+            print(f"Start-match scene, clicking.")
             self._click_point(controller, *PREPARE_TWO_CLICK_POINT)
 
             if self.mode == "multiple":
@@ -748,12 +911,8 @@ class TetrisGamePlayer:
                 scene_name = scene["name"]
 
                 if scene_name == "exit":
-                    print(
-                        f"Exit detected, clicking to leave match. score={scene['score']:.2f}"
-                    )
-                    self._click_template(
-                        controller, scene["x"], scene["y"], self.scene_gate.exit_tpl
-                    )
+                    print("Exit detected, clicking to leave match.")
+                    self._click_point(controller, scene["x"], scene["y"])
                     self._wait_until_exit_to_world(controller, tasker)
                     print("=== Auto Tetris Finished ===")
                     return True
@@ -983,7 +1142,7 @@ class TetrisGamePlayer:
     def _recover_from_scene(self, controller, tasker, scene: dict) -> bool:
         scene_name = scene["name"]
         if scene_name == "world_prompt":
-            print(f"Recovery: world prompt, pressing F. score={scene['score']:.2f}")
+            print("Recovery: world prompt, pressing F.")
             self._tap_key(controller, VK_F)
             return (
                 self._wait_for_scene_names(
@@ -1002,9 +1161,7 @@ class TetrisGamePlayer:
                 else PREPARE_ONE_CLICK_POINT
             )
             mode_label = "多人" if self.mode == "multiple" else "单人"
-            print(
-                f"Recovery: {mode_label}模式入口, clicking. score={scene['score']:.2f}"
-            )
+            print(f"Recovery: {mode_label}模式入口, clicking.")
             self._click_point(controller, *click_point)
             return (
                 self._wait_for_scene_names(
@@ -1017,7 +1174,7 @@ class TetrisGamePlayer:
             )
 
         if scene_name == "prepare_two":
-            print(f"Recovery: start-match, clicking. score={scene['score']:.2f}")
+            print("Recovery: start-match, clicking.")
             self._click_point(controller, *PREPARE_TWO_CLICK_POINT)
             return (
                 self._wait_for_scene_names(
@@ -1030,8 +1187,8 @@ class TetrisGamePlayer:
             )
 
         if scene_name == "exit":
-            print(f"Recovery: exit button, clicking. score={scene['score']:.2f}")
-            self._click_template(controller, scene["x"], scene["y"], scene["template"])
+            print("Recovery: exit button, clicking.")
+            self._click_point(controller, scene["x"], scene["y"])
             return self._wait_until_exit_to_world(
                 controller, tasker, timeout_seconds=6.0
             )
@@ -1058,23 +1215,38 @@ class TetrisGamePlayer:
 
         img = self._safe_get_image(controller)
         if img is not None:
-            found, score, rx, ry = self.scene_gate._find_return_button(img)
-            if found:
-                print(
-                    f"Recovery: return button found at ({rx},{ry}), clicking. score={score:.2f}"
-                )
-                click_x = int(rx + self.scene_gate.return_tpl.shape[1] / 2)
-                click_y = int(ry + self.scene_gate.return_tpl.shape[0] / 2)
-                self._click_point(controller, click_x, click_y)
-                return (
-                    self._wait_for_scene_names(
-                        controller,
-                        tasker,
-                        {"prepare_one", "world_prompt"},
-                        timeout_seconds=4.0,
+            if self.context is not None:
+                ret = self.scene_detector.check_return(self.context, img)
+                if ret:
+                    print(f"Recovery: return button found, clicking.")
+                    self._click_point(controller, ret["cx"], ret["cy"])
+                    return (
+                        self._wait_for_scene_names(
+                            controller,
+                            tasker,
+                            {"prepare_one", "world_prompt"},
+                            timeout_seconds=4.0,
+                        )
+                        is not None
                     )
-                    is not None
-                )
+            else:
+                found, score, rx, ry = self.scene_gate._find_return_button(img)
+                if found:
+                    print(
+                        f"Recovery: return button found at ({rx},{ry}), clicking. score={score:.2f}"
+                    )
+                    click_x = int(rx + self.scene_gate.return_tpl.shape[1] / 2)
+                    click_y = int(ry + self.scene_gate.return_tpl.shape[0] / 2)
+                    self._click_point(controller, click_x, click_y)
+                    return (
+                        self._wait_for_scene_names(
+                            controller,
+                            tasker,
+                            {"prepare_one", "world_prompt"},
+                            timeout_seconds=4.0,
+                        )
+                        is not None
+                    )
 
         print("Recovery: unknown scene, pressing ESC.")
         self._press_escape(controller)
@@ -1096,9 +1268,7 @@ class TetrisGamePlayer:
                 return True
 
             if scene["name"] == "exit":
-                self._click_template(
-                    controller, scene["x"], scene["y"], scene["template"]
-                )
+                self._click_point(controller, scene["x"], scene["y"])
                 if self._wait_until_exit_to_world(
                     controller, tasker, timeout_seconds=4.0
                 ):
