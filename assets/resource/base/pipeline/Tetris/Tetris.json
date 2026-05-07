@@ -14,6 +14,7 @@
             "[JumpBack]TetrisHandleGameIdle",
             "[JumpBack]TetrisHandleLoading",
             "[JumpBack]TetrisHandleWorldWithPrompt",
+            "[JumpBack]TetrisHandlePrepareTwoReturn",
             "[JumpBack]TetrisHandlePrepareTwo",
             "[JumpBack]TetrisHandlePrepareOne",
             "[JumpBack]TetrisHandleWorldNoPrompt",
@@ -26,7 +27,9 @@
         "all_of": [
             "TetrisSceneExit"
         ],
-        "action": "Click",
+        "action": "LongPress",
+        "target": "TetrisSceneExit",
+        "duration": 100,
         "post_delay": 500,
         "next": [
             "[JumpBack]TetrisWaitWorld"
@@ -85,8 +88,9 @@
         "all_of": [
             "TetrisSceneWorldWithPrompt"
         ],
-        "action": "Custom",
-        "custom_action": "tetris_press_f",
+        "action": "ClickKey",
+        "key": [70],
+        "post_delay": 500,
         "next": [
             "[JumpBack]TetrisWaitPrepare"
         ]
@@ -107,14 +111,27 @@
         "all_of": [
             "TetrisScenePrepareOne"
         ],
-        "action": "Custom",
-        "custom_action": "tetris_click_mode",
-        "custom_action_param": {
-            "mode": "single"
-        },
+        "action": "LongPress",
+        "target": "TetrisScenePrepareOne",
+        "duration": 100,
         "post_delay": 500,
         "next": [
             "[JumpBack]TetrisWaitPrepareTwo"
+        ]
+    },
+    "TetrisHandlePrepareTwoReturn": {
+        "desc": "泯除方块 - 准备界面二（初始），点击返回到准备界面一",
+        "recognition": "And",
+        "all_of": [
+            "TetrisScenePrepareTwo",
+            "TetrisSceneReturn"
+        ],
+        "action": "LongPress",
+        "target": "TetrisSceneReturn",
+        "duration": 100,
+        "post_delay": 500,
+        "next": [
+            "[JumpBack]TetrisWaitPrepare"
         ]
     },
     "TetrisHandlePrepareTwo": {
@@ -123,8 +140,9 @@
         "all_of": [
             "TetrisScenePrepareTwo"
         ],
-        "action": "Custom",
-        "custom_action": "tetris_click_start_match",
+        "action": "LongPress",
+        "target": "TetrisScenePrepareTwo",
+        "duration": 100,
         "post_delay": 1000,
         "next": [
             "[JumpBack]TetrisWaitGame"
@@ -185,14 +203,30 @@
             "TetrisSceneDispatch"
         ]
     },
+    "TetrisCheckVitality": {
+        "desc": "泯除方块 - 检测结算界面，OCR识别活力并按ESC",
+        "recognition": "And",
+        "all_of": [
+            "TetrisSceneMatchend"
+        ],
+        "action": "Custom",
+        "custom_action": "tetris_check_vitality_action",
+        "post_delay": 1000,
+        "next": [
+            "[JumpBack]TetrisDismissResult",
+            "[JumpBack]TetrisHandleLoading",
+            "[JumpBack]TetrisHandleWorldWithPrompt",
+            "TetrisExit"
+        ]
+    },
     "TetrisDismissResult": {
         "desc": "泯除方块 - 退出结算界面",
         "recognition": "And",
         "all_of": [
             "TetrisSceneMatchend"
         ],
-        "action": "Custom",
-        "custom_action": "tetris_press_esc",
+        "action": "ClickKey",
+        "key": [27],
         "post_delay": 1000,
         "next": [
             "[JumpBack]TetrisDismissResult",

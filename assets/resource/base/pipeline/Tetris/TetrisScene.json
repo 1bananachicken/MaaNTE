@@ -115,7 +115,7 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [831, 176, 371, 136],
+                "roi": [807, 154, 413, 169],
                 "template": [
                     "Tetris/single_player.png"
                 ],
@@ -131,7 +131,7 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [779, 151, 245, 366],
+                "roi": [808, 321, 428, 180],
                 "template": [
                     "Tetris/multiple.png"
                 ],
@@ -179,7 +179,7 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [1029, 650, 184, 48],
+                "roi": [1046, 656, 142, 36],
                 "template": [
                     "Tetris/start_match.png"
                 ],

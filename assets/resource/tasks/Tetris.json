@@ -49,11 +49,6 @@
                                 "mode": "single",
                                 "repeat": true
                             }
-                        },
-                        "TetrisHandlePrepareOne": {
-                            "custom_action_param": {
-                                "mode": "single"
-                            }
                         }
                     }
                 },
@@ -65,11 +60,6 @@
                             "custom_action_param": {
                                 "mode": "single",
                                 "repeat": false
-                            }
-                        },
-                        "TetrisHandlePrepareOne": {
-                            "custom_action_param": {
-                                "mode": "single"
                             }
                         }
                     }
@@ -94,11 +84,6 @@
                                 "mode": "multiple",
                                 "repeat": true
                             }
-                        },
-                        "TetrisHandlePrepareOne": {
-                            "custom_action_param": {
-                                "mode": "multiple"
-                            }
                         }
                     }
                 },
@@ -110,11 +95,6 @@
                             "custom_action_param": {
                                 "mode": "multiple",
                                 "repeat": false
-                            }
-                        },
-                        "TetrisHandlePrepareOne": {
-                            "custom_action_param": {
-                                "mode": "multiple"
                             }
                         }
                     }
@@ -136,12 +116,11 @@
                                 "mode": "single",
                                 "repeat": true,
                                 "use_all_vitality": true
-                            }
-                        },
-                        "TetrisHandlePrepareOne": {
-                            "custom_action_param": {
-                                "mode": "single"
-                            }
+                            },
+                            "next": [
+                                "[JumpBack]TetrisCheckVitality",
+                                "TetrisExit"
+                            ]
                         }
                     }
                 },
@@ -157,11 +136,6 @@
                                 "mode": "single",
                                 "repeat": true,
                                 "use_all_vitality": false
-                            }
-                        },
-                        "TetrisHandlePrepareOne": {
-                            "custom_action_param": {
-                                "mode": "single"
                             }
                         }
                     }
@@ -183,12 +157,11 @@
                                 "mode": "multiple",
                                 "repeat": true,
                                 "use_all_vitality": true
-                            }
-                        },
-                        "TetrisHandlePrepareOne": {
-                            "custom_action_param": {
-                                "mode": "multiple"
-                            }
+                            },
+                            "next": [
+                                "[JumpBack]TetrisCheckVitality",
+                                "TetrisExit"
+                            ]
                         }
                     }
                 },
@@ -204,11 +177,6 @@
                                 "mode": "multiple",
                                 "repeat": true,
                                 "use_all_vitality": false
-                            }
-                        },
-                        "TetrisHandlePrepareOne": {
-                            "custom_action_param": {
-                                "mode": "multiple"
                             }
                         }
                     }
@@ -237,11 +205,6 @@
                         "use_all_vitality": false,
                         "repeat_count": "{repeat_count}"
                     }
-                },
-                "TetrisHandlePrepareOne": {
-                    "custom_action_param": {
-                        "mode": "single"
-                    }
                 }
             }
         },
@@ -265,11 +228,6 @@
                         "repeat": true,
                         "use_all_vitality": false,
                         "repeat_count": "{repeat_count}"
-                    }
-                },
-                "TetrisHandlePrepareOne": {
-                    "custom_action_param": {
-                        "mode": "multiple"
                     }
                 }
             }

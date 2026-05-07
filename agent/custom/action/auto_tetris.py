@@ -1,15 +1,14 @@
 import json
+import re
 import time
 
+import cv2
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+from maa.pipeline import JOCR, JRecognitionType
 
 from .Tetris.feats.play import TetrisGamePlayer
-
-PREPARE_ONE_CLICK_POINT = (1016, 244)
-PREPARE_ONE_MULTI_CLICK_POINT = (885, 418)
-PREPARE_TWO_CLICK_POINT = (1121, 674)
 
 
 @AgentServer.custom_action("auto_tetris")
@@ -21,9 +20,6 @@ class AutoTetris(CustomAction):
         tasker = context.tasker
 
         mode = "single"
-        repeat = False
-        repeat_count = 1
-        use_all_vitality = False
         if argv.custom_action_param:
             try:
                 if isinstance(argv.custom_action_param, str):
@@ -34,11 +30,6 @@ class AutoTetris(CustomAction):
                     params = {}
 
                 mode = params.get("mode", "single")
-                repeat = params.get("repeat", False)
-                repeat_count = int(params.get("repeat_count", 1))
-                use_all_vitality = params.get("use_all_vitality", False)
-                if repeat_count < 1:
-                    repeat_count = 1
             except Exception:
                 pass
 
@@ -49,64 +40,46 @@ class AutoTetris(CustomAction):
         return CustomAction.RunResult(success=success)
 
 
-@AgentServer.custom_action("tetris_press_f")
-class TetrisPressF(CustomAction):
+@AgentServer.custom_action("tetris_check_vitality_action")
+class TetrisCheckVitalityAction(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
+        roi = [451, 290, 371, 20]
         controller = context.tasker.controller
-        controller.post_key_down(70)
-        time.sleep(0.05)
-        controller.post_key_up(70)
-        return CustomAction.RunResult(success=True)
+        controller.post_screencap().wait()
+        frame = controller.cached_image
 
+        vitality = -1
+        if frame is not None and frame.size > 0:
+            if len(frame.shape) == 3 and frame.shape[2] == 4:
+                frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
 
-@AgentServer.custom_action("tetris_click_mode")
-class TetrisClickMode(CustomAction):
-    def run(
-        self, context: Context, argv: CustomAction.RunArg
-    ) -> CustomAction.RunResult:
-        controller = context.tasker.controller
+            detail = context.run_recognition_direct(
+                JRecognitionType.OCR, JOCR(roi=roi), frame
+            )
 
-        mode = "single"
-        if argv.custom_action_param:
-            try:
-                if isinstance(argv.custom_action_param, str):
-                    params = json.loads(argv.custom_action_param)
-                elif isinstance(argv.custom_action_param, dict):
-                    params = argv.custom_action_param
-                else:
-                    params = {}
-                mode = params.get("mode", "single")
-            except Exception:
-                pass
-
-        if mode == "multiple":
-            x, y = PREPARE_ONE_MULTI_CLICK_POINT
+            if detail is not None and detail.hit and detail.all_results:
+                texts = []
+                for r in detail.all_results:
+                    t = r.text if hasattr(r, "text") else str(r)
+                    texts.append(t)
+                    numbers = re.findall(r"\d+", t)
+                    if numbers:
+                        vitality = int(numbers[-1])
+                print(f"[TetrisCheckVitality] OCR results={texts} -> vitality={vitality}")
+            else:
+                print("[TetrisCheckVitality] OCR no hit")
         else:
-            x, y = PREPARE_ONE_CLICK_POINT
+            print("[TetrisCheckVitality] screencap failed")
 
-        controller.post_click(x, y).wait()
-        return CustomAction.RunResult(success=True)
+        if vitality <= 0:
+            print("[TetrisCheckVitality] vitality <= 0, stopping")
+            controller.post_key_down(27)
+            time.sleep(0.05)
+            controller.post_key_up(27)
+            return CustomAction.RunResult(success=False)
 
-
-@AgentServer.custom_action("tetris_click_start_match")
-class TetrisClickStartMatch(CustomAction):
-    def run(
-        self, context: Context, argv: CustomAction.RunArg
-    ) -> CustomAction.RunResult:
-        controller = context.tasker.controller
-        x, y = PREPARE_TWO_CLICK_POINT
-        controller.post_click(x, y).wait()
-        return CustomAction.RunResult(success=True)
-
-
-@AgentServer.custom_action("tetris_press_esc")
-class TetrisPressEsc(CustomAction):
-    def run(
-        self, context: Context, argv: CustomAction.RunArg
-    ) -> CustomAction.RunResult:
-        controller = context.tasker.controller
         controller.post_key_down(27)
         time.sleep(0.05)
         controller.post_key_up(27)
