@@ -62,6 +62,10 @@
         {
             "name": "MapLocatorPyramid",
             "entry": "MapLocatorPyramid"
+        },
+        {
+            "name": "AutoNavi",
+            "entry": "AutoNavi"
         }
     ],
     "import": [

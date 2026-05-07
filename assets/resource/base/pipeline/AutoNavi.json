@@ -1,0 +1,10 @@
+{
+    "AutoNavi": {
+        "action": "Custom",
+        "custom_action": "combined_auto_navigate",
+        "custom_action_param": {
+            "target_x": 5400,
+            "target_y": 10948
+        }
+    }
+}

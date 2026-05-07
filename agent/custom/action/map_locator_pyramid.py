@@ -1,15 +1,18 @@
+import cv2
 import json
 import math
 import time
+import numpy as np
 
 from pathlib import Path
-
-import cv2
-import numpy as np
+from .Common.logger import get_logger
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+
+
+logger = get_logger(__name__)
 
 
 @AgentServer.custom_action("map_locator_pyramid")
@@ -22,14 +25,14 @@ class MapLocatorPyramid(CustomAction):
         default_big_map = abs_path / f"resource/base/image/map/{map_name}"
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
-        print("=== Map Locator Pyramid Started ===")
+        logger.info("=== Map Locator Pyramid Started ===")
         controller = context.tasker.controller
 
         big_map_path = self.default_big_map
         mini_map_roi = [24, 14, 159, 157]
         frame_interval = 0.1
         nfeatures = 0
-        ratio_thresh = 0.8
+        ratio_thresh = 0.75
         min_matches = 6
         min_inliers = 4
         ransac_thresh = 12.0
@@ -43,18 +46,18 @@ class MapLocatorPyramid(CustomAction):
         chunk_overlap = 200
 
         if not big_map_path.exists():
-            print(f"大地图不存在: {big_map_path}")
+            logger.error(f"大地图不存在: {big_map_path}")
             return CustomAction.RunResult(success=False)
 
         # 1. 载入原始完整大图
-        print(f"正在加载原始大图: {big_map_path}")
+        logger.info(f"正在加载原始大图: {big_map_path}")
         original_map = cv2.imread(str(self.default_big_map), cv2.IMREAD_COLOR)
         if original_map is None:
-            print(f"大地图读取失败: {big_map_path}")
+            logger.error(f"大地图读取失败: {big_map_path}")
             return CustomAction.RunResult(success=False)
 
         origin_h, origin_w = original_map.shape[:2]
-        print(f"原始分辨率: {origin_w}x{origin_h}")
+        logger.info(f"原始分辨率: {origin_w}x{origin_h}")
 
         sift = cv2.SIFT_create(nfeatures=nfeatures)
         matcher = cv2.BFMatcher(cv2.NORM_L2)
@@ -89,10 +92,10 @@ class MapLocatorPyramid(CustomAction):
                         global_points = cache["keypoints"].astype(np.float32, copy=False)
                         global_des = cache["descriptors"]
             except Exception as e:
-                print(f"全局特征缓存读取失败: {e}")
+                logger.error(f"全局特征缓存读取失败: {e}")
 
         if global_points is None or global_des is None:
-            print(" 正在计算低分辨率全局特征...")
+            logger.info(" 正在计算低分辨率全局特征...")
             kp_global, global_des = sift.detectAndCompute(global_gray, None)
             if global_des is not None:
                 global_points = np.float32([kp.pt for kp in kp_global])
@@ -104,9 +107,9 @@ class MapLocatorPyramid(CustomAction):
                         descriptors=global_des,
                     )
                 except Exception as e:
-                    print(f"全局特征缓存保存失败: {e}")
+                    logger.error(f"全局特征缓存保存失败: {e}")
 
-        print(f"全局视图特征点数: {len(global_points)}")
+        logger.debug(f"全局视图特征点数: {len(global_points)}")
 
         # 3. 初始化分块缓存信息
         chunk_cols = math.ceil(origin_w / chunk_size)
@@ -116,7 +119,7 @@ class MapLocatorPyramid(CustomAction):
         chunks_cache_dir = big_map_path.with_name(f"{big_map_path.stem}_chunks_cache")
         chunks_cache_dir.mkdir(parents=True, exist_ok=True)
 
-        print(f"开始预加载所有 {chunk_cols}x{chunk_rows} 个分块特征...")
+        logger.info(f"开始预加载所有 {chunk_cols}x{chunk_rows} 个分块特征...")
         for r in range(chunk_rows):
             for c in range(chunk_cols):
                 raw_cx = c * chunk_size
@@ -143,7 +146,7 @@ class MapLocatorPyramid(CustomAction):
                         pass
 
                 if chunk_pts is None and des_chunk is None:
-                    print(f"加载并计算分块 {(c, r)} (大小 {cw}x{ch})...")
+                    logger.debug(f"加载并计算分块 {(c, r)} (大小 {cw}x{ch})...")
                     chunk_img = original_map[cy:cy+ch, cx:cx+cw]
                     chunk_img = cv2.convertScaleAbs(chunk_img, alpha=2.5, beta=-20)
                     chunk_gray = cv2.cvtColor(chunk_img, cv2.COLOR_BGR2GRAY)
@@ -157,10 +160,10 @@ class MapLocatorPyramid(CustomAction):
                             descriptors=des_chunk if des_chunk is not None else np.array([]),
                         )
                     except Exception as e:
-                        print(f"分块缓存保存失败: {e}")
+                        logger.error(f"分块缓存保存失败: {e}")
                         
                 chunks_cache[(c, r)] = (chunk_pts, des_chunk, cx, cy)
-        print(" 所有分块特征预加载完毕！")
+        logger.info(" 所有分块特征预加载完毕！")
 
         last_center = None
         pending_center = None
@@ -170,7 +173,7 @@ class MapLocatorPyramid(CustomAction):
         # 当前活跃分块
         current_chunk_idx = None  # (col, row)
         
-        print(" press Q to quit")
+        logger.info(" press Q to quit")
         
         while True:
             if context.tasker.stopping:
@@ -339,12 +342,12 @@ class MapLocatorPyramid(CustomAction):
                             pending_count = 1
 
                         if pending_count < 2:
-                            print(
+                            logger.debug(
                                 f"reject jump raw={player_point} last={last_center} jump={jump:.1f} inliers={inliers}"
                             )
                             accept_point = False
                         else:
-                            print(
+                            logger.debug(
                                 f"accept delayed jump raw={player_point} last={last_center} jump={jump:.1f}"
                             )
                             pending_center = None
