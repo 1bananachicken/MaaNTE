@@ -1,15 +1,18 @@
+import cv2
 import json
 import math
 import time
+import numpy as np
 
 from pathlib import Path
-
-import cv2
-import numpy as np
+from .Common.logger import get_logger
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+
+
+logger = get_logger(__name__)
 
 
 @AgentServer.custom_action("map_locator")
@@ -39,12 +42,12 @@ class MapLocator(CustomAction):
         max_processing_long_side = 6144
 
         if not big_map_path.exists():
-            print(f"[map_locator_test] 大地图不存在: {big_map_path}")
+            logger.error(f"大地图不存在: {big_map_path}")
             return CustomAction.RunResult(success=False)
 
         big_map = cv2.imread(str(self.default_big_map), cv2.IMREAD_COLOR)
         if big_map is None:
-            print(f"[map_locator_test] 大地图读取失败: {big_map_path}")
+            logger.error(f"大地图读取失败: {big_map_path}")
             return CustomAction.RunResult(success=False)
 
         origin_h, origin_w = big_map.shape[:2]
@@ -84,7 +87,7 @@ class MapLocator(CustomAction):
                         big_points = cache["keypoints"].astype(np.float32, copy=False)
                         des_big = cache["descriptors"]
             except Exception as e:
-                print(f"[map_locator_test] 特征缓存读取失败: {e}")
+                logger.error(f"特征缓存读取失败: {e}")
 
         if big_points is None or des_big is None:
             kp_big, des_big = sift.detectAndCompute(big_gray, None)
@@ -98,14 +101,14 @@ class MapLocator(CustomAction):
                         descriptors=des_big,
                     )
                 except Exception as e:
-                    print(f"[map_locator_test] 特征缓存保存失败: {e}")
+                    logger.error(f"特征缓存保存失败: {e}")
 
         if des_big is None or len(big_points) < min_matches:
-            print("[map_locator_test] 大地图特征点不足")
+            logger.error("大地图特征点不足")
             return CustomAction.RunResult(success=False)
 
-        print(f"[map_locator_test] big map keypoints: {len(big_points)}")
-        print("[map_locator_test] press Q to quit")
+        logger.debug(f"big map keypoints: {len(big_points)}")
+        logger.info("press Q to quit")
 
         last_center = None
         pending_center = None
@@ -206,13 +209,13 @@ class MapLocator(CustomAction):
                             pending_count = 1
 
                         if pending_count < 2:
-                            print(
-                                f"[map_locator_test] reject jump raw={player_point} last={last_center} jump={jump:.1f} inliers={inliers}"
+                            logger.debug(
+                                f"reject jump raw={player_point} last={last_center} jump={jump:.1f} inliers={inliers}"
                             )
                             accept_point = False
                         else:
-                            print(
-                                f"[map_locator_test] accept delayed jump raw={player_point} last={last_center} jump={jump:.1f}"
+                            logger.debug(
+                                f"accept delayed jump raw={player_point} last={last_center} jump={jump:.1f}"
                             )
                             pending_center = None
                             pending_count = 0
@@ -243,16 +246,6 @@ class MapLocator(CustomAction):
                     int(player_point[1] * big_map_scale),
                 )
                 cv2.circle(map_view, draw_player_point, 16, (0, 0, 255), -1)
-                # cv2.putText(
-                #     map_view,
-                #     f"player=({player_point[0]}, {player_point[1]})",
-                #     (max(0, draw_player_point[0] + 12), max(25, draw_player_point[1] - 12)),
-                #     cv2.FONT_HERSHEY_SIMPLEX,
-                #     5,
-                #     (255, 255, 255),
-                #     2,
-                #     cv2.LINE_AA,
-                # )
 
             cv2.putText(
                 map_view,

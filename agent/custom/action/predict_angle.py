@@ -7,12 +7,14 @@ import numpy as np
 import onnxruntime
 
 from pathlib import Path
-
-from .Common.utils import get_image
+from .Common.logger import get_logger
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+
+
+logger = get_logger(__name__)
 
 
 @AgentServer.custom_action("predict_angle")
@@ -31,7 +33,6 @@ class PredictAngle(CustomAction):
         self._session_cache = {}
         self._provider_name_map = {
             "cpu": "CPUExecutionProvider",
-            "cuda": "CUDAExecutionProvider",
             "directml": "DmlExecutionProvider",
             "dml": "DmlExecutionProvider",
         }
@@ -43,8 +44,8 @@ class PredictAngle(CustomAction):
         session, provider_name = self._get_session(backend)
         input_name = session.get_inputs()[0].name
 
-        print("启动新的 YOLO-Pose 实时角度预测... (在弹出的窗口上按 'Q' 键退出)")
-        print(f"当前推理后端: {backend.upper()} ({provider_name})")
+        logger.info("启动新的 YOLO-Pose 实时角度预测... (在弹出的窗口上按 'Q' 键退出)")
+        logger.info(f"当前推理后端: {backend.upper()} ({provider_name})")
 
         while True:
             if context.tasker.stopping:
@@ -78,8 +79,6 @@ class PredictAngle(CustomAction):
                 dx = tip[0] - tail_center[0]
                 dy = tip[1] - tail_center[1]
                 angle = math.degrees(math.atan2(dx, -dy)) % 360
-                
-                print(f"预测角度: {angle:05.1f}° | 置信度: {max_conf:.2f}")
 
                 x1, y1, x2, y2 = best_pred[0:4]
                 tl = (int(x1), int(y1))
@@ -95,9 +94,6 @@ class PredictAngle(CustomAction):
                 cv2.circle(img_crop, pt0, 2, (0, 0, 255), -1)
                 cv2.circle(img_crop, pt1, 2, (255, 255, 0), -1)
                 cv2.circle(img_crop, pt2, 2, (255, 255, 0), -1)
-
-            else:
-                print(f"未检测到指针，最高置信度仅为: {max_conf:.2f}")
 
             display_img = cv2.cvtColor(img_crop.copy(), cv2.COLOR_RGB2BGR)
             target_size = (400, 400)
@@ -118,7 +114,7 @@ class PredictAngle(CustomAction):
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 break
 
-            time.sleep(0.5) 
+            time.sleep(0.016) 
 
         return CustomAction.RunResult(success=True)
 
@@ -131,19 +127,17 @@ class PredictAngle(CustomAction):
                 if isinstance(params, dict) and params.get("backend"):
                     backend = str(params["backend"])
             except Exception as exc:
-                print(f"解析 custom_action_param 失败，将使用默认后端: {exc}")
+                logger.warning(f"解析 custom_action_param 失败，将使用默认后端: {exc}")
 
         backend = backend.strip().lower()
         if backend == "auto":
             available = onnxruntime.get_available_providers()
-            if "CUDAExecutionProvider" in available:
-                return "cuda"
             if "DmlExecutionProvider" in available:
                 return "directml"
             return "cpu"
 
         if backend not in self._provider_name_map:
-            print(f"未知推理后端 {backend}，将回退到 CPU")
+            logger.warning(f"未知推理后端 {backend}，将回退到 CPU")
             return "cpu"
         return backend
 
@@ -155,9 +149,7 @@ class PredictAngle(CustomAction):
         available = onnxruntime.get_available_providers()
 
         if provider_name not in available:
-            print(
-                f"请求的后端 {backend.upper()} 不可用，当前可用 Providers: {available}，已回退到 CPU"
-            )
+            logger.warning(f"请求的后端 {backend.upper()} 不可用，当前可用 Providers: {available}，已回退到 CPU")
             backend = "cpu"
             provider_name = self._provider_name_map[backend]
 
@@ -165,9 +157,7 @@ class PredictAngle(CustomAction):
         providers = [provider_name]
         provider_options = None
 
-        if provider_name == "CUDAExecutionProvider":
-            provider_options = [{"device_id": 0}]
-        elif provider_name == "DmlExecutionProvider":
+        if provider_name == "DmlExecutionProvider":
             provider_options = [{"device_id": 0}]
 
         if provider_options is None:
