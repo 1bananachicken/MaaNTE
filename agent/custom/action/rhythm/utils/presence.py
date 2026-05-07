@@ -32,7 +32,6 @@ class SceneGate:
                 logger.warning("无法读取场景模板：%s", tpl_path)
                 continue
             templates.append((name, img))
-            logger.info("已加载场景模板：%s/%s (%dx%d)", kind, name, img.shape[1], img.shape[0])
         if not templates:
             logger.debug("未找到场景模板：%s", kind)
 
@@ -124,10 +123,6 @@ class SceneGate:
 
         prev_state = self._state
         if target != self._state and self._state_streak >= self._state_confirm_frames:
-            logger.info(
-                "场景确认切换: %s -> %s",
-                self._state, target,
-            )
             self._state = target
             self._state_streak = 0
 
