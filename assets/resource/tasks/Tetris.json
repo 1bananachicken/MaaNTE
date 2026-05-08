@@ -23,6 +23,9 @@
                     ],
                     "pipeline_override": {
                         "TetrisHandlePrepareOne": {
+                            "all_of": [
+                                "TetrisScenePrepareOneSingle"
+                            ],
                             "target": "TetrisScenePrepareOneSingle"
                         }
                     }
@@ -35,6 +38,9 @@
                     ],
                     "pipeline_override": {
                         "TetrisHandlePrepareOne": {
+                            "all_of": [
+                                "TetrisScenePrepareOneMulti"
+                            ],
                             "target": "TetrisScenePrepareOneMulti"
                         }
                     }
