@@ -17,7 +17,7 @@ class MidiProcessor:
         )
 
     def _parse_midi_with_mido(self, file_path):
-        mid = mido.MidiFile(file_path)
+        mid = mido.MidiFile(file_path, clip=True)
         notes = []
         current_time_sec = 0.0
 
