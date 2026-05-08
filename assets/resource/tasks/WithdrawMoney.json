@@ -12,7 +12,7 @@
             ]
         }
     ],
-    "option":{
+    "option": {
         "Restock": {
             "type": "switch",
             "label": "自动补货",

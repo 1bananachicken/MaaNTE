@@ -1,0 +1,459 @@
+{
+    "FurnitureEntrance": {
+        "desc": "家具收取任务入口",
+        "anchor": "FurnitureNext",
+        "next": [
+            "FurnitureClickHouseProperty",
+            "[JumpBack]SceneAnyEnterCityTycoonsMenu"
+        ]
+    },
+    "FurnitureClickHouseProperty": {
+        "desc": "点击房产界面",
+        "recognition": "OCR",
+        "roi": [
+            274,
+            272,
+            117,
+            71
+        ],
+        "expected": [
+            "房产"
+        ],
+        "action": "Click",
+        "next": [
+            "FurnitureChooseApartments"
+        ]
+    },
+    "FurnitureChooseApartments": {
+        "desc": "依次选择房产, 通过next中各项的max_hit=1来依次选择房产",
+        "anchor": "FurnitureApartmentsNext",
+        "recognition": "TemplateMatch",
+        "roi": [
+            4,
+            7,
+            71,
+            70
+        ],
+        "template": [
+            "Furniture/FurnitureHousePropertyIcon.png"
+        ],
+        "next": [
+            "FurnitureChooseWienerApartments",
+            "FurnitureChooseEdenApartments",
+            "FurnitureChooseSkyviewHalls",
+            "FurnitureChooseGoldenCapital",
+            "FurnitureApartmentsSwipe"
+        ]
+    },
+    "FurnitureApartmentsSwipe": {
+        "desc": "滑动房产界面以选择其他房产",
+        "recognition": "TemplateMatch",
+        "roi": [
+            4,
+            7,
+            71,
+            70
+        ],
+        "template": [
+            "Furniture/FurnitureHousePropertyIcon.png"
+        ],
+        "action": "Swipe",
+        "begin": [
+            20,
+            515,
+            160,
+            1
+        ],
+        "end": [
+            20,
+            435,
+            160,
+            1
+        ],
+        "next": [
+            "FurnitureChooseApartmentsOthers"
+        ]
+    },
+    "FurnitureChooseApartmentsOthers": {
+        "desc": "中间节点，后续新房产的添加也在这里",
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "FurnitureChooseFenglinVilla",
+            "FurnitureExit"
+        ]
+    },
+    "FurnitureChooseWienerApartments": {
+        "desc": "选择维纳公寓",
+        "max_hit": 1,
+        "recognition": "OCR",
+        "roi": [
+            9,
+            84,
+            190,
+            562
+        ],
+        "expected": [
+            "维纳公寓"
+        ],
+        "action": "Click",
+        "next": [
+            "FurnitureGoHome",
+            "FurnitureGotoBuy"
+        ]
+    },
+    "FurnitureChooseEdenApartments": {
+        "desc": "选择伊登公寓",
+        "max_hit": 1,
+        "recognition": "OCR",
+        "roi": [
+            9,
+            84,
+            190,
+            562
+        ],
+        "expected": [
+            "伊登公寓"
+        ],
+        "action": "Click",
+        "next": [
+            "FurnitureGoHome",
+            "FurnitureGotoBuy"
+        ]
+    },
+    "FurnitureChooseSkyviewHalls": {
+        "desc": "选择天景空馆",
+        "max_hit": 1,
+        "recognition": "OCR",
+        "roi": [
+            9,
+            84,
+            190,
+            562
+        ],
+        "expected": [
+            "天景空馆"
+        ],
+        "action": "Click",
+        "next": [
+            "FurnitureGoHome",
+            "FurnitureGotoBuy"
+        ]
+    },
+    "FurnitureChooseGoldenCapital": {
+        "desc": "选择金都云邸",
+        "max_hit": 1,
+        "recognition": "OCR",
+        "roi": [
+            9,
+            84,
+            190,
+            562
+        ],
+        "expected": [
+            "金都云邸"
+        ],
+        "action": "Click",
+        "next": [
+            "FurnitureGoHome",
+            "FurnitureGotoBuy"
+        ]
+    },
+    "FurnitureChooseFenglinVilla": {
+        "desc": "选择峰林别墅",
+        "max_hit": 1,
+        "recognition": "OCR",
+        "roi": [
+            9,
+            84,
+            190,
+            562
+        ],
+        "expected": [
+            "峰林别墅"
+        ],
+        "action": "Click",
+        "next": [
+            "FurnitureGoHome",
+            "FurnitureGotoBuy"
+        ]
+    },
+    "FurnitureExit": {
+        "desc": "家具收取任务结束节点",
+        "focus": {
+            "Node.Action.Succeeded": "家具收取任务结束"
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "FurnitureGotoBuy": {
+        "desc": "识别到前往购买",
+        "recognition": "OCR",
+        "roi": [
+            1029,
+            653,
+            216,
+            60
+        ],
+        "expected": [
+            "前往购买"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "当前房产未购买，前往下一个"
+        },
+        "next": [
+            "[Anchor]FurnitureApartmentsNext"
+        ]
+    },
+    "FurnitureGoHome": {
+        "desc": "点击回去看看",
+        "recognition": "OCR",
+        "roi": [
+            1029,
+            653,
+            216,
+            60
+        ],
+        "expected": [
+            "回去看看"
+        ],
+        "action": "Click",
+        "next": [
+            "FurnitureTeleportHome"
+        ]
+    },
+    "FurnitureTeleportHome": {
+        "desc": "点击传送按钮",
+        "recognition": "OCR",
+        "roi": [
+            929,
+            595,
+            346,
+            97
+        ],
+        "expected": [
+            "传送"
+        ],
+        "action": "Click",
+        "next": [
+            "[JumpBack]SceneLoading",
+            "FurnitureClickFurniture"
+        ]
+    },
+    "FurnitureClickFurniture": {
+        "desc": "在家中点击家具按钮",
+        "recognition": "TemplateMatch",
+        "roi": [
+            566,
+            10,
+            58,
+            58
+        ],
+        "template": [
+            "Furniture/Furniture.png",
+            "Furniture/FurnitureWithRedDot.png"
+        ],
+        "green_mask": true,
+        "action": "Custom",
+        "custom_action": "alt_click",
+        "next": [
+            "FurnitureOverview"
+        ]
+    },
+    "FurnitureOverview": {
+        "desc": "点击赋能总览",
+        "recognition": "OCR",
+        "roi": [
+            1117,
+            103,
+            127,
+            49
+        ],
+        "expected": [
+            "赋能总览"
+        ],
+        "action": "Click",
+        "next": [
+            "FurnitureOverviewSwipe"
+        ]
+    },
+    "FurnitureOverviewSwipe": {
+        "desc": "滑动赋能总览界面(目前以点击实现)",
+        "recognition": "And",
+        "all_of": [
+            "FurnitureOverviewPinkBackground",
+            {
+                "recognition": "OCR",
+                "roi": [
+                    1121,
+                    102,
+                    126,
+                    49
+                ],
+                "expected": [
+                    "赋能总览"
+                ]
+            }
+        ],
+        "action": "Click",
+        "target": [
+            1249,
+            189,
+            6,
+            94
+        ],
+        "next": [
+            "[JumpBack]FurnitureClaimHamsterBall",
+            "[JumpBack]FurnitureClaimMianmian",
+            "[JumpBack]FurnitureClaimWoodenBox",
+            "[Anchor]FurnitureNext"
+        ]
+    },
+    "FurnitureOverviewPinkBackground": {
+        "desc": "赋能总览粉色背景",
+        "recognition": "ColorMatch",
+        "roi": [
+            1121,
+            102,
+            126,
+            49
+        ],
+        "method": 40,
+        "upper": [
+            168,
+            173,
+            239
+        ],
+        "lower": [
+            167,
+            168,
+            214
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureClaimHamsterBall": {
+        "desc": "领取仓鼠球, 识别按钮黄底",
+        "recognition": "ColorMatch",
+        "method": 40,
+        "roi": "FurnitureHamsterBall",
+        "roi_offset": [
+            137,
+            -11,
+            31,
+            26
+        ],
+        "upper": [
+            21,
+            177,
+            237
+        ],
+        "lower": [
+            20,
+            161,
+            231
+        ],
+        "count": 20,
+        "next": [
+            "SceneClickBlankToExit"
+        ]
+    },
+    "FurnitureHamsterBall": {
+        "recognition": "OCR",
+        "roi": [
+            948,
+            170,
+            308,
+            517
+        ],
+        "expected": [
+            "仓鼠球"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureClaimMianmian": {
+        "desc": "领取棉棉, 识别按钮黄底",
+        "recognition": "ColorMatch",
+        "method": 40,
+        "roi": "FurnitureHamsterBall",
+        "roi_offset": [
+            137,
+            -11,
+            31,
+            26
+        ],
+        "upper": [
+            21,
+            177,
+            237
+        ],
+        "lower": [
+            20,
+            161,
+            231
+        ],
+        "count": 20,
+        "next": [
+            "SceneClickBlankToExit"
+        ]
+    },
+    "FurnitureMianmian": {
+        "recognition": "OCR",
+        "roi": [
+            948,
+            170,
+            308,
+            517
+        ],
+        "expected": [
+            "棉棉"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureClaimWoodenBox": {
+        "desc": "领取老旧的木箱, 识别按钮黄底",
+        "recognition": "ColorMatch",
+        "method": 40,
+        "roi": "FurnitureHamsterBall",
+        "roi_offset": [
+            137,
+            -11,
+            31,
+            26
+        ],
+        "upper": [
+            21,
+            177,
+            237
+        ],
+        "lower": [
+            20,
+            161,
+            231
+        ],
+        "count": 20,
+        "next": [
+            "SceneClickBlankToExit"
+        ]
+    },
+    "FurnitureWoodenBox": {
+        "recognition": "OCR",
+        "roi": [
+            948,
+            170,
+            308,
+            517
+        ],
+        "expected": [
+            "老旧的木箱"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    }
+}

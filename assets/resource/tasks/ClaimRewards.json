@@ -4,14 +4,14 @@
             "name": "领取奖励",
             "entry": "ClaimRewardsEntrance",
             "description": "自动领取活跃度/环期赏令的奖励。",
-            "option":[
+            "option": [
                 "ClaimRewardsActivity",
                 "ClaimRewardsBattlePass"
             ]
         }
     ],
-    "option":{
-        "ClaimRewardsActivity":{
+    "option": {
+        "ClaimRewardsActivity": {
             "type": "switch",
             "label": "领取活跃度奖励",
             "cases": [
@@ -36,7 +36,7 @@
             ],
             "default_case": "Yes"
         },
-        "ClaimRewardsBattlePass":{
+        "ClaimRewardsBattlePass": {
             "type": "switch",
             "label": "领取环期赏令奖励",
             "cases": [
