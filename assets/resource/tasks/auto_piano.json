@@ -1,0 +1,145 @@
+{
+  "task": [
+    {
+      "name": "AutoPiano",
+      "label": "自动弹琴",
+      "description": "读取 MIDI 或 MusicXML 谱子并向当前目标窗口发送键盘演奏。",
+      "entry": "AutoPiano",
+      "default_check": false,
+      "option": [
+        "ScoreFormat"
+      ]
+    }
+  ],
+  "option": {
+    "ScoreFormat": {
+      "label": "谱子格式",
+      "type": "select",
+      "default_case": "MidiScore",
+      "cases": [
+        {
+          "name": "MidiScore",
+          "label": "MIDI (.mid / .midi)",
+          "option": [
+            "MidiScoreFile"
+          ]
+        },
+        {
+          "name": "XmlScore",
+          "label": "MusicXML (.xml / .mxl)",
+          "option": [
+            "XmlScoreFile"
+          ]
+        }
+      ]
+    },
+    "MidiScoreFile": {
+      "label": "MIDI 谱子",
+      "type": "select",
+      "default_case": "MidiScoreFile_Custom",
+      "cases": [
+        {
+          "name": "MidiScoreFile_Custom",
+          "label": "自定义路径",
+          "option": [
+            "MidiSettings_Custom"
+          ]
+        }
+      ]
+    },
+    "MidiSettings_Custom": {
+      "label": "MIDI 谱子 自定义路径",
+      "type": "input",
+      "inputs": [
+        {
+          "name": "SongPath",
+          "label": "谱子路径",
+          "description": "相对路径会从项目根目录解析，例如 songs/example.mid；也可以填写绝对路径。",
+          "default": "songs/example.mid",
+          "pipeline_type": "string",
+          "verify": "^.+\\.(mid|midi)$",
+          "pattern_msg": "请输入 .mid / .midi 文件路径。"
+        },
+        {
+          "name": "Speed",
+          "label": "播放速度",
+          "default": "1.0",
+          "pipeline_type": "string",
+          "verify": "^(?:[1-9]\\d*(?:\\.\\d+)?|0\\.\\d+)$",
+          "pattern_msg": "请输入大于 0 的数字，例如 1.0 或 1.25。"
+        },
+        {
+          "name": "Transpose",
+          "label": "转调",
+          "default": "0",
+          "pipeline_type": "string",
+          "verify": "^-?\\d+$",
+          "pattern_msg": "请输入整数半音数，例如 -12、0、7。"
+        }
+      ],
+      "pipeline_override": {
+        "AutoPiano": {
+          "custom_action_param": {
+            "song": "{SongPath}",
+            "speed": "{Speed}",
+            "transpose": "{Transpose}"
+          }
+        }
+      }
+    },
+    "XmlScoreFile": {
+      "label": "MusicXML 谱子",
+      "type": "select",
+      "default_case": "XmlScoreFile_Custom",
+      "cases": [
+        {
+          "name": "XmlScoreFile_Custom",
+          "label": "自定义路径",
+          "option": [
+            "XmlSettings_Custom"
+          ]
+        }
+      ]
+    },
+    "XmlSettings_Custom": {
+      "label": "MusicXML 谱子 自定义路径",
+      "type": "input",
+      "inputs": [
+        {
+          "name": "SongPath",
+          "label": "谱子路径",
+          "description": "相对路径会从项目根目录解析，例如 songs/example.xml；也可以填写绝对路径。",
+          "default": "songs/example.xml",
+          "pipeline_type": "string",
+          "verify": "^.+\\.(xml|mxl)$",
+          "pattern_msg": "请输入 .xml / .mxl 文件路径。"
+        },
+        {
+          "name": "Speed",
+          "label": "播放速度",
+          "default": "1.0",
+          "pipeline_type": "string",
+          "verify": "^(?:[1-9]\\d*(?:\\.\\d+)?|0\\.\\d+)$",
+          "pattern_msg": "请输入大于 0 的数字，例如 1.0 或 1.25。"
+        },
+        {
+          "name": "Transpose",
+          "label": "转调",
+          "default": "0",
+          "pipeline_type": "string",
+          "verify": "^-?\\d+$",
+          "pattern_msg": "请输入整数半音数，例如 -12、0、7。"
+        }
+      ],
+      "pipeline_override": {
+        "AutoPiano": {
+          "custom_action_param": {
+            "song": "{SongPath}",
+            "speed": "{Speed}",
+            "transpose": "{Transpose}"
+          }
+        }
+      }
+    }
+  }
+}
