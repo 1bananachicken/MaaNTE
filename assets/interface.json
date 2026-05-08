@@ -53,8 +53,9 @@
     },
     "task": [],
     "import": [
-        "resource/tasks/ClaimRewards.json",
         "resource/tasks/WithdrawMoney.json",
+        "resource/tasks/Furniture.json",
+        "resource/tasks/ClaimRewards.json",
         "resource/tasks/Fish.json",
         "resource/tasks/RealTime.json",
         "resource/tasks/MakeCoffee.json",
