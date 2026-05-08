@@ -10,5 +10,3 @@ scipy
 scikit-learn
 soundcard
 mido
-music21
-pywin32
