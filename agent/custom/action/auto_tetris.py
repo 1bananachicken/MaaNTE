@@ -39,10 +39,10 @@ class AutoTetris(CustomAction):
                 use_all_vitality = params.get("use_all_vitality", False)
                 rc = params.get("repeat_count", 0)
                 if rc:
-                    if isinstance(rc, str):
-                        _target_round = int(rc)
-                    else:
-                        _target_round = int(rc)
+                    new_target = int(rc) if isinstance(rc, str) else int(rc)
+                    if _target_round != new_target:
+                        _round_count = 0
+                    _target_round = new_target
             except Exception:
                 pass
 
@@ -61,6 +61,11 @@ class AutoTetris(CustomAction):
             if _round_count >= _target_round:
                 _round_count = 0
                 _target_round = 0
+                time.sleep(0.5)
+                controller.post_key_down(27)
+                time.sleep(0.05)
+                controller.post_key_up(27)
+                time.sleep(1.0)
                 return CustomAction.RunResult(success=False)
 
         return CustomAction.RunResult(success=True)

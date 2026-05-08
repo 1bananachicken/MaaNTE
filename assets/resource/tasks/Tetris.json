@@ -56,8 +56,7 @@
                     "pipeline_override": {
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
-                                "mode": "single",
-                                "repeat": true
+                                "mode": "single"
                             }
                         }
                     }
@@ -68,8 +67,7 @@
                     "pipeline_override": {
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
-                                "mode": "single",
-                                "repeat": false
+                                "mode": "single"
                             },
                             "next": [
                                 "TetrisDismissResultThenExit",
@@ -95,8 +93,7 @@
                     "pipeline_override": {
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
-                                "mode": "multiple",
-                                "repeat": true
+                                "mode": "multiple"
                             }
                         }
                     }
@@ -107,8 +104,7 @@
                     "pipeline_override": {
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
-                                "mode": "multiple",
-                                "repeat": false
+                                "mode": "multiple"
                             },
                             "next": [
                                 "TetrisDismissResultThenExit",
@@ -132,7 +128,6 @@
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
                                 "mode": "single",
-                                "repeat": true,
                                 "use_all_vitality": true
                             },
                             "next": [
@@ -152,7 +147,6 @@
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
                                 "mode": "single",
-                                "repeat": true,
                                 "use_all_vitality": false
                             }
                         }
@@ -173,7 +167,6 @@
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
                                 "mode": "multiple",
-                                "repeat": true,
                                 "use_all_vitality": true
                             },
                             "next": [
@@ -193,7 +186,6 @@
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
                                 "mode": "multiple",
-                                "repeat": true,
                                 "use_all_vitality": false
                             }
                         }
@@ -219,7 +211,6 @@
                 "TetrisHandleGameActive": {
                     "custom_action_param": {
                         "mode": "single",
-                        "repeat": true,
                         "use_all_vitality": false,
                         "repeat_count": "{repeat_count}"
                     },
@@ -246,7 +237,6 @@
                 "TetrisHandleGameActive": {
                     "custom_action_param": {
                         "mode": "multiple",
-                        "repeat": true,
                         "use_all_vitality": false,
                         "repeat_count": "{repeat_count}"
                     },
