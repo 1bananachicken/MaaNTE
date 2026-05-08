@@ -20,14 +20,24 @@
                     "label": "单人模式",
                     "option": [
                         "TetrisAutoRepeat_Single"
-                    ]
+                    ],
+                    "pipeline_override": {
+                        "TetrisHandlePrepareOne": {
+                            "target": "TetrisScenePrepareOneSingle"
+                        }
+                    }
                 },
                 {
                     "name": "Multiple",
                     "label": "多人模式",
                     "option": [
                         "TetrisAutoRepeat_Multiple"
-                    ]
+                    ],
+                    "pipeline_override": {
+                        "TetrisHandlePrepareOne": {
+                            "target": "TetrisScenePrepareOneMulti"
+                        }
+                    }
                 }
             ],
             "default_case": "Single"
@@ -60,7 +70,11 @@
                             "custom_action_param": {
                                 "mode": "single",
                                 "repeat": false
-                            }
+                            },
+                            "next": [
+                                "TetrisDismissResultThenExit",
+                                "TetrisExit"
+                            ]
                         }
                     }
                 }
@@ -95,7 +109,11 @@
                             "custom_action_param": {
                                 "mode": "multiple",
                                 "repeat": false
-                            }
+                            },
+                            "next": [
+                                "TetrisDismissResultThenExit",
+                                "TetrisExit"
+                            ]
                         }
                     }
                 }
@@ -204,7 +222,10 @@
                         "repeat": true,
                         "use_all_vitality": false,
                         "repeat_count": "{repeat_count}"
-                    }
+                    },
+                    "on_error": [
+                        "TetrisExit"
+                    ]
                 }
             }
         },
@@ -228,7 +249,10 @@
                         "repeat": true,
                         "use_all_vitality": false,
                         "repeat_count": "{repeat_count}"
-                    }
+                    },
+                    "on_error": [
+                        "TetrisExit"
+                    ]
                 }
             }
         }

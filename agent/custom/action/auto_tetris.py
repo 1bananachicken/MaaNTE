@@ -10,16 +10,22 @@ from maa.pipeline import JOCR, JRecognitionType
 
 from .Tetris.feats.play import TetrisGamePlayer
 
+_round_count = 0
+_target_round = 0
+
 
 @AgentServer.custom_action("auto_tetris")
 class AutoTetris(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
+        global _round_count, _target_round
+
         controller = context.tasker.controller
         tasker = context.tasker
 
         mode = "single"
+        use_all_vitality = False
         if argv.custom_action_param:
             try:
                 if isinstance(argv.custom_action_param, str):
@@ -30,6 +36,13 @@ class AutoTetris(CustomAction):
                     params = {}
 
                 mode = params.get("mode", "single")
+                use_all_vitality = params.get("use_all_vitality", False)
+                rc = params.get("repeat_count", 0)
+                if rc:
+                    if isinstance(rc, str):
+                        _target_round = int(rc)
+                    else:
+                        _target_round = int(rc)
             except Exception:
                 pass
 
@@ -37,7 +50,20 @@ class AutoTetris(CustomAction):
         player.context = context
         player.mode = mode
         success = player.play_round(controller, tasker)
-        return CustomAction.RunResult(success=success)
+
+        if not success:
+            _round_count = 0
+            _target_round = 0
+            return CustomAction.RunResult(success=False)
+
+        if not use_all_vitality and _target_round > 0:
+            _round_count += 1
+            if _round_count >= _target_round:
+                _round_count = 0
+                _target_round = 0
+                return CustomAction.RunResult(success=False)
+
+        return CustomAction.RunResult(success=True)
 
 
 @AgentServer.custom_action("tetris_check_vitality_action")

@@ -141,7 +141,7 @@
             "TetrisScenePrepareTwo"
         ],
         "action": "LongPress",
-        "target": "TetrisScenePrepareTwo",
+        "target": "TetrisSceneStartMatch",
         "duration": 100,
         "post_delay": 1000,
         "next": [
@@ -232,6 +232,19 @@
             "[JumpBack]TetrisDismissResult",
             "[JumpBack]TetrisHandleLoading",
             "[JumpBack]TetrisHandleWorldWithPrompt",
+            "TetrisExit"
+        ]
+    },
+    "TetrisDismissResultThenExit": {
+        "desc": "泯除方块 - 退出结算界面后结束任务",
+        "recognition": "And",
+        "all_of": [
+            "TetrisSceneMatchend"
+        ],
+        "action": "ClickKey",
+        "key": [27],
+        "post_delay": 1000,
+        "next": [
             "TetrisExit"
         ]
     },
