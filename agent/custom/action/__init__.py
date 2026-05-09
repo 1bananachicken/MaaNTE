@@ -15,6 +15,7 @@ from .Movement.mouse_move import *
 from .Movement.character_move import *
 from .Common.alt_click import *
 from .furniture_claim import *
+from .auto_piano.action import *
 
 __all__ = [
     "AutoFishNew",
@@ -32,4 +33,5 @@ __all__ = [
     "AutoFScroll",
     "AltClick",
     "FurnitureClaim",
+    "AutoPlayPiano",
 ]
