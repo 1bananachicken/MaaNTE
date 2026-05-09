@@ -186,10 +186,12 @@ jobs:
             mv -f install/MaaNTE.exe install/MaaNTE-app.exe
             echo "Renamed MaaNTE.exe -> MaaNTE-app.exe"
           fi
+          ls -lh install/MaaNTE-app.exe
           pip install pyinstaller
           pyinstaller --onefile --name MaaNTE --distpath install \
-            --add-data "install/MaaNTE-app.exe:." \
+            --add-data "install/MaaNTE-app.exe;." \
             tools/ci/MaaNTE_launcher.pyw
+          ls -lh install/MaaNTE.exe
           rm -f install/MaaNTE-app.exe
           echo "Compiled MaaNTE.exe launcher (single exe)"
           rm -rf build MaaNTE.spec
