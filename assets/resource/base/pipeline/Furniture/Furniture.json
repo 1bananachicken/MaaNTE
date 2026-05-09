@@ -70,6 +70,7 @@
             160,
             1
         ],
+        "end_hold": 600,
         "next": [
             "FurnitureChooseApartmentsOthers"
         ]
