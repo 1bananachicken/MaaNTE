@@ -187,8 +187,11 @@ jobs:
             echo "Renamed MaaNTE.exe -> MaaNTE-app.exe"
           fi
           pip install pyinstaller
-          pyinstaller --onefile --name MaaNTE --distpath install tools/ci/MaaNTE_launcher.pyw
-          echo "Compiled MaaNTE.exe launcher"
+          pyinstaller --onefile --name MaaNTE --distpath install \
+            --add-data "install/MaaNTE-app.exe:." \
+            tools/ci/MaaNTE_launcher.pyw
+          rm -f install/MaaNTE-app.exe
+          echo "Compiled MaaNTE.exe launcher (single exe)"
           rm -rf build MaaNTE.spec
 
       - name: Copy custom icons

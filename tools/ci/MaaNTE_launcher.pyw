@@ -2,21 +2,34 @@ import ctypes
 import subprocess
 import sys
 import os
+import tempfile
+import shutil
 
 SW_SHOWNORMAL = 1
 MB_YESNO = 0x04
 MB_ICONWARNING = 0x30
 IDYES = 6
 
+BUNDLE_EXE = "MaaNTE-app.exe"
+EXTRACT_DIR = os.path.join(tempfile.gettempdir(), "MaaNTE_app")
 
-def get_app_dir():
+
+def get_bundle_dir():
     if getattr(sys, 'frozen', False):
-        return os.path.dirname(sys.executable)
+        return sys._MEIPASS
     return os.path.dirname(os.path.abspath(__file__))
 
 
+def ensure_extracted():
+    src = os.path.join(get_bundle_dir(), BUNDLE_EXE)
+    dst = os.path.join(EXTRACT_DIR, BUNDLE_EXE)
+    os.makedirs(EXTRACT_DIR, exist_ok=True)
+    shutil.copy2(src, dst)
+    return dst
+
+
 def main():
-    app = os.path.join(get_app_dir(), "MaaNTE-app.exe")
+    app = ensure_extracted()
 
     try:
         is_admin = ctypes.windll.shell32.IsUserAnAdmin()
