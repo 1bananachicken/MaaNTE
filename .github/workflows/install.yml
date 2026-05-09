@@ -150,9 +150,12 @@ jobs:
       - name: Embed UAC admin manifest
         shell: powershell
         run: |
-          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
-          $mtExe = Get-ChildItem -Path "$vsPath\..\..\Windows Kits\*\bin\*\x64\mt.exe" -ErrorAction SilentlyContinue | Sort-Object -Descending | Select-Object -First 1
-          if (-not $mtExe) { $mtExe = Get-Command mt.exe -ErrorAction Stop }
+          $mtExe = Get-ChildItem -Path "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\mt.exe" -ErrorAction SilentlyContinue | Sort-Object -Descending | Select-Object -First 1
+          if (-not $mtExe) {
+            Write-Error "mt.exe not found"
+            exit 1
+          }
+          Write-Host "Using mt.exe: $($mtExe.FullName)"
           & $mtExe.FullName -manifest tools/ci/app.manifest -outputresource:"MFA/MFAAvalonia.exe;#1"
           echo "Embedded UAC manifest into MFA/MFAAvalonia.exe"
 
