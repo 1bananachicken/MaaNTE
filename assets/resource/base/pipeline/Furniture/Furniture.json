@@ -304,10 +304,7 @@
             94
         ],
         "next": [
-            "[JumpBack]FurnitureClaimHamsterBall",
-            "[JumpBack]FurnitureClaimMianmian",
-            "[JumpBack]FurnitureClaimWoodenBox",
-            "[Anchor]FurnitureNext"
+            "FurnitureClaimAction"
         ]
     },
     "FurnitureOverviewPinkBackground": {
@@ -334,130 +331,11 @@
         "post_delay": 0,
         "rate_limit": 0
     },
-    "FurnitureClaimHamsterBall": {
-        "desc": "领取仓鼠球, 识别按钮黄底",
-        "recognition": "ColorMatch",
-        "method": 40,
-        "roi": "FurnitureHamsterBall",
-        "roi_offset": [
-            137,
-            -11,
-            31,
-            26
-        ],
-        "upper": [
-            21,
-            177,
-            237
-        ],
-        "lower": [
-            20,
-            161,
-            231
-        ],
-        "count": 20,
-        "action": "Click",
+    "FurnitureClaimAction": {
+        "action": "Custom",
+        "custom_action": "furniture_claim",
         "next": [
-            "SceneClickBlankToExit"
+            "[Anchor]FurnitureNext"
         ]
-    },
-    "FurnitureHamsterBall": {
-        "recognition": "OCR",
-        "roi": [
-            948,
-            170,
-            308,
-            517
-        ],
-        "expected": [
-            "仓鼠球"
-        ],
-        "pre_delay": 0,
-        "post_delay": 0,
-        "rate_limit": 0
-    },
-    "FurnitureClaimMianmian": {
-        "desc": "领取棉棉, 识别按钮黄底",
-        "recognition": "ColorMatch",
-        "method": 40,
-        "roi": "FurnitureHamsterBall",
-        "roi_offset": [
-            137,
-            -11,
-            31,
-            26
-        ],
-        "upper": [
-            21,
-            177,
-            237
-        ],
-        "lower": [
-            20,
-            161,
-            231
-        ],
-        "count": 20,
-        "action": "Click",
-        "next": [
-            "SceneClickBlankToExit"
-        ]
-    },
-    "FurnitureMianmian": {
-        "recognition": "OCR",
-        "roi": [
-            948,
-            170,
-            308,
-            517
-        ],
-        "expected": [
-            "棉棉"
-        ],
-        "pre_delay": 0,
-        "post_delay": 0,
-        "rate_limit": 0
-    },
-    "FurnitureClaimWoodenBox": {
-        "desc": "领取老旧的木箱, 识别按钮黄底",
-        "recognition": "ColorMatch",
-        "method": 40,
-        "roi": "FurnitureHamsterBall",
-        "roi_offset": [
-            137,
-            -11,
-            31,
-            26
-        ],
-        "upper": [
-            21,
-            177,
-            237
-        ],
-        "lower": [
-            20,
-            161,
-            231
-        ],
-        "count": 20,
-        "action": "Click",
-        "next": [
-            "SceneClickBlankToExit"
-        ]
-    },
-    "FurnitureWoodenBox": {
-        "recognition": "OCR",
-        "roi": [
-            948,
-            170,
-            308,
-            517
-        ],
-        "expected": [
-            "老旧的木箱"
-        ],
-        "pre_delay": 0,
-        "post_delay": 0,
-        "rate_limit": 0
     }
 }
