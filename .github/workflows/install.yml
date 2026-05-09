@@ -147,6 +147,15 @@ jobs:
             echo "MFAAvalonia exe not found, skipping icon update."
           fi
 
+      - name: Embed UAC admin manifest
+        shell: powershell
+        run: |
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -property installationPath
+          $mtExe = Get-ChildItem -Path "$vsPath\..\..\Windows Kits\*\bin\*\x64\mt.exe" -ErrorAction SilentlyContinue | Sort-Object -Descending | Select-Object -First 1
+          if (-not $mtExe) { $mtExe = Get-Command mt.exe -ErrorAction Stop }
+          & $mtExe.FullName -manifest tools/ci/app.manifest -outputresource:"MFA/MFAAvalonia.exe;#1"
+          echo "Embedded UAC manifest into MFA/MFAAvalonia.exe"
+
       - name: Setup Embed Python on Windows
         shell: bash
         run: |
