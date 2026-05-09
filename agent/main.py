@@ -490,7 +490,7 @@ def agent(is_dev_mode=False):
 
             change_console_level("DEBUG")
             logger.info("开发模式：日志等级已设置为DEBUG")
-            
+
 
         from maa.agent.agent_server import AgentServer
         from maa.tasker import Tasker
