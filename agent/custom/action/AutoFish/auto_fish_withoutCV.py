@@ -60,7 +60,7 @@ class AutoFishWithoutCV(CustomAction):
                 )
 
                 if max_try_item <= 0:
-                    logger.warning("尝试次数用尽，控条失败")
+                    logger.debug("尝试次数用尽，控条失败")
                     return CustomAction.RunResult(success=True)
                 continue
 
