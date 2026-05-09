@@ -43,8 +43,6 @@ class DrumDetector:
             img = read_image(path)
             if img is not None:
                 cache[idx] = img
-                th, tw = img.shape[:2]
-                logger.info("已加载鼓面模板: %s (%dx%d)", path.name, tw, th)
 
         loaded_count = len(cache)
         if loaded_count == 0:

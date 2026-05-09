@@ -1,0 +1,32 @@
+{
+    "MoveForward": {
+        "desc": "前进：按住 W 键移动指定时长",
+        "action": "Custom",
+        "custom_action": "character_move",
+        "custom_action_param": {
+            "key": "W",
+            "duration": 1.0
+        }
+    },
+    "MoveBackward": {
+        "desc": "后退：按住 S 键移动指定时长",
+        "action": "Custom",
+        "custom_action": "character_move",
+        "custom_action_param": {
+            "key": "S",
+            "duration": 1.0
+        }
+    },
+    "Turn": {
+        "desc": "转向：鼠标相对位移，使人物朝向与视角对齐",
+        "action": "Custom",
+        "custom_action": "mouse_relative_move",
+        "custom_action_param": {
+            "dx": 0,
+            "dy": 0,
+            "steps": 30,
+            "step_delay": 0.03,
+            "align": true
+        }
+    }
+}

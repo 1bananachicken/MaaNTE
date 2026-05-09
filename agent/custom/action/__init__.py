@@ -11,6 +11,9 @@ from .realtime_task import *
 from .AutoFish.auto_fish_withoutCV import *
 from .SoundTrigger.SoundDodgeAction import *
 from .auto_f_scroll import *
+from .Movement.mouse_move import *
+from .Movement.character_move import *
+from .auto_piano.action import *
 
 __all__ = [
     "AutoFishNew",
@@ -26,4 +29,5 @@ __all__ = [
     "AutoFishWithoutCV",
     "SoundDodgeAction",
     "AutoFScroll",
+    "AutoPlayPiano",
 ]

@@ -4,10 +4,14 @@ import json
 
 from pathlib import Path
 from ..Common.utils import get_image, match_template_in_region
+from ..Common.logger import get_logger
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+
+
+logger = get_logger(__name__)
 
 
 @AgentServer.custom_action("auto_fish")
@@ -44,7 +48,7 @@ class AutoFish(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        print("=== Autofish Action Started ===")
+        logger.info("=== Autofish Action Started ===")
         controller = context.tasker.controller
 
         fishing_count = 10
@@ -101,9 +105,7 @@ class AutoFish(CustomAction):
                     img, settlement_region, self.settlement_template, 0.8
                 )
                 if m_settle:
-                    print(
-                        "  Found settlement screen during check, pressing ESC to close..."
-                    )
+                    logger.debug("Found settlement screen during check, pressing ESC to close...")
                     press_esc()
                     wait_until_settlement_disappears()
                     continue
@@ -115,7 +117,7 @@ class AutoFish(CustomAction):
                     0.6,
                     green_mask=True,
                 )
-                print(f"  Checking for FishGame screen, probability: {game_prob:.2f}")
+                logger.debug(f"Checking for FishGame screen, probability: {game_prob:.2f}")
                 if m_game:
                     return True
 
@@ -123,20 +125,20 @@ class AutoFish(CustomAction):
                     img, prepare_region, self.prepare_start_template, 0.7
                 )
                 if m_prepare:
-                    print("  On FishPrepare screen, pressing start...")
+                    logger.debug("On FishPrepare screen, pressing start...")
                     controller.post_click(x + 15, y + 15)
                     time.sleep(1.5)
                     return True
 
                 time.sleep(0.1)
 
-            print("  ERROR: Not in FishGame or FishPrepare, exiting fishing.")
+            logger.error("ERROR: Not in FishGame or FishPrepare, exiting fishing.")
             return False
 
         for i in range(fishing_count):
             if context.tasker.stopping:
                 return CustomAction.RunResult(success=False)
-            print(f"=== Fishing {i + 1}/{fishing_count} ===")
+            logger.info(f"=== Fishing {i + 1}/{fishing_count} ===")
 
             if not ensure_fish_game():
                 return CustomAction.RunResult(success=False)
@@ -154,14 +156,14 @@ class AutoFish(CustomAction):
                     m_need_bait, prob, _, _ = match_template_in_region(
                         img, need_bait_region, self.need_bait_template, 0.7
                     )
-                    print(f"  Checking for bait, probability: {prob:.2f}")
+                    logger.debug(f"Checking for bait, probability: {prob:.2f}")
                     if m_need_bait:
-                        print("  Need bait! Stopping fishing.")
+                        logger.debug("Need bait! Stopping fishing.")
                         return CustomAction.RunResult(success=False)
 
                     time.sleep(0.1)
 
-                print("  Casting...")
+                logger.debug("Casting...")
 
                 wait_start = time.time()
                 m_settle_unexpected = False
@@ -172,7 +174,7 @@ class AutoFish(CustomAction):
                         return CustomAction.RunResult(success=False)
 
                     if time.time() - wait_start > 30:
-                        print("  Timeout waiting for fish to hook, recasting...")
+                        logger.debug("Timeout waiting for fish to hook, recasting...")
                         timeout_triggered = True
                         break
 
@@ -183,16 +185,14 @@ class AutoFish(CustomAction):
                         img, settlement_region, self.settlement_template, 0.8
                     )
                     if m_settle_unexpected:
-                        print(
-                            "  Unexpected settlement screen detected! Breaking to clear it."
-                        )
+                        logger.debug("Unexpected settlement screen detected! Breaking to clear it.")
                         break
 
                     m_catch, _, _, _ = match_template_in_region(
                         img, success_region, self.success_catch_template, 0.7
                     )
                     if m_catch:
-                        print("  Fish hooked!")
+                        logger.debug("Fish hooked!")
                         break
 
                 if m_settle_unexpected or timeout_triggered:
@@ -233,13 +233,13 @@ class AutoFish(CustomAction):
                             img, settlement_region, self.settlement_template, 0.8
                         )
                         if m_settle:
-                            print("  Fish caught!")
+                            logger.debug("Fish caught!")
                             break
                         m_escape, _, _, _ = match_template_in_region(
                             img, escape_region, self.escape_template, 0.8
                         )
                         if m_escape:
-                            print("  Fish escaped! Recasting...")
+                            logger.debug("Fish escaped! Recasting...")
                             break
 
                     m_left, _, x_left, _ = match_template_in_region(
@@ -255,6 +255,10 @@ class AutoFish(CustomAction):
                     if frame % 10 == 0:
                         if current_ad_key is not None:
                             controller.post_key_up(current_ad_key)
+
+                        controller.post_key_down(KEY_F)
+                        time.sleep(0.05)
+                        controller.post_key_up(KEY_F)
 
                         if current_ad_key is not None:
                             controller.post_key_down(current_ad_key)
@@ -294,6 +298,7 @@ class AutoFish(CustomAction):
                         set_ad_key(None)
 
                 set_ad_key(None)
+                controller.post_key_up(KEY_F)
 
                 img = get_image(controller)
                 time.sleep(0.3)
@@ -304,11 +309,11 @@ class AutoFish(CustomAction):
                     continue
                 break
 
-            print("  Finished.")
+            logger.debug("Finished.")
 
             match_settle = False
             wait_settlement_start = time.time()
-            while time.time() - wait_settlement_start < 5:
+            while time.time() - wait_settlement_start < 15:
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
 
@@ -316,23 +321,23 @@ class AutoFish(CustomAction):
                 match_settle, settle_prob, _, _ = match_template_in_region(
                     img, settlement_region, self.settlement_template, 0.8
                 )
-                print(
-                    f"  Checking for settlement screen, probability: {settle_prob:.2f}"
+                logger.debug(
+                    f"Checking for settlement screen, probability: {settle_prob:.2f}"
                 )
                 if match_settle:
-                    print("  Settlement screen detected.")
+                    logger.debug("Settlement screen detected.")
                     break
-                time.sleep(0.05)
+                time.sleep(0.1)
 
             if match_settle:
-                print("  Closing settlement screen...")
+                logger.debug("Closing settlement screen...")
                 for _ in range(5):
                     press_esc()
                     if wait_until_settlement_disappears():
-                        print("  Settlement closed.")
+                        logger.debug("Settlement closed.")
                         break
             else:
-                print("  Settlement screen not detected, continuing immediately.")
+                logger.debug("Settlement screen not detected, continuing immediately.")
 
-        print("All fishing tasks complete.")
+        logger.info("All fishing tasks complete.")
         return CustomAction.RunResult(success=True)
