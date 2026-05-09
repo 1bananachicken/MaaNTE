@@ -409,16 +409,36 @@ def check_and_install_dependencies():
 
 
 def _check_admin_privilege():
-    """检查是否以管理员权限运行，若否则输出警告"""
+    """检查是否以管理员权限运行，若非则弹窗提示并自动以管理员身份重新启动"""
     import ctypes
 
     if ctypes.windll.shell32.IsUserAnAdmin():
         return
 
-    logger.warning(
-        "未以管理员权限运行，部分输入功能可能无法正常使用。"
-        "请右键 MaaNTE.exe → 以管理员身份运行。"
+    MB_YESNO = 0x04
+    MB_ICONWARNING = 0x30
+    IDYES = 6
+
+    result = ctypes.windll.user32.MessageBoxW(
+        None,
+        "当前未以管理员权限运行，部分功能可能无法正常使用。\n\n是否立即以管理员身份重新启动？",
+        "MaaNTE - 权限不足",
+        MB_YESNO | MB_ICONWARNING,
     )
+
+    if result == IDYES:
+        try:
+            exe_path = sys.executable if getattr(sys, 'frozen', False) else sys.argv[0]
+            exe_path = os.path.abspath(exe_path)
+            ret = ctypes.windll.shell32.ShellExecuteW(None, "runas", exe_path, None, None, 1)
+            if ret <= 32:
+                raise OSError(f"ShellExecuteW 返回值: {ret}")
+            sys.exit(0)
+        except Exception as e:
+            logger.error(f"以管理员身份重启失败: {e}")
+            sys.exit(1)
+    else:
+        logger.warning("用户选择不以管理员权限运行，部分输入功能可能无法正常使用。")
 
 
 def _check_game_resolution():
