@@ -1,0 +1,229 @@
+{
+    "PinkPawHeist_Main": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "PinkPawHeist_Loop"
+        ]
+    },
+    "PinkPawHeist_Loop": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            {
+                "name": "PinkPawHeist_CoreSequence",
+                "jump_back": true
+            },
+            "PinkPawHeist_Finish"
+        ]
+    },
+    "PinkPawHeist_Finish": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "StopTask"
+        }
+    },
+    "PinkPawHeist_CoreSequence": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "PinkPawHeist_DetectXiaoZhi"
+        ]
+    },
+    "PinkPawHeist_DetectXiaoZhi": {
+        "desc": "检测小吱交互按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "小吱",
+                "roi": [
+                    800,
+                    380,
+                    35,
+                    25
+                ]
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "PinkPawHeist_PressF"
+        ],
+        "on_error": [
+            "PinkPawHeist_LogNotFound"
+        ]
+    },
+    "PinkPawHeist_LogNotFound": {
+        "desc": "未找到小吱，直接退出",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Command",
+            "param": {
+                "exec": "cmd",
+                "args": [
+                    "/c",
+                    "echo",
+                    "[自动粉爪]请先找到小吱"
+                ]
+            }
+        },
+        "next": [
+            "PinkPawHeist_StopTask"
+        ]
+    },
+    "PinkPawHeist_StopTask": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "StopTask"
+        }
+    },
+    "PinkPawHeist_PressF": {
+        "desc": "按F交互",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "PinkPawHeist_OCR_Join"
+        ]
+    },
+    "PinkPawHeist_OCR_Join": {
+        "desc": "OCR识别我要参加",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "我要参加",
+                "roi": [
+                    910,
+                    325,
+                    70,
+                    25
+                ]
+            }
+        },
+        "pre_delay": 500,
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "PinkPawHeist_SkipStory"
+        ]
+    },
+    "PinkPawHeist_SkipStory": {
+        "desc": "跳过废话",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    890,
+                    320,
+                    120,
+                    40
+                ]
+            }
+        },
+        "pre_delay": 2000,
+        "next": [
+            "PinkPawHeist_AfterStory"
+        ]
+    },
+    "PinkPawHeist_AfterStory": {
+        "desc": "详情页，点进入按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "进入",
+                "roi": [
+                    900,
+                    620,
+                    170,
+                    35
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "timeout": 60000,
+        "next": [
+            "PinkPawHeist_WaitReward",
+            "[JumpBack]RealTimeSkipStoryDialog",
+            "[JumpBack]RealTimeSkipStory"
+        ]
+    },
+    "PinkPawHeist_WaitReward": {
+        "desc": "等待进地图",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "本局收益",
+                "roi": [
+                    30,
+                    250,
+                    100,
+                    20
+                ]
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "PinkPawHeist_ExecuteScheme"
+        ],
+        "on_error": [
+            "PinkPawHeist_WaitReward_Delay"
+        ]
+    },
+    "PinkPawHeist_WaitReward_Delay": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "post_delay": 2000,
+        "next": [
+            "PinkPawHeist_WaitReward"
+        ]
+    },
+    "PinkPawHeist_ExecuteScheme": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": []
+        // next 由方案选项动态覆写
+    }
+}

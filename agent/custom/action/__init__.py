@@ -8,7 +8,7 @@ from .rhythm.feats.repeat_decision import *
 from .rhythm.feats.select_song import *
 from .Common.click import *
 from .realtime_task import *
-
+from .pinkpaw.pinkpaw_core1 import *
 
 __all__ = [
     "AutoFishNew",
@@ -21,4 +21,5 @@ __all__ = [
     "AutoRhythmRepeatDecision",
     "AutoRhythmSelectSong",
     "RealTimeTaskAction",
+    "PinkPawHeistScheme1Action",
 ]

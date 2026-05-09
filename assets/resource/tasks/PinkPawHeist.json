@@ -1,0 +1,60 @@
+{
+    "task": [
+        {
+            "name": "粉爪大劫案",
+            "entry": "PinkPawHeist_Main",
+            "description": "自动刷取粉爪大劫案，需要[color:red]“桌面端-前台”[/color]控制器。",
+            "option": [
+                "PinkPawHeist_Scheme",
+                "PinkPawHeist_LoopCount"
+            ],
+            "controller": ["Win32-Front"]
+        }
+    ],
+    "option": {
+        "PinkPawHeist_LoopCount": {
+            "type": "input",
+            "label": "循环次数",
+            "description": "刷取粉爪大劫案的次数",
+            "inputs": [
+                {
+                    "name": "count",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "PinkPawHeist_CoreSequence": {
+                    "max_hit": "{count}"
+                }
+            }
+        },
+        "PinkPawHeist_Scheme": {
+            "type": "select",
+            "label": "地图方案",
+            "description": "选择本次战斗的地图移动方案",
+            "default_case": "方案一",
+            "cases": [
+                {
+                    "name": "方案一",
+                    "label": "默认路线",
+                    "pipeline_override": {
+                        "PinkPawHeist_ExecuteScheme": {
+                            "next": ["PinkPawHeist_Scheme1"]
+                        }
+                    }
+                },
+                {
+                    "name": "方案二",
+                    "label": "备选路线",
+                    "pipeline_override": {
+                        "PinkPawHeist_ExecuteScheme": {
+                            "next": ["PinkPawHeist_Scheme2_Actions"]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
