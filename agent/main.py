@@ -412,7 +412,14 @@ def _check_admin_privilege():
     """检查是否以管理员权限运行，若非则弹窗提示并自动以管理员身份重新启动"""
     import ctypes
 
-    if ctypes.windll.shell32.IsUserAnAdmin():
+    try:
+        is_admin = ctypes.windll.shell32.IsUserAnAdmin()
+    except Exception:
+        logger.exception("IsUserAnAdmin 调用失败")
+        return
+
+    logger.info(f"管理员权限检查: is_admin={is_admin}")
+    if is_admin:
         return
 
     SW_SHOWNORMAL = 1
@@ -420,13 +427,18 @@ def _check_admin_privilege():
     MB_ICONWARNING = 0x30
     IDYES = 6
 
-    result = ctypes.windll.user32.MessageBoxW(
-        None,
-        "当前未以管理员权限运行，部分功能可能无法正常使用。\n\n是否立即以管理员身份重新启动？",
-        "MaaNTE - 权限不足",
-        MB_YESNO | MB_ICONWARNING,
-    )
+    try:
+        result = ctypes.windll.user32.MessageBoxW(
+            None,
+            "当前未以管理员权限运行，部分功能可能无法正常使用。\n\n是否立即以管理员身份重新启动？",
+            "MaaNTE - 权限不足",
+            MB_YESNO | MB_ICONWARNING,
+        )
+    except Exception:
+        logger.exception("MessageBoxW 调用失败")
+        return
 
+    logger.info(f"MessageBoxW 返回值: {result}")
     if result == IDYES:
         try:
             exe_path = sys.executable if getattr(sys, 'frozen', False) else sys.argv[0]
