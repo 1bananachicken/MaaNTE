@@ -9,8 +9,14 @@ MB_ICONWARNING = 0x30
 IDYES = 6
 
 
+def get_app_dir():
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
+
+
 def main():
-    app = os.path.join(os.path.dirname(os.path.abspath(__file__)), "MaaNTE-app.exe")
+    app = os.path.join(get_app_dir(), "MaaNTE-app.exe")
 
     try:
         is_admin = ctypes.windll.shell32.IsUserAnAdmin()
