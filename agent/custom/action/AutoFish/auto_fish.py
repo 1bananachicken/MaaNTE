@@ -252,13 +252,13 @@ class AutoFish(CustomAction):
                         img, game_region, self.slider_template, 0.7
                     )
 
-                    if frame % 10 == 0:          
+                    if frame % 10 == 0:
                         if current_ad_key is not None:
                             controller.post_key_up(current_ad_key)
-                        
+
                         controller.post_key_down(KEY_F)
                         time.sleep(0.05)
-                        controller.post_key_up(KEY_F)       
+                        controller.post_key_up(KEY_F)
 
                         if current_ad_key is not None:
                             controller.post_key_down(current_ad_key)

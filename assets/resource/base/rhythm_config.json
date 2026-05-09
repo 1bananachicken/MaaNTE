@@ -29,22 +29,37 @@
             0.80,
             0.81
         ],
-        "cooldown_sec": 0.05,
-        "cooldown_sec_by_lane": [
-            0.05,
-            0.05,
-            0.05,
-            0.05
-        ],
         "region_extend_up_frac": 0.14,
         "region_extend_down_frac": 0.15,
         "region_width_multiplier": 4.0,
+        "simultaneous_score_margin": 0.04,
+        "candidate_threshold_margin": 0.03,
+        "candidate_nms_distance_px": 30.0,
+        "max_candidates_per_lane": 4,
         "enabled_lanes": [
             true,
             true,
             true,
             true
         ]
+    },
+    "position_trigger": {
+        "trigger_line_offset_frac": -0.012,
+        "trigger_band_half_height_frac": 0.018,
+        "min_tap_interval_sec": 0.035,
+        "min_tap_interval_sec_by_lane": [
+            0.035,
+            0.035,
+            0.035,
+            0.035
+        ],
+        "note_speed_px_per_sec": 900.0,
+        "input_latency_sec": 0.035,
+        "schedule_window_sec": 0.22,
+        "stale_note_sec": 0.045,
+        "duplicate_window_sec": 0.025,
+        "chord_window_sec": 0.022,
+        "same_frame_chord_window_sec": 0.045
     },
     "scene": {
         "state_confirm_frames": 1,
@@ -61,12 +76,15 @@
         "song_name": "",
         "scroll_area_x_frac": 0.25,
         "scroll_area_y_frac": 0.50,
-        "scroll_delta": -3,
-        "max_scroll_attempts": 30,
+        "scroll_delta": -1,
+        "max_scroll_attempts": 50,
         "match_threshold": 0.75,
+        "click_x_frac": -1.0,
+        "click_y_offset_frac": 0.0,
         "start_match_threshold": 0.75,
         "click_delay_sec": 0.5,
         "start_delay_sec": 0.8,
+        "start_to_playing_timeout_sec": 3.0,
         "scroll_settle_delay_sec": 0.4,
         "click_reverify_threshold": 0.70,
         "max_click_reverify_retries": 2
@@ -97,9 +115,12 @@
             0.0,
             0.0
         ],
-        "key_hold_sec": 0.01
+        "key_hold_sec": 0.03,
+        "chord_reinforce_count": 1,
+        "chord_reinforce_interval_sec": 0.006
     },
     "run": {
-        "target_fps": 60
+        "target_fps": 60,
+        "debug_score_interval_frames": 60
     }
 }
