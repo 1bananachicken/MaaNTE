@@ -8,7 +8,6 @@ from .realtime_task import *
 from .predict_angle import *
 from .map_locator import *
 from .map_locator_pyramid import *
-from .map_locator_lightglue import *
 from .combined_auto_navigate import *
 
 __all__ = [
@@ -22,6 +21,5 @@ __all__ = [
     "PredictAngle",
     "MapLocator",
     "MapLocatorPyramid",
-    "MapLocatorLightGlue",
     "CombinedAutoNavigate",
 ]

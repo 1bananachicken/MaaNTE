@@ -3,8 +3,33 @@
         "action": "Custom",
         "custom_action": "combined_auto_navigate",
         "custom_action_param": {
-            "target_x": 5400,
-            "target_y": 10948
+            "backend": "auto",
+            "meters_per_pixel": 0.2144,
+            "close_map_after_capture": true,
+            "voice_enabled": true,
+            "debug_window": false,
+            "route_debug_window": false,
+            "route_debug_pause": false,
+            "route_debug_save": false,
+            "skeleton_method": "zhang_suen",
+            "skeleton_max_iterations": 160,
+            "skeleton_bridge_enabled": true,
+            "skeleton_bridge_max_gap": 80,
+            "skeleton_bridge_max_rounds": 16,
+            "skeleton_bridge_max_components": 48,
+            "position_alpha": 0.65,
+            "speech_cooldown": 1.0,
+            "turn_event_lead_m": 25,
+            "turn_pass_grace_m": 8,
+            "progress_forward_bonus": 0.08,
+            "progress_backtrack_penalty": 0.35,
+            "turn_announce_distances_m": [
+                300,
+                100
+            ],
+            "turn_announce_late_tolerance_m": 80,
+            "turn_now_distance_m": 18,
+            "offroute_distance": 80
         }
     }
 }
