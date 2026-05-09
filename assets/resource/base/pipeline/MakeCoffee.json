@@ -24,8 +24,22 @@
     "MakeCoffeeOneOneRound": {
         "desc": "刷 1-1 单轮入口",
         "next": [
-            "MakeCoffeeOneOneEnter",
-            "MakeCoffeeOneOneScrollToEnter"
+            "MakeCoffeeOneOneEnter"
+        ]
+    },
+    "MakeCoffeeOneOneScrollToEnter": {
+        "desc": "未找到粉色店长特供入口时上滚列表",
+        "action": "Scroll",
+        "target": [
+            120,
+            45,
+            80,
+            30
+        ],
+        "dy": -560,
+        "post_delay": 300,
+        "next": [
+            "MakeCoffeeOneOneEnter"
         ]
     },
     "MakeCoffeeOneOneEnter": {
@@ -34,13 +48,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    0,
+                    640,
                     0,
                     1280,
                     720
                 ],
                 "template": "auto_make_coffee/enter.png",
-                "threshold": 0.7
+                "threshold": 0.85
             }
         },
         "action": {
@@ -53,21 +67,7 @@
         },
         "post_delay": 1000,
         "next": [
-            "MakeCoffeeOneOneChooseLevel"
-        ]
-    },
-    "MakeCoffeeOneOneScrollToEnter": {
-        "desc": "未找到粉色店长特供入口时上滚列表",
-        "action": "Scroll",
-        "target": [
-            120,
-            45,
-            80,
-            30
-        ],
-        "dy": -1200,
-        "post_delay": 300,
-        "next": [
+            "MakeCoffeeOneOneChooseLevel",
             "[JumpBack]MakeCoffeeOneOneEnter"
         ]
     },
@@ -80,7 +80,7 @@
                     0,
                     0,
                     1280,
-                    720
+                    360
                 ],
                 "template": "auto_make_coffee/level_chose.png",
                 "threshold": 0.7
@@ -150,7 +150,7 @@
                     0,
                     0,
                     1280,
-                    720
+                    360
                 ],
                 "template": "auto_make_coffee/food_1.png",
                 "threshold": 0.6
@@ -275,7 +275,7 @@
                     0,
                     0,
                     1280,
-                    720
+                    360
                 ],
                 "template": "auto_make_coffee/food_2.png",
                 "threshold": 0.6
@@ -307,7 +307,7 @@
                     145
                 ],
                 "template": "auto_make_coffee/food_2_ready_2.png",
-                "threshold": 0.7
+                "threshold": 0.8
             }
         },
         "post_delay":10,
@@ -345,7 +345,7 @@
                     155
                 ],
                 "template": "auto_make_coffee/food_2_ready_3.png",
-                "threshold": 0.7
+                "threshold": 0.8
             }
         },
         "post_delay":10,
@@ -383,7 +383,7 @@
                     155
                 ],
                 "template": "auto_make_coffee/food_2_empty_after_3.png",
-                "threshold": 0.7
+                "threshold": 0.8
             }
         },
         "post_delay":10,
@@ -400,7 +400,7 @@
                     0,
                     0,
                     1280,
-                    720
+                    360
                 ],
                 "template": "auto_make_coffee/food_3.png",
                 "threshold": 0.6
@@ -447,11 +447,11 @@
             "param":{
                 "roi": [
                     0,
-                    0,
+                    360,
                     1280,
                     720
                 ],
-                "template": "auto_make_coffee/food_3.png",
+                "template": "auto_make_coffee/food_3_ready_2.png",
                 "threshold": 0.7
             }
         },
