@@ -355,6 +355,7 @@
             231
         ],
         "count": 20,
+        "action": "Click",
         "next": [
             "SceneClickBlankToExit"
         ]
@@ -396,6 +397,7 @@
             231
         ],
         "count": 20,
+        "action": "Click",
         "next": [
             "SceneClickBlankToExit"
         ]
@@ -437,6 +439,7 @@
             231
         ],
         "count": 20,
+        "action": "Click",
         "next": [
             "SceneClickBlankToExit"
         ]
