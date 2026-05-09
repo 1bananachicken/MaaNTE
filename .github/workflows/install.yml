@@ -167,14 +167,12 @@ jobs:
         shell: bash
         run: |
           if [ -d "MFA" ]; then
-            echo "Copying MFA files to install directory..."
-            mkdir -p install
-            cp -rpvn MFA/. install/
-            if [ -f "install/MFAAvalonia.exe" ]; then
-              mv -f install/MFAAvalonia.exe install/MaaNTE-app.exe
-              echo "Renamed MFAAvalonia.exe -> MaaNTE-app.exe"
-            elif [ -f "install/MFAAvalonia" ]; then
-              mv -f install/MFAAvalonia install/MaaNTE-app
+            echo "Copying MFA files to install/app/..."
+            mkdir -p install/app
+            cp -rpvn MFA/. install/app/
+            if [ -f "install/app/MFAAvalonia.exe" ]; then
+              mv -f install/app/MFAAvalonia.exe install/app/MaaNTE-app.exe
+              echo "Renamed MFAAvalonia.exe -> app/MaaNTE-app.exe"
             fi
           else
             echo "MFA directory not found, skipping copy."
@@ -191,15 +189,15 @@ jobs:
         shell: bash
         run: |
           # 删除 MFAA 自带的 Assets 文件夹
-          if [ -d "install/Assets" ]; then
-            rm -rf install/Assets
+          if [ -d "install/app/Assets" ]; then
+            rm -rf install/app/Assets
             echo "Removed original Assets folder"
           fi
 
-          # MFAA 版本的图标放根目录
+          # MFAA 版本的图标放 app 目录
           if [ -f "maante.ico" ]; then
-            cp maante.ico install/logo.ico
-            echo "Copied custom icon to install/logo.ico"
+            cp maante.ico install/app/logo.ico
+            echo "Copied custom icon to install/app/logo.ico"
           fi
 
       - uses: actions/upload-artifact@v4

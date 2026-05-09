@@ -10,7 +10,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     if (last_slash) *(last_slash + 1) = '\0';
 
     char app[MAX_PATH];
-    snprintf(app, MAX_PATH, "%sMaaNTE-app.exe", path);
+    char workdir[MAX_PATH];
+    snprintf(app, MAX_PATH, "%sapp\\MaaNTE-app.exe", path);
+    snprintf(workdir, MAX_PATH, "%sapp", path);
 
     if (!IsUserAnAdmin()) {
         int result = MessageBoxA(
@@ -22,7 +24,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
         if (result == IDYES) {
             HINSTANCE ret = ShellExecuteA(
-                NULL, "runas", app, NULL, NULL, SW_SHOWNORMAL
+                NULL, "runas", app, NULL, workdir, SW_SHOWNORMAL
             );
             if ((intptr_t)ret > 32) return 0;
         }
@@ -30,7 +32,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     STARTUPINFOA si = {sizeof(si)};
     PROCESS_INFORMATION pi;
-    if (CreateProcessA(app, NULL, NULL, NULL, FALSE, 0, NULL, NULL, &si, &pi)) {
+    if (CreateProcessA(app, NULL, NULL, NULL, FALSE, 0, NULL, workdir, &si, &pi)) {
         CloseHandle(pi.hProcess);
         CloseHandle(pi.hThread);
     }
