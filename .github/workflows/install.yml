@@ -171,30 +171,21 @@ jobs:
             mkdir -p install
             cp -rpvn MFA/. install/
             if [ -f "install/MFAAvalonia.exe" ]; then
-              mv -f install/MFAAvalonia.exe install/MaaNTE.exe
+              mv -f install/MFAAvalonia.exe install/MaaNTE-app.exe
+              echo "Renamed MFAAvalonia.exe -> MaaNTE-app.exe"
             elif [ -f "install/MFAAvalonia" ]; then
-              mv -f install/MFAAvalonia install/MaaNTE
+              mv -f install/MFAAvalonia install/MaaNTE-app
             fi
           else
             echo "MFA directory not found, skipping copy."
           fi
 
-      - name: Inject admin privilege launcher
-        shell: bash
+      - name: Build admin privilege launcher
+        shell: powershell
         run: |
-          if [ -f "install/MaaNTE.exe" ]; then
-            mv -f install/MaaNTE.exe install/MaaNTE-app.exe
-            echo "Renamed MaaNTE.exe -> MaaNTE-app.exe"
-          fi
-          ls -lh install/MaaNTE-app.exe
-          pip install pyinstaller
-          pyinstaller --onefile --name MaaNTE --distpath install \
-            --add-data "install/MaaNTE-app.exe;." \
-            tools/ci/MaaNTE_launcher.pyw
-          ls -lh install/MaaNTE.exe
-          rm -f install/MaaNTE-app.exe
-          echo "Compiled MaaNTE.exe launcher (single exe)"
-          rm -rf build MaaNTE.spec
+          $vsPath = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath
+          $vcvars = Join-Path $vsPath "VC\Auxiliary\Build\vcvarsall.bat"
+          cmd /c "`"$vcvars`" amd64 && cl /W4 /O1 /Fe:install\MaaNTE.exe tools\ci\MaaNTE_launcher.c /link /SUBSYSTEM:WINDOWS /ENTRY:WinMainCRTStartup user32.lib shell32.lib advapi32.lib"
 
       - name: Copy custom icons
         shell: bash
