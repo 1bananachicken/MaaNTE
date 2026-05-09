@@ -354,6 +354,18 @@ def step_copy_mfa():
         (INSTALL_DIR / "MFAAvalonia").rename(INSTALL_DIR / "MaaNTE")
         print("  重命名: MFAAvalonia -> MaaNTE")
 
+    # Windows: 注入管理员权限检查启动器
+    if platform.system() == "Windows":
+        app_path = INSTALL_DIR / "MaaNTE-app.exe"
+        if target_path.exists():
+            target_path.rename(app_path)
+            print(f"  重命名: {target_path.name} -> {app_path.name}")
+        for fname in ("MaaNTE_launcher.pyw", "MaaNTE.vbs", "MaaNTE.bat"):
+            src = TOOLS_DIR / fname
+            if src.exists():
+                shutil.copy2(src, INSTALL_DIR / fname)
+                print(f"  复制: {fname} -> install/{fname}")
+
     # 删除 MFA 自带 Assets
     assets_path = INSTALL_DIR / "Assets"
     if assets_path.exists():
