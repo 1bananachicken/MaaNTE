@@ -431,7 +431,7 @@ def _check_admin_privilege():
         try:
             exe_path = sys.executable if getattr(sys, 'frozen', False) else sys.argv[0]
             exe_path = os.path.abspath(exe_path)
-            params = " ".join(sys.argv[1:])
+            params = subprocess.list2cmdline(sys.argv[1:])
             ret = ctypes.windll.shell32.ShellExecuteW(
                 None, "runas", exe_path, params or None, None, SW_SHOWNORMAL,
             )
@@ -439,8 +439,7 @@ def _check_admin_privilege():
                 raise OSError(f"ShellExecuteW 返回值: {ret}")
             sys.exit(0)
         except OSError:
-            logger.exception("以管理员身份重启失败")
-            sys.exit(1)
+            logger.exception("以管理员身份重启失败，将以普通权限继续运行")
     else:
         logger.warning("用户选择不以管理员权限运行，部分输入功能可能无法正常使用。")
 
