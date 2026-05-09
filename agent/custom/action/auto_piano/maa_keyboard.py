@@ -41,8 +41,11 @@ WIN32_VK = {
 }
 
 # ==========================================
-# 填入游戏的精确名称
-WINDOW_TITLE = "异环  "
+# 填入游戏的精确名称列表（脚本会按从上到下的顺序匹配）
+WINDOW_TITLES = [
+    "NTE  ",
+    "异环  ",
+]
 # ==========================================
 
 
@@ -61,10 +64,18 @@ class MaaKeyboardBridge:
     ):
         self.mapping = NOTE_KEY_MAPPING
         self.hold_seconds = hold_seconds
-        self.hwnd = user32.FindWindowW(None, WINDOW_TITLE)
+        self.hwnd = 0
+
+        # 按顺序遍历列表，寻找第一个存在的游戏窗口
+        for title in WINDOW_TITLES:
+            hwnd = user32.FindWindowW(None, title)
+            if hwnd:
+                self.hwnd = hwnd
+                print(f"【成功】已连接到游戏窗口: '{title}' (HWND: {self.hwnd})")
+                break  # 找到了就立刻停止搜索
 
         if not self.hwnd:
-            print(f"【警告】找不到窗口: '{WINDOW_TITLE}'")
+            print(f"【警告】未找到列表中的任何窗口，请检查游戏是否运行！列表: {WINDOW_TITLES}")
 
     def _force_send_key(self, vk_code, is_down):
         """带有强行唤醒的底层发送器"""
