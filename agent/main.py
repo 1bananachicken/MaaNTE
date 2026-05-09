@@ -415,6 +415,7 @@ def _check_admin_privilege():
     if ctypes.windll.shell32.IsUserAnAdmin():
         return
 
+    SW_SHOWNORMAL = 1
     MB_YESNO = 0x04
     MB_ICONWARNING = 0x30
     IDYES = 6
@@ -430,12 +431,15 @@ def _check_admin_privilege():
         try:
             exe_path = sys.executable if getattr(sys, 'frozen', False) else sys.argv[0]
             exe_path = os.path.abspath(exe_path)
-            ret = ctypes.windll.shell32.ShellExecuteW(None, "runas", exe_path, None, None, 1)
+            params = " ".join(sys.argv[1:])
+            ret = ctypes.windll.shell32.ShellExecuteW(
+                None, "runas", exe_path, params or None, None, SW_SHOWNORMAL,
+            )
             if ret <= 32:
                 raise OSError(f"ShellExecuteW 返回值: {ret}")
             sys.exit(0)
-        except Exception as e:
-            logger.error(f"以管理员身份重启失败: {e}")
+        except OSError:
+            logger.exception("以管理员身份重启失败")
             sys.exit(1)
     else:
         logger.warning("用户选择不以管理员权限运行，部分输入功能可能无法正常使用。")
