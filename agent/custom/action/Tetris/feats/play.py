@@ -43,7 +43,7 @@ class TetrisGamePlayer:
         self.current_cells = None
         self.queue_pieces_state = []
 
-        self.new_piece_roi = (474, 50, 295, 60)
+        self.new_piece_roi = (474, 50, 295, 100)
 
     def reset(self):
         self.last_active_cells = None
@@ -153,6 +153,7 @@ class TetrisGamePlayer:
             self._apply_move_no_feedback(controller, best_move["rotation"], best_move["target_col"])
 
             if self.fast_drop:
+                time.sleep(0.12)
                 self._tap_key(controller, VK_SPACE, hold=0.02)
 
             next_piece_info = self._detect_next_piece(controller, tasker)
@@ -210,6 +211,9 @@ class TetrisGamePlayer:
         return True
 
     def _detect_next_piece(self, controller, tasker):
+        expected_next = self.queue_pieces_state[0] if self.queue_pieces_state else None
+        current_piece = self.current_piece_name
+
         while True:
             if tasker.stopping:
                 return None
@@ -223,32 +227,58 @@ class TetrisGamePlayer:
                 print("Result screen detected while waiting for next piece.")
                 return "result"
 
-            if not self._is_drop_ready(img):
-                if not self._sleep_with_stop(tasker, 0.01):
-                    return None
-                continue
-
-            match = self.scene_gate.match_active_piece_in_region(
-                img, self.new_piece_roi
-            )
-            if match is not None:
-                print(
-                    f"[NewPiece] Template matched {match['piece']} score={match['score']:.2f}, new piece spawned"
+            if self._is_drop_ready(img):
+                match = self.scene_gate.match_active_piece_in_region(
+                    img, self.new_piece_roi
                 )
-
-                base_rotation = 0
-                shape = PIECES[match["piece"]][base_rotation]
-                piece_info = {
-                    "piece": match["piece"],
-                    "rotation": base_rotation,
-                    "row": 0,
-                    "col": 3,
-                    "cells": tuple(sorted((r, 3 + c) for r, c in shape)),
-                }
-                return piece_info
+                if match is not None:
+                    if self._is_same_piece(match["piece"], current_piece, expected_next):
+                        if not self._sleep_with_stop(tasker, 0.01):
+                            return None
+                        continue
+                    return self._build_new_piece_info(match)
+            else:
+                match = self.scene_gate.match_active_piece_in_region(
+                    img, self.new_piece_roi, min_similarity=0.80
+                )
+                if match is not None:
+                    if self._is_same_piece(match["piece"], current_piece, expected_next):
+                        if not self._sleep_with_stop(tasker, 0.01):
+                            return None
+                        continue
+                    print("[NewPiece] Optimistic match succeeded before drop ready")
+                    return self._build_new_piece_info(match)
 
             if not self._sleep_with_stop(tasker, 0.01):
                 return None
+
+    @staticmethod
+    def _is_same_piece(detected, current_piece, expected_next):
+        if current_piece is None:
+            return False
+        if detected != current_piece:
+            return False
+        if expected_next is not None and detected == expected_next:
+            return False
+        print(
+            f"[NewPiece] Skipping same-piece detection: detected={detected} "
+            f"current={current_piece} expected_next={expected_next}"
+        )
+        return True
+
+    def _build_new_piece_info(self, match):
+        print(
+            f"[NewPiece] Template matched {match['piece']} score={match['score']:.2f}, new piece spawned"
+        )
+        base_rotation = 0
+        shape = PIECES[match["piece"]][base_rotation]
+        return {
+            "piece": match["piece"],
+            "rotation": base_rotation,
+            "row": 0,
+            "col": 3,
+            "cells": tuple(sorted((r, 3 + c) for r, c in shape)),
+        }
 
     def _dismiss_result(self, controller):
         controller.post_key_down(27)
@@ -276,15 +306,6 @@ class TetrisGamePlayer:
         board_crop = extract_board_crop(img)
         if board_crop is None or board_crop.size == 0:
             return None
-
-        if not self._is_drop_ready(img):
-            return {
-                "board_crop": board_crop,
-                "grid": None,
-                "active_cells": None,
-                "piece_state": None,
-                "queue_pieces": [],
-            }
 
         match = self.scene_gate.match_active_piece_in_region(img, self.new_piece_roi)
         piece_state = None
