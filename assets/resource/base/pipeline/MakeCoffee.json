@@ -27,23 +27,8 @@
             "MakeCoffeeOneOneEnter"
         ]
     },
-    "MakeCoffeeOneOneScrollToEnter": {
-        "desc": "未找到粉色店长特供入口时上滚列表",
-        "action": "Scroll",
-        "target": [
-            120,
-            45,
-            80,
-            30
-        ],
-        "dy": -560,
-        "post_delay": 300,
-        "next": [
-            "MakeCoffeeOneOneEnter"
-        ]
-    },
     "MakeCoffeeOneOneEnter": {
-        "desc": "等待粉色店长特供入口并按 F 进入",
+        "desc": "按 F 进入",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
