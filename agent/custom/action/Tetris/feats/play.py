@@ -394,6 +394,7 @@ class TetrisGamePlayer:
                 for _ in range(counterclockwise_steps):
                     self._tap_key(controller, VK_J, hold=0.02)
                     time.sleep(0.01)
+            self.current_rotation = actual_rotation
 
         for _ in range(10):
             self._tap_key(controller, VK_A, hold=0.02)
