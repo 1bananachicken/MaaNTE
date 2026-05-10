@@ -77,7 +77,6 @@ class TetrisGamePlayer:
 
             if time.time() - round_start >= 5.0 and self._is_result_screen(img):
                 print("Result screen detected, round ended.")
-                self._dismiss_result(controller)
                 return True
 
             if self.current_piece_name is None:
@@ -217,7 +216,6 @@ class TetrisGamePlayer:
 
             if self._is_result_screen(img):
                 print("Result screen detected while waiting for next piece.")
-                self._dismiss_result(controller)
                 return "result"
 
             if not self._is_drop_ready(img):

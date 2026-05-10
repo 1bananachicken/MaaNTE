@@ -3,7 +3,7 @@
         {
             "name": "泯除方块",
             "entry": "TetrisEntrance",
-            "description": "[color:red]该任务功能中游戏内棋盘完全由内部ai自主维护，而非获取屏幕图像，在运行该任务时请不要对游戏画面进行操作，以免ai决策与实际游戏状态不符",
+            "description": "[color:red]该任务功能中游戏内棋盘完全由内部ai自主维护，而非获取屏幕图像，在运行该任务时请不要对游戏画面进行操作，以免ai决策与实际游戏状态不符[/color]; [color:green]若要开启消耗所有活力选项，建议在单人模式下进行游戏[/color]",
             "option": [
                 "TetrisMatchMode"
             ]

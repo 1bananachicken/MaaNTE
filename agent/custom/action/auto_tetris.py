@@ -58,8 +58,12 @@ class AutoTetris(CustomAction):
             _target_round = new_target
             _single_shot_done = False
 
-        if not use_all_vitality and _target_round <= 1 and _single_shot_done:
-            print("[AutoTetris] Single shot already done, stopping.")
+        if not use_all_vitality and _single_shot_done:
+            print(f"[AutoTetris] All {_target_round} rounds already done. Stopping task.")
+            tasker.post_stop()  # Stop the task after finishing the target rounds
+            controller.post_key_down(27) # Press ESC to exit game screen
+            time.sleep(0.05)
+            controller.post_key_up(27)
             return CustomAction.RunResult(success=False)
 
         player = TetrisGamePlayer()
@@ -77,13 +81,12 @@ class AutoTetris(CustomAction):
 
             if _round_count >= _target_round:
                 _single_shot_done = True
-                print("[AutoTetris] All rounds finished. Stopping task.")
-                time.sleep(0.5)
-                controller.post_key_down(27)
+                print("[AutoTetris] All rounds finished.")
+                tasker.post_stop()  # Stop the task after finishing the target rounds
+                controller.post_key_down(27) # Press ESC to exit game screen
                 time.sleep(0.05)
                 controller.post_key_up(27)
-                time.sleep(0.5)
-                return CustomAction.RunResult(success=False)
+                return CustomAction.RunResult(success=True)
 
         return CustomAction.RunResult(success=True)
 

@@ -16,8 +16,8 @@
             "[JumpBack]TetrisHandleGameActive",
             "[JumpBack]TetrisHandleGameIdle",
             "[JumpBack]TetrisHandleMatching",
-            "[JumpBack]TetrisHandlePrepareTwoReturn",
             "[JumpBack]TetrisHandlePrepareTwo",
+            "[JumpBack]TetrisHandlePrepareTwoReturn",
             "[JumpBack]TetrisHandlePrepareOne",
             "[JumpBack]TetrisHandleWorldWithPrompt",
             "[JumpBack]TetrisHandleExit",
@@ -52,7 +52,7 @@
             "repeat": false
         },
         "next": [
-            "[JumpBack]TetrisDismissResult",
+            "TetrisDismissResult",
             "TetrisExit"
         ],
         "on_error": [
@@ -131,7 +131,7 @@
         "desc": "泯除方块 - 准备界面二，点击开始匹配",
         "recognition": "And",
         "all_of": [
-            "TetrisScenePrepareTwo"
+            "TetrisSceneStartMatch"
         ],
         "action": "LongPress",
         "target": "TetrisSceneStartMatch",
