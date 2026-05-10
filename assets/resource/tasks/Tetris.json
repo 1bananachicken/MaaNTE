@@ -261,7 +261,7 @@
                     "name": "Yes",
                     "label": "启用",
                     "pipeline_override": {
-                        "TetrisHandleGameActive": {
+                        "TetrisEntrance": {
                             "custom_action_param": {
                                 "allow_speed_drop": true
                             }

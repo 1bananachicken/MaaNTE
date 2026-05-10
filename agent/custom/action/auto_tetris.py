@@ -13,6 +13,7 @@ from .Tetris.feats.play import TetrisGamePlayer
 _round_count = 0
 _target_round = 0
 _single_shot_done = False
+_allow_speed_drop = False
 
 
 @AgentServer.custom_action("tetris_reset_context")
@@ -20,10 +21,18 @@ class TetrisResetContext(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        global _round_count, _target_round, _single_shot_done
+        global _round_count, _target_round, _single_shot_done, _allow_speed_drop
         _round_count = 0
         _target_round = 0
         _single_shot_done = False
+        _allow_speed_drop = False
+
+        params = (
+            json.loads(argv.custom_action_param)
+            if isinstance(argv.custom_action_param, str)
+            else (argv.custom_action_param or {})
+        )
+        _allow_speed_drop = params.get("allow_speed_drop", False)
         print("[AutoTetris] Task stats reset.")
         return CustomAction.RunResult(success=True)
 
@@ -46,7 +55,7 @@ class AutoTetris(CustomAction):
 
         mode = params.get("mode", "single")
         use_all_vitality = params.get("use_all_vitality", False)
-        allow_speed_drop = params.get("allow_speed_drop", False)
+        allow_speed_drop = params.get("allow_speed_drop", _allow_speed_drop)
         rc = params.get("repeat_count", 1)
         try:
             new_target = int(rc) if rc else 0
