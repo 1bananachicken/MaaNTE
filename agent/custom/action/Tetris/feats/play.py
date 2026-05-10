@@ -17,6 +17,7 @@ from ..utils.scene import (
     VK_D,
     VK_J,
     VK_K,
+    VK_SPACE,
 )
 from ..utils.scene_detector import TetrisSceneDetector
 
@@ -32,6 +33,7 @@ class TetrisGamePlayer:
         self.last_clear_time = 0
         self.total_lines_cleared = 0
         self.drop_ready_hits = 0
+        self.fast_drop = False
 
         self.internal_board = np.zeros((BOARD_ROWS, BOARD_COLS), dtype=bool)
         self.current_piece_name = None
@@ -149,6 +151,9 @@ class TetrisGamePlayer:
 
             self._rotate_and_standardize(controller, best_move["rotation"])
             self._apply_move_no_feedback(controller, best_move["rotation"], best_move["target_col"])
+
+            if self.fast_drop:
+                self._tap_key(controller, VK_SPACE, hold=0.02)
 
             next_piece_info = self._detect_next_piece(controller, tasker)
             if next_piece_info is None:

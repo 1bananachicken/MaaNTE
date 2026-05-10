@@ -19,7 +19,8 @@
                     "name": "Single",
                     "label": "单人模式",
                     "option": [
-                        "TetrisAutoRepeat_Single"
+                        "TetrisAutoRepeat_Single",
+                        "TetrisAllowSpeedDrop"
                     ],
                     "pipeline_override": {
                         "TetrisHandlePrepareOne": {
@@ -34,7 +35,8 @@
                     "name": "Multiple",
                     "label": "多人模式",
                     "option": [
-                        "TetrisAutoRepeat_Multiple"
+                        "TetrisAutoRepeat_Multiple",
+                        "TetrisAllowSpeedDrop"
                     ],
                     "pipeline_override": {
                         "TetrisHandlePrepareOne": {
@@ -249,6 +251,29 @@
                     ]
                 }
             }
+        },
+        "TetrisAllowSpeedDrop": {
+            "type": "switch",
+            "label": "允许速降",
+            "description": "启用后方块平移/旋转结束后自动按空格键快速下落",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "启用",
+                    "pipeline_override": {
+                        "TetrisHandleGameActive": {
+                            "custom_action_param": {
+                                "allow_speed_drop": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭"
+                }
+            ],
+            "default_case": "No"
         }
     }
 }

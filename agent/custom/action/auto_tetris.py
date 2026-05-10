@@ -46,6 +46,7 @@ class AutoTetris(CustomAction):
 
         mode = params.get("mode", "single")
         use_all_vitality = params.get("use_all_vitality", False)
+        allow_speed_drop = params.get("allow_speed_drop", False)
         rc = params.get("repeat_count", 1)
         try:
             new_target = int(rc) if rc else 0
@@ -69,6 +70,7 @@ class AutoTetris(CustomAction):
         player = TetrisGamePlayer()
         player.context = context
         player.mode = mode
+        player.fast_drop = allow_speed_drop
         success = player.play_round(controller, tasker)
 
         if not success:

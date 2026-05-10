@@ -12,6 +12,7 @@ VK_A = 65
 VK_D = 68
 VK_J = 74
 VK_K = 75
+VK_SPACE = 32
 
 
 def _find_image_root() -> Path:
