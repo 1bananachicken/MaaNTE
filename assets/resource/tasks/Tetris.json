@@ -73,12 +73,11 @@
                     "pipeline_override": {
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
-                                "mode": "single"
+                                "mode": "single",
+                                "use_all_vitality": false,
+                                "repeat_count": 1
                             },
-                            "next": [
-                                "TetrisDismissResultThenExit",
-                                "TetrisExit"
-                            ]
+                            "on_error": ["TetrisExit"]
                         }
                     }
                 }
@@ -110,12 +109,11 @@
                     "pipeline_override": {
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
-                                "mode": "multiple"
+                                "mode": "multiple",
+                                "use_all_vitality": false,
+                                "repeat_count": 1
                             },
-                            "next": [
-                                "TetrisDismissResultThenExit",
-                                "TetrisExit"
-                            ]
+                            "on_error": ["TetrisExit"]
                         }
                     }
                 }

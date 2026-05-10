@@ -1,7 +1,8 @@
 {
     "TetrisEntrance": {
         "desc": "泯除方块入口",
-        "action": "DoNothing",
+        "action": "Custom",
+        "custom_action": "tetris_reset_context",
         "next": [
             "TetrisSceneDispatch"
         ]
@@ -9,14 +10,17 @@
     "TetrisSceneDispatch": {
         "desc": "泯除方块 - 场景分发器",
         "next": [
-            "[JumpBack]TetrisHandleExit",
+            "[JumpBack]TetrisHandleLoading",
+            "[JumpBack]TetrisDismissResult",
+            "[JumpBack]TetrisCheckVitality",
             "[JumpBack]TetrisHandleGameActive",
             "[JumpBack]TetrisHandleGameIdle",
-            "[JumpBack]TetrisHandleLoading",
-            "[JumpBack]TetrisHandleWorldWithPrompt",
+            "[JumpBack]TetrisHandleMatching",
             "[JumpBack]TetrisHandlePrepareTwoReturn",
             "[JumpBack]TetrisHandlePrepareTwo",
             "[JumpBack]TetrisHandlePrepareOne",
+            "[JumpBack]TetrisHandleWorldWithPrompt",
+            "[JumpBack]TetrisHandleExit",
             "[JumpBack]TetrisHandleWorldNoPrompt",
             "TetrisExitWithError"
         ]
@@ -52,7 +56,8 @@
             "TetrisExit"
         ],
         "on_error": [
-            "TetrisExitWithError"
+            "TetrisDismissResultThenExit"
+            // "TetrisExit"
         ]
     },
     "TetrisHandleGameIdle": {
@@ -79,6 +84,7 @@
             "[JumpBack]TetrisHandleGameIdle",
             "[JumpBack]TetrisHandleLoading",
             "[JumpBack]TetrisHandleWorldWithPrompt",
+            "[JumpBack]TetrisSceneDispatch",
             "TetrisExitWithError"
         ]
     },
@@ -89,7 +95,9 @@
             "TetrisSceneWorldWithPrompt"
         ],
         "action": "ClickKey",
-        "key": [70],
+        "key": [
+            70
+        ],
         "post_delay": 500,
         "next": [
             "[JumpBack]TetrisWaitPrepare"
@@ -119,21 +127,6 @@
             "[JumpBack]TetrisWaitPrepareTwo"
         ]
     },
-    "TetrisHandlePrepareTwoReturn": {
-        "desc": "泯除方块 - 准备界面二（初始），点击返回到准备界面一",
-        "recognition": "And",
-        "all_of": [
-            "TetrisScenePrepareTwo",
-            "TetrisSceneReturn"
-        ],
-        "action": "LongPress",
-        "target": "TetrisSceneReturn",
-        "duration": 100,
-        "post_delay": 500,
-        "next": [
-            "[JumpBack]TetrisWaitPrepare"
-        ]
-    },
     "TetrisHandlePrepareTwo": {
         "desc": "泯除方块 - 准备界面二，点击开始匹配",
         "recognition": "And",
@@ -146,6 +139,21 @@
         "post_delay": 1000,
         "next": [
             "[JumpBack]TetrisWaitGame"
+        ]
+    },
+    "TetrisHandlePrepareTwoReturn": {
+        "desc": "泯除方块 - 准备界面二（初始），点击返回到准备界面一",
+        "recognition": "And",
+        "all_of": [
+            "TetrisScenePrepareTwoMarker",
+            "TetrisSceneReturn"
+        ],
+        "action": "LongPress",
+        "target": "TetrisSceneReturn",
+        "duration": 100,
+        "post_delay": 500,
+        "next": [
+            "[JumpBack]TetrisWaitPrepare"
         ]
     },
     "TetrisHandleMatching": {
@@ -187,6 +195,8 @@
         "desc": "泯除方块 - 等待进入准备界面二",
         "next": [
             "[JumpBack]TetrisHandlePrepareTwo",
+            "[JumpBack]TetrisHandleMatching",
+            "[JumpBack]TetrisHandlePrepareTwoReturn",
             "[JumpBack]TetrisHandleGameActive",
             "[JumpBack]TetrisHandleGameIdle",
             "[JumpBack]TetrisHandleLoading",
@@ -216,6 +226,7 @@
             "[JumpBack]TetrisDismissResult",
             "[JumpBack]TetrisHandleLoading",
             "[JumpBack]TetrisHandleWorldWithPrompt",
+            "[JumpBack]TetrisSceneDispatch",
             "TetrisExit"
         ]
     },
@@ -226,12 +237,15 @@
             "TetrisSceneMatchend"
         ],
         "action": "ClickKey",
-        "key": [27],
+        "key": [
+            27
+        ],
         "post_delay": 1000,
         "next": [
             "[JumpBack]TetrisDismissResult",
             "[JumpBack]TetrisHandleLoading",
             "[JumpBack]TetrisHandleWorldWithPrompt",
+            "[JumpBack]TetrisSceneDispatch",
             "TetrisExit"
         ]
     },
@@ -242,7 +256,9 @@
             "TetrisSceneMatchend"
         ],
         "action": "ClickKey",
-        "key": [27],
+        "key": [
+            27
+        ],
         "post_delay": 1000,
         "next": [
             "TetrisExit"

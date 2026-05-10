@@ -12,6 +12,20 @@ from .Tetris.feats.play import TetrisGamePlayer
 
 _round_count = 0
 _target_round = 0
+_single_shot_done = False
+
+
+@AgentServer.custom_action("tetris_reset_context")
+class TetrisResetContext(CustomAction):
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
+        global _round_count, _target_round, _single_shot_done
+        _round_count = 0
+        _target_round = 0
+        _single_shot_done = False
+        print("[AutoTetris] Task stats reset.")
+        return CustomAction.RunResult(success=True)
 
 
 @AgentServer.custom_action("auto_tetris")
@@ -19,32 +33,34 @@ class AutoTetris(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        global _round_count, _target_round
+        global _round_count, _target_round, _single_shot_done
 
         controller = context.tasker.controller
         tasker = context.tasker
 
-        mode = "single"
-        use_all_vitality = False
-        if argv.custom_action_param:
-            try:
-                if isinstance(argv.custom_action_param, str):
-                    params = json.loads(argv.custom_action_param)
-                elif isinstance(argv.custom_action_param, dict):
-                    params = argv.custom_action_param
-                else:
-                    params = {}
+        params = (
+            json.loads(argv.custom_action_param)
+            if isinstance(argv.custom_action_param, str)
+            else (argv.custom_action_param or {})
+        )
 
-                mode = params.get("mode", "single")
-                use_all_vitality = params.get("use_all_vitality", False)
-                rc = params.get("repeat_count", 0)
-                if rc:
-                    new_target = int(rc) if isinstance(rc, str) else int(rc)
-                    if _target_round != new_target:
-                        _round_count = 0
-                    _target_round = new_target
-            except Exception:
-                pass
+        mode = params.get("mode", "single")
+        use_all_vitality = params.get("use_all_vitality", False)
+        rc = params.get("repeat_count", 1)
+        try:
+            new_target = int(rc) if rc else 0
+        except (ValueError, TypeError):
+            print(f"[AutoTetris] repeat_count parse failed: {rc}")
+            new_target = 0
+
+        if new_target > 0 and _target_round != new_target:
+            _round_count = 0
+            _target_round = new_target
+            _single_shot_done = False
+
+        if not use_all_vitality and _target_round <= 1 and _single_shot_done:
+            print("[AutoTetris] Single shot already done, stopping.")
+            return CustomAction.RunResult(success=False)
 
         player = TetrisGamePlayer()
         player.context = context
@@ -53,19 +69,20 @@ class AutoTetris(CustomAction):
 
         if not success:
             _round_count = 0
-            _target_round = 0
             return CustomAction.RunResult(success=False)
 
-        if not use_all_vitality and _target_round > 0:
+        if not use_all_vitality:
             _round_count += 1
+            print(f"[AutoTetris] Finished round {_round_count}/{_target_round}")
+
             if _round_count >= _target_round:
-                _round_count = 0
-                _target_round = 0
+                _single_shot_done = True
+                print("[AutoTetris] All rounds finished. Stopping task.")
                 time.sleep(0.5)
                 controller.post_key_down(27)
                 time.sleep(0.05)
                 controller.post_key_up(27)
-                time.sleep(1.0)
+                time.sleep(0.5)
                 return CustomAction.RunResult(success=False)
 
         return CustomAction.RunResult(success=True)
@@ -81,7 +98,7 @@ class TetrisCheckVitalityAction(CustomAction):
         controller.post_screencap().wait()
         frame = controller.cached_image
 
-        vitality = -1
+        vitality = 0
         if frame is not None and frame.size > 0:
             if len(frame.shape) == 3 and frame.shape[2] == 4:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
@@ -104,12 +121,15 @@ class TetrisCheckVitalityAction(CustomAction):
         else:
             print("[TetrisCheckVitality] screencap failed")
 
-        if vitality <= 0:
-            print("[TetrisCheckVitality] vitality <= 0, stopping")
+        if vitality == 0:
+            print("[TetrisCheckVitality] vitality == 0, stopping")
             controller.post_key_down(27)
             time.sleep(0.05)
             controller.post_key_up(27)
             return CustomAction.RunResult(success=False)
+
+        if vitality < 0:
+            print("[TetrisCheckVitality] OCR failed or vitality not found, assuming vitality available")
 
         controller.post_key_down(27)
         time.sleep(0.05)

@@ -71,17 +71,18 @@ class TetrisGamePlayer:
 
             img = self._safe_get_image(controller)
             if img is None:
-                if not self._sleep_with_stop(tasker, 0.05):
+                if not self._sleep_with_stop(tasker, 0.02):
                     return False
                 continue
 
             if time.time() - round_start >= 5.0 and self._is_result_screen(img):
                 print("Result screen detected, round ended.")
+                self._dismiss_result(controller)
                 return True
 
             if self.current_piece_name is None:
                 if not self._update_active_piece_state(img):
-                    if not self._sleep_with_stop(tasker, 0.04):
+                    if not self._sleep_with_stop(tasker, 0.02):
                         return False
                     continue
                 print(f"[NewPiece] First piece: {self.current_piece_name}")
@@ -98,7 +99,7 @@ class TetrisGamePlayer:
                     last_piece_signature = None
                     skip_count = 0
                 else:
-                    if not self._sleep_with_stop(tasker, 0.03):
+                    if not self._sleep_with_stop(tasker, 0.02):
                         return False
                     continue
 
@@ -126,7 +127,7 @@ class TetrisGamePlayer:
                 best_move = self._find_best_move(settled_board, self.current_piece_name)
             if best_move is None:
                 print("No valid move found, waiting.")
-                if not self._sleep_with_stop(tasker, 0.06):
+                if not self._sleep_with_stop(tasker, 0.04):
                     return False
                 continue
 
@@ -190,7 +191,7 @@ class TetrisGamePlayer:
             if img2 is not None:
                 self._update_queue_pieces(img2)
 
-            if not self._sleep_with_stop(tasker, 0.04):
+            if not self._sleep_with_stop(tasker, 0.02):
                 return False
 
         print("Tetris round timed out.")
@@ -201,7 +202,7 @@ class TetrisGamePlayer:
         while time.time() < end_at:
             if tasker.stopping:
                 return False
-            time.sleep(min(0.1, end_at - time.time()))
+            time.sleep(min(0.01, end_at - time.time()))
         return True
 
     def _detect_next_piece(self, controller, tasker):
@@ -210,16 +211,17 @@ class TetrisGamePlayer:
                 return None
             img = self._safe_get_image(controller)
             if img is None:
-                if not self._sleep_with_stop(tasker, 0.05):
+                if not self._sleep_with_stop(tasker, 0.01):
                     return None
                 continue
 
             if self._is_result_screen(img):
                 print("Result screen detected while waiting for next piece.")
+                self._dismiss_result(controller)
                 return "result"
 
             if not self._is_drop_ready(img):
-                if not self._sleep_with_stop(tasker, 0.05):
+                if not self._sleep_with_stop(tasker, 0.01):
                     return None
                 continue
 
@@ -242,10 +244,15 @@ class TetrisGamePlayer:
                 }
                 return piece_info
 
-            if not self._sleep_with_stop(tasker, 0.05):
+            if not self._sleep_with_stop(tasker, 0.01):
                 return None
 
-    def _tap_key(self, controller, key_code: int, hold: float = 0.03):
+    def _dismiss_result(self, controller):
+        controller.post_key_down(27)
+        time.sleep(0.05)
+        controller.post_key_up(27)
+
+    def _tap_key(self, controller, key_code: int, hold: float = 0.02):
         controller.post_key_down(key_code)
         time.sleep(hold)
         controller.post_key_up(key_code)
@@ -347,27 +354,27 @@ class TetrisGamePlayer:
         rotated = False
         if clockwise_steps <= counterclockwise_steps:
             for _ in range(clockwise_steps):
-                self._tap_key(controller, VK_K, hold=0.03)
-                time.sleep(0.03)
+                self._tap_key(controller, VK_K, hold=0.02)
+                time.sleep(0.02)
                 self.current_rotation = (self.current_rotation + 1) % rotation_count
                 rotated = True
         else:
             for _ in range(counterclockwise_steps):
-                self._tap_key(controller, VK_J, hold=0.03)
-                time.sleep(0.03)
+                self._tap_key(controller, VK_J, hold=0.02)
+                time.sleep(0.02)
                 self.current_rotation = (self.current_rotation - 1) % rotation_count
                 rotated = True
 
         col_diff = target_col - self.current_col
         if col_diff > 0:
             for _ in range(col_diff):
-                self._tap_key(controller, VK_D, hold=0.03)
-                time.sleep(0.03)
+                self._tap_key(controller, VK_D, hold=0.02)
+                time.sleep(0.02)
                 self.current_col += 1
         elif col_diff < 0:
             for _ in range(-col_diff):
-                self._tap_key(controller, VK_A, hold=0.03)
-                time.sleep(0.03)
+                self._tap_key(controller, VK_A, hold=0.02)
+                time.sleep(0.02)
                 self.current_col -= 1
 
         print(
@@ -383,16 +390,15 @@ class TetrisGamePlayer:
             counterclockwise_steps = (self.current_rotation - actual_rotation) % rotation_count
             if clockwise_steps <= counterclockwise_steps:
                 for _ in range(clockwise_steps):
-                    self._tap_key(controller, VK_K, hold=0.03)
+                    self._tap_key(controller, VK_K, hold=0.02)
                     time.sleep(0.01)
             else:
                 for _ in range(counterclockwise_steps):
-                    self._tap_key(controller, VK_J, hold=0.03)
+                    self._tap_key(controller, VK_J, hold=0.02)
                     time.sleep(0.01)
-            self.current_rotation = actual_rotation
 
         for _ in range(10):
-            self._tap_key(controller, VK_A, hold=0.03)
+            self._tap_key(controller, VK_A, hold=0.02)
             time.sleep(0.01)
         self.current_col = 0
 
