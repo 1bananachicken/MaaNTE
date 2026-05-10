@@ -96,6 +96,11 @@
                             "next": [
                                 "FishLoopStart"
                             ]
+                        },
+                        "FishBaitHandled": {
+                            "next": [
+                                "FishLoopStart"
+                            ]
                         }
                     }
                 },
@@ -151,6 +156,9 @@
                         "AutoBuyFishBait": {
                             "enabled": true
                         },
+                        "FishGotoBuyBait": {
+                            "enabled": true
+                        },
                         "FishNewGotoBuyBait": {
                             "enabled": true
                         }
@@ -164,6 +172,9 @@
                     "label": "禁用",
                     "pipeline_override": {
                         "AutoBuyFishBait": {
+                            "enabled": false
+                        },
+                        "FishGotoBuyBait": {
                             "enabled": false
                         },
                         "FishNewGotoBuyBait": {
