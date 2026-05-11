@@ -9,6 +9,7 @@
     },
     "FishNewStart": {
         "desc": "钓鱼功能主流程",
+        "anchor": "FishNewRestart",
         "recognition": {
             "type": "And",
             "param": {
