@@ -5,9 +5,11 @@ MaaNTE 本地自动化构建脚本
 一键完成：下载依赖 → 配置资源 → 安装 → 打包
 
 用法:
-    python build.py                        # 默认构建
+    python build.py                        # 默认构建 (MFAA + MXU)
     python build.py --skip-mfa             # 跳过 MFAAvalonia GUI
+    python build.py --skip-mxu             # 跳过 MXU GUI
     python build.py --skip-download        # 跳过下载，仅本地组装
+    python build.py --skip-icon            # 跳过图标处理
     python build.py --tag v1.0.0           # 指定版本号
     python build.py --output-dir ./output  # 指定输出目录
 """
@@ -28,15 +30,18 @@ from pathlib import Path
 # 可配置常量
 # ---------------------------------------------------------------------------
 
-MAA_FRAMEWORK_VERSION = "v5.10.2"
-MFAA_VERSION = "v2.12.0"
+MAA_FRAMEWORK_VERSION = "v5.10.4"
+MFAA_VERSION = "v2.12.1"
+MXU_VERSION = "v2.1.3"
 PYTHON_VERSION_TARGET = "3.12.10"
 PYTHON_BUILD_STANDALONE_RELEASE_TAG = "20250409"
 
 ROOT = Path(__file__).resolve().parent
 INSTALL_DIR = ROOT / "install"
+INSTALL_MXU_DIR = ROOT / "install-mxu"
 DEPS_DIR = ROOT / "deps"
 MFA_DIR = ROOT / "MFA"
+MXU_DIR = ROOT / "MXU"
 PYTHON_DIR = INSTALL_DIR / "python"
 PYTHON_DEPS_DIR = INSTALL_DIR / "deps"
 ASSETS_DIR = ROOT / "assets"
@@ -122,7 +127,7 @@ def get_platform():
 def step_setup_python(os_type, os_arch):
     """步骤1: 安装嵌入式 Python + pip"""
     print("\n" + "=" * 60)
-    print("[1/7] 安装嵌入式 Python")
+    print("[1/12] 安装嵌入式 Python")
     print("=" * 60)
 
     python_exe = PYTHON_DIR / ("python.exe" if os_type == "Windows" else "bin/python3")
@@ -229,7 +234,7 @@ def step_setup_python(os_type, os_arch):
 def step_download_python_deps(python_exe):
     """步骤2: 下载 Python 依赖 wheel"""
     print("\n" + "=" * 60)
-    print("[2/7] 下载 Python 依赖")
+    print("[2/12] 下载 Python 依赖")
     print("=" * 60)
 
     download_script = TOOLS_DIR / "download_deps.py"
@@ -239,7 +244,7 @@ def step_download_python_deps(python_exe):
 def step_download_maa_framework(os_arch):
     """步骤3: 下载 MaaFramework 原生库"""
     print("\n" + "=" * 60)
-    print("[3/7] 下载 MaaFramework")
+    print("[3/12] 下载 MaaFramework")
     print("=" * 60)
 
     if (DEPS_DIR / "bin").exists():
@@ -262,7 +267,7 @@ def step_download_maa_framework(os_arch):
 def step_download_mfa(os_arch, platform_tag):
     """步骤4: 下载 MFAAvalonia GUI"""
     print("\n" + "=" * 60)
-    print("[4/7] 下载 MFAAvalonia GUI")
+    print("[4/12] 下载 MFAAvalonia GUI")
     print("=" * 60)
 
     if MFA_DIR.exists():
@@ -282,10 +287,33 @@ def step_download_mfa(os_arch, platform_tag):
     print(f"  MFAAvalonia 解压完成 -> {MFA_DIR}")
 
 
-def step_convert_icon():
-    """步骤5: 转换图标 (仅 x64 Windows)"""
+def step_download_mxu(os_arch):
+    """步骤5: 下载 MXU GUI"""
     print("\n" + "=" * 60)
-    print("[5/7] 转换图标")
+    print("[5/12] 下载 MXU GUI")
+    print("=" * 60)
+
+    if MXU_DIR.exists():
+        print(f"  {MXU_DIR} 已存在，跳过下载（如需重新下载请删除该目录）")
+        return
+
+    mxu_tag = "x86_64" if os_arch in ("AMD64", "x86_64") else "arm64"
+    url = (
+        f"https://github.com/MistEO/MXU/releases/download/"
+        f"{MXU_VERSION}/MXU-win-{mxu_tag}-{MXU_VERSION}.zip"
+    )
+    zip_path = ROOT / f"mxu-{mxu_tag}.zip"
+    download(url, zip_path)
+    MXU_DIR.mkdir(parents=True, exist_ok=True)
+    shutil.unpack_archive(zip_path, MXU_DIR)
+    zip_path.unlink()
+    print(f"  MXU 解压完成 -> {MXU_DIR}")
+
+
+def step_convert_icon():
+    """步骤6: 转换图标 (仅 x64 Windows)"""
+    print("\n" + "=" * 60)
+    print("[6/12] 转换图标")
     print("=" * 60)
 
     ico_path = ROOT / "maante.ico"
@@ -312,20 +340,83 @@ def step_convert_icon():
         print("  ImageMagick 未安装，跳过 ICO 转换。安装命令: choco install imagemagick")
 
 
-def step_install(python_exe, tag, platform_tag):
-    """步骤6: 运行 install.py 组装安装目录"""
+def step_modify_icons(os_arch):
+    """步骤7: 使用 rcedit 修改 exe 图标 (仅 x64 Windows)"""
     print("\n" + "=" * 60)
-    print("[6/7] 组装安装目录")
+    print("[7/12] 修改 exe 图标")
+    print("=" * 60)
+
+    ico_path = ROOT / "maante.ico"
+    if not ico_path.exists():
+        print(f"  未找到图标文件 ({ico_path})，跳过 exe 图标修改。")
+        return
+    if os_arch not in ("x86_64", "AMD64"):
+        print("  rcedit 仅支持 x86_64 架构，跳过。")
+        return
+    if platform.system() != "Windows":
+        print("  rcedit 仅支持 Windows，跳过。")
+        return
+
+    rcedit_path = ROOT / "rcedit.exe"
+    if not rcedit_path.exists():
+        print("  下载 rcedit...")
+        rcedit_url = "https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe"
+        download(rcedit_url, rcedit_path)
+
+    # 修改 MFAAvalonia 图标
+    mfa_exe = MFA_DIR / "MFAAvalonia.exe"
+    if mfa_exe.exists():
+        print(f"  修改图标: {mfa_exe}")
+        run([str(rcedit_path), str(mfa_exe), "--set-icon", str(ico_path)])
+    else:
+        print(f"  MFAAvalonia.exe 未找到 ({mfa_exe})，跳过图标修改。")
+
+    # 修改 MXU 图标
+    mxu_exe = MXU_DIR / "mxu.exe"
+    if mxu_exe.exists():
+        print(f"  修改图标: {mxu_exe}")
+        run([str(rcedit_path), str(mxu_exe), "--set-icon", str(ico_path)])
+    else:
+        print(f"  mxu.exe 未找到 ({mxu_exe})，跳过图标修改。")
+
+
+def step_install(python_exe, tag, platform_tag):
+    """步骤8: 运行 install.py 组装安装目录"""
+    print("\n" + "=" * 60)
+    print("[8/12] 组装安装目录")
     print("=" * 60)
 
     install_script = TOOLS_DIR / "install.py"
     run([str(python_exe), str(install_script), tag, platform_tag])
 
 
-def step_copy_mfa():
-    """步骤7: 复制 MFAAvalonia 文件到安装目录 + 处理图标"""
+def step_install_mxu(python_exe, tag):
+    """步骤9: 运行 install_mxu.py 组装 MXU 安装目录"""
     print("\n" + "=" * 60)
-    print("[7/7] 整合 MFAAvalonia GUI + 图标")
+    print("[9/12] 组装 MXU 安装目录")
+    print("=" * 60)
+
+    install_script = TOOLS_DIR / "install_mxu.py"
+    run([str(python_exe), str(install_script), tag])
+
+    # 复制 Python 环境到 MXU 安装目录
+    print("  复制 Python 到 install-mxu/...")
+    if (INSTALL_MXU_DIR / "python").exists():
+        shutil.rmtree(INSTALL_MXU_DIR / "python", ignore_errors=True)
+    shutil.copytree(PYTHON_DIR, INSTALL_MXU_DIR / "python")
+
+    # 复制依赖到 MXU 安装目录
+    if PYTHON_DEPS_DIR.exists():
+        print("  复制 deps 到 install-mxu/...")
+        if (INSTALL_MXU_DIR / "deps").exists():
+            shutil.rmtree(INSTALL_MXU_DIR / "deps", ignore_errors=True)
+        shutil.copytree(PYTHON_DEPS_DIR, INSTALL_MXU_DIR / "deps")
+
+
+def step_copy_mfa():
+    """步骤10: 复制 MFAAvalonia 文件到安装目录"""
+    print("\n" + "=" * 60)
+    print("[10/12] 整合 MFAAvalonia GUI")
     print("=" * 60)
 
     if not MFA_DIR.exists():
@@ -354,45 +445,85 @@ def step_copy_mfa():
         (INSTALL_DIR / "MFAAvalonia").rename(INSTALL_DIR / "MaaNTE")
         print("  重命名: MFAAvalonia -> MaaNTE")
 
-    # 删除 MFA 自带 Assets
-    assets_path = INSTALL_DIR / "Assets"
-    if assets_path.exists():
-        shutil.rmtree(assets_path)
-        print("  删除 MFA 自带 Assets 目录")
 
-    # 复制图标
+def step_copy_mxu():
+    """步骤11: 复制 MXU 文件到 MXU 安装目录"""
+    print("\n" + "=" * 60)
+    print("[11/12] 整合 MXU GUI")
+    print("=" * 60)
+
+    if not MXU_DIR.exists():
+        print("  MXU 目录不存在，跳过。")
+        return
+
+    if not INSTALL_MXU_DIR.exists():
+        print("  install-mxu 目录不存在，跳过。")
+        return
+
+    mxu_exe = MXU_DIR / "mxu.exe"
+    if mxu_exe.exists():
+        shutil.copy2(mxu_exe, INSTALL_MXU_DIR / "MaaNTE.exe")
+        print(f"  复制: {mxu_exe} -> {INSTALL_MXU_DIR / 'MaaNTE.exe'}")
+    elif (MXU_DIR / "mxu").exists():
+        shutil.copy2(MXU_DIR / "mxu", INSTALL_MXU_DIR / "MaaNTE")
+        print(f"  复制: mxu -> MaaNTE")
+
+
+def step_copy_icons():
+    """步骤12: 复制自定义图标并清理"""
+    print("\n" + "=" * 60)
+    print("[12/12] 复制图标")
+    print("=" * 60)
+
     ico_path = ROOT / "maante.ico"
-    if ico_path.exists():
+    if not ico_path.exists():
+        print("  maante.ico 不存在，跳过。")
+        return
+
+    # MFAA 版本：删除 MFA 自带 Assets + 复制图标
+    if INSTALL_DIR.exists():
+        assets_path = INSTALL_DIR / "Assets"
+        if assets_path.exists():
+            shutil.rmtree(assets_path)
+            print("  删除 MFA 自带 Assets 目录")
         shutil.copy2(ico_path, INSTALL_DIR / "logo.ico")
         print("  复制 logo.ico -> install/logo.ico")
 
+    # MXU 版本：复制图标
+    if INSTALL_MXU_DIR.exists():
+        shutil.copy2(ico_path, INSTALL_MXU_DIR / "logo.ico")
+        print("  复制 logo.ico -> install-mxu/logo.ico")
 
-def step_package(platform_tag, tag, output_dir):
+
+def step_package(platform_tag, tag, output_dir, mxu=False):
     """打包为 zip / tar.gz"""
+    install_dir = INSTALL_MXU_DIR if mxu else INSTALL_DIR
+    variant = "-MXU" if mxu else ""
+
     print("\n" + "=" * 60)
-    print("打包")
+    print(f"打包{' (MXU)' if mxu else ''}")
     print("=" * 60)
 
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     os_type = platform.system()
-    pkg_name = f"MaaNTE-{platform_tag}-{tag}"
+    pkg_name = f"MaaNTE-{platform_tag}-{tag}{variant}"
 
     if os_type == "Windows":
         pkg_path = output_dir / f"{pkg_name}.zip"
         print(f"  创建 ZIP: {pkg_path}")
         with zipfile.ZipFile(pkg_path, "w", zipfile.ZIP_DEFLATED) as zf:
-            for root, dirs, files in os.walk(INSTALL_DIR):
+            for root, dirs, files in os.walk(install_dir):
                 for file in files:
                     file_path = Path(root) / file
-                    arcname = file_path.relative_to(INSTALL_DIR)
+                    arcname = file_path.relative_to(install_dir)
                     zf.write(file_path, arcname)
     else:
         pkg_path = output_dir / f"{pkg_name}.tar.gz"
         print(f"  创建 tar.gz: {pkg_path}")
         with tarfile.open(pkg_path, "w:gz") as tar:
-            tar.add(INSTALL_DIR, arcname=".")
+            tar.add(install_dir, arcname=".")
 
     print(f"  打包完成: {pkg_path}")
     return pkg_path
@@ -401,23 +532,27 @@ def step_package(platform_tag, tag, output_dir):
 # ========== 主入口 ==========
 
 def main():
-    global MAA_FRAMEWORK_VERSION, MFAA_VERSION
+    global MAA_FRAMEWORK_VERSION, MFAA_VERSION, MXU_VERSION
 
     parser = argparse.ArgumentParser(description="MaaNTE 本地自动化构建脚本")
     parser.add_argument("--tag", default="v0.0.1", help="版本号 (默认: v0.0.1)")
     parser.add_argument("--skip-mfa", action="store_true", help="跳过 MFAAvalonia GUI 下载")
+    parser.add_argument("--skip-mxu", action="store_true", help="跳过 MXU GUI 下载")
     parser.add_argument("--skip-download", action="store_true", help="跳过所有下载步骤")
-    parser.add_argument("--skip-icon", action="store_true", help="跳过图标转换")
+    parser.add_argument("--skip-icon", action="store_true", help="跳过图标转换与安装")
     parser.add_argument("--skip-package", action="store_true", help="跳过最终打包")
     parser.add_argument("--output-dir", default=str(ROOT / "output"), help="输出目录 (默认: ./output)")
     parser.add_argument("--maa-version", default=MAA_FRAMEWORK_VERSION,
                         help=f"MaaFramework 版本 (默认: {MAA_FRAMEWORK_VERSION})")
     parser.add_argument("--mfa-version", default=MFAA_VERSION,
                         help=f"MFAAvalonia 版本 (默认: {MFAA_VERSION})")
+    parser.add_argument("--mxu-version", default=MXU_VERSION,
+                        help=f"MXU 版本 (默认: {MXU_VERSION})")
 
     args = parser.parse_args()
     MAA_FRAMEWORK_VERSION = args.maa_version
     MFAA_VERSION = args.mfa_version
+    MXU_VERSION = args.mxu_version
 
     # 初始化 git 子模块
     submodules_ok = (ASSETS_DIR / "MaaCommonAssets" / ".git").exists()
@@ -434,6 +569,7 @@ def main():
     print(f"输出: {args.output_dir}")
     print(f"MaaFramework: {MAA_FRAMEWORK_VERSION}")
     print(f"MFAAvalonia: {MFAA_VERSION}")
+    print(f"MXU: {MXU_VERSION}")
 
     if not args.skip_download:
         # 1. 嵌入式 Python
@@ -449,31 +585,57 @@ def main():
         if not args.skip_mfa:
             step_download_mfa(os_arch, platform_tag)
 
-        # 5. 图标
+        # 5. MXU
+        if not args.skip_mxu:
+            step_download_mxu(os_arch)
+
+        # 6. 图标转换
         if not args.skip_icon:
             step_convert_icon()
+
+        # 7. 修改 exe 图标 (rcedit)
+        if not args.skip_icon:
+            step_modify_icons(os_arch)
     else:
         python_exe = PYTHON_DIR / ("python.exe" if os_type == "Windows" else "bin/python3")
         if not python_exe.exists():
             print(f"Python 未安装: {python_exe}，请先运行 build.py (不带 --skip-download)")
             sys.exit(1)
 
-    # 6. 安装
+    # 8. 安装 (MFAA 版本)
     step_install(python_exe, args.tag, platform_tag)
 
-    # 7. 整合 MFA
+    # 9. 安装 (MXU 版本)
+    if not args.skip_mxu:
+        step_install_mxu(python_exe, args.tag)
+
+    # 10. 整合 MFA
     if not args.skip_mfa:
         step_copy_mfa()
+
+    # 11. 整合 MXU
+    if not args.skip_mxu:
+        step_copy_mxu()
+
+    # 12. 复制图标
+    if not args.skip_icon:
+        step_copy_icons()
 
     # 打包
     if not args.skip_package:
         step_package(platform_tag, args.tag, args.output_dir)
+        if not args.skip_mxu:
+            step_package(platform_tag, args.tag, args.output_dir, mxu=True)
 
     print("\n" + "=" * 60)
     print("构建完成!")
     print(f"安装目录: {INSTALL_DIR}")
+    if not args.skip_mxu:
+        print(f"MXU 安装目录: {INSTALL_MXU_DIR}")
     if not args.skip_package:
         print(f"打包文件: {Path(args.output_dir) / f'MaaNTE-{platform_tag}-{args.tag}'}")
+        if not args.skip_mxu:
+            print(f"MXU 打包文件: {Path(args.output_dir) / f'MaaNTE-{platform_tag}-{args.tag}-MXU'}")
     print("=" * 60)
 
 
