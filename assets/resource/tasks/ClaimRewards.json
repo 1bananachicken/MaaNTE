@@ -4,6 +4,9 @@
             "name": "领取奖励",
             "entry": "ClaimRewardsEntrance",
             "description": "自动领取活跃度/环期赏令的奖励。",
+            "controller": [
+                "Win32",
+                "Win32-Front",
             "option":[
                 "ClaimRewardsActivity",
                 "ClaimRewardsBattlePass"
