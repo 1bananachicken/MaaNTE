@@ -114,13 +114,13 @@
         ]
     },
     "TetrisHandlePrepareOne": {
-        "desc": "泯除方块 - 准备界面一，点击模式入口",
+        "desc": "泯除方块 - 准备界面一，点击单人模式入口",
         "recognition": "And",
         "all_of": [
-            "TetrisScenePrepareOne"
+            "TetrisScenePrepareOneSingle"
         ],
         "action": "LongPress",
-        "target": "TetrisScenePrepareOne",
+        "target": "TetrisScenePrepareOneSingle",
         "duration": 100,
         "post_delay": 500,
         "next": [
