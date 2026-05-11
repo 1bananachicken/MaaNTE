@@ -211,7 +211,7 @@ class TetrisGamePlayer:
         return True
 
     def _detect_next_piece(self, controller, tasker):
-        expected_next = self.queue_pieces_state[0] if self.queue_pieces_state else None
+        expected_next = self.queue_pieces_state[-1] if self.queue_pieces_state else None
         current_piece = self.current_piece_name
 
         while True:
