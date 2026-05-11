@@ -20,6 +20,7 @@ on:
 env:
   MAA_FRAMEWORK_VERSION: "v5.10.4"
   MFAA_VERSION: "v2.12.1"
+  MXU_VERSION: "v2.1.3"
 
 permissions:
   contents: write
@@ -121,6 +122,23 @@ jobs:
           ARCHIVE_FILE_PATH="${{ fromJson(steps.download_mfa.outputs.downloaded_files)[0] }}"
           rm -f "${ARCHIVE_FILE_PATH}"
           echo "Archive cleanup command executed for MFAAvalonia on Windows."
+      
+      - name: Download MXU
+        id: download_mxu
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: MistEO/MXU
+          fileName: "MXU-win-${{ matrix.arch }}*"
+          tag: ${{ env.MXU_VERSION }}
+          out-file-path: "MXU"
+          extract: true
+
+      - name: Clean up MXU archive on Windows
+        shell: bash
+        run: |
+          ARCHIVE_FILE_PATH="${{ fromJson(steps.download_mxu.outputs.downloaded_files)[0] }}"
+          rm -f "${ARCHIVE_FILE_PATH}"
+          echo "Archive cleanup command executed for MXU on Windows."
 
       - name: Convert PNG to ICO
         if: matrix.arch == 'x86_64'
@@ -147,6 +165,14 @@ jobs:
             echo "MFAAvalonia exe not found, skipping icon update."
           fi
 
+          # 修改 MXU 图标（如果存在）
+          if [ -f "MXU/mxu.exe" ]; then
+            ./rcedit.exe "MXU/mxu.exe" --set-icon "maante.ico"
+            echo "MXU icon modified successfully"
+          else
+            echo "MXU exe not found, skipping icon update."
+          fi
+
       - name: Setup Embed Python on Windows
         shell: bash
         run: |
@@ -162,6 +188,16 @@ jobs:
         run: |
           PLATFORM_TAG="win-${{ steps.platform.outputs.tag }}"
           ./install/python/python.exe ./tools/ci/install.py ${{ needs.meta.outputs.tag }} $PLATFORM_TAG
+      
+      - name: Create MXU version
+        shell: bash
+        run: |
+          ./install/python/python.exe ./tools/ci/install_mxu.py ${{ needs.meta.outputs.tag }}
+          cp -rpvn tools/registry/. install-mxu/
+          cp -rpvn install/python/. install-mxu/python/
+          if [ -d "install/deps" ]; then
+            cp -rpvn install/deps/. install-mxu/deps/
+          fi
 
       - name: Copy MFA files to main version
         shell: bash
@@ -177,6 +213,21 @@ jobs:
             fi
           else
             echo "MFA directory not found, skipping copy."
+          fi
+      
+      - name: Copy MXU files to MXU version
+        shell: bash
+        run: |
+          if [ -d "MXU" ]; then
+            echo "Copying MXU files to install-mxu directory..."
+            mkdir -p install-mxu
+            if [ -f "MXU/mxu.exe" ]; then
+              cp MXU/mxu.exe install-mxu/MaaNTE.exe
+            elif [ -f "MXU/mxu" ]; then
+              cp MXU/mxu install-mxu/MaaNTE
+            fi
+          else
+            echo "MXU directory not found, skipping copy."
           fi
 
       - name: Copy custom icons
@@ -194,10 +245,20 @@ jobs:
             echo "Copied custom icon to install/logo.ico"
           fi
 
+          # MXU 版本的图标
+          if [ -f "maante.ico" ]; then
+            cp maante.ico install-mxu/logo.ico
+          fi
+
       - uses: actions/upload-artifact@v4
         with:
           name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MFAA
           path: "install"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
+          path: "install-mxu"
 
   changelog:
     name: Generate changelog

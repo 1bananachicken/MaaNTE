@@ -11,29 +11,26 @@ sys.path.append(script_dir)
 from configure import configure_ocr_model
 
 working_dir = Path(__file__).parent.parent.parent
-install_path = working_dir / Path("install")
+install_path = working_dir / Path("install-mxu")
 version = len(sys.argv) > 1 and sys.argv[1] or "v0.0.1"
-platform_tag = len(sys.argv) > 2 and sys.argv[2] or ""
 
 
-def install_deps(platform_tag: str):
-    """安装 MaaFramework 依赖到对应架构路径
+def install_deps():
+    """安装 MaaFramework 依赖到 maafw 目录（MXU 要求的目录结构）
 
-    Args:
-        platform_tag: 平台标签，如 win-x64, linux-arm64, osx-arm64
+    MXU 要求将 MaaFramework 的 bin 文件夹内容解压到 maafw 文件夹中。
+    参考: https://github.com/MistEO/MXU#依赖文件
     """
-    if not platform_tag:
-        raise ValueError("platform_tag is required")
 
+    # MaaFramework 运行库 → maafw/
     shutil.copytree(
         working_dir / "deps" / "bin",
-        install_path / "runtimes" / platform_tag / "native",
+        install_path / "maafw",
         ignore=shutil.ignore_patterns(
             "*MaaDbgControlUnit*",
             "*MaaThriftControlUnit*",
             "*MaaRpc*",
             "*MaaHttp*",
-            "plugins",
             "*.node",
             "*MaaPiCli*",
         ),
@@ -41,12 +38,7 @@ def install_deps(platform_tag: str):
     )
     shutil.copytree(
         working_dir / "deps" / "share" / "MaaAgentBinary",
-        install_path / "libs" / "MaaAgentBinary",
-        dirs_exist_ok=True,
-    )
-    shutil.copytree(
-        working_dir / "deps" / "bin" / "plugins",
-        install_path / "plugins" / platform_tag,
+        install_path / "maafw" / "MaaAgentBinary",
         dirs_exist_ok=True,
     )
 
@@ -76,18 +68,11 @@ def install_resource():
 
 
 def install_chores():
-    print(working_dir)
     for file in ["README.md", "LICENSE", "CONTACT", "requirements.txt"]:
         shutil.copy2(
             working_dir / file,
             install_path,
         )
-    # shutil.copytree(
-    #     working_dir / "docs",
-    #     install_path / "docs",
-    #     dirs_exist_ok=True,
-    #     ignore=shutil.ignore_patterns("*.yaml"),
-    # )
 
 
 def install_agent():
@@ -114,8 +99,9 @@ def install_agent():
 
 
 if __name__ == "__main__":
-    install_deps(platform_tag)
+    install_deps()
     install_resource()
     install_chores()
     install_agent()
-    print(f"Install to {install_path} successfully.")
+
+    print(f"Install MXU to {install_path} successfully.")
