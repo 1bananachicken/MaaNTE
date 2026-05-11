@@ -1,14 +1,14 @@
 {
-    "FishSceneAnyEnterFishGame":{
+    "FishSceneAnyEnterFishGame": {
         "next": [
-            "FishScenePrepareToFishGame",
+            "FishScenePrepare",
             "[JumpBack]FishSceneWorldToPrepare",
             "[JumpBack]SceneAnyEnterWorld"
         ]
     },
     "FishSceneWorldToPrepare": {
         "desc": "从大世界进入钓鱼准备界面",
-        "recognition":  "And",
+        "recognition": "And",
         "all_of": [
             "FishSceneInWorldNextToFish"
         ],
@@ -22,34 +22,64 @@
             }
         }
     },
-    "FishScenePrepareToFishGame":{
-        "desc": "从钓鱼准备界面进入钓鱼游戏界面",
-        "recognition":  "And",
+    "FishScenePrepare": {
+        "desc": "从钓鱼准备界面进入钓鱼游戏界面/装备鱼饵",
+        "recognition": "And",
         "all_of": [
-            "FishSceneOnFishPrepare"
+            "FishSceneOnFishPrepare",
+            "FishScenePrepareStartFishButton"
         ],
-        "post_delay": 1000,
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "target": [
-                    1038,
-                    616,
-                    78,
-                    23
-                ],
-                "duration": 2
-            }
-        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
         "next": [
-            "MouseMoveReset"
+            "FishScenePrepareToStore",
+            "FishScenePrepareToFishGame"
         ]
     },
-    "FishSceneOnFishGame":{
+    "FishScenePrepareToFishGame": {
+        "desc": "从钓鱼准备界面进入钓鱼游戏界面",
+        "recognition": "And",
+        "all_of": [
+            "FishSceneOnFishPrepare",
+            "FishScenePrepareStartFishButton"
+        ],
+        "box_index": 1,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "action": "Click"
+    },
+    "FishScenePrepareToStore": {
+        "desc": "从钓鱼准备界面进入装备鱼饵界面",
+        "recognition": "OCR",
+        "roi": [
+            1096,
+            545,
+            91,
+            52
+        ],
+        "expected": [
+            "未选择"
+        ],
+        "action": "Click",
+        "target_offset": [
+            12,
+            -61,
+            -21,
+            10
+        ],
+        "focus": {
+            "Node.Action.Succeeded": "未装备鱼饵，尝试前往装备"
+        },
+        "next": [
+            "FishNewChooseGeneralBait"
+        ]
+    },
+    "FishSceneOnFishGame": {
         "desc": "判断正在钓鱼游戏界面，继续业务流程",
         "recognition": {
             "type": "And",
-            "param":{
+            "param": {
                 "all_of": [
                     "FishSceneBaitButton",
                     "FishSceneHookButton"
@@ -57,35 +87,48 @@
             }
         },
         "pre_delay": 0,
-        "post_delay": 0
+        "post_delay": 0,
+        "rate_limit": 0
     },
-    "FishSceneOnFishGameCasting":{
-        "desc": "判断正在等待上鱼/钓上大鱼动画中，继续业务流程",
+    "FishSceneOnFishPrepare": {
+        "desc": "判断正在钓鱼准备界面，继续业务流程",
         "recognition": {
-            "type": "And",
-            "param":{
-                "all_of": [
-                    "FishSceneHookButton"
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    821,
+                    39,
+                    124,
+                    51
+                ],
+                "expected": [
+                    "钓鱼准备"
                 ]
             }
         },
         "pre_delay": 0,
-        "post_delay": 0
+        "post_delay": 0,
+        "rate_limit": 0
     },
-    "FishSceneOnFishPrepare": {
-        "desc": "判断正在钓鱼准备界面，继续业务流程",
-        "recognition":{
-            "type": "TemplateMatch",
+    "FishScenePrepareStartFishButton": {
+        "desc": "钓鱼准备界面的开始钓鱼按钮",
+        "recognition": {
+            "type": "OCR",
             "param": {
-                "roi": [823,43,117,42],
-                "template": [
-                    "Fish/FishPrepareTitle.png"
+                "roi": [
+                    931,
+                    590,
+                    292,
+                    83
                 ],
-                "threshold": 0.8
+                "expected": [
+                    "开始钓鱼"
+                ]
             }
         },
         "pre_delay": 0,
-        "post_delay": 0
+        "post_delay": 0,
+        "rate_limit": 0
     },
     "FishSceneInWorldNextToFish": {
         "desc": "判断正在大世界钓鱼台边，继续业务流程",
@@ -94,49 +137,58 @@
             "InWorld",
             {
                 "recognition": {
-                    "type": "TemplateMatch",
+                    "type": "OCR",
                     "param": {
-                        "roi": [727,365,126,54],
-                        "template": [
-                            "Fish/FishInteractButton.png"
+                        "roi": [
+                            726,
+                            326,
+                            182,
+                            127
                         ],
-                        "threshold": 0.8
+                        "expected": [
+                            "钓鱼"
+                        ]
                     }
                 }
             }
         ],
         "pre_delay": 0,
-        "post_delay": 0
+        "post_delay": 0,
+        "rate_limit": 0
     },
-    "FishSceneHookButton":{
-        "desc":"鱼钩按钮(F)",
+    "FishSceneHookButton": {
+        "desc": "鱼钩按钮(F)",
         "recognition": "TemplateMatch",
-        "roi": [1137,600,100,100],
+        "roi": [
+            1137,
+            600,
+            100,
+            100
+        ],
         "template": [
             "Fish/FishGameSign.png",
             "Fish/FishGameSignThinner.png"
         ],
         "green_mask": true,
         "pre_delay": 0,
-        "post_delay": 0
+        "post_delay": 0,
+        "rate_limit": 0
     },
-    "FishSceneBaitButton":{
-        "desc":"鱼饵按钮(E)",
-        "roi": [1044,600,100,100],
+    "FishSceneBaitButton": {
+        "desc": "鱼饵按钮(E)",
+        "roi": [
+            1044,
+            600,
+            100,
+            100
+        ],
         "recognition": "TemplateMatch",
         "template": [
             "Fish/FishGameSign2.png"
         ],
         "green_mask": true,
         "pre_delay": 0,
-        "post_delay": 0
-    },
-    "FishSceneExit":{
-        "desc":"钓鱼界面通用退出",
-        "pre_delay": 2000,
-        "action": "ClickKey",
-        "key": [
-            27
-        ]
+        "post_delay": 0,
+        "rate_limit": 0
     }
 }

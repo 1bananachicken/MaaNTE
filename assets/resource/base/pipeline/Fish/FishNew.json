@@ -1,6 +1,7 @@
 {
     "FishNewEntrance": {
         "desc": "钓鱼(新)功能入口",
+        "anchor": "FishNewRestart",
         "next": [
             "FishNewStart",
             "[JumpBack]FishSceneAnyEnterFishGame"
@@ -8,7 +9,6 @@
     },
     "FishNewStart": {
         "desc": "钓鱼功能主流程",
-        "anchor": "FishNewRestart",
         "recognition": {
             "type": "And",
             "param": {
@@ -179,12 +179,11 @@
                 124
             ],
             "time": 1000,
-            "timeout": 2000
+            "timeout": 6000
         },
         "next": [
-            "FishNewChooseGeneralBait",
-            // "[JumpBack]FishNewBaitScrollMouse",
-            "[JumpBack]MouseMoveReset"
+            "FishNewChooseGeneralBait"
+            // "[JumpBack]FishNewBaitScrollMouse"
         ]
     },
     "FishNewChooseGeneralBait": {
@@ -198,12 +197,10 @@
                     494,
                     135
                 ],
-                "template": "Fish/FishGeneralBait.png",
-                "threshold": 0.8
+                "template": "Fish/FishGeneralBait.png"
             }
         },
         "action": "Click",
-        "post_wait_freezes": 500,
         "focus": {
             "Node.Action.Succeeded": "选择万能鱼饵"
         },
@@ -229,8 +226,7 @@
         "action": "ClickKey",
         "key": [
             27 // Esc
-        ],
-        "post_wait_freezes": 2000
+        ]
     },
     "FishNewBaitExit": {
         "desc": "未开启自动买鱼饵，尝试前往卖鱼",
@@ -313,8 +309,8 @@
                 418,
                 585
             ],
-            "time": 80,
-            "timeout": 500
+            "time": 500,
+            "timeout": 3000
         },
         "next": [
             "FishNewOnStore"
@@ -338,9 +334,8 @@
             }
         },
         "next": [
-            "FishNewStoreChooseGeneralBait",
-            // "[JumpBack]FishNewStoreScrollMouse",
-            "[JumpBack]MouseMoveReset"
+            "FishNewStoreChooseGeneralBait"
+            // "[JumpBack]FishNewStoreScrollMouse"
         ]
     },
     "FishNewUseBait": {
@@ -618,6 +613,7 @@
         ]
     },
     "FishNewSellFishExit": {
+        "desc": "未开启自动卖鱼，结束钓鱼任务",
         "focus": {
             "Node.Action.Succeeded": "未开启自动卖鱼，结束钓鱼任务"
         },
