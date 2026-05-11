@@ -21,13 +21,11 @@
         "post_delay": 0,
         "next": [
             "FishNewCast",
-            "FishNewOpenFishMaster",
-            "FishNewTaskExit"
+            "FishNewOpenFishMaster"
         ]
     },
-    "FishNewCast":{
-        "desc":"抛竿",
-        "max_hit": 9999,
+    "FishNewCast": {
+        "desc": "抛竿",
         "action": "ClickKey",
         "key": [
             70 // F
@@ -40,55 +38,53 @@
                 ]
             }
         },
+        "pre_delay": 0,
+        "post_delay": 200,
         "next": [
             "FishNewBaitLack",
-            "FishNewGameStart"
+            "FishNewFishFull",
+            "[JumpBack]FishNewFishHooked"
         ]
     },
-    "FishNewGameStart": {
-        "desc": "正在钓鱼游戏界面，执行钓鱼逻辑",
-        "recognition": {
-            "type": "And",
-            "param": {
-                "all_of": [
-                    "FishSceneOnFishGame"
-                ]
-            }
-        },
-        "focus": {
-            "Node.Action.Succeeded": "开始钓鱼",
-            "Node.Recognition.Failed": "判断不在钓鱼界面，尝试返回"
-        },
-        "on_error": [
-            "FishSceneAnyEnterFishGame"
+    "FishNewFishHooked": {
+        "desc": "识别到鱼上钩",
+        "pre_delay": 0,
+        "recognition": "And",
+        "all_of": [
+            "FishHooked"
         ],
+        "action": "ClickKey",
+        "key": [
+            70 // F
+        ],
+        "focus": {
+            "Node.Action.Succeeded": "鱼上钩了!"
+        },
+        "post_delay": 0,
         "next": [
-            "FishNewGaming",
-            "[Anchor]FishNewRestart"
+            "FishNewGaming"
         ]
     },
-    "FishNewGaming":{
-        "desc":"进行钓鱼游戏",
+    "FishNewGaming": {
+        "desc": "进行钓鱼游戏",
         "action": "Custom",
-        "custom_action":"auto_fish_new",
+        "custom_action": "auto_fish_without_cv",
+        "custom_action_param": {
+            "floor_ms": 80,
+            "factor": 1.4
+        },
         "pre_delay": 0,
         "post_wait_freezes": {
-            "target": [
-                500,
-                200,
-                280,
-                260
-            ],
-            "time": 200,
-            "timeout": 2000
+            "time": 1000,
+            "timeout": 6000
         },
         "next": [
             "[Anchor]FishNewRestart",
             "[JumpBack]FishNewGameResult"
         ]
     },
-    "FishNewGameResult":{
-        "desc":"检查钓鱼结果，并且关闭",
+    "FishNewGameResult": {
+        "desc": "检查钓鱼结果，并且关闭",
         "recognition": "OCR",
         "roi": [
             440,
@@ -104,18 +100,14 @@
             27 // Esc
         ],
         "focus": {
-            "Node.Action.Succeeded":"钓到鱼了！"
+            "Node.Action.Succeeded": "钓到鱼了！"
         }
-    }
-    ,
+    },
     "FishNewTaskExit": {
         "desc": "钓鱼任务完成",
         "focus": {
-            "Node.Action.Succeeded":"钓鱼任务结束"
-        },
-        "next": [
-            "MouseMoveReset"
-        ]
+            "Node.Action.Succeeded": "钓鱼任务结束"
+        }
     },
     "FishNewBaitLack": {
         "desc": "缺少鱼饵",
@@ -139,8 +131,30 @@
             "FishNewClickBaitChoose"
         ]
     },
+    "FishNewFishFull": {
+        "desc": "渔获已满",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    520,
+                    340,
+                    240,
+                    40
+                ],
+                "expected": "渔获已满",
+                "threshold": 0.8
+            }
+        },
+        "focus": {
+            "Node.Action.Succeeded": "渔获已满，尝试前往卖鱼"
+        },
+        "next": [
+            "FishNewOpenFishMaster"
+        ]
+    },
     "FishNewClickBaitChoose": {
-        "desc":"进入鱼饵选择界面",
+        "desc": "进入鱼饵选择界面",
         "recognition": {
             "type": "And",
             "param": {
@@ -164,12 +178,12 @@
                 463,
                 124
             ],
-            "time": 80,
-            "timeout": 200
+            "time": 1000,
+            "timeout": 2000
         },
         "next": [
             "FishNewChooseGeneralBait",
-            "[JumpBack]FishNewBaitScrollMouse",
+            // "[JumpBack]FishNewBaitScrollMouse",
             "[JumpBack]MouseMoveReset"
         ]
     },
@@ -188,22 +202,57 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "LongPress",
-            "param":{
-                "duration": 2
-            }
-        },
+        "action": "Click",
+        "post_wait_freezes": 500,
         "focus": {
             "Node.Action.Succeeded": "选择万能鱼饵"
         },
         "next": [
+            "[JumpBack]FishNewBaitDetail",
             "FishNewUseBait",
             "FishNewGotoBuyBait",
-            "[JumpBack]FishNewBaitExit"
+            "FishNewBaitExit"
         ]
     },
-    "FishNewBaitExit":{
+    "FishNewBaitDetail": {
+        "desc": "处理可能出现的鱼饵介绍界面",
+        "recognition": "OCR",
+        "roi": [
+            603,
+            163,
+            170,
+            40
+        ],
+        "expected": [
+            "万能鱼饵"
+        ],
+        "action": "ClickKey",
+        "key": [
+            27 // Esc
+        ],
+        "post_wait_freezes": 2000
+    },
+    "FishNewBaitExit": {
+        "desc": "未开启自动买鱼饵，尝试前往卖鱼",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    663,
+                    449,
+                    237,
+                    44
+                ],
+                "expected": [
+                    "购买"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": "ClickKey",
+        "key": [
+            27
+        ],
         "focus": {
             "Node.Action.Succeeded": "未开启自动买鱼饵，尝试前往卖鱼"
         },
@@ -223,13 +272,20 @@
                     167,
                     59
                 ],
-                "expected": ["更换鱼饵"],
+                "expected": [
+                    "更换鱼饵"
+                ],
                 "threshold": 0.8
             }
         },
         "pre_delay": 500,
         "action": "Scroll",
-        "target": [750,350,10,20],
+        "target": [
+            750,
+            350,
+            10,
+            20
+        ],
         "dy": -1200
     },
     "FishNewGotoBuyBait": {
@@ -249,20 +305,41 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "LongPress",
-            "param":{
-                "duration": 2
-            }
-        },
+        "action": "Click",
         "post_wait_freezes": {
-            "target": [26,81,418,585],
+            "target": [
+                26,
+                81,
+                418,
+                585
+            ],
             "time": 80,
             "timeout": 500
         },
         "next": [
+            "FishNewOnStore"
+        ]
+    },
+    "FishNewOnStore": {
+        "desc": "到达商店界面商店界面",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    60,
+                    16,
+                    120,
+                    48
+                ],
+                "expected": [
+                    "渔具商店"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "next": [
             "FishNewStoreChooseGeneralBait",
-            "[JumpBack]FishNewStoreScrollMouse",
+            // "[JumpBack]FishNewStoreScrollMouse",
             "[JumpBack]MouseMoveReset"
         ]
     },
@@ -283,26 +360,25 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "LongPress",
-            "param":{
-                "duration": 2
-            }
-        },
+        "action": "Click",
         "next": [
             "[Anchor]FishNewRestart"
         ]
     },
-    "FishNewStoreChooseGeneralBait":{
-        "desc":"商店界面选择万能鱼饵",
+    "FishNewStoreChooseGeneralBait": {
+        "desc": "商店界面选择万能鱼饵",
         "recognition": "TemplateMatch",
-        "roi":[26,81,418,585],
+        "roi": [
+            26,
+            81,
+            418,
+            585
+        ],
         "template": [
             "Fish/FishStoreGeneralBait.png"
         ],
         "threshold": 0.8,
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "next": [
             "FishNewStoreChooseMaxSuccess",
             "[JumpBack]FishNewStoreChooseMax"
@@ -327,7 +403,12 @@
         },
         "pre_delay": 500,
         "action": "Scroll",
-        "target": [82,149,294,468],
+        "target": [
+            82,
+            149,
+            294,
+            468
+        ],
         "dy": -2400
     },
     "FishNewStoreChooseMax": {
@@ -348,18 +429,17 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "LongPress",
-            "param":{
-                "duration": 2,
-                "pressure": 10
-            }
-        }
+        "action": "Click"
     },
-    "FishNewStoreChooseMaxSuccess":{
-        "desc":"确认选中最大或鱼鳞币不足",
+    "FishNewStoreChooseMaxSuccess": {
+        "desc": "确认选中最大或鱼鳞币不足",
         "recognition": "TemplateMatch",
-        "roi": [1135,616,38,38],
+        "roi": [
+            1135,
+            616,
+            38,
+            38
+        ],
         "template": [
             "Fish/FishStoreSlider.png"
         ],
@@ -384,19 +464,37 @@
                 "threshold": 0.8
             }
         },
-        "action": {
-            "type": "LongPress",
-            "param":{
-                "duration": 2
-            }
-        },
+        "action": "Click",
         "next": [
             "FishNewConfirmBuyBait",
             "FishNewSellFishEntrance"
         ]
     },
     "FishNewConfirmBuyBait": {
-        "desc":"点击空白区域关闭",
+        "desc": "确认购买鱼饵",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    700,
+                    455,
+                    150,
+                    40
+                ],
+                "expected": [
+                    "确认"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "pre_delay": 500,
+        "action": "Click",
+        "next": [
+            "FishNewStoreContinue"
+        ]
+    },
+    "FishNewStoreContinue": {
+        "desc": "渔具商店点击空白区域关闭",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -425,7 +523,7 @@
         ]
     },
     "FishNewExitStore": {
-        "desc": "退出渔具商店继续选择鱼饵",
+        "desc": "退出渔具商店重新开始钓鱼",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -456,7 +554,12 @@
     "FishNewSellFishEntrance": {
         "desc": "卖鱼流程入口：识别到鱼鳞币不足，前往卖鱼流程",
         "recognition": "OCR",
-        "roi":[553,340,172,38],
+        "roi": [
+            553,
+            340,
+            172,
+            38
+        ],
         "expected": [
             "货币不足无法购买"
         ],
@@ -493,13 +596,14 @@
                 ]
             }
         },
+        "post_delay": 2000,
         "next": [
             "FishNewOpenFishMaster",
             "FishNewSellFishExit"
         ]
     },
-    "FishNewOpenFishMaster":{
-        "desc":"在钓鱼界面打开海上钓客以卖鱼",
+    "FishNewOpenFishMaster": {
+        "desc": "在钓鱼界面打开海上钓客以卖鱼",
         "recognition": "And",
         "all_of": [
             "FishSceneOnFishGame"
@@ -513,7 +617,7 @@
             "FishNewSellFishStart"
         ]
     },
-    "FishNewSellFishExit":{
+    "FishNewSellFishExit": {
         "focus": {
             "Node.Action.Succeeded": "未开启自动卖鱼，结束钓鱼任务"
         },
@@ -521,10 +625,15 @@
             "FishNewTaskExit"
         ]
     },
-    "FishNewSellFishStart":{
-        "desc":"在海上钓客第一页卖鱼",
+    "FishNewSellFishStart": {
+        "desc": "在海上钓客第一页卖鱼",
         "recognition": "OCR",
-        "roi": [155,154,136,55],
+        "roi": [
+            155,
+            154,
+            136,
+            55
+        ],
         "expected": [
             "渔获市场"
         ],
@@ -532,68 +641,124 @@
             "FishNewFishingMasterPage1Sell1"
         ]
     },
-    "FishNewFishingMasterPage1Sell1":{
-        "desc":"渔获市场卖鱼1",
+    "FishNewFishingMasterPage1Sell1": {
+        "desc": "渔获市场卖鱼1",
         "recognition": "OCR",
-        "roi": [280,280,125,33],
+        "roi": [
+            280,
+            280,
+            125,
+            33
+        ],
         "expected": [
             "收购"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "post_wait_freezes": 200,
         "next": [
-            "[JumpBack]FishNewFishingMasterPage1Submit",
+            "FishNewFishingMasterPage1Submit1"
+        ]
+    },
+    "FishNewFishingMasterPage1Submit1": {
+        "desc": "渔获市场提交1",
+        "recognition": "OCR",
+        "roi": [
+            969,
+            622,
+            107,
+            37
+        ],
+        "expected": [
+            "快捷提交"
+        ],
+        "action": "Click",
+        "next": [
             "[JumpBack]FishNewFishingMasterContinue",
             "FishNewFishingMasterPage1Sell2"
         ]
     },
-    "FishNewFishingMasterPage1Sell2":{
-        "desc":"渔获市场卖鱼2",
+    "FishNewFishingMasterPage1Sell2": {
+        "desc": "渔获市场卖鱼2",
         "recognition": "OCR",
-        "roi": [280,400,125,33],
+        "roi": [
+            280,
+            400,
+            125,
+            33
+        ],
         "expected": [
             "收购"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "post_wait_freezes": 200,
         "next": [
-            "[JumpBack]FishNewFishingMasterPage1Submit",
+            "FishNewFishingMasterPage1Submit2"
+        ]
+    },
+    "FishNewFishingMasterPage1Submit2": {
+        "desc": "渔获市场提交2",
+        "recognition": "OCR",
+        "roi": [
+            969,
+            622,
+            107,
+            37
+        ],
+        "expected": [
+            "快捷提交"
+        ],
+        "action": "Click",
+        "next": [
             "[JumpBack]FishNewFishingMasterContinue",
             "FishNewFishingMasterPage1Sell3"
         ]
     },
-    "FishNewFishingMasterPage1Sell3":{
-        "desc":"渔获市场卖鱼3",
+    "FishNewFishingMasterPage1Sell3": {
+        "desc": "渔获市场卖鱼3",
         "recognition": "OCR",
-        "roi": [280,520,125,33],
+        "roi": [
+            280,
+            520,
+            125,
+            33
+        ],
         "expected": [
             "收购"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
         "post_wait_freezes": 200,
         "next": [
-            "[JumpBack]FishNewFishingMasterPage1Submit",
+            "FishNewFishingMasterPage1Submit3"
+        ]
+    },
+    "FishNewFishingMasterPage1Submit3": {
+        "desc": "渔获市场提交3",
+        "recognition": "OCR",
+        "roi": [
+            969,
+            622,
+            107,
+            37
+        ],
+        "expected": [
+            "快捷提交"
+        ],
+        "action": "Click",
+        "next": [
             "[JumpBack]FishNewFishingMasterContinue",
             "FishNewFishingMasterSwitchToPage2"
         ]
     },
-    "FishNewFishingMasterPage1Submit":{
-        "desc":"渔获市场提交",
+    "FishNewFishingMasterContinue": {
+        "desc": "海上钓客界面点击空白处关闭",
+        "pre_delay": 500,
         "recognition": "OCR",
-        "roi": [969,622,107,37],
-        "expected": [
-            "快捷提交"
+        "roi": [
+            555,
+            617,
+            176,
+            43
         ],
-        "action": "LongPress",
-        "duration": 2
-    },
-    "FishNewFishingMasterContinue":{
-        "desc":"海上钓客界面点击空白处关闭",
-        "recognition": "OCR",
-        "roi": [555,617,176,43],
         "expected": [
             "点击空白区域关闭"
         ],
@@ -602,39 +767,76 @@
             27 //Esc
         ]
     },
-    "FishNewFishingMasterSwitchToPage2":{
-        "desc":"切换到海上钓客第二页",
+    "FishNewFishingMasterSwitchToPage2": {
+        "desc": "切换到海上钓客第二页",
         "recognition": "TemplateMatch",
-        "roi": [59,241,78,69],
+        "roi": [
+            59,
+            241,
+            78,
+            69
+        ],
         "template": [
             "Fish/FishSellFishPage2.png"
         ],
-        "action": "LongPress",
-        "duration": 2,
+        "action": "Click",
+        "pre_wait_freezes": 200,
         "post_wait_freezes": 200,
         "next": [
-            "FishNewFishingMasterPage2Submit"
+            "FishNewFishingMasterPage2Submit",
+            "FishNewSellFishNoFish"
         ]
     },
-    "FishNewFishingMasterPage2Submit":{
-        "desc":"归流鱼仓一键出售",
+    "FishNewFishingMasterPage2Submit": {
+        "desc": "归流鱼仓一键出售",
         "recognition": "OCR",
-        "roi": [647,627,129,39],
-        "expected": [
-            "一键出售"
+        "roi": [
+            647,
+            627,
+            129,
+            39
         ],
-        "action": "LongPress",
-        "duration": 2,
-        "post_wait_freezes": 200,
+        "expected": [
+            "出售"
+        ],
+        "action": "Click",
+        "post_wait_freezes": 1000,
         "next": [
-            "FishNewFishingMasterContinue",
+            "FishNewConfirmSellFish"
+        ]
+    },
+    "FishNewConfirmSellFish": {
+        "desc": "确认卖鱼",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    700,
+                    455,
+                    150,
+                    40
+                ],
+                "expected": [
+                    "确认"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": "Click",
+        "next": [
+            "[JumpBack]FishNewFishingMasterContinue",
             "FishNewFishingMasterExit"
         ]
     },
-    "FishNewSellFishNoFish":{
-        "desc":"无鱼可卖",
+    "FishNewSellFishNoFish": {
+        "desc": "无鱼可卖",
         "recognition": "OCR",
-        "roi": [398,404,136,36],
+        "roi": [
+            398,
+            404,
+            136,
+            36
+        ],
         "expected": [
             "暂未获得鱼"
         ],
@@ -642,13 +844,18 @@
             "Node.Action.Succeeded": "无鱼可卖，结束卖鱼"
         },
         "next": [
-            "FishNewFishingMasterExit"
+            "FishNewTaskExit"
         ]
     },
-    "FishNewFishingMasterExit":{
-        "desc":"从海上钓客退回钓鱼游戏界面",
+    "FishNewFishingMasterExit": {
+        "desc": "从海上钓客退回钓鱼游戏界面",
         "recognition": "OCR",
-        "roi": [61,16,120,48],
+        "roi": [
+            61,
+            16,
+            120,
+            48
+        ],
         "expected": [
             "海上钓客"
         ],
@@ -657,7 +864,7 @@
             27 // Esc
         ],
         "next": [
-            "FishNewSellFishEntrance"
+            "[Anchor]FishNewRestart"
         ]
     }
 }

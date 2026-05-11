@@ -3,10 +3,10 @@
     "name": "MaaNTE",
     "description": "异环小助手，由MAAFramework强力驱动！",
     "contact": "QQ群: 1103323319",
-    "license": "MIT",
+    "license": "[GNU Affero General Public License v3.0 (AGPL-3.0)](https://github.com/MaaEnd/MaaEnd/blob/v2/LICENSE)",
     "welcome": "首次使用！欢迎使用 MaaNTE!",
     "github": "https://github.com/1bananachicken/MaaNTE",
-    "icon": "logo.png",
+    "icon": "logo.ico",
     "version": "0.0.4",
     "mirrorchyan_rid": "MaaNTE",
     "mirrorchyan_multiplatform": true,
@@ -71,7 +71,11 @@
         "resource/tasks/Fish.json",
         "resource/tasks/RealTime.json",
         "resource/tasks/MakeCoffee.json",
-        "resource/tasks/Rhythm.json"
+        "resource/tasks/Rhythm.json",
+        "resource/tasks/FountainCheckin.json",
+        "resource/tasks/SoundDodge.json",
+        "resource/tasks/AutoFScroll.json",
+        "resource/tasks/auto_piano.json"
     ],
     "option": {}
 }

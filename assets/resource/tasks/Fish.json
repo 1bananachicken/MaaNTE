@@ -9,16 +9,15 @@
                 "FishSellAuto",
                 "FishBuyBaitAuto"
             ]
-            // {
-            //     "name": "钓鱼任务（新）",
-            //     "entry": "FishNewEntrance",
-            //     "description": "重构的钓鱼功能，若不选择自动买鱼饵和自动卖鱼，不抢占鼠标。若仅自动卖鱼，建议钓鱼数量小于鱼饵量。自动买鱼饵为识别到鱼饵不足时购买",
-            //     "option": [
-            //         "FishNumber",
-            //         "FishSellAuto",
-            //         "FishBuyBaitAuto"
-            //     ]
-            // }
+        },
+        {
+            "name": "钓鱼任务（新）",
+            "entry": "FishNewEntrance",
+            "description": "重构的钓鱼功能。理论上目前能无限钓鱼。（仍无法直接处理被月卡打断的跨夜钓鱼，可以尝试设置定时任务来继续钓鱼，实际效果无法保证。）[color:red]若不选择自动买鱼饵和自动卖鱼，不抢占鼠标。自动买鱼饵为识别到鱼饵不足时购买或切换为万能鱼饵（鱼饵识别功能与本任务无关，数值无影响），卖鱼也是在鱼鳞币不足时尝试卖[/color]",
+            "option": [
+                "FishSellAuto",
+                "FishBuyBaitAuto"
+            ]
         }
     ],
     "option": {
@@ -97,6 +96,11 @@
                             "next": [
                                 "FishLoopStart"
                             ]
+                        },
+                        "FishBaitHandled": {
+                            "next": [
+                                "FishLoopStart"
+                            ]
                         }
                     }
                 },
@@ -152,6 +156,9 @@
                         "AutoBuyFishBait": {
                             "enabled": true
                         },
+                        "FishGotoBuyBait": {
+                            "enabled": true
+                        },
                         "FishNewGotoBuyBait": {
                             "enabled": true
                         }
@@ -165,6 +172,9 @@
                     "label": "禁用",
                     "pipeline_override": {
                         "AutoBuyFishBait": {
+                            "enabled": false
+                        },
+                        "FishGotoBuyBait": {
                             "enabled": false
                         },
                         "FishNewGotoBuyBait": {
