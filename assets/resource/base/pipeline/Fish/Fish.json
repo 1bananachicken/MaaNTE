@@ -59,6 +59,8 @@
         "custom_action": "auto_buy_fish_bait",
         "custom_action_param": {},
         "next": [
+            // 只要触发了购买鱼饵，就当作是需要更换鱼饵。这样少一步 FishStart 
+            "FishHandleBaitLack",
             "FishStart",
             "FishTaskExit"
         ]
@@ -156,7 +158,6 @@
             }
         },
         "action": "Click",
-        "post_wait_freezes": 1000,
         "next": [
             "FishBaitHandled"
         ]
