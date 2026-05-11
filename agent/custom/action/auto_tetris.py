@@ -71,6 +71,7 @@ class AutoTetris(CustomAction):
         player.context = context
         player.mode = mode
         player.fast_drop = allow_speed_drop
+        player.debug = params.get("debug", False)
         success = player.play_round(controller, tasker)
 
         if not success:
@@ -113,14 +114,12 @@ class TetrisCheckVitalityAction(CustomAction):
             )
 
             if detail is not None and detail.hit and detail.all_results:
-                texts = []
                 for r in detail.all_results:
                     t = r.text if hasattr(r, "text") else str(r)
-                    texts.append(t)
                     numbers = re.findall(r"\d+", t)
                     if numbers:
                         vitality = int(numbers[-1])
-                print(f"[TetrisCheckVitality] OCR results={texts} -> vitality={vitality}")
+                print(f"[TetrisCheckVitality] vitality={vitality}")
             else:
                 print("[TetrisCheckVitality] OCR no hit")
         else:
