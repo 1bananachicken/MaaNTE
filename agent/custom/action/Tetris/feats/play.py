@@ -34,6 +34,7 @@ class TetrisGamePlayer:
         self.total_lines_cleared = 0
         self.drop_ready_hits = 0
         self.fast_drop = False
+        self.debug = False
 
         self.internal_board = np.zeros((BOARD_ROWS, BOARD_COLS), dtype=bool)
         self.current_piece_name = None
@@ -96,7 +97,7 @@ class TetrisGamePlayer:
             if current_signature == last_piece_signature:
                 skip_count += 1
                 if skip_count >= 10:
-                    print("Same piece signature repeated too long, forcing re-evaluation.")
+                    self._debug_log("Same piece signature repeated too long, forcing re-evaluation.")
                     last_piece_signature = None
                     skip_count = 0
                 else:
@@ -127,12 +128,12 @@ class TetrisGamePlayer:
             if best_move is None:
                 best_move = self._find_best_move(settled_board, self.current_piece_name)
             if best_move is None:
-                print("No valid move found, waiting.")
+                self._debug_log("No valid move found, waiting.")
                 if not self._sleep_with_stop(tasker, 0.04):
                     return False
                 continue
 
-            print(
+            self._debug_log(
                 "Piece=%s rot=%s col=%s -> target_rot=%s target_col=%s score=%.2f"
                 % (
                     self.current_piece_name,
@@ -160,7 +161,6 @@ class TetrisGamePlayer:
             if next_piece_info is None:
                 return False
             if next_piece_info == "result":
-                print("Result screen detected, round ended.")
                 return True
 
             if planned_result is not None:
@@ -358,6 +358,10 @@ class TetrisGamePlayer:
             return matched
         return self.scene_detector.check_matchend(self.context, img) is not None
 
+    def _debug_log(self, *args):
+        if self.debug:
+            print(*args)
+
     def _log_internal_board(self):
         rows = []
         for r in range(BOARD_ROWS):
@@ -365,7 +369,7 @@ class TetrisGamePlayer:
                 "#" if self.internal_board[r, c] else "." for c in range(BOARD_COLS)
             ]
             rows.append("".join(row_cells))
-        print("[Board] internal state:\n" + "\n".join(rows))
+        self._debug_log("[Board] internal state:\n" + "\n".join(rows))
 
     def _apply_move_no_feedback(self, controller, target_rotation, target_col):
         rotation_count = len(PIECES[self.current_piece_name])
@@ -401,7 +405,7 @@ class TetrisGamePlayer:
                 time.sleep(0.02)
                 self.current_col -= 1
 
-        print(
+        self._debug_log(
             f"[ApplyMove] piece={self.current_piece_name} rot={self.current_rotation} col={self.current_col}"
         )
 
@@ -427,9 +431,7 @@ class TetrisGamePlayer:
             time.sleep(0.01)
         self.current_col = 0
 
-        print(
-            f"[RotateAndStd] piece={self.current_piece_name} rot={self.current_rotation} col={self.current_col}"
-        )
+
 
     def _update_active_piece_state(self, img) -> bool:
         play_state = self._scan_play_state(img)
@@ -463,7 +465,6 @@ class TetrisGamePlayer:
         queue = play_state.get("queue_pieces", [])
         if queue:
             self.queue_pieces_state = queue
-            print(f"Queue(bottom->top)={self.queue_pieces_state}")
 
     def _apply_internal_drop(
         self,
