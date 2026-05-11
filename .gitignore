@@ -461,3 +461,4 @@ assets/resource/base/model/detect/sos_nodes.onnx
 assets/resource/base/model/navi/pointer_model.onnx
 assets/resource/base/image/map/*.npz
 assets/resource/base/image/map/map_chunks_cache/*
+assets/resource/base/model/depth/*

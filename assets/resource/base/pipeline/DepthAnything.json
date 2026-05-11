@@ -1,0 +1,9 @@
+{
+    "DepthAnything": {
+        "action": "Custom",
+        "custom_action": "predict_depth",
+        "custom_action_param": {
+            "backend": "auto"
+        }
+    }
+}

@@ -66,6 +66,10 @@
         {
             "name": "AutoNavi",
             "entry": "AutoNavi"
+        },
+        {
+            "name": "DepthAnything",
+            "entry": "DepthAnything"
         }
     ],
     "import": [

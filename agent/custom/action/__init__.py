@@ -6,6 +6,7 @@ from .auto_make_coffee import *
 from .Common.click import *
 from .realtime_task import *
 from .predict_angle import *
+from .predict_depth import *
 from .map_locator import *
 from .map_locator_pyramid import *
 from .combined_auto_navigate import *
@@ -19,6 +20,7 @@ __all__ = [
     "ClickOverride",
     "RealTimeTaskAction",
     "PredictAngle",
+    "PredictDepth",
     "MapLocator",
     "MapLocatorPyramid",
     "CombinedAutoNavigate",
