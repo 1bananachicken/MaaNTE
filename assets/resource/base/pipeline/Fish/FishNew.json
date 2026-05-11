@@ -221,6 +221,7 @@
         "expected": [
             "万能鱼饵"
         ],
+        "pre_delay": 1000,
         "action": "ClickKey",
         "key": [
             27 // Esc
