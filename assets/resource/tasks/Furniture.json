@@ -1,0 +1,144 @@
+{
+    "task": [
+        {
+            "name": "Furniture",
+            "label": "家具领取",
+            "entry": "FurnitureEntrance",
+            "description": "到各个房产中领取异象家具收益，默认遍历所有房产，可以配置下列选项来选择前往/拥有与否",
+            "option": [
+                "FurnitureChooseWienerApartments",
+                "FurnitureChooseEdenApartments",
+                "FurnitureChooseSkyviewHalls",
+                "FurnitureChooseGoldenCapital",
+                "FurnitureChooseFenglinVilla"
+            ]
+        }
+    ],
+    "option": {
+        "FurnitureChooseWienerApartments": {
+            "type": "switch",
+            "label": "维纳公寓",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "前往",
+                    "pipeline_override": {
+                        "FurnitureChooseWienerApartments": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "FurnitureChooseWienerApartments": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "FurnitureChooseEdenApartments": {
+            "type": "switch",
+            "label": "伊登公寓",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "前往",
+                    "pipeline_override": {
+                        "FurnitureChooseEdenApartments": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "FurnitureChooseEdenApartments": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "FurnitureChooseSkyviewHalls": {
+            "type": "switch",
+            "label": "天景空馆",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "前往",
+                    "pipeline_override": {
+                        "FurnitureChooseSkyviewHalls": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "FurnitureChooseSkyviewHalls": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "FurnitureChooseGoldenCapital": {
+            "type": "switch",
+            "label": "金都云邸",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "前往",
+                    "pipeline_override": {
+                        "FurnitureChooseGoldenCapital": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "FurnitureChooseGoldenCapital": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "FurnitureChooseFenglinVilla": {
+            "type": "switch",
+            "label": "峰林别墅",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "前往",
+                    "pipeline_override": {
+                        "FurnitureChooseFenglinVilla": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "禁用",
+                    "pipeline_override": {
+                        "FurnitureChooseFenglinVilla": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -13,6 +13,8 @@ from .SoundTrigger.SoundDodgeAction import *
 from .auto_f_scroll import *
 from .Movement.mouse_move import *
 from .Movement.character_move import *
+from .Common.alt_click import *
+from .furniture_claim import *
 from .auto_piano.action import *
 
 __all__ = [
@@ -29,5 +31,7 @@ __all__ = [
     "AutoFishWithoutCV",
     "SoundDodgeAction",
     "AutoFScroll",
+    "AltClick",
+    "FurnitureClaim",
     "AutoPlayPiano",
 ]

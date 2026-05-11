@@ -1,0 +1,88 @@
+{
+    "FurnitureHamsterBall": {
+        "recognition": "OCR",
+        "roi": [
+            948,
+            170,
+            308,
+            517
+        ],
+        "expected": [
+            "仓鼠球"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureMianmian": {
+        "recognition": "OCR",
+        "roi": [
+            948,
+            170,
+            308,
+            517
+        ],
+        "expected": [
+            "棉棉"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureWoodenBox": {
+        "recognition": "OCR",
+        "roi": [
+            948,
+            170,
+            308,
+            517
+        ],
+        "expected": [
+            "破损的木箱"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureClaim": {
+        "desc": " 识别按钮黄底",
+        "recognition": "ColorMatch",
+        "method": 40,
+        "roi": [
+            1022,
+            194,
+            90,
+            18
+        ],
+        "roi_offset": [
+            140,
+            -20,
+            59,
+            49
+        ],
+        "upper": [
+            21,
+            177,
+            237
+        ],
+        "lower": [
+            20,
+            161,
+            231
+        ],
+        "count": 20,
+        "action": "Click",
+        "pre_delay": 0,
+        "post_wait_freezes": {
+            "time": 500,
+            "timeout": 3000
+        },
+        "rate_limit": 0,
+        "focus": {
+            "Node.Action.succeeded": "领取一个家具成功"
+        },
+        "next": [
+            "SceneClickBlankToExit"
+        ]
+    }
+}

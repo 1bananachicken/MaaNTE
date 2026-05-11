@@ -8,5 +8,28 @@
             "[JumpBack]__ScenePrivateLogin",
             "[JumpBack]__ScenePrivateAnyExit"
         ]
+    },
+    "SceneLoading": {
+        "desc": "在加载界面(右下角有一只塔吉多)",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Common/Scene/SceneLoading.png"
+                ]
+            }
+        },
+        "next": [
+            "SceneLoading",
+            "__ScenePrivateNextTrue"
+        ]
+    },
+    "SceneClickBlankToExit": {
+        "desc": "点击空白区域关闭",
+        "recognition": "OCR",
+        "expected": [
+            "点击空白区域关闭"
+        ],
+        "action": "Click"
     }
 }

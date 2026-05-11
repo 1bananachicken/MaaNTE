@@ -1,10 +1,10 @@
 {
-    "InWorld":{
-        "desc":"在大世界界面",
-        "recognition":{
+    "InWorld": {
+        "desc": "在大世界界面",
+        "recognition": {
             "type": "And",
             "param": {
-                "all_of":[
+                "all_of": [
                     "EscMenuButton",
                     "TasksMenuButton"
                 ]
@@ -35,8 +35,8 @@
         "post_delay": 0,
         "rate_limit": 0
     },
-    "InExplorationGuideMenu":{
-        "desc":"在探索指南菜单内",
+    "InExplorationGuideMenu": {
+        "desc": "在探索指南菜单内",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -53,8 +53,8 @@
             }
         }
     },
-    "InBattlePassMenu":{
-        "desc":"在环期赏令菜单内（第一页）",
+    "InBattlePassMenu": {
+        "desc": "在环期赏令菜单内（第一页）",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -71,8 +71,8 @@
             }
         }
     },
-    "InScarboroughFairMenu":{
-        "desc":"在斯卡布罗集市内",
+    "InScarboroughFairMenu": {
+        "desc": "在斯卡布罗集市内",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -89,8 +89,8 @@
             }
         }
     },
-    "InEventsMenu":{
-        "desc":"在活动菜单内",
+    "InEventsMenu": {
+        "desc": "在活动菜单内",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -107,8 +107,8 @@
             }
         }
     },
-    "InBagMenu":{
-        "desc":"在背包菜单内",
+    "InBagMenu": {
+        "desc": "在背包菜单内",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -125,8 +125,8 @@
             }
         }
     },
-    "InCharactersMenu":{
-        "desc":"在角色菜单内",
+    "InCharactersMenu": {
+        "desc": "在角色菜单内",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -142,8 +142,9 @@
                 "threshold": 0.8
             }
         }
-    },"InCityTycoonMenu":{
-        "desc":"在都市大亨菜单内",
+    },
+    "InCityTycoonMenu": {
+        "desc": "在都市大亨菜单内",
         "recognition": {
             "type": "OCR",
             "param": {
