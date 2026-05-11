@@ -103,5 +103,9 @@ if __name__ == "__main__":
     install_resource()
     install_chores()
     install_agent()
+<<<<<<<< HEAD:tools/ci/install_mxu.py
 
     print(f"Install MXU to {install_path} successfully.")
+========
+    print(f"Install to {install_path} successfully.")
+>>>>>>>> dev:tools/ci/install.py
