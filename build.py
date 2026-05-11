@@ -6,8 +6,9 @@ MaaNTE 本地自动化构建脚本
 
 用法:
     python build.py                        # 默认构建 (MFAA + MXU)
-    python build.py --skip-mfa             # 跳过 MFAAvalonia GUI
-    python build.py --skip-mxu             # 跳过 MXU GUI
+    python build.py --mode=mfaa            # 仅构建 MFAA 版本
+    python build.py --mode=mxu             # 仅构建 MXU 版本
+    python build.py --compress=false       # 不打包压缩包
     python build.py --skip-download        # 跳过下载，仅本地组装
     python build.py --skip-icon            # 跳过图标处理
     python build.py --tag v1.0.0           # 指定版本号
@@ -536,8 +537,10 @@ def main():
 
     parser = argparse.ArgumentParser(description="MaaNTE 本地自动化构建脚本")
     parser.add_argument("--tag", default="v0.0.1", help="版本号 (默认: v0.0.1)")
-    parser.add_argument("--skip-mfa", action="store_true", help="跳过 MFAAvalonia GUI 下载")
-    parser.add_argument("--skip-mxu", action="store_true", help="跳过 MXU GUI 下载")
+    parser.add_argument("--mode", default="all", choices=["mfaa", "mxu", "all"],
+                        help="构建模式 (默认: all)")
+    parser.add_argument("--compress", default="true", choices=["true", "false"],
+                        help="是否打包压缩包 (默认: true)")
     parser.add_argument("--skip-download", action="store_true", help="跳过所有下载步骤")
     parser.add_argument("--skip-icon", action="store_true", help="跳过图标转换与安装")
     parser.add_argument("--skip-package", action="store_true", help="跳过最终打包")
@@ -553,6 +556,11 @@ def main():
     MAA_FRAMEWORK_VERSION = args.maa_version
     MFAA_VERSION = args.mfa_version
     MXU_VERSION = args.mxu_version
+
+    # 从 --mode 推导 skip 标志
+    skip_mfa = args.mode == "mxu"
+    skip_mxu = args.mode == "mfaa"
+    skip_package = args.skip_package or args.compress == "false"
 
     # 初始化 git 子模块
     submodules_ok = (ASSETS_DIR / "MaaCommonAssets" / ".git").exists()
@@ -570,6 +578,7 @@ def main():
     print(f"MaaFramework: {MAA_FRAMEWORK_VERSION}")
     print(f"MFAAvalonia: {MFAA_VERSION}")
     print(f"MXU: {MXU_VERSION}")
+    print(f"模式: {args.mode}  |  打包: {args.compress}")
 
     if not args.skip_download:
         # 1. 嵌入式 Python
@@ -582,11 +591,11 @@ def main():
         step_download_maa_framework(os_arch)
 
         # 4. MFAAvalonia
-        if not args.skip_mfa:
+        if not skip_mfa:
             step_download_mfa(os_arch, platform_tag)
 
         # 5. MXU
-        if not args.skip_mxu:
+        if not skip_mxu:
             step_download_mxu(os_arch)
 
         # 6. 图标转换
@@ -603,38 +612,50 @@ def main():
             sys.exit(1)
 
     # 8. 安装 (MFAA 版本)
-    step_install(python_exe, args.tag, platform_tag)
+    if not skip_mfa:
+        step_install(python_exe, args.tag, platform_tag)
 
     # 9. 安装 (MXU 版本)
-    if not args.skip_mxu:
+    if not skip_mxu:
         step_install_mxu(python_exe, args.tag)
 
     # 10. 整合 MFA
-    if not args.skip_mfa:
+    if not skip_mfa:
         step_copy_mfa()
 
     # 11. 整合 MXU
-    if not args.skip_mxu:
+    if not skip_mxu:
         step_copy_mxu()
+
+    # 清理未构建模式的 install 目录
+    if skip_mfa and INSTALL_DIR.exists():
+        shutil.rmtree(INSTALL_DIR)
+        print("  已清理 install/ 目录")
+    if skip_mxu and INSTALL_MXU_DIR.exists():
+        shutil.rmtree(INSTALL_MXU_DIR)
+        print("  已清理 install-mxu/ 目录")
 
     # 12. 复制图标
     if not args.skip_icon:
         step_copy_icons()
 
     # 打包
-    if not args.skip_package:
-        step_package(platform_tag, args.tag, args.output_dir)
-        if not args.skip_mxu:
+    if not skip_package:
+        if not skip_mfa:
+            step_package(platform_tag, args.tag, args.output_dir)
+        if not skip_mxu:
             step_package(platform_tag, args.tag, args.output_dir, mxu=True)
 
     print("\n" + "=" * 60)
     print("构建完成!")
-    print(f"安装目录: {INSTALL_DIR}")
-    if not args.skip_mxu:
+    if not skip_mfa:
+        print(f"安装目录: {INSTALL_DIR}")
+    if not skip_mxu:
         print(f"MXU 安装目录: {INSTALL_MXU_DIR}")
-    if not args.skip_package:
-        print(f"打包文件: {Path(args.output_dir) / f'MaaNTE-{platform_tag}-{args.tag}'}")
-        if not args.skip_mxu:
+    if not skip_package:
+        if not skip_mfa:
+            print(f"打包文件: {Path(args.output_dir) / f'MaaNTE-{platform_tag}-{args.tag}'}")
+        if not skip_mxu:
             print(f"MXU 打包文件: {Path(args.output_dir) / f'MaaNTE-{platform_tag}-{args.tag}-MXU'}")
     print("=" * 60)
 
