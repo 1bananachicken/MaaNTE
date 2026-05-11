@@ -58,9 +58,6 @@
         "key": [
             70 // F
         ],
-        "focus": {
-            "Node.Action.Succeeded": "鱼上钩了!"
-        },
         "post_delay": 0,
         "next": [
             "FishNewGaming"
