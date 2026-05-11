@@ -68,9 +68,6 @@ def _detect_cost_vitality(context: Context, frame: Any, cfg: dict[str, Any]) -> 
             JRecognitionType.OCR, JOCR(roi=roi), frame
         )
         if detail is None or not detail.hit or detail.best_result is None:
-            logger.debug(
-                "消耗活力 OCR 未命中 (尝试 %d/%d)", attempt + 1, min_confirm + 2
-            )
             continue
 
         text = (
@@ -83,35 +80,22 @@ def _detect_cost_vitality(context: Context, frame: Any, cfg: dict[str, Any]) -> 
         m = cost_pattern.search(text)
         if m:
             cost = int(m.group(1))
-            logger.debug(
-                "消耗活力 OCR: %s -> %d (尝试 %d/%d)",
-                text,
-                cost,
-                attempt + 1,
-                min_confirm + 2,
-            )
             confirmed_costs.append(cost)
             if len(confirmed_costs) >= min_confirm:
                 break
         else:
-            logger.debug(
-                "消耗活力 OCR 未匹配: %s (尝试 %d/%d)",
-                text,
-                attempt + 1,
-                min_confirm + 2,
-            )
+            pass
+            # logger.debug(
+            #     "消耗活力 OCR 未匹配: %s (尝试 %d/%d)",
+            #     text,
+            #     attempt + 1,
+            #     min_confirm + 2,
+            # )
 
     if confirmed_costs:
         from collections import Counter
 
-        most_common_cost, count = Counter(confirmed_costs).most_common(1)[0]
-        logger.info(
-            "活力消耗确认: %d (出现 %d/%d 次, 原始: %s)",
-            most_common_cost,
-            count,
-            len(confirmed_costs),
-            last_text,
-        )
+        most_common_cost, _ = Counter(confirmed_costs).most_common(1)[0]
         return most_common_cost
 
     if last_text:
@@ -134,7 +118,6 @@ class AutoRhythmVitalityOnResults(CustomAction):
         vitality_enabled = bool(vcfg.get("enabled", True))
 
         if not vitality_enabled:
-            logger.debug("活力检测已禁用，跳过结算页 OCR")
             _vitality_cost = None
             return CustomAction.RunResult(success=True)
 

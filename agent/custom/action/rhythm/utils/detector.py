@@ -1,9 +1,8 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 import logging
-import time
 from concurrent.futures import ThreadPoolExecutor
-from pathlib import Path
 from typing import Any
 
 import cv2
@@ -16,6 +15,13 @@ from .lanes import LaneLayout
 logger = logging.getLogger(__name__)
 
 _LANE_NAMES = ("d", "f", "j", "k")
+
+
+@dataclass(frozen=True)
+class DrumCandidate:
+    score: float
+    center_x: float
+    center_y: float
 
 
 class DrumDetector:
@@ -37,8 +43,6 @@ class DrumDetector:
             img = read_image(path)
             if img is not None:
                 cache[idx] = img
-                th, tw = img.shape[:2]
-                logger.info("已加载鼓面模板: %s (%dx%d)", path.name, tw, th)
 
         loaded_count = len(cache)
         if loaded_count == 0:
@@ -62,20 +66,23 @@ class DrumDetector:
         self._region_extend_up_frac = float(tcfg.get("region_extend_up_frac", 0.14))
         self._region_extend_down_frac = float(tcfg.get("region_extend_down_frac", 0.15))
         self._region_width_multiplier = float(tcfg.get("region_width_multiplier", 4.0))
+        self._candidate_threshold_margin = max(
+            0.0,
+            float(tcfg.get("candidate_threshold_margin", 0.03)),
+        )
+        self._candidate_nms_distance_px = max(
+            1.0,
+            float(tcfg.get("candidate_nms_distance_px", 30.0)),
+        )
+        self._max_candidates_per_lane = max(
+            1,
+            int(tcfg.get("max_candidates_per_lane", 4)),
+        )
         enabled = tcfg.get("enabled_lanes")
         if isinstance(enabled, list) and len(enabled) == 4:
             self._enabled_lanes = [bool(x) for x in enabled]
         else:
             self._enabled_lanes = [True, True, True, True]
-
-        cooldown_global = float(tcfg.get("cooldown_sec", 0.05))
-        cooldown_by_lane = tcfg.get("cooldown_sec_by_lane")
-        if isinstance(cooldown_by_lane, list) and len(cooldown_by_lane) == 4:
-            self._cooldown_sec: list[float] = [float(x) for x in cooldown_by_lane]
-        else:
-            self._cooldown_sec = [cooldown_global] * 4
-
-        self._last_trigger_time: list[float] = [0.0] * 4
 
         self._templates: list[NDArray[np.uint8] | None] = [None, None, None, None]
         self._template_loaded: list[bool] = [False, False, False, False]
@@ -96,9 +103,9 @@ class DrumDetector:
         lane_idx: int,
         frame_bgr: NDArray[np.uint8],
         layout: LaneLayout,
-    ) -> tuple[bool, float]:
+    ) -> tuple[float, list[DrumCandidate]]:
         if not self._enabled_lanes[lane_idx] or not self._template_loaded[lane_idx] or self._templates[lane_idx] is None:
-            return False, 0.0
+            return 0.0, []
 
         tpl = self._templates[lane_idx]
         th, tw = tpl.shape[:2]
@@ -118,11 +125,39 @@ class DrumDetector:
         ry1 = min(layout.frame_h, jy1 + extend_down)
 
         if rx1 - rx0 < tw or ry1 - ry0 < th:
-            return False, 0.0
+            return 0.0, []
 
         roi = frame_bgr[ry0:ry1, rx0:rx1]
         result = cv2.matchTemplate(roi, tpl, cv2.TM_CCOEFF_NORMED)
-        _, max_val, _, _ = cv2.minMaxLoc(result)
+        _, max_val, _, max_loc = cv2.minMaxLoc(result)
+        candidate_threshold = self._thresholds[lane_idx] - self._candidate_threshold_margin
+        ys, xs = np.where(result >= candidate_threshold)
+
+        candidates: list[DrumCandidate] = []
+        if len(xs) == 0:
+            center_x = float(rx0 + max_loc[0] + tw / 2.0)
+            center_y = float(ry0 + max_loc[1] + th / 2.0)
+            return float(max_val), [DrumCandidate(float(max_val), center_x, center_y)]
+
+        raw_candidates = [
+            DrumCandidate(
+                score=float(result[y, x]),
+                center_x=float(rx0 + x + tw / 2.0),
+                center_y=float(ry0 + y + th / 2.0),
+            )
+            for y, x in zip(ys, xs)
+        ]
+        raw_candidates.sort(key=lambda c: c.score, reverse=True)
+
+        for candidate in raw_candidates:
+            if len(candidates) >= self._max_candidates_per_lane:
+                break
+            duplicate = any(
+                abs(candidate.center_y - kept.center_y) < self._candidate_nms_distance_px
+                for kept in candidates
+            )
+            if not duplicate:
+                candidates.append(candidate)
 
         # logger.debug(
         #     "轨道 %s: max_val=%.3f, threshold=%.3f, triggered=%s, roi_size=(%dx%d)",
@@ -130,42 +165,25 @@ class DrumDetector:
         #     max_val >= self._thresholds[lane_idx], roi.shape[1], roi.shape[0]
         # )
 
-        if max_val >= self._thresholds[lane_idx]:
-            return True, float(max_val)
-
-        return False, float(max_val)
+        return float(max_val), candidates
 
     def analyze(
         self,
         frame_bgr: NDArray[np.uint8],
         layout: LaneLayout,
-    ) -> tuple[list[bool], list[float]]:
-        triggers: list[bool] = [False, False, False, False]
+    ) -> tuple[list[float], list[list[DrumCandidate]]]:
         scores: list[float] = [0.0, 0.0, 0.0, 0.0]
-
-        now = time.perf_counter()
-        lanes_to_check: list[int] = []
-        for i in range(4):
-            if now - self._last_trigger_time[i] < self._cooldown_sec[i]:
-                continue
-            lanes_to_check.append(i)
-
-        if not lanes_to_check:
-            return triggers, scores
+        candidates_by_lane: list[list[DrumCandidate]] = [[], [], [], []]
 
         futures = {}
-        for i in lanes_to_check:
+        for i in range(4):
             future = self._executor.submit(self._match_lane, i, frame_bgr, layout)
             futures[future] = i
 
         for future in futures:
             idx = futures[future]
-            triggered, score = future.result()
-            if triggered:
-                triggers[idx] = True
-                scores[idx] = score
-                self._last_trigger_time[idx] = now
-            else:
-                scores[idx] = score
+            score, candidates = future.result()
+            scores[idx] = score
+            candidates_by_lane[idx] = candidates
 
-        return triggers, scores
+        return scores, candidates_by_lane
