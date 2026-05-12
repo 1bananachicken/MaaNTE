@@ -3,33 +3,30 @@
         "action": "Custom",
         "custom_action": "combined_auto_navigate",
         "custom_action_param": {
-            "backend": "auto",
+            // 地图像素到游戏内米数的换算，影响所有距离播报和到达判定。
             "meters_per_pixel": 0.2144,
-            "close_map_after_capture": true,
+            // 是否启用系统语音播报；关闭后仍会显示 A* 可视化窗口。
             "voice_enabled": true,
-            "debug_window": false,
-            "route_debug_window": false,
-            "route_debug_pause": false,
-            "route_debug_save": false,
-            "skeleton_method": "zhang_suen",
-            "skeleton_max_iterations": 160,
-            "skeleton_bridge_enabled": true,
-            "skeleton_bridge_max_gap": 80,
-            "skeleton_bridge_max_rounds": 16,
-            "skeleton_bridge_max_components": 48,
-            "position_alpha": 0.65,
-            "speech_cooldown": 1.0,
-            "turn_event_lead_m": 25,
-            "turn_pass_grace_m": 8,
-            "progress_forward_bonus": 0.08,
-            "progress_backtrack_penalty": 0.35,
+            // 是否显示 A* 路线和当前位置窗口。
+            "visualize_astar": true,
+            // A* 后处理的拉直强度；越大路线越直，太大可能贴近障碍边缘。
+            "path_smoothing_max_skip_cells": 120,
+            // 进一步简化路线折线，单位米；越大转折点越少。
+            "route_simplify_m": 6,
+            // 两句普通播报之间的最小间隔，避免语音重叠。
+            "speech_min_interval": 1.2,
+            // 距离终点多少米以内判定为到达。
+            "arrival_distance_m": 12,
+            // 偏离 A* 路线多少米以上播报偏航。
+            "offroute_distance_m": 30,
+            // 每个转弯点的提前播报距离；会按从远到近逐个触发。
             "turn_announce_distances_m": [
-                300,
-                100
+                500,
+                200
             ],
-            "turn_announce_late_tolerance_m": 80,
-            "turn_now_distance_m": 18,
-            "offroute_distance": 80
+            // 选点窗口大小；如果窗口仍然被系统缩放限制，就继续调大这两个值。
+            "selector_window_width": 1600,
+            "selector_window_height": 960
         }
     }
 }
