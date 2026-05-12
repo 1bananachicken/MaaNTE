@@ -1,6 +1,7 @@
 {
     "FishNewEntrance": {
         "desc": "钓鱼(新)功能入口",
+        "anchor": "FishNewRestart",
         "next": [
             "FishNewStart",
             "[JumpBack]FishSceneAnyEnterFishGame"
@@ -43,6 +44,7 @@
         "next": [
             "FishNewBaitLack",
             "FishNewFishFull",
+            "FishNewCast",
             "[JumpBack]FishNewFishHooked"
         ]
     },
@@ -57,9 +59,6 @@
         "key": [
             70 // F
         ],
-        "focus": {
-            "Node.Action.Succeeded": "鱼上钩了!"
-        },
         "post_delay": 0,
         "next": [
             "FishNewGaming"
@@ -67,6 +66,10 @@
     },
     "FishNewGaming": {
         "desc": "进行钓鱼游戏",
+        "recognition": "And",
+        "all_of": [
+            "FishCursor"
+        ],
         "action": "Custom",
         "custom_action": "auto_fish_without_cv",
         "custom_action_param": {
@@ -179,12 +182,11 @@
                 124
             ],
             "time": 1000,
-            "timeout": 2000
+            "timeout": 6000
         },
         "next": [
-            "FishNewChooseGeneralBait",
-            // "[JumpBack]FishNewBaitScrollMouse",
-            "[JumpBack]MouseMoveReset"
+            "FishNewChooseGeneralBait"
+            // "[JumpBack]FishNewBaitScrollMouse"
         ]
     },
     "FishNewChooseGeneralBait": {
@@ -198,12 +200,10 @@
                     494,
                     135
                 ],
-                "template": "Fish/FishGeneralBait.png",
-                "threshold": 0.8
+                "template": "Fish/FishGeneralBait.png"
             }
         },
         "action": "Click",
-        "post_wait_freezes": 500,
         "focus": {
             "Node.Action.Succeeded": "选择万能鱼饵"
         },
@@ -226,11 +226,11 @@
         "expected": [
             "万能鱼饵"
         ],
+        "pre_delay": 1000,
         "action": "ClickKey",
         "key": [
             27 // Esc
-        ],
-        "post_wait_freezes": 2000
+        ]
     },
     "FishNewBaitExit": {
         "desc": "未开启自动买鱼饵，尝试前往卖鱼",
@@ -313,8 +313,8 @@
                 418,
                 585
             ],
-            "time": 80,
-            "timeout": 500
+            "time": 500,
+            "timeout": 3000
         },
         "next": [
             "FishNewOnStore"
@@ -338,9 +338,8 @@
             }
         },
         "next": [
-            "FishNewStoreChooseGeneralBait",
-            // "[JumpBack]FishNewStoreScrollMouse",
-            "[JumpBack]MouseMoveReset"
+            "FishNewStoreChooseGeneralBait"
+            // "[JumpBack]FishNewStoreScrollMouse"
         ]
     },
     "FishNewUseBait": {
@@ -433,15 +432,32 @@
     },
     "FishNewStoreChooseMaxSuccess": {
         "desc": "确认选中最大或鱼鳞币不足",
-        "recognition": "TemplateMatch",
-        "roi": [
-            1135,
-            616,
-            38,
-            38
-        ],
-        "template": [
-            "Fish/FishStoreSlider.png"
+        "recognition": "And",
+        "all_of": [
+            {
+                "recognition": "TemplateMatch",
+                "roi": [
+                    1135,
+                    616,
+                    38,
+                    38
+                ],
+                "template": [
+                    "Fish/FishStoreSlider.png"
+                ]
+            },
+            {
+                "recognition": "OCR",
+                "roi": [
+                    1031,
+                    119,
+                    94,
+                    48
+                ],
+                "expected": [
+                    "万能鱼饵"
+                ]
+            }
         ],
         "next": [
             "FishNewStoreBuyBait"
@@ -618,6 +634,7 @@
         ]
     },
     "FishNewSellFishExit": {
+        "desc": "未开启自动卖鱼，结束钓鱼任务",
         "focus": {
             "Node.Action.Succeeded": "未开启自动卖鱼，结束钓鱼任务"
         },
