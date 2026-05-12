@@ -1,0 +1,13 @@
+{
+    "SoundDodgeMain": {
+        "desc": "音频闪避主入口",
+        "action": "Custom",
+        "custom_action": "SoundDodgeAction",
+        "custom_action_param": {
+            "enable_sound_trigger": true,
+            "dodge_all_attacks": true,
+            "threshold": 0.13,
+            "counter_attack_threshold": 0.12
+        }
+    }
+}

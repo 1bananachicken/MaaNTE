@@ -1,0 +1,13 @@
+{
+    "MouseRelativeMove": {
+        "desc": "鼠标相对位移转向（仅前台 Seize 控制器）",
+        "action": "Custom",
+        "custom_action": "mouse_relative_move",
+        "custom_action_param": {
+            "dx": 0,
+            "dy": 0,
+            "steps": 30,
+            "step_delay": 0.03
+        }
+    }
+}

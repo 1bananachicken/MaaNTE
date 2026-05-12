@@ -63,6 +63,170 @@
             "FishTaskExit"
         ]
     },
+    "FishHandleBaitLack": {
+        "desc": "缺少鱼饵时进入鱼饵选择界面：由 auto_fish 检测到 need_bait 后跳转到这里",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "FishSceneOnFishGame"
+                ]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    69
+                ]
+            }
+        },
+        "post_wait_freezes": {
+            "target": [
+                410,
+                298,
+                463,
+                124
+            ],
+            "time": 1000,
+            "timeout": 1000
+        },
+        "next": [
+            "FishChooseGeneralBait",
+            "[JumpBack]MouseMoveReset"
+        ]
+    },
+    "FishChooseGeneralBait": {
+        "desc": "找到并选中万能鱼饵：后续根据右侧按钮是“更换”还是“购买”决定分支",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    389,
+                    293,
+                    494,
+                    135
+                ],
+                "template": "Fish/FishGeneralBait.png",
+                "threshold": 0.8
+            }
+        },
+        "action": "Click",
+        "post_wait_freezes": 500,
+        "next": [
+            "[JumpBack]FishBaitDetail",
+            "FishUseBait",
+            "FishGotoBuyBait",
+            "FishBaitExit"
+        ]
+    },
+    "FishBaitDetail": {
+        "desc": "处理可能出现的万能鱼饵介绍界面",
+        "recognition": "OCR",
+        "roi": [
+            603,
+            163,
+            170,
+            40
+        ],
+        "expected": [
+            "万能鱼饵"
+        ],
+        "action": "ClickKey",
+        "key": [
+            27
+        ],
+        "post_wait_freezes": 2000
+    },
+    "FishUseBait": {
+        "desc": "点击更换按钮使用万能鱼饵：说明万能鱼饵仍有库存，处理完成后重新开始钓鱼",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    663,
+                    449,
+                    237,
+                    44
+                ],
+                "expected": [
+                    "更换"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": "Click",
+        "post_wait_freezes": 1000,
+        "next": [
+            "FishBaitHandled"
+        ]
+    },
+    "FishGotoBuyBait": {
+        "desc": "万能鱼饵为 0 时点击购买按钮：先进入渔具商店，再交给 auto_buy_fish_bait 执行实际购买",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    663,
+                    449,
+                    237,
+                    44
+                ],
+                "expected": [
+                    "购买"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": "Click",
+        "post_wait_freezes": {
+            "target": [
+                26,
+                81,
+                418,
+                585
+            ],
+            "time": 500,
+            "timeout": 3000
+        },
+        "next": [
+            "AutoBuyFishBait"
+        ]
+    },
+    "FishBaitExit": {
+        "desc": "未开启自动买鱼饵时退出鱼饵界面：FishGotoBuyBait 被禁用时会走到这里",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    663,
+                    449,
+                    237,
+                    44
+                ],
+                "expected": [
+                    "购买"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": "ClickKey",
+        "key": [
+            27
+        ],
+        "next": [
+            "AutoSellFish",
+            "FishTaskExit"
+        ]
+    },
+    "FishBaitHandled": {
+        "desc": "鱼饵处理完成后重新开始原版钓鱼流程：无限循环模式下会被任务选项改写到 FishLoopStart",
+        "action": "DoNothing",
+        "next": [
+            "FishStart",
+            "FishTaskExit"
+        ]
+    },
     "FishTaskExit": {
         "desc": "钓鱼任务完成",
         "next": [

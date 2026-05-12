@@ -76,8 +76,8 @@ class AutoRhythmSelectSong(CustomAction):
 
             if state == STATE_SONG_SELECT:
                 scroll_fn = lambda sx, sy, sd: (
-                    controller.post_swipe(sx, sy, sx, sy + sd * 100, duration=100).wait(),
-                    time.sleep(0.1),
+                    controller.post_swipe(sx, sy, sx, sy + sd * 100, duration=250).wait(),
+                    time.sleep(0.15),
                 )
                 sel_info = song_selector.step(
                     frame, controller, scroll_func=scroll_fn
