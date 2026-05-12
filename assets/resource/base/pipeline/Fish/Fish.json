@@ -58,6 +58,7 @@
         "action": "Custom",
         "custom_action": "auto_buy_fish_bait",
         "custom_action_param": {},
+        "post_wait_freezes": 100, // 此处等待可以确保命中 
         "next": [
             // 只要触发了购买鱼饵，就当作是需要更换鱼饵。这样少一步 FishStart 
             "FishHandleBaitLack",
@@ -94,8 +95,7 @@
             "timeout": 1000
         },
         "next": [
-            "FishChooseGeneralBait",
-            "[JumpBack]MouseMoveReset"
+            "FishChooseGeneralBait"
         ]
     },
     "FishChooseGeneralBait": {
@@ -114,7 +114,7 @@
             }
         },
         "action": "Click",
-        "post_wait_freezes": 500,
+        "post_wait_freezes": 200,
         "next": [
             "[JumpBack]FishBaitDetail",
             "FishUseBait",
@@ -138,7 +138,7 @@
         "key": [
             27
         ],
-        "post_wait_freezes": 2000
+        "post_wait_freezes": 1000
     },
     "FishUseBait": {
         "desc": "点击更换按钮使用万能鱼饵：说明万能鱼饵仍有库存，处理完成后重新开始钓鱼",

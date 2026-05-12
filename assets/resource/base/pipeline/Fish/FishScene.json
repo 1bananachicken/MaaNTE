@@ -38,7 +38,19 @@
         ]
     },
     "FishScenePrepareToFishGame": {
-        "desc": "从钓鱼准备界面进入钓鱼游戏界面",
+        "desc": "从钓鱼准备界面进入钓鱼游戏界面 (old钓鱼)",
+        "recognition": "And",
+        "all_of": [
+            "FishSceneOnFishPrepare",
+            "FishScenePrepareStartFishButton"
+        ],
+        "next": [
+            "FishScenePrepareNoBait",
+            "FishScenePrepareToFishGameGo"
+        ]
+    },
+    "FishScenePrepareToFishGameGo": {
+        "desc": "从钓鱼准备界面进入钓鱼游戏界面 (old钓鱼)",
         "recognition": "And",
         "all_of": [
             "FishSceneOnFishPrepare",
@@ -48,6 +60,32 @@
         "pre_delay": 0,
         "post_delay": 1000,
         "action": "Click"
+    },
+    "FishScenePrepareNoBait": {
+        "desc": "准备页面没有鱼饵的情况(old钓鱼)",
+        "recognition": "OCR",
+        "roi": [
+            1096,
+            545,
+            91,
+            52
+        ],
+        "expected": [
+            "未选择"
+        ],
+        "action": "Click",
+        "target_offset": [
+            12,
+            -61,
+            -21,
+            10
+        ],
+        "focus": {
+            "Node.Action.Succeeded": "未装备鱼饵，尝试前往装备"
+        },
+        "next": [
+            "FishChooseGeneralBait"
+        ]
     },
     "FishScenePrepareToStore": {
         "desc": "从钓鱼准备界面进入装备鱼饵界面",
