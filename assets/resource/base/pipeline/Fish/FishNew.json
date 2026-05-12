@@ -432,15 +432,32 @@
     },
     "FishNewStoreChooseMaxSuccess": {
         "desc": "确认选中最大或鱼鳞币不足",
-        "recognition": "TemplateMatch",
-        "roi": [
-            1135,
-            616,
-            38,
-            38
-        ],
-        "template": [
-            "Fish/FishStoreSlider.png"
+        "recognition": "And",
+        "all_of": [
+            {
+                "recognition": "TemplateMatch",
+                "roi": [
+                    1135,
+                    616,
+                    38,
+                    38
+                ],
+                "template": [
+                    "Fish/FishStoreSlider.png"
+                ]
+            },
+            {
+                "recognition": "OCR",
+                "roi": [
+                    1031,
+                    119,
+                    94,
+                    48
+                ],
+                "expected": [
+                    "万能鱼饵"
+                ]
+            }
         ],
         "next": [
             "FishNewStoreBuyBait"
