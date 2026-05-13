@@ -7,7 +7,7 @@
   <p align="center">
     MAA Assistant for Neverness to Everness
     <br/>
-    <a href="../README.md">中文</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">Report Bug</a>
+    <a href="../README.md">中文</a> | <a href="README_zh-tw.md">繁體中文</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">Report Bug</a>
   </p>
 
   <p align="center">
@@ -17,8 +17,10 @@
     <br>
     <a href="https://maafw.com/" target="_blank"><img alt="website" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/maafw.svg"></a>
     <a href="https://mirrorchyan.com/zh/projects?rid=MaaNTE" target="_blank"><img alt="mirrorc" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/mirrorc-en.svg"></a>
+    <a href="https://space.bilibili.com/3546893080594665" target="_blank"><img alt="Bilibili" src="https://img.shields.io/badge/Bilibili-MaaNTE--Official-00A1D6?logo=bilibili"></a>
+    <a href="https://discord.gg/EjwrrGzy" target="_blank"><img alt="Discord" src="https://img.shields.io/badge/Discord-MaaNTE--Official-5865F2?logo=discord"></a>
     <br/>
-    <img alt="commit" src="https://img.shields.io/github/commit-activity/m/1bananachicken/MaaNTE?color=%23ff69b4">
+    <img alt="commit" src="https://img.shields.io/github/commit-activity/m/1bananachicken/MaaNTE?&style=flat-square&logo=github&color=darkgreen">
     <img src="https://img.shields.io/github/stars/1bananachicken/MaaNTE?style=flat-square&logo=github&color=darkgreen" alt="Stars" />
   </p>
 
@@ -29,6 +31,12 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 > [!Warning]
 >
 > This document was translated using AI and may contain inaccuracies. Corrections are welcome!
+
+> [!Caution]
+>
+> Recently, a large number of accounts have been redistributing this software, even impersonating official accounts. Software obtained through unofficial channels **may contain viruses** and is generally not the latest version. Please verify carefully.
+>
+> We have recently discovered that some individuals are using this project to spread viruses. Please make sure to download only from the official channels.
 
 > [!Tip]
 >
@@ -42,11 +50,9 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 >
 > QQ Group 2: 1101147419 (Full)
 >
-> QQ Group 3: 1075143235
-
-> [!Caution]
+> QQ Group 3: 1075143235 (Full)
 >
-> Recently, a large number of accounts have been redistributing this software, even impersonating official accounts. Software obtained through unofficial channels **may contain viruses** and is generally not the latest version. Please verify carefully.
+> QQ Group 4: 713114598
 
 # Disclaimer and Risk Notice
 
@@ -64,7 +70,11 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 >
 > **You should fully understand and voluntarily bear all risks that may arise from using this tool.**
 
-## ✨ Features
+## 📄Open Source License
+
+This software is open-sourced under [GNU Affero General Public License v3.0 only](https://spdx.org/licenses/AGPL-3.0-only.html).
+
+## ✨Features
 
 - 🎣 Auto Fishing
   - 🐟 Auto Sell Fish
@@ -81,10 +91,15 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
   - ⏩ Auto Skip Story
 - ⚔️ Auto Dodge
   - 🛡️ Audio-based auto dodge/counter
+- 🎵 Auto Rhythm Game
 
 ## ❓FAQ
 
-### 🤔 Can't find how to start?
+### 📄Troubleshooting
+
+Please refer to the [Troubleshooting Guide](zh_cn/问题排查.md) (Chinese).
+
+### 🤔Can't find how to start?
 
 - Regular users please download the release version. Only clone the repository if you plan to develop.
 
@@ -95,6 +110,8 @@ The game must run in windowed mode at 1280×720 resolution. The new fishing algo
 ## 💻Development Guide
 
 <details><summary>Click to expand</summary>
+
+MaaNTE Developer QQ Group: 1092630280
 
 ### Quick Start
 
@@ -129,21 +146,39 @@ For more development documentation, refer to the [M9A documentation site](https:
 
 - [MaaFramework](https://github.com/MaaXYZ/MaaFramework)
   An automation black-box testing framework based on image recognition.
+- [MXU](https://github.com/MistEO/MXU)
+  MaaFramework Next UI
 - [MaaAssistantArknights](https://github.com/MaaAssistantArknights/MaaAssistantArknights)
   Assistant for Arknights – automate your daily grind with one click!
 - [MaaEnd](https://github.com/MaaEnd/MaaEnd)
   Vision AI based automation tool for Arknights: Endfield.
 - [M9A](https://github.com/MAA1999/M9A)
   Assistant for Reverse: 1999.
-- [MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia)
-  A general-purpose GUI solution for MaaFramework built with Avalonia UI.
+- ~~[MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia)
+  A general-purpose GUI solution for MaaFramework built with Avalonia UI.~~
 
-### ❤️Contributors
+### Contributors
 
 Thanks to all the developers who participated in testing and development (´▽`ʃ♡ƪ)
 
-[![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=200&columns=15)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
+[![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=1000)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
 
-## Promotion
+## ☕Buy Us a Coffee
 
-If you find this software helpful, please give us a Star! (the little star at the top right of the page) – that’s the greatest support for us!
+If MaaNTE has saved you a lot of time, how about buying the developers a coffee?
+
+Your support is our biggest motivation to keep updating! 🥰
+
+[<img width="200" alt="Sponsor Us" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.png">](https://afdian.com/a/MaaNTE)
+
+## ⭐Star History
+
+If you find this software helpful, please give us a Star! (the little star at the top right of the page) – that's the greatest support for us!
+
+<a href="https://www.star-history.com/?repos=1bananachicken%2FMaaNTE&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=1bananachicken/MaaNTE&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=1bananachicken/MaaNTE&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=1bananachicken/MaaNTE&type=date&legend=top-left" />
+ </picture>
+</a>
