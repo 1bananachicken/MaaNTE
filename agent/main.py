@@ -235,9 +235,11 @@ def _apply_maahub_ui_config(config: dict) -> bool:
 
 
 def ensure_mxu_ui_config() -> None:
+    import stat
     config_dir = Path(project_root_dir) / "config"
     config_dir.mkdir(exist_ok=True)
     config_path = config_dir / "mxu-MaaNTE.json"
+    os.chmod(config_path, stat.S_IWRITE)
     config = {}
     if config_path.exists():
         try:
@@ -252,6 +254,7 @@ def ensure_mxu_ui_config() -> None:
         config = {}
 
     changed = _apply_maahub_ui_config(config)
+    
     if not changed:
         return
 
@@ -261,6 +264,8 @@ def ensure_mxu_ui_config() -> None:
             f.write("\n")
     except Exception:
         logger.exception("写入 mxu-MaaNTE.json 失败")
+    
+    os.chmod(config_path, stat.S_IREAD)
 
 
 def read_interface_version(interface_file_name="./interface.json") -> str:
