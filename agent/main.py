@@ -225,37 +225,28 @@ def _verify_warning_integrity():
     welcome_path = Path(project_root_dir) / "assets" / "resource" / "welcome.md"
     hash_path = Path(project_root_dir) / "assets" / ".welcome.hash"
 
-    if not welcome_path.exists() or not hash_path.exists():
+    # 缺少 welcome.md 时不弹公告
+    if not welcome_path.exists():
         return
+
+    # 有 welcome.md 但无 hash → 缺少完整性校验依据，阻止启动
+    if not hash_path.exists():
+        title = "⚠ 完整性校验异常"
+        message = (
+            "检测到 welcome.md 文件但缺少对应的完整性校验文件 (.welcome.hash)。\n\n"
+            "⚠ 本软件为免费开源项目，从未授权任何人售卖。\n"
+            "⚠ 如在第三方平台购买了本软件，请凭此截图退款举报。\n\n"
+            "已阻止启动以保护您的安全。"
+        )
+        _show_messagebox_blocking(title, message)
+        sys.exit(1)
 
     try:
         welcome_bytes = welcome_path.read_bytes()
         actual_hash = hashlib.sha256(welcome_bytes).hexdigest()
         expected_hash = hash_path.read_text("utf-8").strip()
-
-        if actual_hash == expected_hash:
-            # 完整性通过 → 弹窗显示正常公告（不阻止启动）
-            welcome_content = welcome_bytes.decode("utf-8")
-            _show_messagebox_blocking("📢 公告", welcome_content)
-            return
-
-        # 哈希不匹配 → 弹窗并阻止启动
-        welcome_content = welcome_bytes.decode("utf-8")
-        title = "⚠ 完整性校验失败"
-        message = (
-            "本软件已被篡改！请从官方渠道重新下载。\n\n"
-            "━━━━━━━━━━━━━━━━━━━━━\n\n"
-            f"{welcome_content}\n\n"
-            "━━━━━━━━━━━━━━━━━━━━━\n\n"
-            "⚠ MaaNTE 为免费开源项目，从未授权任何人售卖。\n"
-            "⚠ 如在第三方平台购买了本软件，请凭此截图退款举报。\n"
-            "⚠ 本弹窗说明程序已被篡改，已阻止启动。"
-        )
-        _show_messagebox_blocking(title, message)
-        sys.exit(1)
-
     except Exception as e:
-        # 读取/计算异常 → 同样弹警告并阻止
+        # 读取/计算异常 → 弹警告并阻止
         title = "⚠ 完整性校验异常"
         message = (
             f"无法完成完整性校验：{e}\n\n"
@@ -265,6 +256,33 @@ def _verify_warning_integrity():
         )
         _show_messagebox_blocking(title, message)
         sys.exit(1)
+
+    try:
+        welcome_text = welcome_bytes.decode("utf-8")
+    except UnicodeDecodeError:
+        welcome_text = welcome_bytes.decode("utf-8", errors="replace")
+
+    # 用 welcome.md 的第一行（去除 # 号）作为标题
+    first_line = welcome_text.splitlines()[0] if welcome_text.splitlines() else ""
+    title = first_line.lstrip("# \t\r") or "📢 公告"
+
+    if actual_hash == expected_hash:
+        # 完整性通过 → 弹窗显示正常公告（不阻止启动）
+        _show_messagebox_blocking(title, welcome_text)
+        return
+
+    # 哈希不匹配 → 弹窗并阻止启动
+    message = (
+        "本软件已被篡改！请从官方渠道重新下载。\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━\n\n"
+        f"{welcome_text}\n\n"
+        "━━━━━━━━━━━━━━━━━━━━━\n\n"
+        "⚠ MaaNTE 为免费开源项目，从未授权任何人售卖。\n"
+        "⚠ 如在第三方平台购买了本软件，请凭此截图退款举报。\n"
+        "⚠ 本弹窗说明程序已被篡改，已阻止启动。"
+    )
+    _show_messagebox_blocking("⚠ 完整性校验失败", message)
+    sys.exit(1)
 
 
 def read_pip_config() -> dict:

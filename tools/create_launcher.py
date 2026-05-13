@@ -10,8 +10,15 @@ import subprocess
 import sys
 from pathlib import Path
 
-sys.stdout.reconfigure(encoding="utf-8")
-sys.stderr.reconfigure(encoding="utf-8")
+def _safe_reconfigure(stream):
+    """安全地重配置流编码，兼容旧 Python 或被替换的流对象。"""
+    fn = getattr(stream, "reconfigure", None)
+    if callable(fn):
+        fn(encoding="utf-8")
+
+
+_safe_reconfigure(sys.stdout)
+_safe_reconfigure(sys.stderr)
 
 script_dir = Path(__file__).parent
 install_path = script_dir.parent.parent / "install"
@@ -26,8 +33,12 @@ def create_launcher():
         return
 
     # 重命名原始 exe
-    shutil.move(str(maa_exe), str(maa_core))
-    print(f"已重命名 MaaNTE.exe -> MaaNTE_core.exe")
+    try:
+        shutil.move(str(maa_exe), str(maa_core))
+        print(f"已重命名 MaaNTE.exe -> MaaNTE_core.exe")
+    except Exception as e:
+        print(f"错误: 无法重命名 {maa_exe} -> {maa_core}: {e}")
+        return
 
     launcher_src = script_dir / "launcher_standalone.py"
     if not launcher_src.exists():
