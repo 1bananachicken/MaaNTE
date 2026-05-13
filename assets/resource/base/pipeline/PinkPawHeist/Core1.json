@@ -164,5 +164,25 @@
         "pre_delay": 100,
         "post_delay": 250,
         "next": []
+    },
+    "PinkPawHeist_EvacuateOnce": {
+        "desc": "撤离确认",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "确认撤离",
+                "roi": [
+                    710,
+                    490,
+                    120,
+                    30
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": []
     }
 }

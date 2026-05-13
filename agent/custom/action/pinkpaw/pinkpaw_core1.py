@@ -212,6 +212,7 @@ class PinkPawHeistScheme1Action(CustomAction):
         ah.key_up("S")
 
         # ----- 第一场战斗（怪堆） -----
+        print(datetime.now().strftime("%H:%M:%S.%f")[:-3], "等待战斗")
         for _ in range(3):
             ah.click_key("1")
             ah.delay(200)
@@ -243,7 +244,6 @@ class PinkPawHeistScheme1Action(CustomAction):
         ah.delay(200)
         ah.key_up("A")
         ah.delay(200)
-        print("准备后退", datetime.now().strftime("%H:%M:%S.%f")[:-3])
         # 后退
         ah.key_down("S")
         for _ in range(22):
@@ -251,13 +251,10 @@ class PinkPawHeistScheme1Action(CustomAction):
             ah.delay(300)
         ah.key_up("S")
         ah.delay(500)
-        print("准备前进", datetime.now().strftime("%H:%M:%S.%f")[:-3])
         # 前进
         ah.key_down("A")
-        print("ah.key_down(A)", datetime.now().strftime("%H:%M:%S.%f")[:-3])
         ah.delay(700)
         ah.key_up("A")
-        print("ah.key_up(A)", datetime.now().strftime("%H:%M:%S.%f")[:-3])
         ah.delay(200)
         ah.key_down("W")
         for _ in range(13):
@@ -265,7 +262,6 @@ class PinkPawHeistScheme1Action(CustomAction):
             ah.delay(300)
         ah.key_up("W")
         ah.delay(500)
-        print("准备继续向前", datetime.now().strftime("%H:%M:%S.%f")[:-3])
         # 继续向前
         ah.key_down("W")
         ah.delay(2500)
@@ -407,6 +403,7 @@ class PinkPawHeistScheme1Action(CustomAction):
         ah.delay(200)
         ah.key_up("S")
         ah.delay(2000)
+        print(datetime.now().strftime("%H:%M:%S.%f")[:-3], "等待战斗")
 
         ah.fight_until_no_monster(
             timeout_no_monster=10000,
@@ -459,19 +456,25 @@ class PinkPawHeistScheme1Action(CustomAction):
         ah.delay(300)
 
         ah.key_down("D")
-        ah.delay(1300)
+        ah.delay(1600)
         ah.key_up("D")
         ah.delay(200)
 
         ah.key_down("S")
-        for _ in range(20):
-            ah.click_key("F")
-            ah.delay(300)
+        ah.delay(6000)
         ah.key_up("S")
+        ah.delay(300)
+        ah.key_down("A")
+        ah.delay(3000)
+        ah.key_up("A")
         ah.delay(300)
 
         ah.click_key("F")
         ah.delay(1000)
+        ah.key_down("D")
+        ah.delay(300)
+        ah.key_up("D")
+        ah.delay(200)
         ah.key_down("S")
         ah.delay(1500)
         ah.key_up("S")
@@ -500,10 +503,14 @@ class PinkPawHeistScheme1Action(CustomAction):
         # 最终撤离点检测
         ah.click_key("F")
         ah.delay(1500)
+        """
         if not ah.wait_evacuate():
             self._exit_to_main(ah)
             return CustomAction.RunResult(success=False)
+        """
 
+        ah.ctx.run_task("PinkPawHeist_EvacuateOnce")
+        ah.delay(10000)
         return CustomAction.RunResult(success=True)
 
     def _exit_to_main(self, ah: ActionHelper):

@@ -34,11 +34,11 @@
             "type": "select",
             "label": "地图方案",
             "description": "选择本次战斗的地图移动方案。方案1需要配队：1娜娜莉3薄荷4早雾，需要一定练度，目前极不稳定。",
-            "default_case": "方案一",
+            "default_case": "Core1",
             "cases": [
                 {
-                    "name": "方案一",
-                    "label": "默认路线",
+                    "name": "Core1",
+                    "label": "方案一",
                     "pipeline_override": {
                         "PinkPawHeist_ExecuteScheme": {
                             "next": ["PinkPawHeist_Scheme1"]
@@ -46,8 +46,8 @@
                     }
                 }//,
                 //{
-                //    "name": "方案二",
-                //    "label": "备选路线",
+                //    "name": "Core2",
+                //    "label": "方案二",
                 //    "pipeline_override": {
                 //        "PinkPawHeist_ExecuteScheme": {
                 //            "next": ["PinkPawHeist_Scheme2_Actions"]
