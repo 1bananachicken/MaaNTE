@@ -220,20 +220,48 @@ def _show_messagebox_blocking(title: str, message: str):
 
 
 def _verify_warning_integrity():
-    """校验 assets/resource/welcome.md 的完整性，防止第三方篡改。
+    """校验 assets/interface.json 中 welcome 字段的完整性，防止第三方篡改。
     校验通过时弹出正常公告，校验失败时弹出篡改警告并阻止启动。"""
-    welcome_path = Path(project_root_dir) / "assets" / "resource" / "welcome.md"
+    interface_path = Path(project_root_dir) / "assets" / "interface.json"
     hash_path = Path(project_root_dir) / "assets" / ".welcome.hash"
 
-    # 缺少 welcome.md 时不弹公告
-    if not welcome_path.exists():
+    # 缺少 interface.json 时不弹公告
+    if not interface_path.exists():
         return
 
-    # 有 welcome.md 但无 hash → 缺少完整性校验依据，阻止启动
+    try:
+        with open(interface_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+        welcome_text = data.get("welcome", "")
+        if not welcome_text:
+            return
+        actual_hash = hashlib.sha256(welcome_text.encode("utf-8")).hexdigest()
+    except json.JSONDecodeError as e:
+        title = "⚠ 完整性校验异常"
+        message = (
+            f"无法解析 interface.json：{e}\n\n"
+            "⚠ 本软件为免费开源项目，从未授权任何人售卖。\n"
+            "⚠ 如在第三方平台购买了本软件，请凭此截图退款举报。\n\n"
+            "已阻止启动以保护您的安全。"
+        )
+        _show_messagebox_blocking(title, message)
+        sys.exit(1)
+    except Exception as e:
+        title = "⚠ 完整性校验异常"
+        message = (
+            f"读取 interface.json 失败：{e}\n\n"
+            "⚠ 本软件为免费开源项目，从未授权任何人售卖。\n"
+            "⚠ 如在第三方平台购买了本软件，请凭此截图退款举报。\n\n"
+            "已阻止启动以保护您的安全。"
+        )
+        _show_messagebox_blocking(title, message)
+        sys.exit(1)
+
+    # 有 interface.json 但无 .welcome.hash → 缺少完整性校验依据，阻止启动
     if not hash_path.exists():
         title = "⚠ 完整性校验异常"
         message = (
-            "检测到 welcome.md 文件但缺少对应的完整性校验文件 (.welcome.hash)。\n\n"
+            "检测到 interface.json 文件但缺少对应的完整性校验文件 (.welcome.hash)。\n\n"
             "⚠ 本软件为免费开源项目，从未授权任何人售卖。\n"
             "⚠ 如在第三方平台购买了本软件，请凭此截图退款举报。\n\n"
             "已阻止启动以保护您的安全。"
@@ -242,14 +270,11 @@ def _verify_warning_integrity():
         sys.exit(1)
 
     try:
-        welcome_bytes = welcome_path.read_bytes()
-        actual_hash = hashlib.sha256(welcome_bytes).hexdigest()
         expected_hash = hash_path.read_text("utf-8").strip()
     except Exception as e:
-        # 读取/计算异常 → 弹警告并阻止
         title = "⚠ 完整性校验异常"
         message = (
-            f"无法完成完整性校验：{e}\n\n"
+            f"无法读取 .welcome.hash：{e}\n\n"
             "⚠ 本软件为免费开源项目，从未授权任何人售卖。\n"
             "⚠ 如在第三方平台购买了本软件，请凭此截图退款举报。\n\n"
             "已阻止启动以保护您的安全。"
@@ -257,12 +282,7 @@ def _verify_warning_integrity():
         _show_messagebox_blocking(title, message)
         sys.exit(1)
 
-    try:
-        welcome_text = welcome_bytes.decode("utf-8")
-    except UnicodeDecodeError:
-        welcome_text = welcome_bytes.decode("utf-8", errors="replace")
-
-    # 用 welcome.md 的第一行（去除 # 号）作为标题
+    # 用 welcome 内容的第一行（去除 # 号）作为标题
     first_line = welcome_text.splitlines()[0] if welcome_text.splitlines() else ""
     title = first_line.lstrip("# \t\r") or "📢 公告"
 
