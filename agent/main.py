@@ -4,7 +4,6 @@ import os
 import sys
 import json
 import subprocess
-import threading
 from pathlib import Path
 
 # utf-8
@@ -239,7 +238,6 @@ def ensure_mxu_ui_config() -> None:
     config_dir = Path(project_root_dir) / "config"
     config_dir.mkdir(exist_ok=True)
     config_path = config_dir / "mxu-MaaNTE.json"
-
     config = {}
     if config_path.exists():
         try:
@@ -591,12 +589,10 @@ def agent(is_dev_mode=False):
         try:
             AgentServer.start_up(socket_id)
             logger.info("AgentServer启动")
-            ensure_mxu_ui_config()
             _check_game_resolution()
             AgentServer.join()
         finally:
             AgentServer.shut_down()
-            ensure_mxu_ui_config()
         logger.info("AgentServer关闭")
     except ImportError as e:
         logger.error(f"导入模块失败: {e}")
@@ -623,7 +619,6 @@ def main():
     if sys.platform.startswith("linux") or is_dev_mode:
         ensure_venv_and_relaunch_if_needed()
 
-    ensure_mxu_ui_config()
     check_and_install_dependencies()
 
     if is_dev_mode:
@@ -634,4 +629,5 @@ def main():
 
 
 if __name__ == "__main__":
+    ensure_mxu_ui_config()
     main()
