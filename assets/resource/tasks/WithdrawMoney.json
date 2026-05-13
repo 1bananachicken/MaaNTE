@@ -3,7 +3,7 @@
         {
             "name": "领取一咖舍收益",
             "entry": "WithdrawMoneyEntrance",
-            "description": "自动领取一咖舍收益.[color:red]仅支持Seize的鼠标输入方式（必须前台），使用时请前往左下角设置-连接设置自行配置。暂不支持根据风向标替换商品，若在意收益，建议关闭[/color]",
+            "description": "自动领取一咖舍收益<br><span style='color:red'>暂不支持根据风向标自动替换商品，若在意损失，建议关闭</span>",
             "option": [
                 "Restock"
             ],
@@ -12,7 +12,7 @@
             ]
         }
     ],
-    "option":{
+    "option": {
         "Restock": {
             "type": "switch",
             "label": "自动补货",

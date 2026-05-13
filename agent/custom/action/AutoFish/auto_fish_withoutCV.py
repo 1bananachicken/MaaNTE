@@ -5,12 +5,10 @@ from maa.context import Context
 import time
 import json
 
-from agent.custom.action.Common.logger import get_logger
-
-logger = get_logger("auto_fish_without_cv")
+from utils.logger import logger
 
 # 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
-CURSOR_PX_PER_SEC = 200.0
+CURSOR_PX_PER_SEC = 168
 
 
 @AgentServer.custom_action("auto_fish_without_cv")
@@ -19,8 +17,8 @@ class AutoFishWithoutCV(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
 
-        deadzone = 10  # 光标与绿条中心的距离在 deadzone（像素）以内时不操作，避免过度频繁地轻微调整导致的抖动
-        max_try_item = 10  # 识别不完整（绿条或光标未命中）的最大尝试次数，超过后放弃本次钓鱼，重新抛竿（执行 FishHook）
+        deadzone = 15  # 光标与绿条中心的距离在 deadzone（像素）以内时不操作，避免过度频繁地轻微调整导致的抖动
+        max_try_item = 5  # 识别不完整（绿条或光标未命中）的最大尝试次数，超过后放弃本次钓鱼，重新抛竿（执行 FishHook）
         factor = 1.5  # 控条时长的调整因子，实际时长 = 基础时长 * factor，基础时长 = (光标与绿条中心的像素偏移 / CURSOR_PX_PER_SEC) * 1000ms，增加 factor 可以适当补偿识别误差和按键响应延迟
         cap_ms = (
             1500  # 控条时长的上限（毫秒），避免因识别到较大偏移时按键过久，导致过度补偿
@@ -38,18 +36,8 @@ class AutoFishWithoutCV(CustomAction):
                 floor_ms = params.get("floor_ms", floor_ms)
             except Exception:
                 pass
-        logger.info("开始：等待鱼上钩")
-        # 等待鱼上钩
-        while not context.tasker.stopping:
-            image = context.tasker.controller.post_screencap().wait().get()
-            fish_hooked = context.run_recognition("FishHooked", image)
-            time.sleep(0.1)
-            if fish_hooked and fish_hooked.hit:
-                logger.info("识别到鱼上钩，执行 FishHook")
-                context.run_action("FishHook")
-                break
 
-        logger.info("进入控条阶段（绿条/光标对齐）")
+        logger.debug("钓鱼开始：进入控条阶段（绿条/光标对齐）")
         # 钓鱼阶段
         while not context.tasker.stopping:
             image = context.tasker.controller.post_screencap().wait().get()
@@ -67,14 +55,13 @@ class AutoFishWithoutCV(CustomAction):
                 is not None  # 这个是为了消除pylance的warning，实际运行时不应该有None的情况
             ):
                 max_try_item -= 1
-                logger.warning(
+                logger.debug(
                     f"识别不完整（绿条或光标未命中），剩余尝试次数: {max_try_item}"
                 )
 
                 if max_try_item <= 0:
-                    logger.error("尝试次数用尽，控条失败")
+                    logger.debug("尝试次数用尽，控条失败")
                     return CustomAction.RunResult(success=True)
-                context.run_action("FishHook")
                 continue
 
             green_bar_x, green_bar_y, green_bar_w, green_bar_h = green_bar.box
@@ -94,7 +81,7 @@ class AutoFishWithoutCV(CustomAction):
             param_override = {"duration": duration_ms}
 
             if offset > deadzone:
-                logger.info(
+                logger.debug(
                     f"控条: offset={offset:.1f}px, 时长={duration_ms}ms → FishLeft"
                 )
                 context.run_action(
@@ -104,7 +91,7 @@ class AutoFishWithoutCV(CustomAction):
                     },
                 )
             elif offset < -deadzone:
-                logger.info(
+                logger.debug(
                     f"控条: offset={offset:.1f}px, 时长={duration_ms}ms → FishRight"
                 )
                 context.run_action(
@@ -114,5 +101,5 @@ class AutoFishWithoutCV(CustomAction):
                     },
                 )
 
-        logger.info("任务结束（success=True）")
+        logger.debug("任务结束（success=True）")
         return CustomAction.RunResult(success=True)
