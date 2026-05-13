@@ -249,6 +249,12 @@ jobs:
             cp maante.ico install-mxu/logo.ico
           fi
 
+      - name: Compute welcome.md integrity hash
+        shell: bash
+        run: |
+          sha256sum assets/resource/welcome.md | cut -d' ' -f1 > assets/.welcome.hash
+          echo "Computed welcome.md hash: $(cat assets/.welcome.hash)"
+
       - uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install PyInstaller
