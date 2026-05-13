@@ -253,7 +253,7 @@ def ensure_mxu_ui_config() -> None:
     if not isinstance(config, dict):
         config = {}
 
-    changed = _apply_maahub_ui_config(config) or not config_path.exists()
+    changed = _apply_maahub_ui_config(config)
     if not changed:
         return
 
@@ -625,7 +625,6 @@ def main():
 
     ensure_mxu_ui_config()
     check_and_install_dependencies()
-    cleanup_debug_log_files()
 
     if is_dev_mode:
         os.chdir(Path("./assets"))

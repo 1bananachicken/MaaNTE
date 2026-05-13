@@ -120,7 +120,7 @@ jobs:
         run: |
           ARCHIVE_FILE_PATH="${{ fromJson(steps.download_mxu.outputs.downloaded_files)[0] }}"
           rm -f "${ARCHIVE_FILE_PATH}"
-          echo "Archive cleanup command executed for MFAAvalonia on Windows."
+          echo "Archive cleanup command executed for MXU on Windows."
 
       - name: Convert PNG to ICO
         if: matrix.arch == 'x86_64'
