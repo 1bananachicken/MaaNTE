@@ -33,7 +33,7 @@
         "PinkPawHeist_Scheme": {
             "type": "select",
             "label": "地图方案",
-            "description": "选择本次战斗的地图移动方案",
+            "description": "选择本次战斗的地图移动方案。方案1需要配队：1娜娜莉3薄荷4早雾，需要一定练度，目前极不稳定。",
             "default_case": "方案一",
             "cases": [
                 {
