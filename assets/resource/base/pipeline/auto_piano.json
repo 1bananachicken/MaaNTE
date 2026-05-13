@@ -1,0 +1,13 @@
+{
+  "AutoPiano": {
+    "recognition": "DirectHit",
+    "action": "Custom",
+    "custom_action": "auto_play_piano",
+    "custom_action_param": {
+      "song": "songs/example.mid",
+      "speed": "1.0",
+      "transpose": "0"
+    },
+    "next": []
+  }
+}

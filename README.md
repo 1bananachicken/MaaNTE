@@ -34,15 +34,39 @@
 >
 > 官方 B 站账号: [MaaNTE-Official](https://space.bilibili.com/3546893080594665)
 >
-> QQ交流1群: 1103323319
+> QQ交流1群: 1103323319 (已满)
 >
-> 若1群已满请加2群: 1101147419
+> QQ交流2群: 1101147419 (已满)
+>
+> QQ交流3群: 1075143235 (已满)
+>
+> QQ交流4群: 713114598
 
 > [!Caution]
 >
 > 近期出现大量账号二次分发本软件，甚至冒充官方账号。通过非官方途径获取的软件可能**含有病毒**，并且一般不是最新的版本，请注意甄别。
 
-## ✨ 功能一览
+# ⚠️免责声明与风险提示
+
+> [!Note]
+>
+> 本软件为第三方工具，通过识别游戏画面模拟常规交互动作，简化《异环》的游戏玩法。本项目遵循相关法律法规。本项目旨在简化用户的重复性操作，不会破坏游戏平衡或提供不公平优势，也绝不会修改任何游戏文件或数据。
+>
+> 本项目开源、免费，且仅供学习和交流使用，请勿用于任何商业或营利性目的。开发者团队拥有本项目的最终解释权。因使用本软件而产生的任何问题，均与本项目及开发者无关。
+
+> [!Caution]
+>
+> 根据[《异环》公平游戏宣言](https://yh.wanmei.com/news/gamebroad/20260202/260701.html)：
+>
+> 严禁使用任何第三方工具破坏游戏公平性。我们将严厉打击使用外挂、加速器、作弊软件、宏脚本等非法工具的行为，这些行为包括但不限于自动挂机、技能加速、无敌模式、瞬移、修改游戏数据等操作。一经查实，我们将视违规严重程度及违规次数，采取包括但不限于扣除违规收益、冻结游戏账号、永久封禁游戏账号等措施。
+>
+> **您应充分了解并自愿承担使用本工具可能带来的所有风险。**
+
+## 🧾开源许可
+
+本软件使用 [GNU Affero General Public License v3.0 only](https://spdx.org/licenses/AGPL-3.0-only.html) 开源。
+
+## ✨功能一览
 
 - 🎣 自动钓鱼
   - 🐟 自动卖鱼
@@ -57,6 +81,10 @@
 - 🕛 实时辅助
   - 🗼 自动传送
   - ⏩ 自动跳剧情
+- ⚔️ 自动闪避
+  - 🛡️ 基于音频识别的自动闪避/反击
+- 🎵 自动超强音
+  - 🥁 循环演奏迷星叫
 
 ## ❓常见问题
 
@@ -73,6 +101,7 @@
 游戏需要运行在1280x720分辨率，窗口化，钓鱼新算法支持120帧运行
 
 ## 💻开发指南
+MaaNTE开发者群: 1092630280
 
 <details><summary>点击展开</summary>
 
@@ -103,7 +132,7 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 
 </details>
 
-## ☕鸣谢
+## ❤️鸣谢
 
 ### 开源项目
 
@@ -117,13 +146,25 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
   重返未来：1999 小助手
 - [MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia)
   基于 Avalonia UI 构建的 MaaFramework 通用 GUI 解决方案
-  
-### ❤️贡献/参与者
+### 贡献/参与者
 
 感谢全部参与到测试与开发中的开发者(´▽`ʃ♡ƪ)
 
-[![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=200&columns=15)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
+[![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=1000)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
 
-## 广告
+## ☕请我们喝咖啡
+如果 MaaNTE 帮你省下了不少时间，不妨请开发者喝杯咖啡？
 
+你的支持就是我们持续更新的最大动力🥰
+
+[<img width="200" alt="赞助我们" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.png">](https://afdian.com/a/MaaNTE)
+
+## ⭐Star History
 如果觉得软件对你有帮助，帮忙点个 Star 吧！~（网页最上方右上角的小星星），这就是对我们最大的支持了！
+<a href="https://www.star-history.com/?repos=1bananachicken%2FMaaNTE&type=date&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=1bananachicken/MaaNTE&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=1bananachicken/MaaNTE&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=1bananachicken/MaaNTE&type=date&legend=top-left" />
+ </picture>
+</a>
