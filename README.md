@@ -7,7 +7,7 @@
   <p align="center">
     MAA异环小助手
     <br/>
-    <a href="docs/README_en.md">English</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">报告 Bug</a>
+    <a href="docs/README_en.md">English</a> | <a href="docs/README_zh-tw.md">繁體中文</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">报告 Bug</a>
   </p>
 
   <p align="center">
@@ -17,14 +17,22 @@
     <br>
     <a href="https://maafw.com/" target="_blank"><img alt="website" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/maafw.svg"></a>
     <a href="https://mirrorchyan.com/zh/projects?rid=MaaNTE" target="_blank"><img alt="mirrorc" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/mirrorc-zh.svg"></a>
+    <a href="https://space.bilibili.com/3546893080594665" target="_blank"><img alt="Bilibili" src="https://img.shields.io/badge/Bilibili-MaaNTE--Official-00A1D6?logo=bilibili"></a>
+    <a href="https://discord.gg/EjwrrGzy" target="_blank"><img alt="Discord" src="https://img.shields.io/badge/Discord-MaaNTE--Official-5865F2?logo=discord"></a>
     <br/>
-    <img alt="commit" src="https://img.shields.io/github/commit-activity/m/1bananachicken/MaaNTE?color=%23ff69b4">
+    <img alt="commit" src="https://img.shields.io/github/commit-activity/m/1bananachicken/MaaNTE?&style=flat-square&logo=github&color=darkgreen">
     <img src="https://img.shields.io/github/stars/1bananachicken/MaaNTE?style=flat-square&logo=github&color=darkgreen" alt="Stars" />
   </p>
 
 由 [MaaFramework](https://github.com/MaaXYZ/MaaFramework) 强力驱动！
 
 </div>
+
+> [!Caution]
+>
+> 近期出现大量账号二次分发本软件，甚至冒充官方账号。通过非官方途径获取的软件可能**含有病毒**，并且一般不是最新的版本，请注意甄别。
+>
+>近日，我们发现存在借本项目之名传播病毒的行为，请在下载时认准官方渠道。
 
 > [!Tip]
 >
@@ -41,10 +49,6 @@
 > QQ交流3群: 1075143235 (已满)
 >
 > QQ交流4群: 713114598
-
-> [!Caution]
->
-> 近期出现大量账号二次分发本软件，甚至冒充官方账号。通过非官方途径获取的软件可能**含有病毒**，并且一般不是最新的版本，请注意甄别。
 
 # ⚠️免责声明与风险提示
 
@@ -101,9 +105,10 @@
 游戏需要运行在1280x720分辨率，窗口化，钓鱼新算法支持120帧运行
 
 ## 💻开发指南
-MaaNTE开发者群: 1092630280
 
 <details><summary>点击展开</summary>
+
+MaaNTE开发者群: 1092630280
 
 ### 快速开始
 
@@ -138,14 +143,17 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 
 - [MaaFramework](https://github.com/MaaXYZ/MaaFramework)
   基于图像识别的自动化黑盒测试框架
+- [MXU](https://github.com/MistEO/MXU)
+  MaaFramework Next UI
 - [MaaAssistantArknights](https://github.com/MaaAssistantArknights/MaaAssistantArknights)
   《明日方舟》小助手，全日常一键长草！
 - [MaaEnd](https://github.com/MaaEnd/MaaEnd)
   基于视觉 AI 的「明日方舟：终末地」自动化工具
 - [M9A](https://github.com/MAA1999/M9A)
   重返未来：1999 小助手
-- [MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia)
-  基于 Avalonia UI 构建的 MaaFramework 通用 GUI 解决方案
+- ~~[MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia)
+  基于 Avalonia UI 构建的 MaaFramework 通用 GUI 解决方案~~
+
 ### 贡献/参与者
 
 感谢全部参与到测试与开发中的开发者(´▽`ʃ♡ƪ)
@@ -153,6 +161,7 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 [![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=1000)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
 
 ## ☕请我们喝咖啡
+
 如果 MaaNTE 帮你省下了不少时间，不妨请开发者喝杯咖啡？
 
 你的支持就是我们持续更新的最大动力🥰
@@ -160,6 +169,7 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 [<img width="200" alt="赞助我们" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.png">](https://afdian.com/a/MaaNTE)
 
 ## ⭐Star History
+
 如果觉得软件对你有帮助，帮忙点个 Star 吧！~（网页最上方右上角的小星星），这就是对我们最大的支持了！
 <a href="https://www.star-history.com/?repos=1bananachicken%2FMaaNTE&type=date&legend=top-left">
  <picture>
