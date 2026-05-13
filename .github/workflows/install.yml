@@ -249,11 +249,10 @@ jobs:
             cp maante.ico install-mxu/logo.ico
           fi
 
-      - name: Compute welcome.md integrity hash
+      - name: Compute welcome integrity hash
         shell: bash
         run: |
-          sha256sum assets/resource/welcome.md | cut -d' ' -f1 > assets/.welcome.hash
-          echo "Computed welcome.md hash: $(cat assets/.welcome.hash)"
+          python -c "import json,hashlib; d=json.load(open('assets/interface.json',encoding='utf-8')); h=hashlib.sha256(d.get('welcome','').encode('utf-8')).hexdigest(); open('assets/.welcome.hash','w').write(h); print(f'Computed welcome hash: {h}')"
 
       - uses: ilammy/msvc-dev-cmd@v1
 
