@@ -43,11 +43,11 @@ class AutoBuyFishBait(CustomAction):
         KEY_ESC = 27
         controller = context.tasker.controller  
         
-        found_bait_threshold = 0.8
+        found_bait_threshold = 0.7
         if argv.custom_action_param:
             try:
                 params = json.loads(argv.custom_action_param)
-                found_bait_threshold = params.get("found_bait_threshold", 0.8)
+                found_bait_threshold = params.get("found_bait_threshold", 0.7)
             except:
                 pass
         
@@ -59,10 +59,12 @@ class AutoBuyFishBait(CustomAction):
             found_bait, prob, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, found_bait_threshold)
             print(f"Current found bait threshold: {found_bait_threshold}, match probability: {prob:.2f}, clicked on bait at ({x+15}, {y+5})")
             if found_bait:
+                controller.post_touch_move(x,y) # 先移动到指定位置再进行点击，否则可能会触发滑动买到别的东东
                 for _ in range(3):
                     click_rect(controller, [x, y, 30, 10])
                     time.sleep(0.1)
-                
+
+                time.sleep(1) # 120hz下可能会过快地出现触发检测。适当的延时
                 img = get_image(controller)
                 found_bait_success, _, _, _ = match_template_in_region(img, find_bait_success_region, self.find_bait_success_template, match_threshold)
                 if found_bait_success:
