@@ -1,0 +1,161 @@
+{
+    "PinkPawHeist_Scheme2_Actions": {
+        "recognition": { "type": "DirectHit" },
+        "action": { "type": "DoNothing" },
+        "next": ["PinkPawHeist_S1_Step1"]
+    },
+
+    "PinkPawHeist_S1_Step1": {
+        "desc": "按住W前进",
+        "recognition": { "type": "DirectHit" },
+        "action": {
+            "type": "LongPressKey",
+            "param": { "key": 87, "duration": 8000 }
+        },
+        "next": ["PinkPawHeist_S1_Step2"]
+    },
+
+    "PinkPawHeist_S1_Step2": {
+        "desc": "按住D右移",
+        "recognition": { "type": "DirectHit" },
+        "action": {
+            "type": "LongPressKey",
+            "param": { "key": 68, "duration": 3000 }
+        },
+        "next": ["PinkPawHeist_S1_Step3"]
+    },
+
+    "PinkPawHeist_S1_Step3": {
+        "desc": "按住W前进",
+        "recognition": { "type": "DirectHit" },
+        "action": {
+            "type": "LongPressKey",
+            "param": { "key": 87, "duration": 3000 }
+        },
+        "next": ["PinkPawHeist_S1_Step4"]
+    },
+
+    "PinkPawHeist_S1_Step4": {
+        "desc": "检测强制开启，否则退出",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "强制开启",
+                "roi": [799,380,65,25],
+                "threshold": 0.8
+            }
+        },
+        "action": { "type": "DoNothing" },
+        "next": ["PinkPawHeist_S1_Step5"],
+        "on_error": ["PinkPawHeist_ErrorExit"]
+    },
+
+    "PinkPawHeist_S1_Step5": {
+        "desc": "按F撬锁",
+        "recognition": { "type": "DirectHit" },
+        "action": {
+            "type": "ClickKey",
+            "param": { "key": 70 }
+        },
+        "next": ["PinkPawHeist_S1_Step5"]
+    },
+
+    "PinkPawHeist_S1_Step6": {
+        "desc": "等待撬锁",
+        "recognition": { "type": "DirectHit" },
+        "action": { "type": "DoNothing" },
+        "post_delay": 5000,
+        "next": ["PinkPawHeist_S1_Step7"]
+    },
+
+    "PinkPawHeist_S1_Step7": {
+        "desc": "进门找怪",
+        "recognition": { "type": "DirectHit" },
+        "action": {
+            "type": "LongPressKey",
+            "param": { "key": 87, "duration": 5000 }
+        },
+        "next": ["PinkPawHeist_S1_Step8"]
+    },
+    "PinkPawHeist_S1_Step8": {
+        "desc": "打怪按E",
+        "recognition": { "type": "DirectHit" },
+        "action": {
+            "type": "ClickKey",
+            "param": { "key": 69 }
+        },
+        "next": ["PinkPawHeist_S1_Step9"]
+    },
+    "PinkPawHeist_S1_Step9": {
+        "desc": "左键连点20次",
+        "recognition": { "type": "DirectHit" },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [960, 540],
+                "contact": 0
+            }
+        },
+        "repeat": 20,
+        "repeat_delay": 500,
+        "next": ["PinkPawHeist_S1_Step10"]
+    },
+
+    "PinkPawHeist_S1_Step10": {
+        "desc": "按住W前进20秒",
+        "recognition": { "type": "DirectHit" },
+        "action": {
+            "type": "LongPressKey",
+            "param": { "key": 87, "duration": 20000 }
+        },
+        "next": ["PinkPawHeist_OCR_Confirm"]
+    },
+    "PinkPawHeist_LG1-01": {
+        "desc": "检测LG1-01撤离点",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "LG1-01撤离点",
+                "roi": [798,380,100,25]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70
+            }
+        },
+        "next": [
+            "PinkPawHeist_OCR_Confirm"
+        ],
+        "on_error": [
+            "PinkPawHeist_LogNotFound"
+        ]
+    },
+    "PinkPawHeist_OCR_Confirm": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "确认撤离",
+                "roi": [720,490,100,30]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": []
+    },
+
+    "PinkPawHeist_ErrorExit": {
+        "desc": "未找到open.png，输出错误并停止",
+        "recognition": { "type": "DirectHit" },
+        "action": {
+            "type": "Command",
+            "param": {
+                "exec": "cmd",
+                "args": ["/c", "echo", "[自动粉爪]方案一：未能匹配open.png，任务终止"]
+            }
+        },
+        "next": ["PinkPawHeist_StopTask"]
+    }
+}

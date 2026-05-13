@@ -1,0 +1,168 @@
+{
+    "PinkPawHeist_Scheme1": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "PinkPawHeistScheme1Action"
+            }
+        }
+    },
+    "PinkPawHeist_CheckMonsterOnce": {
+        "desc": "单次检测怪物血条颜色",
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    33,
+                    27,
+                    1222,
+                    639
+                ],
+                "method": 4,
+                "lower": [
+                    243,
+                    32,
+                    33
+                ],
+                "upper": [
+                    243,
+                    32,
+                    33
+                ],
+                "count": 3,
+                "connected": true
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": []
+    },
+    "PinkPawHeist_CheckGateOnce": {
+        "desc": "单次检测铁门",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "强制开启",
+                "roi": [
+                    800,
+                    379,
+                    80,
+                    25
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [],
+        "timeout": 1500,
+        "max_hit": 1
+    },
+    "PinkPawHeist_CheckEvacuateOnce": {
+        "desc": "单次检测撤离确认按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "确认撤离",
+                "roi": [
+                    710,
+                    490,
+                    120,
+                    30
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": []
+    },
+    "PinkPawHeist_ClickKey": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 0
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "PinkPawHeist_KeyDown": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "KeyDown",
+            "param": {
+                "key": 0
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "PinkPawHeist_KeyUp": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "KeyUp",
+            "param": {
+                "key": 0
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "PinkPawHeist_LongPressKey": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "key": 0,
+                "duration": 1000
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "PinkPawHeist_Core1_Attack_Space":{
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 32
+            }
+        },
+        "pre_delay": 100,
+        "post_delay": 100,
+        "next": ["PinkPawHeist_Core1_Attack_Mouse"]
+    },
+    "PinkPawHeist_Core1_Attack_Mouse":{
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [640,360],
+                "contact": 0
+            }
+        },
+        "pre_delay": 100,
+        "post_delay": 250,
+        "next": []
+    }
+}

@@ -44,16 +44,16 @@
                             "next": ["PinkPawHeist_Scheme1"]
                         }
                     }
-                },
-                {
-                    "name": "方案二",
-                    "label": "备选路线",
-                    "pipeline_override": {
-                        "PinkPawHeist_ExecuteScheme": {
-                            "next": ["PinkPawHeist_Scheme2_Actions"]
-                        }
-                    }
-                }
+                }//,
+                //{
+                //    "name": "方案二",
+                //    "label": "备选路线",
+                //    "pipeline_override": {
+                //        "PinkPawHeist_ExecuteScheme": {
+                //            "next": ["PinkPawHeist_Scheme2_Actions"]
+                //        }
+                //    }
+                //}
             ]
         }
     }
