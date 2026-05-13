@@ -5,6 +5,7 @@
 用 PyInstaller 将 launcher_standalone.py 编译为新的 MaaNTE.exe。
 """
 
+import os
 import shutil
 import subprocess
 import sys
@@ -46,6 +47,12 @@ def create_launcher():
         return
 
     # 用 PyInstaller 编译
+    timeout_env = os.environ.get("PYINSTALLER_TIMEOUT")
+    try:
+        pyinstaller_timeout = int(timeout_env) if timeout_env else 300
+    except ValueError:
+        pyinstaller_timeout = 300
+
     try:
         result = subprocess.run(
             [
@@ -58,7 +65,7 @@ def create_launcher():
                 "--clean", "-y",
                 str(launcher_src),
             ],
-            capture_output=True, text=True, timeout=120,
+            capture_output=True, text=True, timeout=pyinstaller_timeout,
         )
         if result.returncode == 0:
             print("已编译 MaaNTE.exe 启动器 (PyInstaller)")
