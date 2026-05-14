@@ -1,0 +1,410 @@
+{
+    "点击红点2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    362,
+                    163,
+                    30,
+                    449
+                ],
+                "template": [
+                    "auto_clean_message/redcy.png"
+                ],
+                "order_by": "Vertical",
+                "index": 1
+            }
+        }
+    },
+    "判断是否退出": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "next": [
+            "退出"
+        ]
+    },
+    "判断是否点进下一个对话": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "识别对话是否结束",
+                    "点击红点2"
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "timeout": 2000,
+        "next": [
+            "移开鼠标2"
+        ]
+    },
+    "回到主界面": {
+        "next": [
+            "识别是否主界面",
+            "[JumpBack]返回点esc"
+        ]
+    },
+    "返回点esc": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "post_delay": 1000
+    },
+    "识别是否主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1223,
+                    49,
+                    31,
+                    22
+                ],
+                "template": [
+                    "auto_clean_message/esc.png"
+                ]
+            }
+        },
+        "next": [
+            "点击esc"
+        ]
+    },
+    "判断是否在消息界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    69,
+                    25,
+                    62,
+                    30
+                ],
+                "template": [
+                    "auto_clean_message/messUP.png"
+                ]
+            }
+        },
+        "inverse": true,
+        "next": [
+            "回到主界面"
+        ]
+    },
+    "滑动到最上面": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    417,
+                    182
+                ]
+            }
+        },
+        "next": [
+            "空节点"
+        ]
+    },
+    "移开鼠标": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    784,
+                    201,
+                    1,
+                    1
+                ]
+            }
+        },
+        "timeout": 1000,
+        "next": [
+            "[JumpBack]点击对话图标",
+            "[JumpBack]识别没有对话长按加速"
+        ],
+        "on_error": [
+            "空节点"
+        ]
+    },
+    "移开鼠标2": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    784,
+                    201,
+                    1,
+                    1
+                ]
+            }
+        }
+    },
+    "点击对话图标": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    634,
+                    452,
+                    36,
+                    30
+                ],
+                "template": [
+                    "auto_clean_message/simMess.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        }
+    },
+    "点击对话图标2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    634,
+                    452,
+                    36,
+                    30
+                ],
+                "template": [
+                    "auto_clean_message/simMess.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        }
+    },
+    "自动清理消息": {
+        "next": [
+            "回到主界面"
+        ]
+    },
+    "点击esc": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "next": [
+            "滑动到第二页"
+        ]
+    },
+    "滑动到第二页": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1220,
+                    390
+                ],
+                "end": [
+                    [
+                        1045,
+                        390
+                    ]
+                ]
+            }
+        },
+        "next": [
+            "点击消息"
+        ]
+    },
+    "点击消息": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1149,
+                    366,
+                    73,
+                    103
+                ],
+                "template": [
+                    "auto_clean_message/message.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "滑动到最上面"
+        ]
+    },
+    "点击红点": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    362,
+                    163,
+                    30,
+                    449
+                ],
+                "template": [
+                    "auto_clean_message/redcy.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "timeout": 3000,
+        "on_error": [
+            "空节点"
+        ],
+        "next": [
+            "移开鼠标"
+        ]
+    },
+    "识别没有对话长按加速": {
+        "recognition": {
+            "type": "DirectHit",
+            "param": {
+                "roi": [
+                    634,
+                    452,
+                    36,
+                    30
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    824,
+                    284,
+                    16,
+                    10
+                ],
+                "duration": 2500
+            }
+        },
+        "timeout": 2500,
+        "next": [
+            "判断是否点进下一个对话",
+            "点击对话图标2"
+        ],
+        "on_error": [
+            "空节点"
+        ]
+    },
+    "未识别到红点": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    361,
+                    170,
+                    36,
+                    442
+                ],
+                "template": [
+                    "auto_clean_message/redcy.png"
+                ]
+            }
+        },
+        "inverse": true,
+        "next": [
+            "判断是否退出"
+        ]
+    },
+    "退出": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "next": [
+            "结束清除消息任务"
+        ]
+    },
+    "结束清除消息任务": {
+        "action": {
+            "type": "StopTask"
+        }
+    },
+    "向上滚动": {
+        "pre_delay": 300,
+        "action": {
+            "type": "Scroll",
+            "param": {
+                "target": [
+                    290,
+                    350
+                ],
+                "dy": -200
+            }
+        }
+    },
+    "识别对话是否结束": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    802,
+                    580,
+                    63,
+                    30
+                ],
+                "template": [
+                    "auto_clean_message/end.png"
+                ]
+            }
+        }
+    },
+    "空节点": {
+        "next": [
+            "判断是否在消息界面",
+            "识别滑动条是否在最下端",
+            "点击红点",
+            "[JumpBack]向上滚动"
+        ]
+    },
+    "识别滑动条是否在最下端": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    406,
+                    580,
+                    23,
+                    40
+                ],
+                "template": [
+                    "auto_clean_message/botEnd.png"
+                ],
+                "threshold": [
+                    0.9
+                ]
+            }
+        },
+        "next": [
+            "未识别到红点"
+        ]
+    }
+}
