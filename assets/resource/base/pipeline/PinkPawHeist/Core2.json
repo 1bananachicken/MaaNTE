@@ -129,7 +129,7 @@
             "PinkPawHeist_OCR_Confirm"
         ],
         "on_error": [
-            "PinkPawHeist_LogNotFound"
+            "PinkPawHeist_StopTask"
         ]
     },
     "PinkPawHeist_OCR_Confirm": {

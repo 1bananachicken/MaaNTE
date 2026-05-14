@@ -8,7 +8,13 @@
         },
         "next": [
             "PinkPawHeist_Loop"
-        ]
+        ],
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "{name} 即将开始执行，请确保你设置了**结束任务**的**全局快捷键**！",
+                "display": "modal"
+            }
+        }
     },
     "PinkPawHeist_Loop": {
         "recognition": {
@@ -65,28 +71,22 @@
             "PinkPawHeist_PressF"
         ],
         "on_error": [
-            "PinkPawHeist_LogNotFound"
-        ]
-    },
-    "PinkPawHeist_LogNotFound": {
-        "desc": "未找到小吱，直接退出",
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "Command",
-            "param": {
-                "exec": "cmd",
-                "args": [
-                    "/c",
-                    "echo",
-                    "[自动粉爪]请先找到小吱"
-                ]
-            }
-        },
-        "next": [
             "PinkPawHeist_StopTask"
-        ]
+        ],
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "开始寻找小吱",
+                "display": ["log", "toast"]
+            },
+            "Node.Action.Failed": {
+                "content": "❌ 未找到小吱，请确保在小吱面前开始任务",
+                "display": ["log", "toast"]
+            },
+            "Node.Action.Succeeded": {
+                "content": "✅ 成功找到小吱，开始任务",
+                "display": ["log", "toast"]
+            }
+        }
     },
     "PinkPawHeist_StopTask": {
         "recognition": {
@@ -202,7 +202,17 @@
         ],
         "on_error": [
             "PinkPawHeist_WaitReward_Delay"
-        ]
+        ],
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "等待进入地图……",
+                "display": ["log", "toast"]
+            },
+            "Node.Action.Succeeded": {
+                "content": "✅ 成功进入地图",
+                "display": ["log", "toast"]
+            }
+        }
     },
     "PinkPawHeist_WaitReward_Delay": {
         "recognition": {

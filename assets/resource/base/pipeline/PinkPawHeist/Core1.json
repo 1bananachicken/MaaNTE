@@ -184,5 +184,33 @@
             "type": "Click"
         },
         "next": []
+    },
+    "PinkPawHeist_Core1_Log_FightG1": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "等待G层战斗1",
+                "display": ["log", "toast"]
+            }
+        }
+    },
+    "PinkPawHeist_Core1_Log_FightG2": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "等待G层战斗2",
+                "display": ["log", "toast"]
+            }
+        }
     }
 }

@@ -1,6 +1,7 @@
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+from maa.define import Status
 from datetime import datetime
 
 VK = {
@@ -212,7 +213,7 @@ class PinkPawHeistScheme1Action(CustomAction):
         ah.key_up("S")
 
         # ----- 第一场战斗（怪堆） -----
-        print(datetime.now().strftime("%H:%M:%S.%f")[:-3], "等待战斗")
+        ah.ctx.run_task("PinkPawHeist_Core1_Log_FightG1")
         for _ in range(3):
             ah.click_key("1")
             ah.delay(200)
@@ -403,7 +404,7 @@ class PinkPawHeistScheme1Action(CustomAction):
         ah.delay(200)
         ah.key_up("S")
         ah.delay(2000)
-        print(datetime.now().strftime("%H:%M:%S.%f")[:-3], "等待战斗")
+        ah.ctx.run_task("PinkPawHeist_Core1_Log_FightG2")
 
         ah.fight_until_no_monster(
             timeout_no_monster=10000,
@@ -426,7 +427,6 @@ class PinkPawHeistScheme1Action(CustomAction):
         ah.key_up("S")
         ah.delay(300)
         ah.key_up("D")
-        print("G-1定位", datetime.now().strftime("%H:%M:%S.%f")[:-3])
 
         ah.delay(300)
         ah.key_down("A")
@@ -503,14 +503,13 @@ class PinkPawHeistScheme1Action(CustomAction):
         # 最终撤离点检测
         ah.click_key("F")
         ah.delay(1500)
-        """
-        if not ah.wait_evacuate():
+
+        evac_result = ah.ctx.run_task("PinkPawHeist_EvacuateOnce")
+        if evac_result.status.succeeded:
+            ah.delay(10000)
+        else:
             self._exit_to_main(ah)
             return CustomAction.RunResult(success=False)
-        """
-
-        ah.ctx.run_task("PinkPawHeist_EvacuateOnce")
-        ah.delay(10000)
         return CustomAction.RunResult(success=True)
 
     def _exit_to_main(self, ah: ActionHelper):
