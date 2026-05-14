@@ -97,7 +97,7 @@ This software is open-sourced under [GNU Affero General Public License v3.0 only
 
 ### 📄Troubleshooting
 
-Please refer to the [Troubleshooting Guide](zh_cn/问题排查.md) (Chinese).
+Please refer to the [Trouble shooting Guide](zh_cn/trouble_shooting.md) (English).
 
 ### 🤔Can't find how to start?
 
