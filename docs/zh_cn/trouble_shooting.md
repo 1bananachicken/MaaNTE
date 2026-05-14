@@ -1,17 +1,17 @@
 # MaaNTE Problem Troubleshooting Guide
- This text was translated using a translation tool; please let me know if you spot any errors.
+This text was translated using a translation tool; please let me know if you spot any errors.
 
 ## operational issues
 ### cannot start
->A pop-up window displays the message: `To run this application, you must install .NET`.
->> Go and download [.NET 10.0 ](https://dotnet.microsoft.com/zh-tw/download/dotnet/thank-you/sdk-10.0.300-windows-x64-installer) and install ` .NET 10.0 Desktop Runtime` .
+1.A pop-up window displays the message: `To run this application, you must install .NET`.
+1-1.Go and download [.NET 10.0 ](https://dotnet.microsoft.com/zh-tw/download/dotnet/thank-you/sdk-10.0.300-windows-x64-installer) and install ` .NET 10.0 Desktop Runtime` .
 
 ### Unable to Connect to Window
 1. Make sure you have opened Neverness to Everness(NTE).
 2. Make sure you are running MaaNTE as an administrator.
 3. Set NTE to a resolution of `1280x720` and run it in windowed mode.
 
-
+:8870/home
 ## Task Issues
 ### General
 1. I have fewer features than others
