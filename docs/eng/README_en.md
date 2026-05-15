@@ -7,7 +7,8 @@
   <p align="center">
     MAA Assistant for Neverness to Everness
     <br/>
-    <a href="../README.md">中文</a> | <a href="README_zh-tw.md">繁體中文</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">Report Bug</a>
+    <br/>
+    <a href="docs/eng/README_en.md">English</a> | <a href="../README.md">简体中文</a> | <a href="docs/README_zh-tw.md">繁體中文</a> | <a href="docs/jp/README_jp.md">日本語</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">报告 Bug</a>
   </p>
 
   <p align="center">
