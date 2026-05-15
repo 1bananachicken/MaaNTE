@@ -7,7 +7,8 @@
   <p align="center">
     MAA Assistant for Neverness to Everness
     <br/>
-    <a href="../README.md">中文</a> | <a href="README_zh-tw.md">繁體中文</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">Report Bug</a>
+    <br/>
+    <a href="docs/eng/README_en.md">English</a> | <a href="../README.md">简体中文</a> | <a href="docs/README_zh-tw.md">繁體中文</a> | <a href="docs/jp/README_jp.md">日本語</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">报告 Bug</a>
   </p>
 
   <p align="center">
@@ -97,7 +98,7 @@ This software is open-sourced under [GNU Affero General Public License v3.0 only
 
 ### 📄Troubleshooting
 
-Please refer to the [Troubleshooting Guide](zh_cn/问题排查.md) (Chinese).
+Please refer to the [Trouble shooting Guide](zh_cn/trouble_shooting.md) (English).
 
 ### 🤔Can't find how to start?
 
