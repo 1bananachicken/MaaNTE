@@ -7,7 +7,7 @@
   <p align="center">
     MAA异环小助手
     <br/>
-    <a href="docs/README_en.md">English</a> | <a href="docs/README_zh-tw.md">繁體中文</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">报告 Bug</a>
+    <a href="docs/eng/README_en.md">English</a> | <a href="../README.md">简体中文</a> | <a href="docs/README_zh-tw.md">繁體中文</a> | <a href="docs/jp/README_jp.md">日本語</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">报告 Bug</a>
   </p>
 
   <p align="center">
