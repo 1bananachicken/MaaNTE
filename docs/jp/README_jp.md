@@ -1,6 +1,6 @@
 <!-- markdownlint-disable MD028 MD029 MD033 MD041 -->
 <div align="center">
-  <img alt="LOGO" src="./assets/logo.png" width="256" height="256" />
+  <img alt="LOGO" src="../assets/logo.png" width="256" height="256" />
 
 # MaaNTE
 
@@ -96,7 +96,7 @@
 
 ### 📄トラブルシューティングマニュアル
 
-まずは[トラブルシューティングマニュアル](docs/jp/トラブルシューティングマニュアル.md)に行って、解決策を探してください。
+まずは[トラブルシューティングマニュアル](../jp/トラブルシューティングマニュアル.md)に行って、解決策を探してください。
 
 ### 🤔どうやって起動するかわからない？
 
