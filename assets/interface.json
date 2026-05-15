@@ -72,6 +72,7 @@
         "resource/tasks/RealTime.json",
         "resource/tasks/MakeCoffee.json",
         "resource/tasks/Rhythm.json",
+        "resource/tasks/Tetris.json",
         "resource/tasks/FountainCheckin.json",
         "resource/tasks/SoundDodge.json",
         "resource/tasks/AutoFScroll.json",
