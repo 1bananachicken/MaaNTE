@@ -14,6 +14,8 @@ _round_count = 0
 _target_round = 0
 _single_shot_done = False
 _allow_speed_drop = False
+_task_started = False
+_task_config = {}
 
 
 @AgentServer.custom_action("tetris_reset_context")
@@ -22,10 +24,13 @@ class TetrisResetContext(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         global _round_count, _target_round, _single_shot_done, _allow_speed_drop
+        global _task_started, _task_config
         _round_count = 0
         _target_round = 0
         _single_shot_done = False
         _allow_speed_drop = False
+        _task_started = False
+        _task_config = {}
 
         params = (
             json.loads(argv.custom_action_param)
@@ -33,7 +38,6 @@ class TetrisResetContext(CustomAction):
             else (argv.custom_action_param or {})
         )
         _allow_speed_drop = params.get("allow_speed_drop", False)
-        print("[AutoTetris] Task stats reset.")
         return CustomAction.RunResult(success=True)
 
 
@@ -43,6 +47,7 @@ class AutoTetris(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         global _round_count, _target_round, _single_shot_done
+        global _task_started, _task_config
 
         controller = context.tasker.controller
         tasker = context.tasker
@@ -60,7 +65,6 @@ class AutoTetris(CustomAction):
         try:
             new_target = int(rc) if rc else 0
         except (ValueError, TypeError):
-            print(f"[AutoTetris] repeat_count parse failed: {rc}")
             new_target = 0
 
         if new_target > 0 and _target_round != new_target:
@@ -68,10 +72,27 @@ class AutoTetris(CustomAction):
             _target_round = new_target
             _single_shot_done = False
 
+        if not _task_started:
+            _task_started = True
+            _task_config = {
+                "mode": mode,
+                "use_all_vitality": use_all_vitality,
+                "allow_speed_drop": allow_speed_drop,
+                "target_round": new_target if new_target > 0 else 1,
+            }
+            mode_label = "单人" if mode == "single" else "多人"
+            parts = [f"模式: {mode_label}"]
+            if new_target > 1:
+                parts.append(f"连打: {new_target}轮")
+            if use_all_vitality:
+                parts.append("消耗所有活力: 是")
+            if allow_speed_drop:
+                parts.append("允许速降: 是")
+            print(f"[泯除方块] 任务开始 | {' | '.join(parts)}")
+
         if not use_all_vitality and _single_shot_done:
-            print(f"[AutoTetris] All {_target_round} rounds already done. Stopping task.")
-            tasker.post_stop()  # Stop the task after finishing the target rounds
-            controller.post_key_down(27) # Press ESC to exit game screen
+            tasker.post_stop()
+            controller.post_key_down(27)
             time.sleep(0.05)
             controller.post_key_up(27)
             return CustomAction.RunResult(success=False)
@@ -85,17 +106,18 @@ class AutoTetris(CustomAction):
 
         if not success:
             _round_count = 0
+            print("[泯除方块] 任务异常结束")
             return CustomAction.RunResult(success=False)
 
         if not use_all_vitality:
             _round_count += 1
-            print(f"[AutoTetris] Finished round {_round_count}/{_target_round}")
+            print(f"[泯除方块] 进度: {_round_count}/{_target_round}")
 
             if _round_count >= _target_round:
                 _single_shot_done = True
-                print("[AutoTetris] All rounds finished.")
-                tasker.post_stop()  # Stop the task after finishing the target rounds
-                controller.post_key_down(27) # Press ESC to exit game screen
+                print("[泯除方块] 任务完成")
+                tasker.post_stop()
+                controller.post_key_down(27)
                 time.sleep(0.05)
                 controller.post_key_up(27)
                 return CustomAction.RunResult(success=True)
@@ -128,21 +150,13 @@ class TetrisCheckVitalityAction(CustomAction):
                     numbers = re.findall(r"\d+", t)
                     if numbers:
                         vitality = int(numbers[-1])
-                print(f"[TetrisCheckVitality] vitality={vitality}")
-            else:
-                print("[TetrisCheckVitality] OCR no hit")
-        else:
-            print("[TetrisCheckVitality] screencap failed")
 
         if vitality == 0:
-            print("[TetrisCheckVitality] vitality == 0, stopping")
+            print("[泯除方块] 活力耗尽，任务完成")
             controller.post_key_down(27)
             time.sleep(0.05)
             controller.post_key_up(27)
             return CustomAction.RunResult(success=False)
-
-        if vitality < 0:
-            print("[TetrisCheckVitality] OCR failed or vitality not found, assuming vitality available")
 
         controller.post_key_down(27)
         time.sleep(0.05)

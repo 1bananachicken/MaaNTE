@@ -66,8 +66,6 @@ class TetrisGamePlayer:
         last_piece_signature = None
         skip_count = 0
 
-        print(f"=== Tetris Round Started | mode={self.mode} ===")
-
         while time.time() - round_start < 900:
             if tasker.stopping:
                 return False
@@ -79,7 +77,6 @@ class TetrisGamePlayer:
                 continue
 
             if time.time() - round_start >= 5.0 and self._is_result_screen(img):
-                print("Result screen detected, round ended.")
                 return True
 
             if self.current_piece_name is None:
@@ -87,7 +84,7 @@ class TetrisGamePlayer:
                     if not self._sleep_with_stop(tasker, 0.02):
                         return False
                     continue
-                print(f"[NewPiece] First piece: {self.current_piece_name}")
+                self._debug_log(f"[NewPiece] First piece: {self.current_piece_name}")
 
             current_signature = (
                 self.current_piece_name,
@@ -179,7 +176,7 @@ class TetrisGamePlayer:
                     self.combo_count = 1
                 self.last_clear_time = now
                 self.total_lines_cleared += lines_cleared
-                print(f"[Stats] Lines cleared: {lines_cleared}, Total: {self.total_lines_cleared}")
+                self._debug_log(f"[Stats] Lines cleared: {lines_cleared}, Total: {self.total_lines_cleared}")
             else:
                 if time.time() - self.last_clear_time > 5.0:
                     self.combo_count = 0
@@ -199,7 +196,6 @@ class TetrisGamePlayer:
             if not self._sleep_with_stop(tasker, 0.02):
                 return False
 
-        print("Tetris round timed out.")
         return False
 
     def _sleep_with_stop(self, tasker, seconds: float) -> bool:
@@ -224,7 +220,6 @@ class TetrisGamePlayer:
                 continue
 
             if self._is_result_screen(img):
-                print("Result screen detected while waiting for next piece.")
                 return "result"
 
             if self._is_drop_ready(img):
@@ -246,7 +241,7 @@ class TetrisGamePlayer:
                         if not self._sleep_with_stop(tasker, 0.01):
                             return None
                         continue
-                    print("[NewPiece] Optimistic match succeeded before drop ready")
+                    self._debug_log("[NewPiece] Optimistic match succeeded before drop ready")
                     return self._build_new_piece_info(match)
 
             if not self._sleep_with_stop(tasker, 0.01):
@@ -260,14 +255,10 @@ class TetrisGamePlayer:
             return False
         if expected_next is not None and detected == expected_next:
             return False
-        print(
-            f"[NewPiece] Skipping same-piece detection: detected={detected} "
-            f"current={current_piece} expected_next={expected_next}"
-        )
         return True
 
     def _build_new_piece_info(self, match):
-        print(
+        self._debug_log(
             f"[NewPiece] Template matched {match['piece']} score={match['score']:.2f}, new piece spawned"
         )
         base_rotation = 0
@@ -293,8 +284,7 @@ class TetrisGamePlayer:
     def _safe_get_image(self, controller):
         try:
             return get_image(controller)
-        except Exception as exc:
-            print(f"Tetris screencap failed: {exc}")
+        except Exception:
             return None
 
     def _scan_play_state(self, img):
@@ -450,7 +440,7 @@ class TetrisGamePlayer:
 
         self.queue_pieces_state = play_state.get("queue_pieces", [])
         if self.queue_pieces_state:
-            print(f"Queue(bottom->top)={self.queue_pieces_state}")
+            self._debug_log(f"Queue(bottom->top)={self.queue_pieces_state}")
 
         active_cells = play_state.get("active_cells")
         if active_cells is not None:
@@ -477,7 +467,7 @@ class TetrisGamePlayer:
         shape = PIECES[piece_name][rotation]
         result = simulate_drop(board, shape, target_col)
         if result is None:
-            print("[Board] Internal drop failed; keeping previous board state.")
+            self._debug_log("[Board] Internal drop failed; keeping previous board state.")
             return None
         if apply:
             self.internal_board = result["board"]
