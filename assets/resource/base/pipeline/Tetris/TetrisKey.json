@@ -1,0 +1,22 @@
+{
+    "TetrisPressF": {
+        "desc": "泯除方块 - 按下F键（交互）",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [70]
+            }
+        },
+        "post_delay": 500
+    },
+    "TetrisPressEsc": {
+        "desc": "泯除方块 - 按下Esc键",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [27]
+            }
+        },
+        "post_delay": 800
+    }
+}
