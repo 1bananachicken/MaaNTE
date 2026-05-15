@@ -19,7 +19,6 @@ on:
 
 env:
   MAA_FRAMEWORK_VERSION: "v5.10.4"
-  MFAA_VERSION: "v2.12.1"
   MXU_VERSION: "v2.1.3"
 
 permissions:
@@ -105,23 +104,6 @@ jobs:
           tag: ${{ env.MAA_FRAMEWORK_VERSION }}
           out-file-path: "deps"
           extract: true
-
-      - name: Download MFAAvalonia
-        id: download_mfa
-        uses: robinraju/release-downloader@v1
-        with:
-          repository: MaaXYZ/MFAAvalonia
-          fileName: "MFAAvalonia-*-win-${{ steps.platform.outputs.tag }}*"
-          tag: ${{ env.MFAA_VERSION }}
-          out-file-path: "MFA"
-          extract: true
-
-      - name: Clean up MFAAvalonia archive on Windows
-        shell: bash
-        run: |
-          ARCHIVE_FILE_PATH="${{ fromJson(steps.download_mfa.outputs.downloaded_files)[0] }}"
-          rm -f "${ARCHIVE_FILE_PATH}"
-          echo "Archive cleanup command executed for MFAAvalonia on Windows."
       
       - name: Download MXU
         id: download_mxu
@@ -157,14 +139,6 @@ jobs:
           # 下载 rcedit
           curl -L https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe -o rcedit.exe
 
-          # 修改 MFAAvalonia 图标（如果存在）
-          if [ -f "MFA/MFAAvalonia.exe" ]; then
-            ./rcedit.exe "MFA/MFAAvalonia.exe" --set-icon "maante.ico"
-            echo "MFAAvalonia icon modified successfully"
-          else
-            echo "MFAAvalonia exe not found, skipping icon update."
-          fi
-
           # 修改 MXU 图标（如果存在）
           if [ -f "MXU/mxu.exe" ]; then
             ./rcedit.exe "MXU/mxu.exe" --set-icon "maante.ico"
@@ -182,12 +156,6 @@ jobs:
         shell: bash
         run: |
           ./install/python/python.exe tools/ci/download_deps.py --deps-dir install/deps
-
-      - name: Install
-        shell: bash
-        run: |
-          PLATFORM_TAG="win-${{ steps.platform.outputs.tag }}"
-          ./install/python/python.exe ./tools/ci/install.py ${{ needs.meta.outputs.tag }} $PLATFORM_TAG
       
       - name: Create MXU version
         shell: bash
@@ -196,22 +164,6 @@ jobs:
           cp -rpvn install/python/. install-mxu/python/
           if [ -d "install/deps" ]; then
             cp -rpvn install/deps/. install-mxu/deps/
-          fi
-
-      - name: Copy MFA files to main version
-        shell: bash
-        run: |
-          if [ -d "MFA" ]; then
-            echo "Copying MFA files to install directory..."
-            mkdir -p install
-            cp -rpvn MFA/. install/
-            if [ -f "install/MFAAvalonia.exe" ]; then
-              mv -f install/MFAAvalonia.exe install/MaaNTE.exe
-            elif [ -f "install/MFAAvalonia" ]; then
-              mv -f install/MFAAvalonia install/MaaNTE
-            fi
-          else
-            echo "MFA directory not found, skipping copy."
           fi
       
       - name: Copy MXU files to MXU version
@@ -232,27 +184,10 @@ jobs:
       - name: Copy custom icons
         shell: bash
         run: |
-          # 删除 MFAA 自带的 Assets 文件夹
-          if [ -d "install/Assets" ]; then
-            rm -rf install/Assets
-            echo "Removed original Assets folder"
-          fi
-
-          # MFAA 版本的图标放根目录
-          if [ -f "maante.ico" ]; then
-            cp maante.ico install/logo.ico
-            echo "Copied custom icon to install/logo.ico"
-          fi
-
           # MXU 版本的图标
           if [ -f "maante.ico" ]; then
             cp maante.ico install-mxu/logo.ico
           fi
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MFAA
-          path: "install"
 
       - uses: actions/upload-artifact@v4
         with:
@@ -307,9 +242,6 @@ jobs:
                 chmod +x "$f/MaaPiCli"
                 echo "Set execute permission for $f/MaaPiCli"
               fi
-
-              find "$f" -type f -name "MFAAvalonia*" -exec chmod +x {} \; 2>/dev/null || true
-              echo "Set execute permission for all MFAAvalonia files"
 
               find "$f" -type f -name "MFAUpdater*" -exec chmod +x {} \; 2>/dev/null || true
               echo "Set execute permission for all MFAUpdater files"

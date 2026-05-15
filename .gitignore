@@ -447,6 +447,7 @@ deps/tools/*
 !deps/tools/*.schema.json
 build
 install
+install-mxu
 
 # Tools
 tools/ImageCropper/**/*.png
@@ -462,6 +463,7 @@ assets/resource/base/model/detect/sos_nodes.onnx
 
 # local gui test
 MFA/
+MXU/
 deps_maafw.zip
 test/
 output/
