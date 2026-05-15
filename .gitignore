@@ -468,6 +468,5 @@ deps_maafw.zip
 test/
 output/
 
-
 # Models
 assets/resource/base/model/*
