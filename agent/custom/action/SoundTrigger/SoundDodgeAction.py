@@ -24,7 +24,14 @@ class Ctx:
     def _stopped(self):
         return self._stop_event.is_set()
 
-    def setup(self, controller, threshold=0.13, counter_threshold=0.12):
+    def setup(
+        self,
+        controller,
+        threshold=0.13,
+        counter_threshold=0.12,
+        capture_mode: str = "process",
+        process_name: str = "",
+    ):
         if self.active:
             return
 
@@ -40,6 +47,8 @@ class Ctx:
             counter_path=counter,
             threshold=threshold,
             counter_threshold=counter_threshold,
+            capture_mode=capture_mode,
+            process_name=process_name,
             stop_check=self._stopped,
         )
         self.dodger = Dodger(controller=controller, stop_check=self._stopped)
@@ -87,15 +96,22 @@ class SoundDodgeAction(CustomAction):
 
         threshold = 0.13
         counter_threshold = 0.12
+        monitor_process_audio_only = True
         if argv.custom_action_param:
             try:
                 p = json.loads(argv.custom_action_param)
                 threshold = float(p.get("threshold", 0.13))
                 counter_threshold = float(p.get("counter_attack_threshold", 0.12))
+                monitor_process_audio_only = bool(
+                    p.get("monitor_process_audio_only", True)
+                )
             except (json.JSONDecodeError, ValueError, TypeError) as e:
                 logger.warning(
                     f"Invalid custom_action_param: {argv.custom_action_param!r}, error: {e}. Using defaults."
                 )
+
+        capture_mode = "process" if monitor_process_audio_only else "device"
+        process_name = "HTGame.exe"
 
         ctx = Ctx()
         try:
@@ -103,6 +119,8 @@ class SoundDodgeAction(CustomAction):
                 context.tasker.controller,
                 threshold=threshold,
                 counter_threshold=counter_threshold,
+                capture_mode=capture_mode,
+                process_name=process_name,
             )
             if not ctx.enter():
                 return CustomAction.RunResult(success=False)

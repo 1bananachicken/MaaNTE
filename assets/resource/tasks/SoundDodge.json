@@ -8,7 +8,8 @@
                 "SoundDodgeEnable",
                 "SoundDodgeAllAttacks",
                 "SoundDodgeThreshold",
-                "SoundCounterThreshold"
+                "SoundCounterThreshold",
+                "SoundMonitorProcessAudioOnly"
             ],
             "controller": [
                 "Win32-Front"
@@ -109,6 +110,36 @@
                     }
                 }
             }
+        },
+        "SoundMonitorProcessAudioOnly": {
+            "type": "switch",
+            "label": "仅监视进程音频",
+            "description": "开启后仅监听 HTGame.exe 的进程音频流，避免其他软件声音干扰",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "SoundDodgeMain": {
+                            "custom_action_param": {
+                                "monitor_process_audio_only": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "SoundDodgeMain": {
+                            "custom_action_param": {
+                                "monitor_process_audio_only": false
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
         }
     }
 }

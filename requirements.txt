@@ -10,3 +10,4 @@ scipy
 scikit-learn
 soundcard
 mido
+proc-tap
