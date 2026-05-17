@@ -5,6 +5,9 @@
             "label": "家具领取",
             "entry": "FurnitureEntrance",
             "description": "到各个房产中领取异象家具收益，默认遍历所有房产，可以配置下列选项来选择前往/拥有与否",
+            "controller": [
+                "Win32-Front"
+            ],
             "option": [
                 "FurnitureChooseWienerApartments",
                 "FurnitureChooseEdenApartments",
