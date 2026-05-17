@@ -158,8 +158,11 @@ class AutoFish(CustomAction):
                     )
                     logger.debug(f"Checking for bait, probability: {prob:.2f}")
                     if m_need_bait:
-                        logger.debug("Need bait! Stopping fishing.")
-                        return CustomAction.RunResult(success=False)
+                        logger.debug("Need bait! Switching to bait handler.")
+                        # 缺少鱼饵不是异常退出：这里临时改写 FishGameStart 的后续节点，
+                        # 让流水线去打开鱼饵界面，优先切换万能鱼饵，必要时再购买鱼饵。
+                        context.override_next("FishGameStart", ["FishHandleBaitLack"])
+                        return CustomAction.RunResult(success=True)
 
                     time.sleep(0.1)
 
