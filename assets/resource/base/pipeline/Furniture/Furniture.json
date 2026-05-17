@@ -60,13 +60,13 @@
         "action": "Swipe",
         "begin": [
             20,
-            515,
+            520,
             160,
             1
         ],
         "end": [
             20,
-            435,
+            380,
             160,
             1
         ],
@@ -273,6 +273,7 @@
         "expected": [
             "赋能总览"
         ],
+        "pre_delay": 1000,
         "action": "Click",
         "next": [
             "FurnitureOverviewSwipe"
