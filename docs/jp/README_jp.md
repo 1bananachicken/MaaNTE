@@ -48,7 +48,9 @@
 >
 > QQ Group 3: 1075143235 (満員)
 >
-> QQ Group 4: 713114598
+> QQ Group 4: 713114598 (満員)
+>
+> QQ Group 5: 1106448578
 
 # ⚠️免責事項とリスク警告
 
@@ -72,7 +74,7 @@
 
 ## ✨機能一覧
 
-- 🎣 自动钓鱼
+- 🎣 自動釣り
   - 🐟 自動釣り
   - 🪝 自動で餌を買う
 - 🥤 自動でコーヒーを作る
@@ -166,7 +168,7 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 
 もしMaaNTEがあなたの時間を大いに節約してくれたなら、開発者にコーヒーを奢ってあげてはいかがでしょうか？
 
-あなたのサポートが私たちの継続的な更新の最大の原動力です🥰。
+あなたのサポートが私たちの継続な更新の最大の原動力です🥰。
 
 [<img width="200" alt="赞助我们" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.png">](https://afdian.com/a/MaaNTE)
 
