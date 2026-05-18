@@ -206,7 +206,7 @@ jobs:
             -DVERSION="$tag" `
             -DARCH="$arch" `
             -DSOURCE_DIR="install-mxu" `
-            -DICON_FILE="maante.ico" `
+            -DICON_FILE="${{ github.workspace }}\maante.ico" `
             -DOUTFILE="MaaNTE-win-$arch-$tag-Setup.exe" `
             tools/ci/installer.nsi
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
