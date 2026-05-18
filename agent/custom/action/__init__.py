@@ -9,6 +9,7 @@ from .rhythm.feats.select_song import *
 from .Common.click import *
 from .realtime_task import *
 from .pinkpaw.pinkpaw_core1 import *
+from .pinkpaw.pinkpaw_core2 import *
 from .AutoFish.auto_fish_withoutCV import *
 from .SoundTrigger.SoundDodgeAction import *
 from .auto_f_scroll import *
@@ -28,6 +29,7 @@ __all__ = [
     "AutoRhythmSelectSong",
     "RealTimeTaskAction",
     "PinkPawHeistScheme1Action",
+    "PinkPawHeistScheme2Action",
     "AutoFishWithoutCV",
     "SoundDodgeAction",
     "AutoFScroll",

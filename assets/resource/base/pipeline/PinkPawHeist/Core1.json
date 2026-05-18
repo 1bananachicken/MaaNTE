@@ -10,6 +10,17 @@
             }
         }
     },
+    "PinkPawHeist_Scheme2": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "PinkPawHeistScheme2Action"
+            }
+        }
+    },
     "PinkPawHeist_CheckMonsterOnce": {
         "desc": "单次检测怪物血条颜色",
         "recognition": {
@@ -60,8 +71,49 @@
             "type": "DoNothing"
         },
         "next": [],
-        "timeout": 1500,
-        "max_hit": 1
+        "timeout": 1500
+    },
+    "PinkPawHeist_CheckGate2Once": {
+        "desc": "单次检测铁门",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "强制开启",
+                "roi": [
+                    800,
+                    359,
+                    80,
+                    25
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [],
+        "timeout": 1500
+    },
+    "PinkPawHeist_CheckDoorOnce": {
+        "desc": "单次检测开门",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "开门",
+                "roi": [
+                    800,
+                    379,
+                    80,
+                    25
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [],
+        "timeout": 1500
     },
     "PinkPawHeist_CheckEvacuateOnce": {
         "desc": "单次检测撤离确认按钮",
@@ -122,6 +174,26 @@
         "pre_delay": 0,
         "post_delay": 0
     },
+    "PinkPawHeist_CheckReward": {
+        "desc": "识别在地图",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "本局收益",
+                "roi": [
+                    30,
+                    250,
+                    100,
+                    20
+                ]
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 100,
+        "next": []
+    },
     "PinkPawHeist_LongPressKey": {
         "recognition": {
             "type": "DirectHit"
@@ -136,7 +208,7 @@
         "pre_delay": 0,
         "post_delay": 0
     },
-    "PinkPawHeist_Core1_Attack_Space":{
+    "PinkPawHeist_Core1_Attack_Space": {
         "recognition": {
             "type": "DirectHit"
         },
@@ -148,16 +220,21 @@
         },
         "pre_delay": 100,
         "post_delay": 100,
-        "next": ["PinkPawHeist_Core1_Attack_Mouse"]
+        "next": [
+            "PinkPawHeist_Core1_Attack_Mouse"
+        ]
     },
-    "PinkPawHeist_Core1_Attack_Mouse":{
+    "PinkPawHeist_Core1_Attack_Mouse": {
         "recognition": {
             "type": "DirectHit"
         },
         "action": {
             "type": "Click",
             "param": {
-                "target": [640,360],
+                "target": [
+                    640,
+                    360
+                ],
                 "contact": 0
             }
         },
@@ -183,6 +260,28 @@
         "action": {
             "type": "Click"
         },
+        "timeout": 5000,
+        "next": []
+    },
+    "PinkPawHeist_Once": {
+        "desc": "撤离确认",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": "确认",
+                "roi": [
+                    710,
+                    460,
+                    120,
+                    30
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "timeout": 5000,
         "next": []
     },
     "PinkPawHeist_Core1_Log_FightG1": {
@@ -195,7 +294,10 @@
         "focus": {
             "Node.Action.Starting": {
                 "content": "等待G层战斗1",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             }
         }
     },
@@ -209,7 +311,10 @@
         "focus": {
             "Node.Action.Starting": {
                 "content": "等待G层战斗2",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             }
         }
     }
