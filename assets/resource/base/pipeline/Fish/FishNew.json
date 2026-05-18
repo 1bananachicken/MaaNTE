@@ -78,6 +78,12 @@
         },
         "pre_delay": 0,
         "post_wait_freezes": {
+            "target": [
+                0,
+                0,
+                0,
+                0
+            ],
             "time": 1000,
             "timeout": 6000
         },
@@ -202,10 +208,6 @@
                 ],
                 "template": "Fish/FishGeneralBait.png"
             }
-        },
-        "action": "Click",
-        "focus": {
-            "Node.Action.Succeeded": "选择万能鱼饵"
         },
         "next": [
             "[JumpBack]FishNewBaitDetail",
