@@ -52,8 +52,9 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 >
 > QQ Group 3: 1075143235 (Full)
 >
-> QQ Group 4: 713114598
-
+> QQ Group 4: 713114598 (Full)
+>
+> QQ Group 5: 1106448578
 # Disclaimer and Risk Notice
 
 > [!Note]
