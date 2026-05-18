@@ -3,7 +3,7 @@
         "desc": "喷泉打卡入口",
         "next": [
             "FountainFindButton",
-            "FountainCheckinExit"
+            "FountainCheckinNotFound"
         ]
     },
     "FountainFindButton": {
@@ -184,6 +184,15 @@
         "next": [
             "FountainCheckinExit"
         ]
+    },
+    "FountainCheckinNotFound": {
+        "desc": "未识别到喷泉打卡标识",
+        "next": [
+            "FountainCheckinExit"
+        ],
+        "focus": {
+            "Node.Action.Succeeded": "❌ 未能找到喷泉打卡图标，请移动到喷泉位置再次进行该任务"
+        }
     },
     "FountainCheckinExit": {
         "desc": "喷泉打卡任务出口"

@@ -3,7 +3,7 @@
         {
             "name": "喷泉打卡",
             "entry": "FountainCheckinEntrance",
-            "description": "识别并点击喷泉打卡按钮。",
+            "description": "识别并点击喷泉打卡按钮。<br><span style='color:red'>请移动到喷泉位置后再执行该任务。</span><br>",
             "controller": [
                 "Win32-Front"
             ]
