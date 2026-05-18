@@ -202,11 +202,13 @@ jobs:
           tag="${{ needs.meta.outputs.tag }}"
           arch="${{ steps.platform.outputs.tag }}"
           export PATH="/c/Program Files (x86)/NSIS:$PATH"
+          ICON_FILE_WIN=$(cygpath -w "$PWD/maante.ico")
+          SOURCE_DIR_WIN=$(cygpath -w "$PWD/install-mxu")
           makensis \
             -DVERSION="${tag}" \
             -DARCH="${arch}" \
-            -DSOURCE_DIR="install-mxu" \
-            -DICON_FILE="maante.ico" \
+            -DSOURCE_DIR="${SOURCE_DIR_WIN}" \
+            -DICON_FILE="${ICON_FILE_WIN}" \
             -DOUTFILE="MaaNTE-win-${arch}-${tag}-Setup.exe" \
             tools/ci/installer.nsi
 
