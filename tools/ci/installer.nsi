@@ -32,6 +32,7 @@ SetCompressor lzma
 
 ; ---------- 页面 ----------
 !insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
@@ -41,8 +42,19 @@ SetCompressor lzma
 
 !insertmacro MUI_LANGUAGE "SimpChinese"
 
+; ---------- 组件描述 ----------
+LangString DESC_SecCore ${LANG_SIMPCHINESE} "核心程序文件（必选）"
+LangString DESC_SecStartMenu ${LANG_SIMPCHINESE} "在开始菜单中创建 MAANTE 的快捷方式"
+LangString DESC_SecDesktop ${LANG_SIMPCHINESE} "在桌面上创建 MAANTE 的快捷方式"
+
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecCore} $(DESC_SecCore)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecStartMenu} $(DESC_SecStartMenu)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecDesktop} $(DESC_SecDesktop)
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
+
 ; ---------- 安装区段 ----------
-Section "Install"
+Section "核心文件" SecCore
     SetOutPath "$INSTDIR"
     ; 使用动态源文件目录
     File /r "${SOURCE_DIR}\*.*"
@@ -59,20 +71,28 @@ Section "Install"
     WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MAANTE" "NoModify" 1
     WriteRegDWORD HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MAANTE" "NoRepair" 1
     WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MAANTE" "DisplayVersion" "${VERSION}"
-    ; 如需记录架构，可取消下面注释（非标准字段）
-    ; WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\MAANTE" "Architecture" "${ARCH}"
-    
-    WriteRegStr HKLM "Software\MAANTE" "InstallDir" "$INSTDIR"
 
-    ; 创建开始菜单快捷方式
+    WriteRegStr HKLM "Software\MAANTE" "InstallDir" "$INSTDIR"
+SectionEnd
+
+Section /o "开始菜单快捷方式" SecStartMenu
     SetShellVarContext all
     CreateDirectory "$SMPROGRAMS\MAANTE"
     CreateShortCut "$SMPROGRAMS\MAANTE\MAANTE.lnk" "$INSTDIR\MAANTE.exe" "" "$INSTDIR\logo.ico" 0
     CreateShortCut "$SMPROGRAMS\MAANTE\Uninstall.lnk" "$INSTDIR\uninstall.exe" "" "$INSTDIR\logo.ico" 0
+SectionEnd
 
-    ; 创建桌面快捷方式
+Section /o "桌面快捷方式" SecDesktop
+    SetShellVarContext all
     CreateShortCut "$DESKTOP\MAANTE.lnk" "$INSTDIR\MAANTE.exe" "" "$INSTDIR\logo.ico" 0
 SectionEnd
+
+; ---------- .onInit（组件默认选中） ----------
+Function .onInit
+    ; 默认选中开始菜单和桌面快捷方式
+    SectionSetFlags ${SecStartMenu} 1
+    SectionSetFlags ${SecDesktop} 1
+FunctionEnd
 
 ; ---------- 卸载区段 ----------
 Section "Uninstall"
