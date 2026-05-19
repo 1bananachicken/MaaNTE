@@ -90,6 +90,7 @@
         "action": {
             "type": "Click"
         },
+        "timeout": 5000,
         "next": []
     },
     "PinkPawHeist_ClickKey": {
