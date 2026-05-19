@@ -20,26 +20,30 @@ if os.getcwd() != project_root_dir:
 print(f"set cwd: {os.getcwd()}")
 
 
-def cleanup_debug_log_files():
-    """每次启动时清理 debug 目录下的日志文件。"""
-    debug_dir = Path(project_root_dir) / "debug"
-
-    if not debug_dir.exists() or not debug_dir.is_dir():
-        return
-
-    for log_file in debug_dir.glob("**/*.log"):
-        try:
-            if log_file.is_file() and not log_file.is_symlink():
-                log_file.unlink()
-        except OSError as e:
-            continue
-
-
 # 将脚本自身的目录添加到sys.path，以便导入utils、maa等模块
 if current_script_dir not in sys.path:
     sys.path.insert(0, current_script_dir)
 
 from utils import logger
+
+MAAHUB_ACCENT_NAME = "custom-9e8de7d9-ab2b-4784-a082-63110b986d90"
+MAAHUB_ACCENT = {
+    "id": "9e8de7d9-ab2b-4784-a082-63110b986d90",
+    "name": MAAHUB_ACCENT_NAME,
+    "label": {
+        "zh-CN": "MaaHub",
+        "zh-TW": "MaaHub",
+        "en-US": "MaaHub",
+        "ja-JP": "MaaHub",
+        "ko-KR": "MaaHub",
+    },
+    "colors": {
+        "default": "#fe9800",
+        "hover": "#fe9800",
+        "light": "#fe9800",
+        "lightDark": "#fe9800",
+    },
+}
 
 # 路径兼容性检测 —— 最早执行，检测含中文/全角字符/中文符号的路径
 import re
@@ -182,6 +186,86 @@ def read_config(config_name: str, default_config: dict) -> dict:
     except Exception:
         logger.exception(f"读取 {config_name}.json 失败，使用默认配置")
         return default_config
+
+
+def _apply_maahub_ui_config(config: dict) -> bool:
+    changed = False
+
+    settings = config.setdefault("settings", {})
+    if not isinstance(settings, dict):
+        settings = {}
+        config["settings"] = settings
+        changed = True
+
+    if settings.get("theme") != "dark":
+        settings["theme"] = "dark"
+        changed = True
+    if settings.get("accentColor") != MAAHUB_ACCENT_NAME:
+        settings["accentColor"] = MAAHUB_ACCENT_NAME
+        changed = True
+
+    custom_accents = config.setdefault("customAccents", [])
+    if not isinstance(custom_accents, list):
+        custom_accents = []
+        config["customAccents"] = custom_accents
+        changed = True
+
+    accent_index = next(
+        (
+            index
+            for index, accent in enumerate(custom_accents)
+            if isinstance(accent, dict)
+            and (
+                accent.get("id") == MAAHUB_ACCENT["id"]
+                or accent.get("name") == MAAHUB_ACCENT_NAME
+            )
+        ),
+        None,
+    )
+
+    accent_config = json.loads(json.dumps(MAAHUB_ACCENT, ensure_ascii=False))
+    if accent_index is None:
+        custom_accents.append(accent_config)
+        changed = True
+    elif custom_accents[accent_index] != accent_config:
+        custom_accents[accent_index] = accent_config
+        changed = True
+
+    return changed
+
+
+def ensure_mxu_ui_config() -> None:
+    import stat
+    config_dir = Path(project_root_dir) / "config"
+    config_dir.mkdir(exist_ok=True)
+    config_path = config_dir / "mxu-MaaNTE.json"
+    os.chmod(config_path, stat.S_IWRITE)
+    config = {}
+    if config_path.exists():
+        try:
+            with open(config_path, "r", encoding="utf-8") as f:
+                config = json.load(f)
+        except Exception:
+            logger.exception("读取 mxu-MaaNTE.json 失败，将重建UI主题配置")
+    else:
+        return
+
+    if not isinstance(config, dict):
+        config = {}
+
+    changed = _apply_maahub_ui_config(config)
+    
+    if not changed:
+        return
+
+    try:
+        with open(config_path, "w", encoding="utf-8") as f:
+            json.dump(config, f, indent=2, ensure_ascii=False)
+            f.write("\n")
+    except Exception:
+        logger.exception("写入 mxu-MaaNTE.json 失败")
+    
+    os.chmod(config_path, stat.S_IREAD)
 
 
 def read_interface_version(interface_file_name="./interface.json") -> str:
@@ -507,11 +591,13 @@ def agent(is_dev_mode=False):
         logger.debug(f"socket_id: {socket_id}")
 
         log_pi_environment()
-        AgentServer.start_up(socket_id)
-        logger.info("AgentServer启动")
-        _check_game_resolution()
-        AgentServer.join()
-        AgentServer.shut_down()
+        try:
+            AgentServer.start_up(socket_id)
+            logger.info("AgentServer启动")
+            _check_game_resolution()
+            AgentServer.join()
+        finally:
+            AgentServer.shut_down()
         logger.info("AgentServer关闭")
     except ImportError as e:
         logger.error(f"导入模块失败: {e}")
@@ -539,7 +625,6 @@ def main():
         ensure_venv_and_relaunch_if_needed()
 
     check_and_install_dependencies()
-    cleanup_debug_log_files()
 
     if is_dev_mode:
         os.chdir(Path("./assets"))
@@ -549,4 +634,5 @@ def main():
 
 
 if __name__ == "__main__":
+    ensure_mxu_ui_config()
     main()
