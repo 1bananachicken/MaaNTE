@@ -2,7 +2,7 @@
     "task": [
         {
             "name": "ClaimRewards",
-            "label": "$task_claim_rewards_name",
+            "label": "$task_claim_rewards_label",
             "entry": "ClaimRewardsEntrance",
             "description": "$task_claim_rewards_desc",
             "controller": [

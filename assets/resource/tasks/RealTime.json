@@ -2,7 +2,7 @@
     "task": [
         {
             "name": "RealTime",
-            "label": "$task_realtime_name",
+            "label": "$task_realtime_label",
             "entry": "RealTimeTaskMain",
             "description": "$task_realtime_desc",
             "option": [

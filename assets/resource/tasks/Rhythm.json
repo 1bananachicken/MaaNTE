@@ -2,7 +2,7 @@
     "task": [
         {
             "name": "Rhythm",
-            "label": "$task_rhythm_name",
+            "label": "$task_rhythm_label",
             "entry": "RhythmEntrance",
             "option": [
                 "自动选曲",
@@ -45,7 +45,7 @@
             "cases": [
                 {
                     "name": "Heroic_Appearance",
-                    "label": "Heroic_Appearance",
+                    "label": "Heroic Appearance",
                     "pipeline_override": {
                         "RhythmSceneFindSong": {
                             "recognition": {
@@ -75,7 +75,7 @@
                 },
                 {
                     "name": "Everlasting_Dazing_Summer_Short",
-                    "label": "Everlasting_Dazing_Summer(Short_Ver.)",
+                    "label": "Everlasting Dazing Summer(Short Ver.)",
                     "pipeline_override": {
                         "RhythmSceneFindSong": {
                             "recognition": {
@@ -90,7 +90,7 @@
                 },
                 {
                     "name": "Everlasting_Dazing_Summer",
-                    "label": "Everlasting_Dazing_Summer",
+                    "label": "Everlasting Dazing Summer",
                     "pipeline_override": {
                         "RhythmSceneFindSong": {
                             "recognition": {

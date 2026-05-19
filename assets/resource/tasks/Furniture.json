@@ -2,7 +2,7 @@
     "task": [
         {
             "name": "Furniture",
-            "label": "$task_furniture_name",
+            "label": "$task_furniture_label",
             "entry": "FurnitureEntrance",
             "description": "$task_furniture_desc",
             "controller": [

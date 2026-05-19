@@ -2,7 +2,7 @@
     "task": [
         {
             "name": "Tetris",
-            "label": "$task_tetris_name",
+            "label": "$task_tetris_label",
             "entry": "TetrisEntrance",
             "description": "$task_tetris_desc",
             "option": [

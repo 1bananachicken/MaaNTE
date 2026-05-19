@@ -2,7 +2,7 @@
     "task": [
         {
             "name": "Fish",
-            "label": "$task_fish_name",
+            "label": "$task_fish_label",
             "entry": "FishEntrance",
             "option": [
                 "FishLoopInfinite",
@@ -13,7 +13,7 @@
         },
         {
             "name": "FishNew",
-            "label": "$task_fish_new_name",
+            "label": "$task_fish_new_label",
             "entry": "FishNewEntrance",
             "description": "$task_fish_new_desc",
             "option": [

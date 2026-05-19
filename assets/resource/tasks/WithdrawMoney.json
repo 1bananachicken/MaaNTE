@@ -2,7 +2,7 @@
     "task": [
         {
             "name": "WithdrawMoney",
-            "label": "$task_withdraw_money_name",
+            "label": "$task_withdraw_money_label",
             "entry": "WithdrawMoneyEntrance",
             "description": "$task_withdraw_money_desc",
             "option": [

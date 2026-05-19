@@ -2,7 +2,7 @@
   "task": [
     {
       "name": "AutoPiano",
-      "label": "$task_auto_piano_name",
+      "label": "$task_auto_piano_label",
       "description": "$task_auto_piano_desc",
       "entry": "AutoPiano",
       "default_check": false,
