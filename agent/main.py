@@ -25,6 +25,7 @@ if current_script_dir not in sys.path:
     sys.path.insert(0, current_script_dir)
 
 from utils import logger
+import utils.screen as screen
 
 MAAHUB_ACCENT_NAME = "custom-9e8de7d9-ab2b-4784-a082-63110b986d90"
 MAAHUB_ACCENT = {
@@ -535,11 +536,14 @@ def _check_game_resolution():
         return
 
     w, h = size
-    if (w, h) == (1280, 720):
-        logger.info(f"当前窗口分辨率: {w}x{h} [正常]")
+    screen.update_screen_size(w, h)
+    scale_x, scale_y = screen.scaling_factors()
+
+    if (w, h) == (screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT):
+        logger.info(f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})")
     else:
         logger.warning(
-            f"当前窗口分辨率: {w}x{h}，请使用 1280x720 分辨率。"
+            f"当前窗口分辨率: {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
             "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。"
         )
 

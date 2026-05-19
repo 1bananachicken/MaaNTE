@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 from ..Common.utils import get_image, match_template_in_region
 from ..Common.logger import get_logger
+from utils import screen
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -74,6 +75,16 @@ class AutoFish(CustomAction):
         fish_game_sign_region = [1141, 609, 87, 84]
         fish_game_sign_region_2 = [1224, 27, 30, 30]
         need_bait_region = [610, 350, 141, 21]
+        deadzone = max(1, int(round(15 * screen.scaling_factors()[0])))
+
+        success_region = screen.map_rect(success_region)
+        settlement_region = screen.map_rect(settlement_region)
+        game_region = screen.map_rect(game_region)
+        escape_region = screen.map_rect(escape_region)
+        prepare_region = screen.map_rect(prepare_region)
+        fish_game_sign_region = screen.map_rect(fish_game_sign_region)
+        fish_game_sign_region_2 = screen.map_rect(fish_game_sign_region_2)
+        need_bait_region = screen.map_rect(need_bait_region)
 
         def press_esc():
             controller.post_key_down(KEY_ESC)
