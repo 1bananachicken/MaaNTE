@@ -486,7 +486,6 @@
         "action": "Click",
         "next": [
             "FishNewConfirmBuyBait",
-            "FishNewStoreContinue",
             "FishNewSellFishEntrance"
         ]
     },
