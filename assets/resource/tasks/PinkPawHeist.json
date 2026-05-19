@@ -27,7 +27,9 @@
                 {
                     "name": "No",
                     "label": "关闭",
-                    "option": ["PinkPawHeist_LoopCount"]
+                    "option": [
+                        "PinkPawHeist_LoopCount"
+                    ]
                 }
             ]
         },
@@ -54,8 +56,6 @@
             "label": "地图方案",
             "description": "选择本次战斗的地图移动方案。。",
             "default_case": "Core1",
-            "description": "选择本次战斗的地图移动方案。方案1需要配队：1娜娜莉3薄荷4早雾，需要一定练度，目前极不稳定。方案2需要配队：1娜娜莉3早雾4狼，走藏品层路线难撤离更稳定收益更高，请设置画质到性能档位，关闭设置里的移动镜头修正！",
-            "default_case": "Core2",
             "cases": [
                 {
                     "name": "Core1",
@@ -77,7 +77,7 @@
                     "pipeline_override": {
                         "PinkPawHeist_ExecuteScheme": {
                             "next": [
-                                "PinkPawHeist_Scheme2_Actions"
+                                "PinkPawHeist_Scheme2"
                             ]
                         }
                     },
@@ -96,7 +96,7 @@
         "PinkPawHeist_Scheme_Core2_desc": {
             "type": "input",
             "label": "方案二说明",
-            "description": "<span style='color:orange'>暂无作用，仅供测试</span><br><span style='color:green'>配队要求：</span>测试<br><span style='color:green'>路线说明：</span>测试",
+            "description": "<span style='color:orange'>更稳定收益更高，请设置画质到性能档位，关闭设置里的移动镜头修正！</span><br><span style='color:green'>配队要求：</span>1娜娜莉3早雾4狼<br><span style='color:green'>路线说明：</span>走藏品层路线撤离",
             "inputs": []
         }
     }

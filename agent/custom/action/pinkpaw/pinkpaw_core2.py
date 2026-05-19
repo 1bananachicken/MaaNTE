@@ -419,7 +419,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.click_key("F")
             ah.delay(1000, check_reward=False)
             ah.key_down("W")
-            ah.delay(14600)
+            ah.delay(14500)
             ah.key_up("W")
             ah.delay(100)
             ah.key_down("D")
@@ -429,7 +429,7 @@ class PinkPawHeistScheme2Action(CustomAction):
 
             # ---------- 移动至G1办公层与电梯 ----------
             ah.key_down("D")
-            ah.delay(4950)
+            ah.delay(4900)
             ah.key_up("D")
             ah.delay(100)
             ah.key_down("W")
