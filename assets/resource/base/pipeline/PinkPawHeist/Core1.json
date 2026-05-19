@@ -66,5 +66,19 @@
                 "display": ["log", "toast"]
             }
         }
+    },
+    "PinkPawHeist_LogMessage": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "",
+                "display": ["log", "toast"]
+            }
+        }
     }
 }

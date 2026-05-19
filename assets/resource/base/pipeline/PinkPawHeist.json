@@ -11,8 +11,8 @@
         ],
         "focus": {
             "Node.Action.Starting": {
-                "content": "{name} 即将开始执行，请确保你设置了**结束任务**的**全局快捷键**！",
-                "display": "modal"
+                "content": "{name} 开始执行，请确保设置了结束任务快捷键(F11)",
+                "display": "toast"
             }
         }
     },
@@ -46,8 +46,12 @@
         "action": {
             "type": "DoNothing"
         },
+        "timeout": 30000,
         "next": [
             "PinkPawHeist_DetectXiaoZhi"
+        ],
+        "on_error": [
+            "PinkPawHeist_StopTask"
         ]
     },
     "PinkPawHeist_DetectXiaoZhi": {
@@ -55,7 +59,8 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "小吱",
+                "expected": ["小吱", "小岐", "小妓"],
+                "threshold": 0.5,
                 "roi": [
                     800,
                     380,
@@ -67,6 +72,7 @@
         "action": {
             "type": "DoNothing"
         },
+        "timeout": 30000,
         "next": [
             "PinkPawHeist_PressF"
         ],
@@ -75,11 +81,11 @@
         ],
         "focus": {
             "Node.Action.Starting": {
-                "content": "开始寻找小吱",
+                "content": "开始寻找小吱（最多等待2分钟）",
                 "display": ["log", "toast"]
             },
             "Node.Action.Failed": {
-                "content": "❌ 未找到小吱，请确保在小吱面前开始任务",
+                "content": "❌ 2分钟内未找到小吱，任务终止",
                 "display": ["log", "toast"]
             },
             "Node.Action.Succeeded": {
@@ -234,6 +240,5 @@
             "type": "DoNothing"
         },
         "next": []
-        // next 由方案选项动态覆写
     }
 }
