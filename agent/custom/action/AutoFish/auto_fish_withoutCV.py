@@ -9,7 +9,7 @@ from utils.logger import logger
 from utils import screen
 
 # 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
-# CURSOR_PX_PER_SEC = 168  适配不同分辨率，放到run里面去乘以缩放系数
+CURSOR_PX_PER_SEC = 168  # 用到的时候自己会再乘scale，这里仍然以1280的base resolution作为参照
 
 
 @AgentServer.custom_action("auto_fish_without_cv")
@@ -18,7 +18,6 @@ class AutoFishWithoutCV(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         scale_x, _ = screen.scaling_factors()
-        CURSOR_PX_PER_SEC = 168 * scale_x
         deadzone = max(1, int(round(15 * scale_x)))  # 光标与绿条中心的距离在 deadzone（像素）以内时不操作，避免过度频繁地轻微调整导致的抖动
         max_try_item = 5  # 识别不完整（绿条或光标未命中）的最大尝试次数，超过后放弃本次钓鱼，重新抛竿（执行 FishHook）
         factor = 1.5  # 控条时长的调整因子，实际时长 = 基础时长 * factor，基础时长 = (光标与绿条中心的像素偏移 / CURSOR_PX_PER_SEC) * 1000ms，增加 factor 可以适当补偿识别误差和按键响应延迟
