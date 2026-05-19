@@ -4,7 +4,12 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [0, 0, 1280, 720],
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
                 "template": [
                     "auto_rhythm/scene_templates/playing/pause.png"
                 ],
@@ -18,11 +23,16 @@
     "RhythmSceneOnResults": {
         "desc": "判断正在结算界面",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "roi": [0, 0, 1280, 720],
-                "template": [
-                    "auto_rhythm/scene_templates/results/score.png"
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
+                "expected": [
+                    "得分"
                 ],
                 "threshold": 0.7
             }
@@ -36,7 +46,12 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [0, 0, 1280, 720],
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
                 "template": [
                     "auto_rhythm/scene_templates/song_select/logo.png"
                 ],
