@@ -6,5 +6,35 @@
             "count": 1,
             "freq": 2
         }
+    },
+    "MakeCoffeeStart": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [1057, 648, 178, 44],
+                "template": "auto_make_coffee/start.png",
+                "threshold": 0.8
+            }
+        }
+    },
+    "MakeCoffeeStar": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [1204, 109, 29, 27],
+                "template": "auto_make_coffee/star.png",
+                "threshold": 0.9
+            }
+        }
+    },
+    "MakeCoffeeClaim": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [681, 539, 187, 38],
+                "template": "auto_make_coffee/claim.png",
+                "threshold": 0.8
+            }
+        }
     }
 }

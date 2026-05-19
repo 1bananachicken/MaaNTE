@@ -1,0 +1,130 @@
+{
+    "FishSlider": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    401,
+                    39,
+                    481,
+                    24
+                ],
+                "template": "Fish/slider.png"
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FishValidRegionLeft": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    401,
+                    39,
+                    481,
+                    24
+                ],
+                "template": "Fish/valid_region_left.png"
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FishValidRegionRight": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    401,
+                    39,
+                    481,
+                    24
+                ],
+                "template": "Fish/valid_region_right.png"
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FishSuccessCatch": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "鱼上钩了"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FishEscape": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "鱼儿溜走了"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FishNeedBait": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "需要鱼饵"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FishPrepareStartButton": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    908,
+                    602,
+                    339,
+                    52
+                ],
+                "expected": [
+                    "开始钓鱼"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FishGameSign3": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1224,
+                    27,
+                    30,
+                    30
+                ],
+                "template": "Fish/FishGameSign3.png",
+                "threshold": 0.6,
+                "green_mask": true
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    }
+}

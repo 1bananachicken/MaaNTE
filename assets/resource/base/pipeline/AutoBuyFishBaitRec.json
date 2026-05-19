@@ -1,0 +1,62 @@
+{
+    "BuyFishBaitItem": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [35, 88, 410, 475],
+                "template": "auto_buy_fish_bait/bait.png",
+                "threshold": 0.7
+            }
+        }
+    },
+    "BuyFishBaitFindSuccess": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [1044, 131, 68, 23],
+                "template": "auto_buy_fish_bait/find_bait_success.png",
+                "threshold": 0.7
+            }
+        }
+    },
+    "BuyFishBaitSelectMax": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [1202, 620, 33, 32],
+                "template": "auto_buy_fish_bait/select_max.png",
+                "threshold": 0.7
+            }
+        }
+    },
+    "BuyFishBaitBuy": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [1050, 674, 50, 25],
+                "template": "auto_buy_fish_bait/buy.png",
+                "threshold": 0.7
+            }
+        }
+    },
+    "BuyFishBaitConfirm": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [749, 462, 47, 25],
+                "template": "auto_buy_fish_bait/buy_confirm.png",
+                "threshold": 0.7
+            }
+        }
+    },
+    "BuyFishBaitSuccess": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [569, 629, 145, 19],
+                "template": "auto_buy_fish_bait/buy_success.png",
+                "threshold": 0.7
+            }
+        }
+    }
+}

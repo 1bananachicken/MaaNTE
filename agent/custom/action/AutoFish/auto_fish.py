@@ -1,49 +1,18 @@
-import cv2
 import time
 import json
 
-from pathlib import Path
-from ..Common.utils import get_image, match_template_in_region
+from ..Common.utils import get_image
 from ..Common.logger import get_logger
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
-
 logger = get_logger(__name__)
 
 
 @AgentServer.custom_action("auto_fish")
 class AutoFish(CustomAction):
-    abs_path = Path(__file__).parents[4]
-    if Path.exists(abs_path / "assets"):
-        image_dir = abs_path / "assets/resource/base/image/Fish"
-    else:
-        image_dir = abs_path / "resource/base/image/Fish"
-    settlement_img = image_dir / "settlement_blank.png"
-    valid_region_left_img = image_dir / "valid_region_left.png"
-    valid_region_right_img = image_dir / "valid_region_right.png"
-    slider_img = image_dir / "slider.png"
-    success_catch_img = image_dir / "success_catch.png"
-    escape_img = image_dir / "escape.png"
-    prepare_start_img = image_dir / "FishPrepareStartButton.png"
-    fish_game_sign_img = image_dir / "FishGameSign3.png"
-    need_bait_img = image_dir / "need_bait.png"
-
-    slider_template = cv2.imread(str(slider_img), cv2.IMREAD_COLOR)
-    valid_region_left_template = cv2.imread(
-        str(valid_region_left_img), cv2.IMREAD_COLOR
-    )
-    valid_region_right_template = cv2.imread(
-        str(valid_region_right_img), cv2.IMREAD_COLOR
-    )
-    settlement_template = cv2.imread(str(settlement_img), cv2.IMREAD_COLOR)
-    success_catch_template = cv2.imread(str(success_catch_img), cv2.IMREAD_COLOR)
-    escape_template = cv2.imread(str(escape_img), cv2.IMREAD_COLOR)
-    prepare_start_template = cv2.imread(str(prepare_start_img), cv2.IMREAD_COLOR)
-    fish_game_sign_template = cv2.imread(str(fish_game_sign_img), cv2.IMREAD_COLOR)
-    need_bait_template = cv2.imread(str(need_bait_img), cv2.IMREAD_COLOR)
 
     def run(
         self, context: Context, argv: CustomAction.RunArg
@@ -66,14 +35,7 @@ class AutoFish(CustomAction):
         KEY_F = 70
         KEY_ESC = 27
 
-        success_region = [520, 160, 265, 30]
-        settlement_region = [566, 642, 150, 23]
         game_region = [401, 39, 481, 24]
-        escape_region = [590, 349, 99, 22]
-        prepare_region = [908, 602, 339, 52]
-        fish_game_sign_region = [1141, 609, 87, 84]
-        fish_game_sign_region_2 = [1224, 27, 30, 30]
-        need_bait_region = [610, 350, 141, 21]
 
         def press_esc():
             controller.post_key_down(KEY_ESC)
@@ -87,11 +49,8 @@ class AutoFish(CustomAction):
                     return False
 
                 img = get_image(controller)
-                matched, _, _, _ = match_template_in_region(
-                    img, settlement_region, self.settlement_template, 0.8
-                )
-
-                if not matched:
+                settle_result = context.run_recognition("SceneClickBlankToExit", img)
+                if not (settle_result and settle_result.hit):
                     return True
                 time.sleep(interval)
 
@@ -101,32 +60,25 @@ class AutoFish(CustomAction):
             for _ in range(10):
                 img = get_image(controller)
 
-                m_settle, _, _, _ = match_template_in_region(
-                    img, settlement_region, self.settlement_template, 0.8
-                )
-                if m_settle:
-                    logger.debug("Found settlement screen during check, pressing ESC to close...")
+                settle_result = context.run_recognition("SceneClickBlankToExit", img)
+                if settle_result and settle_result.hit:
+                    logger.debug(
+                        "Found settlement screen during check, pressing ESC to close..."
+                    )
                     press_esc()
                     wait_until_settlement_disappears()
                     continue
 
-                m_game, game_prob, _, _ = match_template_in_region(
-                    img,
-                    fish_game_sign_region_2,
-                    self.fish_game_sign_template,
-                    0.6,
-                    green_mask=True,
-                )
-                logger.debug(f"Checking for FishGame screen, probability: {game_prob:.2f}")
-                if m_game:
+                game_result = context.run_recognition("FishGameSign3", img)
+                if game_result and game_result.hit:
                     return True
 
-                m_prepare, _, x, y = match_template_in_region(
-                    img, prepare_region, self.prepare_start_template, 0.7
-                )
-                if m_prepare:
+                prepare_result = context.run_recognition("FishPrepareStartButton", img)
+                if prepare_result and prepare_result.hit:
                     logger.debug("On FishPrepare screen, pressing start...")
-                    controller.post_click(x + 15, y + 15)
+                    controller.post_click(
+                        prepare_result.box.x + 15, prepare_result.box.y + 15
+                    )
                     time.sleep(1.5)
                     return True
 
@@ -153,11 +105,8 @@ class AutoFish(CustomAction):
 
                 for _ in range(5):
                     img = get_image(controller)
-                    m_need_bait, prob, _, _ = match_template_in_region(
-                        img, need_bait_region, self.need_bait_template, 0.7
-                    )
-                    logger.debug(f"Checking for bait, probability: {prob:.2f}")
-                    if m_need_bait:
+                    need_bait_result = context.run_recognition("FishNeedBait", img)
+                    if need_bait_result and need_bait_result.hit:
                         logger.debug("Need bait! Switching to bait handler.")
                         # 缺少鱼饵不是异常退出：这里临时改写 FishGameStart 的后续节点，
                         # 让流水线去打开鱼饵界面，优先切换万能鱼饵，必要时再购买鱼饵。
@@ -184,17 +133,20 @@ class AutoFish(CustomAction):
                     time.sleep(check_freq)
                     img = get_image(controller)
 
-                    m_settle_unexpected, _, _, _ = match_template_in_region(
-                        img, settlement_region, self.settlement_template, 0.8
+                    settle_result = context.run_recognition(
+                        "SceneClickBlankToExit", img
+                    )
+                    m_settle_unexpected = (
+                        settle_result is not None and settle_result.hit
                     )
                     if m_settle_unexpected:
-                        logger.debug("Unexpected settlement screen detected! Breaking to clear it.")
+                        logger.debug(
+                            "Unexpected settlement screen detected! Breaking to clear it."
+                        )
                         break
 
-                    m_catch, _, _, _ = match_template_in_region(
-                        img, success_region, self.success_catch_template, 0.7
-                    )
-                    if m_catch:
+                    catch_result = context.run_recognition("FishSuccessCatch", img)
+                    if catch_result and catch_result.hit:
                         logger.debug("Fish hooked!")
                         break
 
@@ -232,28 +184,28 @@ class AutoFish(CustomAction):
                     frame += 1
 
                     if frame % 10 == 0:
-                        m_settle, _, _, _ = match_template_in_region(
-                            img, settlement_region, self.settlement_template, 0.8
+                        settle_result = context.run_recognition(
+                            "SceneClickBlankToExit", img
                         )
-                        if m_settle:
+                        if settle_result and settle_result.hit:
                             logger.debug("Fish caught!")
                             break
-                        m_escape, _, _, _ = match_template_in_region(
-                            img, escape_region, self.escape_template, 0.8
-                        )
-                        if m_escape:
+                        escape_result = context.run_recognition("FishEscape", img)
+                        if escape_result and escape_result.hit:
                             logger.debug("Fish escaped! Recasting...")
                             break
 
-                    m_left, _, x_left, _ = match_template_in_region(
-                        img, game_region, self.valid_region_left_template, 0.7
-                    )
-                    m_right, _, x_right, _ = match_template_in_region(
-                        img, game_region, self.valid_region_right_template, 0.7
-                    )
-                    m_slider, _, x_slider, _ = match_template_in_region(
-                        img, game_region, self.slider_template, 0.7
-                    )
+                    left_result = context.run_recognition("FishValidRegionLeft", img)
+                    right_result = context.run_recognition("FishValidRegionRight", img)
+                    slider_result = context.run_recognition("FishSlider", img)
+
+                    m_left = left_result is not None and left_result.hit
+                    m_right = right_result is not None and right_result.hit
+                    m_slider = slider_result is not None and slider_result.hit
+
+                    x_left = left_result.box.x if m_left else 0
+                    x_right = right_result.box.x if m_right else 0
+                    x_slider = slider_result.box.x if m_slider else 0
 
                     if frame % 10 == 0:
                         if current_ad_key is not None:
@@ -305,10 +257,8 @@ class AutoFish(CustomAction):
 
                 img = get_image(controller)
                 time.sleep(0.3)
-                m_escape, _, _, _ = match_template_in_region(
-                    img, escape_region, self.escape_template, 0.8
-                )
-                if m_escape:
+                escape_result = context.run_recognition("FishEscape", img)
+                if escape_result and escape_result.hit:
                     continue
                 break
 
@@ -321,13 +271,8 @@ class AutoFish(CustomAction):
                     return CustomAction.RunResult(success=False)
 
                 img = get_image(controller)
-                match_settle, settle_prob, _, _ = match_template_in_region(
-                    img, settlement_region, self.settlement_template, 0.8
-                )
-                logger.debug(
-                    f"Checking for settlement screen, probability: {settle_prob:.2f}"
-                )
-                if match_settle:
+                settle_result = context.run_recognition("SceneClickBlankToExit", img)
+                if settle_result and settle_result.hit:
                     logger.debug("Settlement screen detected.")
                     break
                 time.sleep(0.1)

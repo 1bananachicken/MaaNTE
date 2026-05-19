@@ -17,7 +17,6 @@ from ..utils.detector import DrumDetector
 from ..utils.assets import list_scene_templates, read_image
 from ..utils.presence import SceneGate, STATE_PLAYING
 
-
 logger = logging.getLogger(__name__)
 
 _LANES = ("d", "f", "j", "k")
@@ -137,7 +136,9 @@ class _KeyScheduler:
         lanes: list[int] = []
         fired: list[tuple[int, float, float, float]] = []
         for due_time, lane_idx, target_time, center_y, score in due:
-            next_allowed_time = self._last_tap_time[lane_idx] + self._min_tap_interval_by_lane[lane_idx]
+            next_allowed_time = (
+                self._last_tap_time[lane_idx] + self._min_tap_interval_by_lane[lane_idx]
+            )
             if now < next_allowed_time:
                 logger.debug(
                     "候选丢弃: lane=%s target=%.3f next_allowed=%.3f y=%.1f score=%.3f reason=min_interval",
@@ -170,11 +171,15 @@ class _KeyScheduler:
     def _prune_recent(self, now: float) -> None:
         keep_after = now - 0.5
         for i, times in enumerate(self._recent_target_times):
-            self._recent_target_times[i] = [target_time for target_time in times if target_time >= keep_after]
+            self._recent_target_times[i] = [
+                target_time for target_time in times if target_time >= keep_after
+            ]
 
     def close(self) -> None:
         if self._pending:
-            logger.debug("候选丢弃: count=%d reason=scheduler_close", len(self._pending))
+            logger.debug(
+                "候选丢弃: count=%d reason=scheduler_close", len(self._pending)
+            )
             self._pending.clear()
         lanes = [li for li in range(_LANE_COUNT) if self._is_down[li]]
         jobs = [self._controller.post_key_up(_VK[_LANES[li]]) for li in reversed(lanes)]
@@ -228,7 +233,10 @@ def _normalize_same_frame_chords(
         for group in groups:
             group_lanes = {item[0] for item in group}
             group_anchor = sum(item[1] for item in group) / len(group)
-            if lane_idx not in group_lanes and abs(target_time - group_anchor) <= window_sec:
+            if (
+                lane_idx not in group_lanes
+                and abs(target_time - group_anchor) <= window_sec
+            ):
                 group.append(event)
                 merged = True
                 break
@@ -280,7 +288,9 @@ class AutoRhythmPlay(CustomAction):
         key_cfg = cfg.get("keys") or {}
         key_hold_sec = float(key_cfg.get("key_hold_sec", 0.01))
         chord_reinforce_count = int(key_cfg.get("chord_reinforce_count", 1))
-        chord_reinforce_interval_sec = float(key_cfg.get("chord_reinforce_interval_sec", 0.006))
+        chord_reinforce_interval_sec = float(
+            key_cfg.get("chord_reinforce_interval_sec", 0.006)
+        )
         thresholds = list(
             (cfg.get("template_detection") or {}).get(
                 "thresholds", [0.81, 0.80, 0.80, 0.81]
@@ -290,11 +300,17 @@ class AutoRhythmPlay(CustomAction):
             thresholds.extend([0.80] * (4 - len(thresholds)))
         simultaneous_margin = max(
             0.0,
-            float((cfg.get("template_detection") or {}).get("simultaneous_score_margin", 0.04)),
+            float(
+                (cfg.get("template_detection") or {}).get(
+                    "simultaneous_score_margin", 0.04
+                )
+            ),
         )
         trigger_cfg = cfg.get("position_trigger") or {}
         trigger_offset_frac = float(trigger_cfg.get("trigger_line_offset_frac", -0.012))
-        trigger_band_frac = max(0.0, float(trigger_cfg.get("trigger_band_half_height_frac", 0.018)))
+        trigger_band_frac = max(
+            0.0, float(trigger_cfg.get("trigger_band_half_height_frac", 0.018))
+        )
         min_tap_interval_sec = float(trigger_cfg.get("min_tap_interval_sec", 0.035))
         min_tap_by_lane = trigger_cfg.get("min_tap_interval_sec_by_lane")
         if isinstance(min_tap_by_lane, list) and len(min_tap_by_lane) == _LANE_COUNT:
@@ -347,7 +363,9 @@ class AutoRhythmPlay(CustomAction):
 
         logger.info(
             "演奏开始 | FPS=%d | 鼓面检测=%s | 场景冷却=%.1fs(音符命中重置)",
-            target_fps, drum_available, scene_lock_sec,
+            target_fps,
+            drum_available,
+            scene_lock_sec,
         )
 
         start_time = time.perf_counter()
@@ -424,7 +442,8 @@ class AutoRhythmPlay(CustomAction):
                     scheduled: list[tuple[int, float, float, float]] = []
                     for i in range(_LANE_COUNT):
                         judge_center_y = (
-                            cached_layout.judge_y0_by_lane[i] + cached_layout.judge_y1_by_lane[i]
+                            cached_layout.judge_y0_by_lane[i]
+                            + cached_layout.judge_y1_by_lane[i]
                         ) / 2.0
                         trigger_y = judge_center_y + trigger_offset_frac * fh
                         trigger_half_band = trigger_band_frac * fh
@@ -437,7 +456,9 @@ class AutoRhythmPlay(CustomAction):
                             if candidate.center_y > latest_acceptable_y:
                                 continue
 
-                            eta_sec = (trigger_y - candidate.center_y) / note_speed_px_per_sec
+                            eta_sec = (
+                                trigger_y - candidate.center_y
+                            ) / note_speed_px_per_sec
                             target_time = now + eta_sec
                             if target_time < now - stale_note_sec:
                                 continue
@@ -446,7 +467,9 @@ class AutoRhythmPlay(CustomAction):
                             if due_time > now + schedule_window_sec:
                                 continue
 
-                            candidate_events.append((i, target_time, candidate.center_y, candidate.score))
+                            candidate_events.append(
+                                (i, target_time, candidate.center_y, candidate.score)
+                            )
 
                     for i, target_time, center_y, score in _normalize_same_frame_chords(
                         candidate_events,
@@ -477,12 +500,20 @@ class AutoRhythmPlay(CustomAction):
                             ["%.1f" % center_y for _, _, center_y, _ in scheduled],
                             ["%.3f" % score for _, _, _, score in scheduled],
                         )
-                    elif debug_score_interval and frame_count % debug_score_interval == 0:
+                    elif (
+                        debug_score_interval and frame_count % debug_score_interval == 0
+                    ):
                         logger.debug(
                             "鼓面检测分数: d=%.3f f=%.3f j=%.3f k=%.3f candidates=%s",
-                            scores[0], scores[1], scores[2], scores[3],
+                            scores[0],
+                            scores[1],
+                            scores[2],
+                            scores[3],
                             [
-                                ["%.1f/%.3f" % (c.center_y, c.score) for c in candidates_by_lane[i]]
+                                [
+                                    "%.1f/%.3f" % (c.center_y, c.score)
+                                    for c in candidates_by_lane[i]
+                                ]
                                 for i in range(_LANE_COUNT)
                             ],
                         )
@@ -492,13 +523,16 @@ class AutoRhythmPlay(CustomAction):
                     if gate_state != STATE_PLAYING:
                         logger.info(
                             "演奏结束 (帧#%d, 耗时%.1f秒, 冷却锁过期，场景识别=%s)",
-                            frame_count, elapsed_total, gate_state,
+                            frame_count,
+                            elapsed_total,
+                            gate_state,
                         )
                         return CustomAction.RunResult(success=True)
                     if not _is_still_playing(frame, playing_tpl):
                         logger.info(
                             "演奏结束 (帧#%d, 耗时%.1f秒, 冷却锁过期，识别为非playing)",
-                            frame_count, elapsed_total,
+                            frame_count,
+                            elapsed_total,
                         )
                         return CustomAction.RunResult(success=True)
                     scene_lock_until = now + scene_lock_sec

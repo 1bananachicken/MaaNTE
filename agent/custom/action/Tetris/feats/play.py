@@ -331,11 +331,8 @@ class TetrisGamePlayer:
         }
 
     def _is_drop_ready(self, img) -> bool:
-        if self.context is not None:
-            result = self.scene_detector.check_drop(self.context, img)
-            matched = result is not None
-        else:
-            matched, score, _, _ = self.scene_gate._find_drop_button(img)
+        result = self.scene_detector.check_drop(self.context, img)
+        matched = result is not None
         if matched:
             self.drop_ready_hits = min(self.drop_ready_hits + 1, 3)
         else:
@@ -343,9 +340,6 @@ class TetrisGamePlayer:
         return self.drop_ready_hits >= 2
 
     def _is_result_screen(self, img) -> bool:
-        if self.context is None:
-            matched, score, _, _ = self.scene_gate._find_matchend(img)
-            return matched
         return self.scene_detector.check_matchend(self.context, img) is not None
 
     def _debug_log(self, *args):

@@ -3,11 +3,6 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from ...Common.utils import match_template_in_region
-
-DROP_BUTTON_REGION = [270, 425, 92, 97]
-MATCHEND_REGION = [355, 11, 354, 122]
-
 VK_A = 65
 VK_D = 68
 VK_J = 74
@@ -50,9 +45,6 @@ def _read_image(name: str):
 
 class SceneGate:
     def __init__(self):
-        self.drop_tpl = _read_image("drop.png")
-        self.matchend_tpl = _read_image("Matchend.png")
-
         self.active_piece_templates = self._load_block_templates("blocks/active")
         self.queue_piece_templates = self._load_block_templates("blocks/queue")
 
@@ -132,74 +124,6 @@ class SceneGate:
         match["x"] += x1
         match["y"] += y1
         return match
-
-    def _match_template_region(
-        self, img, region, template, min_similarity=0.8, grayscale=False
-    ):
-        if template is None:
-            return False, 0.0, 0, 0
-
-        if not grayscale:
-            return match_template_in_region(img, region, template, min_similarity)
-
-        if img is None or not isinstance(img, np.ndarray):
-            return False, 0.0, 0, 0
-
-        x1, y1, width, height = region
-        x2, y2 = x1 + width, y1 + height
-        img_height, img_width = img.shape[:2]
-
-        x1, y1 = max(0, x1), max(0, y1)
-        x2, y2 = min(img_width, x2), min(img_height, y2)
-        if x2 <= x1 or y2 <= y1:
-            return False, 0.0, 0, 0
-
-        roi = img[y1:y2, x1:x2]
-        if len(roi.shape) == 3 and roi.shape[2] == 4:
-            roi = cv2.cvtColor(roi, cv2.COLOR_BGRA2BGR)
-
-        template_img = template
-        if len(template_img.shape) == 3 and template_img.shape[2] == 4:
-            template_img = cv2.cvtColor(template_img, cv2.COLOR_BGRA2BGR)
-
-        roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-        template_gray = (
-            cv2.cvtColor(template_img, cv2.COLOR_BGR2GRAY)
-            if len(template_img.shape) == 3
-            else template_img
-        )
-
-        if (
-            roi_gray.shape[0] < template_gray.shape[0]
-            or roi_gray.shape[1] < template_gray.shape[1]
-        ):
-            return False, 0.0, 0, 0
-
-        res = cv2.matchTemplate(roi_gray, template_gray, cv2.TM_CCOEFF_NORMED)
-        _, max_val, _, max_loc = cv2.minMaxLoc(res)
-        if max_val >= min_similarity:
-            return True, max_val, x1 + max_loc[0], y1 + max_loc[1]
-        return False, max_val, 0, 0
-
-    def _find_drop_button(self, img):
-        if self.drop_tpl is None:
-            return False, 0.0, 0, 0
-        return self._match_template_region(
-            img,
-            DROP_BUTTON_REGION,
-            self.drop_tpl,
-            0.70,
-        )
-
-    def _find_matchend(self, img):
-        if self.matchend_tpl is None:
-            return False, 0.0, 0, 0
-        return self._match_template_region(
-            img,
-            MATCHEND_REGION,
-            self.matchend_tpl,
-            0.75,
-        )
 
     def read_piece_queue(self, img):
         from ..utils.board import extract_queue_crop

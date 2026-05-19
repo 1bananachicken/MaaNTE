@@ -1,0 +1,72 @@
+{
+    "SellFishOptionGray": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [63, 247, 66, 57],
+                "template": "auto_sell_fish/sell_option_gray.png",
+                "threshold": 0.7
+            }
+        }
+    },
+    "SellFishOption": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [172, 166, 103, 29],
+                "template": "auto_sell_fish/sell_option.png",
+                "threshold": 0.8
+            }
+        }
+    },
+    "SellFishNoFish": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [433, 457, 77, 20],
+                "template": "auto_sell_fish/no_fish.png",
+                "threshold": 0.8
+            }
+        }
+    },
+    "SellFishButton": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [665, 635, 92, 23],
+                "template": "auto_sell_fish/sell_button.png",
+                "threshold": 0.8
+            }
+        }
+    },
+    "SellFishConfirm": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [756, 461, 48, 21],
+                "template": "auto_sell_fish/confirm_sell.png",
+                "threshold": 0.8
+            }
+        }
+    },
+    "SellFishSuccess": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [565, 628, 149, 21],
+                "template": "auto_sell_fish/sell_success.png",
+                "threshold": 0.8
+            }
+        }
+    },
+    "SellFishFail": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [739, 349, 202, 24],
+                "template": "auto_sell_fish/sell_fail.png",
+                "threshold": 0.8
+            }
+        }
+    }
+}
