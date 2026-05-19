@@ -4,12 +4,14 @@
     "json.schemas": [
         {
             "fileMatch": [
-                "/assets/resource/**/*.json",
-                "/install/resource/**/*.json",
-                "!/assets/resource/data/**/**.json",
-                "!/install/resource/data/**/**.json",
-                "!/assets/resource/tasks/**/**.json",
-                "!/install/resource/tasks/**/**.json"
+                "/assets/resource/pipeline/**/*.json",
+                "/assets/resource_*/pipeline/**/*.json",
+                "/install/resource/pipeline/**/*.json",
+                "/install/resource_*/pipeline/**/*.json",
+                "/assets/resource/pipeline/**/*.jsonc",
+                "/assets/resource_*/pipeline/**/*.jsonc",
+                "/install/resource/pipeline/**/*.jsonc",
+                "/install/resource_*/pipeline/**/*.jsonc"
             ],
             "url": "/deps/tools/pipeline.schema.json"
         },

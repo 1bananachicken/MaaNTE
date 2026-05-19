@@ -1,7 +1,7 @@
 {
     "task": [
         {
-            "name": "自动做咖啡",
+            "name": "$task_make_coffee_name",
             "entry": "AutoMakeCoffee",
             "option": [
                 "MakeCoffeeLoopTime"

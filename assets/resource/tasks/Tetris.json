@@ -1,9 +1,9 @@
 {
     "task": [
         {
-            "name": "泯除方块",
+            "name": "$task_tetris_name",
             "entry": "TetrisEntrance",
-            "description": "<font color='red'>该任务功能中游戏内棋盘完全由内部ai自主维护，而非获取屏幕图像，在运行该任务时请不要对游戏画面进行操作，以免ai决策与实际游戏状态不符</font>",
+            "description": "$task_tetris_desc",
             "option": [
                 "TetrisAutoRepeat_Single",
                 "TetrisAllowSpeedDrop"

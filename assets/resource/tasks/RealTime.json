@@ -1,9 +1,9 @@
 {
     "task": [
         {
-            "name": "实时辅助",
+            "name": "$task_realtime_name",
             "entry": "RealTimeTaskMain",
-            "description": "实时辅助小工具，需要[color:red]“桌面端-前台”[/color]控制器",
+            "description": "$task_realtime_desc",
             "option": [
                 "RealTimeCheckInterval",
                 "RealTimeAutoSkipStory",

@@ -1,9 +1,9 @@
 {
     "task": [
         {
-            "name": "音频闪避",
+            "name": "$task_sound_dodge_name",
             "entry": "SoundDodgeMain",
-            "description": "基于音频识别的自动闪避与反击，需要[color:red]“桌面端-前台”[/color]控制器",
+            "description": "$task_sound_dodge_desc",
             "option": [
                 "SoundDodgeEnable",
                 "SoundDodgeAllAttacks",

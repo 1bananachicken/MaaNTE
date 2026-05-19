@@ -2,8 +2,8 @@
   "task": [
     {
       "name": "AutoPiano",
-      "label": "自动弹琴",
-      "description": "读取 MIDI 谱子并向当前目标窗口发送键盘演奏。",
+      "label": "$task_auto_piano_name",
+      "description": "$task_auto_piano_desc",
       "entry": "AutoPiano",
       "default_check": false,
       "option": [
