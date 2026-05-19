@@ -16,7 +16,6 @@ from ..utils.presence import (
 )
 from ..utils.song_selector import SongSelector
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -35,11 +34,6 @@ class AutoRhythmSelectSong(CustomAction):
             except Exception:
                 pass
 
-        if "song_name" in params:
-            cfg.setdefault("song_select", {})["song_name"] = str(params["song_name"])
-            if cfg["song_select"]["song_name"]:
-                cfg["song_select"]["enabled"] = True
-
         auto_select = params.get("auto_select", False)
         if auto_select:
             cfg.setdefault("song_select", {})["auto_select"] = True
@@ -49,7 +43,7 @@ class AutoRhythmSelectSong(CustomAction):
             logger.info("自动选曲未启用，跳过选歌")
             return CustomAction.RunResult(success=True)
 
-        logger.info("开始选歌: %s", song_selector.song_name)
+        logger.info("开始选歌")
 
         scene_gate = SceneGate(cfg)
         target_fps = int(cfg.get("run", {}).get("target_fps", 60))
@@ -72,15 +66,17 @@ class AutoRhythmSelectSong(CustomAction):
             if len(frame.shape) == 3 and frame.shape[2] == 4:
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
 
-            state, _ = scene_gate.step(frame)
+            state, _ = scene_gate.step(context, frame)
 
             if state == STATE_SONG_SELECT:
                 scroll_fn = lambda sx, sy, sd: (
-                    controller.post_swipe(sx, sy, sx, sy + sd * 100, duration=250).wait(),
+                    controller.post_swipe(
+                        sx, sy, sx, sy + sd * 100, duration=250
+                    ).wait(),
                     time.sleep(0.15),
                 )
                 sel_info = song_selector.step(
-                    frame, controller, scroll_func=scroll_fn
+                    context, frame, controller, scroll_func=scroll_fn
                 )
                 sel_state = sel_info.get("state", "")
                 if sel_state == "done":

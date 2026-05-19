@@ -14,7 +14,6 @@ from maa.context import Context
 from ..utils.config import load_rhythm_config
 from ..utils.lanes import build_lane_layout, LaneLayout
 from ..utils.detector import DrumDetector
-from ..utils.assets import list_scene_templates, read_image
 from ..utils.presence import SceneGate, STATE_PLAYING
 
 logger = logging.getLogger(__name__)
@@ -24,7 +23,6 @@ _VK = {"d": 0x44, "f": 0x46, "j": 0x4A, "k": 0x4B}
 
 _TIMEOUT_SEC = 600
 _SCENE_LOCK_SEC = 8.0
-_PLAYING_CHECK_THRESHOLD = 0.7
 _LANE_COUNT = 4
 
 
@@ -189,36 +187,6 @@ class _KeyScheduler:
             self._is_down[li] = False
 
 
-def _load_playing_check_template() -> NDArray[np.uint8] | None:
-    templates = list_scene_templates("playing")
-    for name, path in templates:
-        if name == "pause":
-            img = read_image(path)
-            if img is not None:
-                logger.info(
-                    "已加载演奏状态检测模板: pause.png (%dx%d)",
-                    img.shape[1],
-                    img.shape[0],
-                )
-                return img
-    logger.warning("未找到演奏状态检测模板 (pause.png)")
-    return None
-
-
-def _is_still_playing(
-    frame: NDArray[np.uint8], template: NDArray[np.uint8] | None
-) -> bool:
-    if template is None or frame is None or frame.size == 0:
-        return True
-    fh, fw = frame.shape[:2]
-    th, tw = template.shape[:2]
-    if th > fh or tw > fw:
-        return True
-    result = cv2.matchTemplate(frame, template, cv2.TM_CCOEFF_NORMED)
-    _, max_val, _, _ = cv2.minMaxLoc(result)
-    return max_val >= _PLAYING_CHECK_THRESHOLD
-
-
 def _normalize_same_frame_chords(
     events: list[tuple[int, float, float, float]],
     window_sec: float,
@@ -258,20 +226,10 @@ def _normalize_same_frame_chords(
 
 @AgentServer.custom_action("auto_rhythm_play")
 class AutoRhythmPlay(CustomAction):
-    _playing_check_template: NDArray[np.uint8] | None = None
-    _template_loaded: bool = False
-
-    @classmethod
-    def _ensure_template_loaded(cls) -> None:
-        if cls._template_loaded:
-            return
-        cls._template_loaded = True
-        cls._playing_check_template = _load_playing_check_template()
 
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        self._ensure_template_loaded()
         controller = context.tasker.controller
         cfg = load_rhythm_config()
 
@@ -372,7 +330,6 @@ class AutoRhythmPlay(CustomAction):
         frame_count = 0
         cached_layout: LaneLayout | None = None
         cached_layout_size: tuple[int, int] = (0, 0)
-        playing_tpl = self._playing_check_template
 
         scene_lock_until = time.perf_counter() + scene_lock_sec
         key_scheduler = _KeyScheduler(
@@ -519,7 +476,7 @@ class AutoRhythmPlay(CustomAction):
                         )
 
                 if now >= scene_lock_until:
-                    gate_state, _ = scene_gate.step(frame)
+                    gate_state, _ = scene_gate.step(context, frame)
                     if gate_state != STATE_PLAYING:
                         logger.info(
                             "演奏结束 (帧#%d, 耗时%.1f秒, 冷却锁过期，场景识别=%s)",
@@ -528,7 +485,8 @@ class AutoRhythmPlay(CustomAction):
                             gate_state,
                         )
                         return CustomAction.RunResult(success=True)
-                    if not _is_still_playing(frame, playing_tpl):
+                    playing_result = context.run_recognition("RhythmSceneOnPlaying", frame)
+                    if not (playing_result and playing_result.hit):
                         logger.info(
                             "演奏结束 (帧#%d, 耗时%.1f秒, 冷却锁过期，识别为非playing)",
                             frame_count,

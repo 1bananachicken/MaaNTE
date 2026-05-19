@@ -22,8 +22,7 @@
                     "pipeline_override": {
                         "RhythmSelectSong": {
                             "custom_action_param": {
-                                "auto_select": true,
-                                "song_name": ""
+                                "auto_select": true
                             }
                         }
                     }
@@ -47,9 +46,13 @@
                     "name": "Heroic_Appearance",
                     "label": "Heroic_Appearance",
                     "pipeline_override": {
-                        "RhythmSelectSong": {
-                            "custom_action_param": {
-                                "song_name": "Heroic_Appearance"
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "HeroicAppearance"
+                                    ]
+                                }
                             }
                         }
                     }
@@ -58,9 +61,13 @@
                     "name": "Destiny",
                     "label": "Destiny",
                     "pipeline_override": {
-                        "RhythmSelectSong": {
-                            "custom_action_param": {
-                                "song_name": "Destiny"
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "Destiny"
+                                    ]
+                                }
                             }
                         }
                     }
@@ -69,9 +76,13 @@
                     "name": "Everlasting_Dazing_Summer_Short",
                     "label": "Everlasting_Dazing_Summer(Short_Ver.)",
                     "pipeline_override": {
-                        "RhythmSelectSong": {
-                            "custom_action_param": {
-                                "song_name": "Everlasting_Dazing_Summer(Short_Ver.)"
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "ShortVer"
+                                    ]
+                                }
                             }
                         }
                     }
@@ -80,9 +91,13 @@
                     "name": "Everlasting_Dazing_Summer",
                     "label": "Everlasting_Dazing_Summer",
                     "pipeline_override": {
-                        "RhythmSelectSong": {
-                            "custom_action_param": {
-                                "song_name": "Everlasting_Dazing_Summer"
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "EverlastingDazingSummer"
+                                    ]
+                                }
                             }
                         }
                     }
@@ -91,15 +106,19 @@
                     "name": "迷星叫",
                     "label": "迷星叫",
                     "pipeline_override": {
-                        "RhythmSelectSong": {
-                            "custom_action_param": {
-                                "song_name": "迷星叫"
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "迷星叫"
+                                    ]
+                                }
                             }
                         }
                     }
                 }
             ],
-            "default_case": "Heroic_Appearance"
+            "default_case": "迷星叫"
         },
         "自动连打": {
             "type": "switch",
