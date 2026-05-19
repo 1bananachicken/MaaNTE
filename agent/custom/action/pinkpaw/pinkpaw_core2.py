@@ -918,7 +918,7 @@ class PinkPawHeistScheme2Action(CustomAction):
 
             # 开始吃二楼左边
             ah.key_down("S")
-            for _ in range(29):
+            for _ in range(28):
                 ah.click_key("F")
                 ah.delay(200)
 
@@ -939,7 +939,7 @@ class PinkPawHeistScheme2Action(CustomAction):
 
             # ---------- 最后撤离1 ----------
 
-            ah.delay(1000)
+            ah.delay(1500)
             ah.key_down("W")
             ah.delay(4500)
             ah.key_up("W")
