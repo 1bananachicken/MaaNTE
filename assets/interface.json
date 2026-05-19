@@ -83,7 +83,7 @@
         "resource/tasks/FountainCheckin.json",
         "resource/tasks/SoundDodge.json",
         "resource/tasks/AutoFScroll.json",
-        "resource/tasks/auto_piano.json"
+        "resource/tasks/AutoPiano.json"
     ],
     "option": {}
 }

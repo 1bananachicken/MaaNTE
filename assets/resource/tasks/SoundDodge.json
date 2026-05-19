@@ -1,7 +1,8 @@
 {
     "task": [
         {
-            "name": "$task_sound_dodge_name",
+            "name": "SoundDodge",
+            "label": "$task_sound_dodge_name",
             "entry": "SoundDodgeMain",
             "description": "$task_sound_dodge_desc",
             "option": [

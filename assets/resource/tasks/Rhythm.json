@@ -1,7 +1,8 @@
 {
     "task": [
         {
-            "name": "$task_rhythm_name",
+            "name": "Rhythm",
+            "label": "$task_rhythm_name",
             "entry": "RhythmEntrance",
             "option": [
                 "自动选曲",

@@ -1,7 +1,8 @@
 {
     "task": [
         {
-            "name": "$task_fountain_name",
+            "name": "FountainCheckin",
+            "label": "$task_fountain_name",
             "entry": "FountainCheckinEntrance",
             "description": "$task_fountain_desc",
             "controller": [

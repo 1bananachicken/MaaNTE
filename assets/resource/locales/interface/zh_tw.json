@@ -6,7 +6,7 @@
     "controller_front_label": "桌面端-前台",
     "controller_background_label": "桌面端-後台",
     "resource_official_label": "官服",
-    "task_furniture_name": "家具領取（新）",
+    "task_furniture_name": "家具領取",
     "task_furniture_desc": "依次識別並領取三個已知的家具（倉鼠球、棉棉、破損的木箱）。注：不保證能領取新放置的家具。",
     "task_withdraw_money_name": "領取一咖舍收益",
     "task_withdraw_money_desc": "自動領取一咖舍收益<br><span style='color:red'>暫不支持根據風向標自動替換商品，若在意損失，建議關閉</span>",
@@ -83,8 +83,6 @@
     "task_autofscroll_desc": "開啟後將一直F+滾輪快速拾取（按住F觸發）",
     "task_auto_piano_name": "自動彈琴",
     "task_auto_piano_desc": "讀取.midi曲目並向當前目標視窗發送鍵盤演奏。",
-    "task_auto_piano_option_midi_file": "MIDI曲目",
-    "task_auto_piano_option_midi_path": "MIDI曲目 自定義路徑",
     "task_test_movement_turn_name": "[测试] 视角转向",
     "task_test_movement_turn_desc": "鼠标相对位移转向。dx=100 ≈ 10度，正值右转，负值左转。",
     "task_test_movement_forward_name": "[测试] 前进",
@@ -101,5 +99,13 @@
     "task_furniture_option_golden_capital": "金都雲邸",
     "task_furniture_option_fenglin": "峰林別墅",
     "task_furniture_option_go": "前往",
-    "task_furniture_option_disable": "禁用"
+    "task_furniture_option_disable": "禁用",
+    "task_auto_piano_option_midi_score": "MIDI 樂譜",
+    "task_auto_piano_option_midi_custom_path": "MIDI 樂譜 自訂路徑",
+    "task_auto_piano_option_custom_path_case": "自訂路徑",
+    "task_auto_piano_input_song_path_label": "樂譜路徑",
+    "task_auto_piano_input_song_path_desc": "相對路徑會從專案根目錄解析，例如 songs/example.mid；也可以填寫絕對路徑。",
+    "task_auto_piano_input_song_path_pattern_msg": "請輸入 .mid / .midi 檔案路徑。",
+    "task_auto_piano_input_speed_label": "播放速度",
+    "task_auto_piano_input_transpose_label": "轉調"
 }

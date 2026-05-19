@@ -10,7 +10,7 @@
     "task_withdraw_money_desc": "auto collect earnings<br><span style='color:red'>Fashion Center ar not currently supported.If you want to use it, please change and close the entry.</span>",
     "task_withdraw_money_option_restock": "auto restock",
     "task_withdraw_money_option_restock_desc": "Enable Auto-Replenishment",
-    "task_furniture_name": "Furniture Claim (New)",
+    "task_furniture_name": "Furniture Claim ",
     "task_furniture_desc": "Claim 3 known furniture items in sequence (Hamster Ball / Mianmian / Damaged Wooden Box). Note: Does not guarantee claiming newly placed furniture.",
     "task_claim_rewards_name": "Claim your reward",
     "task_claim_rewards_desc": "Auto claim the City Stamina / Circle bounty rewards。",
@@ -84,8 +84,6 @@
     "task_sound_dodge_option_dodge_threshold_desc": "Evasion audio cue recognition threshold, range 0.0-1.0, the lower the more sensitive",
     "task_sound_dodge_option_counter_threshold": "Counterattack Threshold",
     "task_sound_dodge_option_counter_threshold_desc": "Counterattack audio cue recognition threshold, range 0.0-1.0, the lower the more sensitive",
-    "task_auto_piano_option_midi_file": "MIDI Scores",
-    "task_auto_piano_option_midi_path": "Custom Path for MIDI Scores",
     "task_test_movement_turn_name": "[测试] 视角转向",
     "task_test_movement_turn_desc": "鼠标相对位移转向。dx=100 ≈ 10度，正值右转，负值左转。",
     "task_test_movement_forward_name": "[测试] 前进",
@@ -102,5 +100,13 @@
     "task_furniture_option_golden_capital": "Golden Capital",
     "task_furniture_option_fenglin": "Fenglin Villa",
     "task_furniture_option_go": "Go",
-    "task_furniture_option_disable": "Disable"
+    "task_furniture_option_disable": "Disable",
+    "task_auto_piano_option_midi_score": "MIDI Score",
+    "task_auto_piano_option_midi_custom_path": "MIDI Score Custom Path",
+    "task_auto_piano_option_custom_path_case": "Custom Path",
+    "task_auto_piano_input_song_path_label": "Score Path",
+    "task_auto_piano_input_song_path_desc": "Relative paths are resolved from the project root directory, e.g. songs/example.mid. Absolute paths are also accepted.",
+    "task_auto_piano_input_song_path_pattern_msg": "Please enter a .mid / .midi file path.",
+    "task_auto_piano_input_speed_label": "Playback Speed",
+    "task_auto_piano_input_transpose_label": "Transpose"
 }
