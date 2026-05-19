@@ -357,8 +357,7 @@
                 ],
                 "expected": [
                     "更换"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
         "action": "Click",
@@ -378,7 +377,7 @@
         "template": [
             "Fish/FishStoreGeneralBait.png"
         ],
-        "threshold": 0.8,
+        "green_mask": true,
         "action": "Click",
         "next": [
             "FishNewStoreChooseMaxSuccess",
@@ -426,8 +425,7 @@
                 "template": [
                     "Fish/FishStoreMax.png",
                     "Fish/FishStoreMaxGrey.png"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
         "action": "Click"
@@ -508,35 +506,7 @@
         "pre_delay": 500,
         "action": "Click",
         "next": [
-            "FishNewStoreContinue"
-        ]
-    },
-    "FishNewStoreContinue": {
-        "desc": "渔具商店点击空白区域关闭",
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    553,
-                    619,
-                    175,
-                    38
-                ],
-                "expected": [
-                    "点击空白区域关闭"
-                ],
-                "threshold": 0.8
-            }
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": [
-                    27 // Esc
-                ]
-            }
-        },
-        "next": [
+            "[JumpBack]SceneClickBlankToExit",
             "FishNewExitStore"
         ]
     },
@@ -581,7 +551,6 @@
         "expected": [
             "货币不足无法购买"
         ],
-        "threshold": 0.8,
         "focus": {
             "Node.Action.Succeeded": "鱼鳞币不足，尝试前往卖鱼"
         },
@@ -692,7 +661,7 @@
         ],
         "action": "Click",
         "next": [
-            "[JumpBack]FishNewFishingMasterContinue",
+            "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell2"
         ]
     },
@@ -728,7 +697,7 @@
         ],
         "action": "Click",
         "next": [
-            "[JumpBack]FishNewFishingMasterContinue",
+            "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell3"
         ]
     },
@@ -764,7 +733,7 @@
         ],
         "action": "Click",
         "next": [
-            "[JumpBack]FishNewFishingMasterContinue",
+            "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterSwitchToPage2"
         ]
     },
@@ -843,7 +812,7 @@
         },
         "action": "Click",
         "next": [
-            "[JumpBack]FishNewFishingMasterContinue",
+            "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterExit"
         ]
     },
