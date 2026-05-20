@@ -43,7 +43,7 @@
         },
         "ClaimRewardsBattlePass": {
             "type": "switch",
-            "label": "领取环期赏令奖励",
+            "label": "$task_claim_rewards_option_battle_pass",
             "cases": [
                 {
                     "name": "Yes",

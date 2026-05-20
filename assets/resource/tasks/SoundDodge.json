@@ -93,8 +93,8 @@
         },
         "SoundCounterThreshold": {
             "type": "input",
-            "label": "反击阈值",
-            "description": "反击音效识别阈值，范围 0.0-1.0，越低越敏感",
+            "label": "$task_sound_dodge_option_counter_threshold",
+            "description": "$task_sound_dodge_option_counter_threshold_desc",
             "inputs": [
                 {
                     "name": "counter_threshold",
