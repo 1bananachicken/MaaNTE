@@ -31,11 +31,11 @@ def update_screen_size(width: int, height: int) -> None:
     _scale_y = _current_height / BASELINE_HEIGHT if BASELINE_HEIGHT else 1.0
 
 
-def map_point(x: int, y: int) -> Sequence[int, int]:
+def map_point(x: int, y: int) -> Sequence[int]:
     return int(round(x * _scale_x)), int(round(y * _scale_y))
 
 
-def map_rect(rect: Sequence[int, int, int, int]) -> Sequence[int, int, int, int]:
+def map_rect(rect: Sequence[int]) -> Sequence[int]:
     x, y, w, h = rect
     mapped_x, mapped_y = map_point(x, y)
     return mapped_x, mapped_y, int(round(w * _scale_x)), int(round(h * _scale_y))

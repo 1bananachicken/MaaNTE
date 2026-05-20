@@ -218,6 +218,26 @@
                             }
                         }
                     }
+                },
+                {
+                    "name": "0.5",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "0.4",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.4
+                            }
+                        }
+                    }
                 }
             ]
         }

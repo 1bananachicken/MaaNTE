@@ -240,10 +240,10 @@ def ensure_mxu_ui_config() -> None:
     config_dir = Path(project_root_dir) / "config"
     config_dir.mkdir(exist_ok=True)
     config_path = config_dir / "mxu-MaaNTE.json"
-    os.chmod(config_path, stat.S_IWRITE)
     config = {}
     if config_path.exists():
         try:
+            os.chmod(config_path, stat.S_IWRITE)
             with open(config_path, "r", encoding="utf-8") as f:
                 config = json.load(f)
         except Exception:
