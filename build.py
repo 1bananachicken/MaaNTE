@@ -387,8 +387,9 @@ def step_install(python_exe, tag, platform_tag):
     print("[8/12] 组装安装目录")
     print("=" * 60)
 
-    install_script = TOOLS_DIR / "install.py"
-    run([str(python_exe), str(install_script), tag, platform_tag])
+    # 说是弃用了MFAA所以这个install.py不会出现，这个步骤就skip
+    # install_script = TOOLS_DIR / "install.py"
+    # run([str(python_exe), str(install_script), tag, platform_tag])
 
 
 def step_install_mxu(python_exe, tag):

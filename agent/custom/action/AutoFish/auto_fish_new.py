@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 from ..Common.utils import get_image, match_template_in_region
 from ..Common.logger import get_logger
+from utils import screen
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -42,7 +43,8 @@ class AutoFishNew(CustomAction):
         KEY_D = 68
 
         game_region = [395, 40, 490, 20]
-        deadzone = 15
+        deadzone = max(1, int(round(15 * screen.scaling_factors()[0])))
+        game_region = screen.map_rect(game_region)
 
         # --- 小游戏 ---
         frame = 0

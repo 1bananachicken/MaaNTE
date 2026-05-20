@@ -59,7 +59,7 @@
         "key": [
             70 // F
         ],
-        "post_delay": 0,
+        "post_delay": 300, // 稍等一会，按下F后最上面的条都没出来，第一次会识别失败，引入不必要的延迟，孩子们，你们也不想让S级逃走罢（
         "next": [
             "FishNewGaming"
         ]
@@ -130,9 +130,10 @@
                     40
                 ],
                 "expected": "需要装备鱼饵",
-                "threshold": 0.8
+                "threshold": 0.5
             }
         },
+        "post_delay": 2000, // 等中间文字消失
         "focus": {
             "Node.Action.Succeeded": "未装备鱼饵，尝试前往装备"
         },
@@ -187,7 +188,7 @@
                 463,
                 124
             ],
-            "time": 1000,
+            "time": 2000,
             "timeout": 6000
         },
         "next": [
@@ -375,10 +376,14 @@
             418,
             585
         ],
+        // 考虑到刚开始鱼鳞币万能鱼饵可能不在那个位置，放宽ROI
+        // 通过置信度排序的方式滤除方斯鱼饵的选项
         "template": [
             "Fish/FishStoreGeneralBait.png"
         ],
+        "threshold": 0.5,
         // "threshold": 0.8, // 0.8 有点高了
+        "order_by": "Score", // 默认似乎不是按置信度排的，需要显式声明
         "action": "Click",
         "next": [
             "FishNewStoreChooseMaxSuccess",
@@ -430,8 +435,10 @@
                 "threshold": 0.8
             }
         },
-        "pre_delay": 500,
-        "action": "Click"
+        "action": "LongPress",
+        "pre_delay": 500 // pre或post都行
+        // "post_delay": 200, // 实测必须加上这个，也不知道为什么有些电脑上快速点击没用
+        // "action": "Click"
     },
     "FishNewStoreChooseMaxSuccess": {
         "desc": "确认选中最大或鱼鳞币不足",
