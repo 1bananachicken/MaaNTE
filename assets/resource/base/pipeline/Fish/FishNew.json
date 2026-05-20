@@ -371,18 +371,19 @@
         "desc": "商店界面选择万能鱼饵",
         "recognition": "TemplateMatch",
         "roi": [
-            166,
-            78,
-            143,
-            172
+            26,
+            81,
+            418,
+            585
         ],
-        // 必须缩小ROI，不然方斯的那个也会被识别到，然后list中有2个就不行了
-        // 这个框架无法启用识别到多个的时候按照置信度排序吗？如果可以的话可以排序后选择高置信度的那个
+        // 考虑到刚开始鱼鳞币万能鱼饵可能不在那个位置，放宽ROI
+        // 通过置信度排序的方式滤除方斯鱼饵的选项
         "template": [
             "Fish/FishStoreGeneralBait.png"
         ],
         "threshold": 0.5,
         // "threshold": 0.8, // 0.8 有点高了
+        "order_by": "Score", // 默认似乎不是按置信度排的，需要显式声明
         "action": "Click",
         "next": [
             "FishNewStoreChooseMaxSuccess",
@@ -417,7 +418,7 @@
         "dy": -2400
     },
     "FishNewStoreChooseMax": {
-        "desc": "商店界面点击最多按钮", // 持续时间太短，有问题，还是点的位置不对？
+        "desc": "商店界面点击最多按钮",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -435,9 +436,9 @@
             }
         },
         "action": "LongPress",
-        // "pre_delay": 500,  // pre或post都行
-        "post_delay": 200 // 实测必须加上这个，也不知道为什么有些电脑上快速点击没用
-        "action": "Click"
+        "pre_delay": 500 // pre或post都行
+        // "post_delay": 200, // 实测必须加上这个，也不知道为什么有些电脑上快速点击没用
+        // "action": "Click"
     },
     "FishNewStoreChooseMaxSuccess": {
         "desc": "确认选中最大或鱼鳞币不足",
