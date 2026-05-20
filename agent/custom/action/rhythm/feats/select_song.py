@@ -9,6 +9,8 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
+from utils.maafocus import PrintT
+
 from ..utils.config import load_rhythm_config
 from ..utils.presence import (
     STATE_SONG_SELECT,
@@ -40,10 +42,10 @@ class AutoRhythmSelectSong(CustomAction):
 
         song_selector = SongSelector(cfg)
         if not song_selector.enabled:
-            logger.info("自动选曲未启用，跳过选歌")
+            PrintT(ctx, "rhythm.auto_select_disabled")
             return CustomAction.RunResult(success=True)
 
-        logger.info("开始选歌")
+        PrintT(ctx, "rhythm.selecting")
 
         scene_gate = SceneGate(cfg)
         target_fps = int(cfg.get("run", {}).get("target_fps", 60))
@@ -54,7 +56,7 @@ class AutoRhythmSelectSong(CustomAction):
 
         while wait_count < max_wait_frames:
             if context.tasker.stopping:
-                logger.info("tasker 发出停止信号，退出选歌")
+                PrintT(ctx, "rhythm.stopped_while_selecting")
                 return CustomAction.RunResult(success=False)
 
             controller.post_screencap().wait()
@@ -80,7 +82,7 @@ class AutoRhythmSelectSong(CustomAction):
                 )
                 sel_state = sel_info.get("state", "")
                 if sel_state == "done":
-                    logger.info("选歌完成")
+                    PrintT(ctx, "rhythm.select_done")
                     return CustomAction.RunResult(success=True)
                 elif sel_state == "failed":
                     logger.warning("自动选歌失败")

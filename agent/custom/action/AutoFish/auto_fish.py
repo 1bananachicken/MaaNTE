@@ -11,6 +11,8 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
+from utils.maafocus import PrintT
+
 
 logger = get_logger(__name__)
 
@@ -49,7 +51,7 @@ class AutoFish(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        logger.info("=== Autofish Action Started ===")
+        PrintT(ctx, "autofish.started")
         controller = context.tasker.controller
 
         fishing_count = 10
@@ -149,7 +151,7 @@ class AutoFish(CustomAction):
         for i in range(fishing_count):
             if context.tasker.stopping:
                 return CustomAction.RunResult(success=False)
-            logger.info(f"=== Fishing {i + 1}/{fishing_count} ===")
+            PrintT(ctx, "autofish.progress", i + 1, fishing_count)
 
             if not ensure_fish_game():
                 return CustomAction.RunResult(success=False)
@@ -353,5 +355,5 @@ class AutoFish(CustomAction):
             else:
                 logger.debug("Settlement screen not detected, continuing immediately.")
 
-        logger.info("All fishing tasks complete.")
+        PrintT(ctx, "autofish.all_done")
         return CustomAction.RunResult(success=True)

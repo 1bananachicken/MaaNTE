@@ -89,7 +89,7 @@
         },
         "next": [
             "[Anchor]FishNewRestart",
-            "[JumpBack]FishNewGameResult"
+            "[JumpBack]SceneClickBlankToExit"
         ]
     },
     "FishNewGameResult": {
@@ -744,24 +744,6 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterSwitchToPage2"
-        ]
-    },
-    "FishNewFishingMasterContinue": {
-        "desc": "海上钓客界面点击空白处关闭",
-        "pre_delay": 500,
-        "recognition": "OCR",
-        "roi": [
-            555,
-            617,
-            176,
-            43
-        ],
-        "expected": [
-            "点击空白区域关闭"
-        ],
-        "action": "ClickKey",
-        "key": [
-            27 //Esc
         ]
     },
     "FishNewFishingMasterSwitchToPage2": {

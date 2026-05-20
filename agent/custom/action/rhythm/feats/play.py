@@ -11,6 +11,8 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
+from utils.maafocus import PrintT
+
 from ..utils.config import load_rhythm_config
 from ..utils.lanes import build_lane_layout, LaneLayout
 from ..utils.detector import DrumDetector
@@ -319,12 +321,7 @@ class AutoRhythmPlay(CustomAction):
 
         scene_gate = SceneGate(cfg)
 
-        logger.info(
-            "演奏开始 | FPS=%d | 鼓面检测=%s | 场景冷却=%.1fs(音符命中重置)",
-            target_fps,
-            drum_available,
-            scene_lock_sec,
-        )
+        PrintT(ctx, "rhythm.playing_started", target_fps, "ON" if drum_available else "OFF", scene_lock_sec)
 
         start_time = time.perf_counter()
         frame_count = 0
@@ -363,7 +360,7 @@ class AutoRhythmPlay(CustomAction):
                 key_scheduler.release_expired(now)
                 fire_and_log(now)
                 if context.tasker.stopping:
-                    logger.info("tasker 停止信号，退出演奏")
+                    PrintT(ctx, "rhythm.stopped")
                     return CustomAction.RunResult(success=False)
 
                 elapsed_total = time.perf_counter() - start_time
@@ -478,20 +475,11 @@ class AutoRhythmPlay(CustomAction):
                 if now >= scene_lock_until:
                     gate_state, _ = scene_gate.step(context, frame)
                     if gate_state != STATE_PLAYING:
-                        logger.info(
-                            "演奏结束 (帧#%d, 耗时%.1f秒, 冷却锁过期，场景识别=%s)",
-                            frame_count,
-                            elapsed_total,
-                            gate_state,
-                        )
+                        PrintT(ctx, "rhythm.playing_ended", frame_count, elapsed_total)
                         return CustomAction.RunResult(success=True)
                     playing_result = context.run_recognition("RhythmSceneOnPlaying", frame)
                     if not (playing_result and playing_result.hit):
-                        logger.info(
-                            "演奏结束 (帧#%d, 耗时%.1f秒, 冷却锁过期，识别为非playing)",
-                            frame_count,
-                            elapsed_total,
-                        )
+                        PrintT(ctx, "rhythm.playing_ended", frame_count, elapsed_total)
                         return CustomAction.RunResult(success=True)
                     scene_lock_until = now + scene_lock_sec
 

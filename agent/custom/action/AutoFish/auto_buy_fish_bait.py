@@ -10,6 +10,9 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
+from utils.logger import logger
+from utils.maafocus import PrintT
+
 
 @AgentServer.custom_action("auto_buy_fish_bait")
 class AutoBuyFishBait(CustomAction):
@@ -61,13 +64,13 @@ class AutoBuyFishBait(CustomAction):
             except:
                 pass
         
-        print("=== AutoBuyFishBait Action Started ===")
+        PrintT(ctx, "autofish.buy_bait_started")
 
         match_threshold = 0.7
         while True:
             img = get_image(controller)
             found_bait, prob, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, found_bait_threshold)
-            print(f"Current found bait threshold: {found_bait_threshold}, match probability: {prob:.2f}, clicked on bait at ({x+15}, {y+5})")
+            logger.debug("Current found bait threshold: %s, match probability: %.2f, clicked on bait at (%d, %d)", found_bait_threshold, prob, x + 15, y + 5)
             if found_bait:
                 controller.post_touch_move(x,y) # 先移动到指定位置再进行点击，否则可能会触发滑动买到别的东东
                 for _ in range(3):
@@ -81,10 +84,10 @@ class AutoBuyFishBait(CustomAction):
                     time.sleep(0.5)
                     break
                 else:
-                    print("Bait found but not click correctly, retrying...")
+                    PrintT(ctx, "autofish.bait_retry_click")
                     time.sleep(1)
             else:
-                print("Bait not found in fish shop, retrying...")
+                PrintT(ctx, "autofish.bait_not_found")
                 controller.post_click_key(KEY_R).wait()  
                 time.sleep(1)
                 continue
@@ -92,57 +95,57 @@ class AutoBuyFishBait(CustomAction):
         while True:
             img = get_image(controller)
             found_select_max, prob, _, _ = match_template_in_region(img, select_max_region, self.select_max_template, match_threshold)
-            print(f"Looking for select max option, match probability: {prob:.2f}")
+            logger.debug("Looking for select max option, match probability: %.2f", prob)
             if found_select_max:
-                print("Select max option found, clicking...")
+                PrintT(ctx, "autofish.select_max_found")
                 for _ in range(5):
                     click_rect(controller, select_max_region, 0.3)
                     time.sleep(0.1)
                 time.sleep(1)
                 break
             else:
-                print("Select max option not found, retrying...")
+                PrintT(ctx, "autofish.select_max_retry")
                 time.sleep(1)
         
         while True:
             img = get_image(controller)
             found_buy, _, _, _ = match_template_in_region(img, buy_region, self.buy_template, match_threshold)
             if found_buy:
-                print("Buy button found, clicking...")
+                PrintT(ctx, "autofish.buy_button_click")
                 for _ in range(3):
                     click_rect(controller, buy_region, 0.3)
                     time.sleep(0.1)
                 time.sleep(0.5)
                 break
             else:
-                print("Buy button not found, retrying...")
+                PrintT(ctx, "autofish.buy_button_retry")
                 time.sleep(1)
 
         for _ in range(5):
             img = get_image(controller)
             found_buy_confirm, _, _, _ = match_template_in_region(img, buy_confirm_region, self.buy_confirm_template, match_threshold)
             if found_buy_confirm:
-                print("Buy confirm button found, clicking...")
+                PrintT(ctx, "autofish.buy_confirm_click")
                 for _ in range(3):
                     click_rect(controller, buy_confirm_region)
                     time.sleep(0.1)
                 time.sleep(0.5)
                 break
             else:
-                print("Buy confirm button not found, retrying...")
+                PrintT(ctx, "autofish.buy_confirm_retry")
                 time.sleep(1)
 
         while True:
             img = get_image(controller)
             found_buy_success, _, _, _ = match_template_in_region(img, buy_success_region, self.buy_success_template, match_threshold)
             if found_buy_success:
-                print("Buy success.")
+                PrintT(ctx, "autofish.buy_success")
                 controller.post_click_key(KEY_ESC).wait()
                 time.sleep(0.5)
                 controller.post_click_key(KEY_ESC).wait()
                 break
             else:
-                print("Buy success confirmation not found, retrying...")
+                PrintT(ctx, "autofish.buy_success_retry")
                 time.sleep(1)                
 
         return CustomAction.RunResult(success=True)

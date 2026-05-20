@@ -6,10 +6,12 @@ import time
 import json
 
 from utils.logger import logger
-from utils import screen
+from utils.maafocus import Print, PrintT
 
 # 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
-CURSOR_PX_PER_SEC = 168  # 用到的时候自己会再乘scale，这里仍然以1280的base resolution作为参照
+CURSOR_PX_PER_SEC = (
+    168  # 用到的时候自己会再乘scale，这里仍然以1280的base resolution作为参照
+)
 
 
 @AgentServer.custom_action("auto_fish_without_cv")
@@ -40,8 +42,9 @@ class AutoFishWithoutCV(CustomAction):
         logger.debug("钓鱼开始：进入控条阶段（绿条/光标对齐）")
         # 钓鱼阶段
         while not context.tasker.stopping:
-            image = context.tasker.controller.post_screencap().wait().get()  # (720, 1280, 3)，自动缩放至框架规定的标准res
-            image = image[:int(image.shape[0] * 0.15), :, :]  # 坐标原点在左上，可以裁掉下面部分的图片优化性能，比如只留上面15%
+            image = (
+                context.tasker.controller.post_screencap().wait().get()
+            )  # (720, 1280, 3)，自动缩放至框架规定的标准res
             green_bar = context.run_recognition("FishGreenBar", image)
             cursor = context.run_recognition("FishCursor", image)
 
@@ -55,6 +58,12 @@ class AutoFishWithoutCV(CustomAction):
                 and cursor.box
                 is not None  # 这个是为了消除pylance的warning，实际运行时不应该有None的情况
             ):
+                # 绿条/光标未命中时检查是否已弹出结算画面
+                click_blank = context.run_recognition("SceneClickBlankToExit", image)
+                if click_blank and click_blank.hit:
+                    PrintT(context, "autofish.fish_caught")
+                    return CustomAction.RunResult(success=True)
+
                 max_try_item -= 1
                 logger.debug(
                     f"识别不完整（绿条或光标未命中），剩余尝试次数: {max_try_item}"
@@ -65,7 +74,7 @@ class AutoFishWithoutCV(CustomAction):
                     return CustomAction.RunResult(success=True)
                 # 看来就是通过识别失败几次直接通用适配成功/失败的情况的，不用管，根本没有去识别有没有钓到
                 continue
-            
+
             green_bar_x, green_bar_y, green_bar_w, green_bar_h = green_bar.box
             cursor_x, cursor_y, cursor_w, cursor_h = cursor.box
 

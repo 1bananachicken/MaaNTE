@@ -2,12 +2,13 @@
 
 from maa.context import Context
 from utils.logger import logger
+from utils.i18n import T
 
 _FOCUS_NODE = "_MAANTE_FOCUS_"
 
 
 def Print(ctx: Context, content: str):
-    """向 MXU 发送 focus 消息。ctx 为 MaaFramework Context 对象。"""
+    """向 MXU 发送 focus 消息（原样文本，不做 i18n）。ctx 为 MaaFramework Context 对象。"""
     if ctx is None:
         logger.warning("context is None, skip sending focus")
         return
@@ -25,3 +26,8 @@ def Print(ctx: Context, content: str):
         ctx.run_action(_FOCUS_NODE, pipeline_override=pipeline_override)
     except Exception as e:
         logger.warning(f"failed to send focus: {e}")
+
+
+def PrintT(ctx: Context, key: str, *args):
+    """向 MXU 发送 focus 消息（i18n 版本）。key 为翻译键，*args 为 %-格式化参数。"""
+    Print(ctx, T(key, *args))

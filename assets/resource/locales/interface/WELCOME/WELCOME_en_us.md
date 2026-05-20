@@ -7,6 +7,7 @@
 - Every penny you pay to resellers makes the open-source community more difficult
 
 > Mirror酱 is our partner providing download acceleration services, not a sales activity
+> Resource loading currently supports Simplified Chinese best. Some text translations rely on AI. If you find any issues, please submit an issue on GitHub.
 ---
 This software is free and open-source, for learning and communication purposes only.
 All consequences arising from the use of this software are borne by the user and are not related to the developer team.

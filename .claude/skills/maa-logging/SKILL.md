@@ -12,7 +12,20 @@ MaaNTE 的日志系统位于 `agent/utils/logger.py`，提供统一的 `logger` 
 - **优先 loguru**：若已安装 `loguru`，则使用 loguru 的彩色输出与结构化日志。
 - **回退标准 logging**：若未安装 loguru，使用标准库 `logging` + `TimedRotatingFileHandler`。
 - **控制台**：根据客户端类型（MXU / MFAAvalonia / 其他）自动适配输出格式（HTML 彩色 / 短标签 / ANSI 颜色）。
+- **MXU 模式**：console_level 自动降为 `"WARNING"`，用户只看到 WARNING/ERROR；INFO/DEBUG 仅入文件日志。
 - **文件**：按天滚动，保留 2 周，压缩归档；文件日志固定带时间戳和调用位置。
+
+## logger 与 maafocus 的职责分离
+
+```
+logger          → 开发者日志（内部状态、算法细节、调试信息）
+maafocus        → 用户可见消息（任务进度、状态变更、错误提示）
+```
+
+- `logger.debug/info` 在 MXU 模式下**不会**出现在用户面前（console_level = WARNING）。
+- 所有面向用户的消息必须使用 `maafocus.Print(ctx, msg)` 或 `maafocus.PrintT(ctx, key, *args)`。
+- `maafocus.PrintT()` 自动通过 `utils.i18n.T()` 查翻译，支持多语言。
+- 详见 [python-action-guide](../python-action-guide/SKILL.md#用户可见消息maafocus)。
 
 ## 导入
 
@@ -26,12 +39,14 @@ from utils.logger import logger
 
 | 级别 | 用途 | 示例 |
 |------|------|------|
-| `logger.info` | 关键步骤、状态变更、任务开始/结束 | `logger.info("演奏开始")` |
+| `logger.info` | 内部关键步骤、启动初始化 | `logger.info("已加载演奏配置文件: %s", path)` |
 | `logger.debug` | 识别细节、中间计算结果 | `logger.debug("未识别到 %s", name)` |
 | `logger.warning` | 可恢复异常、降级、配置缺失 | `logger.warning("鼓面模板缺失，演奏检测不可用")` |
 | `logger.error` | 不可恢复错误 | `logger.error("Error: %s", e)` |
-| `logger.success` | 操作成功确认（loguru） | `logger.success("任务完成")` |
+| `logger.success` | 操作成功确认（loguru） | `logger.success("初始化完成")` |
 | `logger.trace` | 逐帧/高频细节（loguru） | `logger.trace("候选入队: ...")` |
+
+**注意**：MXU 模式下 console_level 为 `"WARNING"`，`logger.info` 不会出现在用户面前。用户可见的消息请用 `maafocus.PrintT()`。
 
 ## 格式化
 
@@ -48,21 +63,24 @@ logger.info("演奏开始 | FPS=" + str(target_fps))
 logger.info(f"演奏开始 | FPS={target_fps}")
 ```
 
-## 禁止 print
+## 禁止 print / logger.info 用户消息
 
-**所有用户可见的输出应使用 logger，禁止 `print()`**。Pipeline 的 focus 消息用于向用户展示任务进度，Python 代码中的 print 无法正确路由到 MXU/MFA 的日志面板。
+**用户可见的消息必须通过 `maafocus.Print()` / `PrintT()` 发送，禁止 `print()` 和 `logger.info()`。**
 
 ```python
-# Bad
-print("=== Auto Make Coffee Action Started ===")
-print(f"=== Making Coffee {count + 1}/{make_count} ===")
-
-# Good
+# Bad — 用户看不到（MXU 模式下 logger.info 被过滤）
 logger.info("冲咖啡任务开始")
-logger.info("制作进度: %d/%d", count + 1, make_count)
-```
+print("=== Auto Make Coffee Action Started ===")
 
-特例：`auto_tetris.py` 中 `print()` 的报告消息（如 `[泯除方块] 任务开始 | 模式: 单人`）应迁移为 `context.run_action("_MAANTE_FOCUS_", pipeline_override=...)` 或 logger。
+# Good — 用户能看的用 maafocus
+PrintT(ctx, "coffee.started")
+PrintT(ctx, "coffee.making", count + 1, make_count)
+
+# Good — 开发者调试用 logger
+logger.debug("识别分数: prob=%.2f", prob)
+logger.warning("模板缺失，功能降级")
+logger.error("不可恢复错误: %s", e)
+```
 
 ## 敏感信息
 

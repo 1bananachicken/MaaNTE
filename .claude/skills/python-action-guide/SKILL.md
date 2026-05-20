@@ -1,6 +1,6 @@
 ---
 name: python-action-guide
-description: MaaNTE Python 自定义动作（CustomAction）编写指南。覆盖 agent/custom/action/ 下的 Python 代码的架构、注册、命名、日志、Controller API、Pipeline 集成、错误处理等编码规范和模式参考。在编写、修改或审查 Python 自定义动作，或需要了解 agent 项目结构与 MaaFramework Python 绑定集成方式时使用。
+description: MaaNTE Python 自定义动作（CustomAction）编写指南。覆盖 agent/custom/action/ 下的 Python 代码的架构、注册、命名、maafocus 用户消息、日志、Controller API、Pipeline 集成、错误处理等编码规范和模式参考。在编写、修改或审查 Python 自定义动作，或需要了解 agent 项目结构与 MaaFramework Python 绑定集成方式时使用。
 ---
 
 # MaaNTE Python CustomAction 编写指南
@@ -115,13 +115,14 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 from utils.logger import logger
+from utils.maafocus import PrintT
 
 @AgentServer.custom_action("my_action")
 class MyAction(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        logger.info("MyAction 开始")
+        PrintT(ctx, "my_action.started")
 
         params = {}
         if argv.custom_action_param:
@@ -141,6 +142,7 @@ class MyAction(CustomAction):
             return CustomAction.RunResult(success=False)
 
         # 业务逻辑 ...
+        logger.debug("识别结果: score=%.2f", score)
 
         return CustomAction.RunResult(success=True)
 ```
@@ -247,22 +249,72 @@ if detail and detail.hit and detail.best_result:
     text = detail.best_result.text
 ```
 
+## 用户可见消息（maafocus）
+
+**所有面向用户的进度、状态、错误提示必须使用 `maafocus.Print()` / `PrintT()`，禁止 `print()` 和 `logger.info()`。**
+
+两个通道职责分离：
+
+| | logger | maafocus |
+|---|---|---|
+| 目标 | 开发者（调试） | 终端用户 |
+| 传输 | stderr / 文件 | Pipeline `focus` 协议 → MXU |
+| i18n | 不支持 | `PrintT()` 自动调 `T()` |
+| 阈值 | MXU 模式下仅 WARNING+ | 全部 |
+
+
+### PrintT — i18n 用户消息（推荐）
+
+```python
+from utils.maafocus import PrintT
+
+PrintT(ctx, "tetris.task_started", " | ".join(parts))
+PrintT(ctx, "coffee.making", count + 1, make_count)
+PrintT(ctx, "rhythm.playing_started", fps, "ON", scene_lock)
+```
+
+首个参数是 i18n key（定义在 `assets/resource/locales/agent/zh_cn.json`），后续参数为 `%`-格式化值。
+
+### Print — 原样文本
+
+```python
+from utils.maafocus import Print
+
+Print(ctx, "纯文本消息，不做翻译")
+```
+
+### 模块依赖
+
+`maafocus.py` 内部导入 `utils.i18n`，因此需确保 `i18n_init()` 已先执行（`main.py` 中已有）。
+
+### 辅助类中无 context 的情况
+
+辅助类（如 `_KeyScheduler`、`MaaKeyboardBridge`）不持有 `ctx`，内部只用 `logger.debug()` 记录调试信息。用户消息由调用方（CustomAction.run()）发送。
+
+### 管道 focus 消息（JSON 侧）
+
+Pipeline JSON 中的 `"focus"` 字段是纯 pipeline 层消息，不走 Python i18n：
+
+```jsonc
+"focus": { "Node.Action.Succeeded": "钓到鱼了！" }
+```
+
+其 i18n 依赖 MXU 侧支持，与 agent 的 `T()` 系统不互通。
+
 ### context.run_action
 
 调用 Pipeline 中定义的动作节点：
 
 ```python
-context.run_action(
-    "_MAANTE_FOCUS_",
-    pipeline_override={
-        "_MAANTE_FOCUS_": {
-            "focus": {"Node.Action.Starting": "消息内容"},
-            "action": "DoNothing",
-            "pre_delay": 0,
-            "post_delay": 0,
-        }
-    },
-)
+context.run_action("SomeClickNode")
+```
+
+带参数覆盖：
+
+```python
+context.run_action("SomeClickNode", pipeline_override={
+    "SomeClickNode": {"target": [100, 200]},
+})
 ```
 
 ### context.run_task
@@ -306,16 +358,17 @@ while True:
 
 ## 日志
 
-使用 `utils.logger`，禁止 `print()`。详见 [maa-logging](../maa-logging/SKILL.md)。
+**logger 用于开发者调试，用户消息走 maafocus。** 详见 [maa-logging](../maa-logging/SKILL.md)。
 
 ```python
 from utils.logger import logger
 
-logger.info("任务开始 | 参数=%s", params)
-logger.debug("识别结果: %s", result)
-logger.warning("模板缺失，功能降级")
-logger.error("不可恢复错误: %s", e)
+logger.debug("识别结果: %s", result)        # 内部细节
+logger.warning("模板缺失，功能降级")         # 开发者关注的异常
+logger.error("不可恢复错误: %s", e)          # 严重错误
 ```
+
+禁止 `print()`。MXU 模式下 logger 的 console_level 已降为 `"WARNING"`，因此 `logger.info()` 不再出现在用户面前。
 
 ## 资源路径
 
