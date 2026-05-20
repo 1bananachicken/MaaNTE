@@ -378,7 +378,7 @@
         "template": [
             "Fish/FishStoreGeneralBait.png"
         ],
-        "threshold": 0.8,
+        // "threshold": 0.8, // 0.8 有点高了
         "action": "Click",
         "next": [
             "FishNewStoreChooseMaxSuccess",
@@ -430,6 +430,7 @@
                 "threshold": 0.8
             }
         },
+        "pre_delay": 500,
         "action": "Click"
     },
     "FishNewStoreChooseMaxSuccess": {
