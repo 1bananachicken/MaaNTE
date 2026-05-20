@@ -47,7 +47,8 @@
             "type": "DoNothing"
         },
         "next": [
-            "PinkPawHeist_DetectXiaoZhi"
+            "PinkPawHeist_DetectXiaoZhi",
+            "[JumpBack]SceneAnyEnterWorld"
         ]
     },
     "PinkPawHeist_DetectXiaoZhi": {
@@ -55,7 +56,10 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "小吱",
+                "expected": [
+                    "小吱",
+                    "小岐"
+                ],
                 "roi": [
                     800,
                     380,
@@ -76,15 +80,24 @@
         "focus": {
             "Node.Action.Starting": {
                 "content": "开始寻找小吱",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             },
             "Node.Action.Failed": {
                 "content": "❌ 未找到小吱，请确保在小吱面前开始任务",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             },
             "Node.Action.Succeeded": {
                 "content": "✅ 成功找到小吱，开始任务",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             }
         }
     },
@@ -206,11 +219,17 @@
         "focus": {
             "Node.Action.Starting": {
                 "content": "等待进入地图……",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             },
             "Node.Action.Succeeded": {
                 "content": "✅ 成功进入地图",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             }
         }
     },
