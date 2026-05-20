@@ -4,6 +4,7 @@ import json
 
 from pathlib import Path
 from ..Common.utils import get_image, match_template_in_region, click_rect
+from utils import screen
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -39,6 +40,15 @@ class AutoBuyFishBait(CustomAction):
         buy_success_region = [569, 629, 145, 19]
         not_enough_shell_region = [1170, 585, 18, 16]
         shell_count_region = [961, 31, 70, 21]
+
+        fish_shop_region = screen.map_rect(fish_shop_region)
+        find_bait_success_region = screen.map_rect(find_bait_success_region)
+        select_max_region = screen.map_rect(select_max_region)
+        buy_region = screen.map_rect(buy_region)
+        buy_confirm_region = screen.map_rect(buy_confirm_region)
+        buy_success_region = screen.map_rect(buy_success_region)
+        not_enough_shell_region = screen.map_rect(not_enough_shell_region)
+        shell_count_region = screen.map_rect(shell_count_region)
         KEY_R = 82
         KEY_ESC = 27
         controller = context.tasker.controller  

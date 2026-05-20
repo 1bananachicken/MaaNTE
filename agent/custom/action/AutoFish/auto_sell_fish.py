@@ -3,6 +3,7 @@ import time
 
 from pathlib import Path
 from ..Common.utils import get_image, match_template_in_region, click_rect
+from utils import screen
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -47,6 +48,15 @@ class AutoSellFish(CustomAction):
         sell_success_region = [565, 628, 149, 21]
         sell_fail_region = [739, 349, 202, 24]
         no_valid_fish_region = [509, 350, 261, 22]
+
+        no_fish_to_sell_region = screen.map_rect(no_fish_to_sell_region)
+        sell_option_region = screen.map_rect(sell_option_region)
+        sell_option_selected_region = screen.map_rect(sell_option_selected_region)
+        sell_button_region = screen.map_rect(sell_button_region)
+        confirm_sell_region = screen.map_rect(confirm_sell_region)
+        sell_success_region = screen.map_rect(sell_success_region)
+        sell_fail_region = screen.map_rect(sell_fail_region)
+        no_valid_fish_region = screen.map_rect(no_valid_fish_region)
         
         while True:
             img = get_image(controller)

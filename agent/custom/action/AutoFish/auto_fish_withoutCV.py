@@ -6,9 +6,10 @@ import time
 import json
 
 from utils.logger import logger
+from utils import screen
 
 # 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
-CURSOR_PX_PER_SEC = 168
+CURSOR_PX_PER_SEC = 168  # 用到的时候自己会再乘scale，这里仍然以1280的base resolution作为参照
 
 
 @AgentServer.custom_action("auto_fish_without_cv")
@@ -16,7 +17,6 @@ class AutoFishWithoutCV(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-
         deadzone = 15  # 光标与绿条中心的距离在 deadzone（像素）以内时不操作，避免过度频繁地轻微调整导致的抖动
         max_try_item = 5  # 识别不完整（绿条或光标未命中）的最大尝试次数，超过后放弃本次钓鱼，重新抛竿（执行 FishHook）
         factor = 1.5  # 控条时长的调整因子，实际时长 = 基础时长 * factor，基础时长 = (光标与绿条中心的像素偏移 / CURSOR_PX_PER_SEC) * 1000ms，增加 factor 可以适当补偿识别误差和按键响应延迟
@@ -40,7 +40,8 @@ class AutoFishWithoutCV(CustomAction):
         logger.debug("钓鱼开始：进入控条阶段（绿条/光标对齐）")
         # 钓鱼阶段
         while not context.tasker.stopping:
-            image = context.tasker.controller.post_screencap().wait().get()
+            image = context.tasker.controller.post_screencap().wait().get()  # (720, 1280, 3)，自动缩放至框架规定的标准res
+            image = image[:int(image.shape[0] * 0.15), :, :]  # 坐标原点在左上，可以裁掉下面部分的图片优化性能，比如只留上面15%
             green_bar = context.run_recognition("FishGreenBar", image)
             cursor = context.run_recognition("FishCursor", image)
 
@@ -62,8 +63,9 @@ class AutoFishWithoutCV(CustomAction):
                 if max_try_item <= 0:
                     logger.debug("尝试次数用尽，控条失败")
                     return CustomAction.RunResult(success=True)
+                # 看来就是通过识别失败几次直接通用适配成功/失败的情况的，不用管，根本没有去识别有没有钓到
                 continue
-
+            
             green_bar_x, green_bar_y, green_bar_w, green_bar_h = green_bar.box
             cursor_x, cursor_y, cursor_w, cursor_h = cursor.box
 
@@ -74,7 +76,8 @@ class AutoFishWithoutCV(CustomAction):
             offset = cursor_center_x - green_bar_center_x
 
             abs_offset = abs(offset)
-            base_ms = (abs_offset / CURSOR_PX_PER_SEC) * 1000.0
+            scaled_px_per_sec = max(1.0, CURSOR_PX_PER_SEC)
+            base_ms = (abs_offset / scaled_px_per_sec) * 1000.0
             duration_ms = min(cap_ms, max(floor_ms, int(base_ms * factor)))
 
             # 键码与 LongPressKey 定义见资源 pipeline FishKey（FishLeft / FishRight），此处只覆盖时长
