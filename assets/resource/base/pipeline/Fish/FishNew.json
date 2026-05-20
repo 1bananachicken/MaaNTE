@@ -380,13 +380,10 @@
         "template": [
             "Fish/FishStoreGeneralBait.png"
         ],
-<<<<<<< HEAD
         "green_mask": true,
-=======
         "threshold": 0.5,
         // "threshold": 0.8, // 0.8 有点高了
         "order_by": "Score", // 默认似乎不是按置信度排的，需要显式声明
->>>>>>> dev
         "action": "Click",
         "next": [
             "FishNewStoreChooseMaxSuccess",
