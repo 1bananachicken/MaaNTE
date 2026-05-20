@@ -14,7 +14,8 @@
         "zh_cn": "resource/locales/interface/zh_cn.json",
         "zh_tw": "resource/locales/interface/zh_tw.json",
         "en_us": "resource/locales/interface/en_us.json",
-        "ja_jp": "resource/locales/interface/ja_jp.json"
+        "ja_jp": "resource/locales/interface/ja_jp.json",
+        "ko_kr": "resource/locales/interface/ko_kr.json"
     },
     "controller": [
         {
