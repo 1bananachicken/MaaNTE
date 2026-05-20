@@ -939,9 +939,12 @@ class PinkPawHeistScheme2Action(CustomAction):
 
             # ---------- 最后撤离1 ----------
 
-            ah.delay(1500)
+            ah.key_down("S")
+            ah.delay(3000)
+            ah.key_up("S")
+            ah.delay(200)
             ah.key_down("W")
-            ah.delay(4500)
+            ah.delay(6500)
             ah.key_up("W")
             ah.delay(500)
             ah.key_down("A")
@@ -957,7 +960,7 @@ class PinkPawHeistScheme2Action(CustomAction):
                 ah.delay(10000, check_reward=False)
             else:
                 # ---------- 最后撤离2 ----------
-                ah.delay(2000)
+
                 ah.key_down("D")
                 ah.delay(6100)
                 ah.key_up("D")
