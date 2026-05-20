@@ -22,7 +22,7 @@
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "点击补货": {
                             "enabled": true
@@ -31,7 +31,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "禁用",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "点击补货": {
                             "enabled": false

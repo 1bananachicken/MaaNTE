@@ -19,7 +19,7 @@
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "RhythmSelectSong": {
                             "custom_action_param": {
@@ -30,7 +30,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "关闭",
+                    "label": "$option_switch_case_no",
                     "option": [
                         "演奏目标歌曲选择"
                     ]
@@ -128,14 +128,14 @@
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "option": [
                         "连打模式"
                     ]
                 },
                 {
                     "name": "No",
-                    "label": "关闭",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "RhythmRepeatCheck": {
                             "custom_action_param": {
@@ -155,7 +155,7 @@
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "Max",
+                    "label": "$task_rhythm_option_play_mode_case_max",
                     "pipeline_override": {
                         "RhythmRepeatCheck": {
                             "custom_action_param": {
@@ -166,7 +166,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "固定次数",
+                    "label": "$task_rhythm_option_play_mode_case_fixed",
                     "option": [
                         "连打次数"
                     ]
@@ -181,7 +181,7 @@
             "inputs": [
                 {
                     "name": "auto_repeat_count",
-                    "label": "次数",
+                    "label": "$task_rhythm_option_play_count_input",
                     "default": "5",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
@@ -203,7 +203,7 @@
             "inputs": [
                 {
                     "name": "target_fps",
-                    "label": "FPS",
+                    "label": "$task_rhythm_option_fps_input",
                     "default": "60",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"

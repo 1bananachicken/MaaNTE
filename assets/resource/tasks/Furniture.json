@@ -25,7 +25,7 @@
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "$task_furniture_option_go",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "FurnitureChooseWienerApartments": {
                             "enabled": true
@@ -34,7 +34,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "$task_furniture_option_disable",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "FurnitureChooseWienerApartments": {
                             "enabled": false
@@ -50,7 +50,7 @@
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "$task_furniture_option_go",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "FurnitureChooseEdenApartments": {
                             "enabled": true
@@ -59,7 +59,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "$task_furniture_option_disable",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "FurnitureChooseEdenApartments": {
                             "enabled": false
@@ -75,7 +75,7 @@
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "$task_furniture_option_go",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "FurnitureChooseSkyviewHalls": {
                             "enabled": true
@@ -84,7 +84,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "$task_furniture_option_disable",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "FurnitureChooseSkyviewHalls": {
                             "enabled": false
@@ -100,7 +100,7 @@
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "$task_furniture_option_go",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "FurnitureChooseGoldenCapital": {
                             "enabled": true
@@ -109,7 +109,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "$task_furniture_option_disable",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "FurnitureChooseGoldenCapital": {
                             "enabled": false
@@ -125,7 +125,7 @@
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "$task_furniture_option_go",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "FurnitureChooseFenglinVilla": {
                             "enabled": true
@@ -134,7 +134,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "$task_furniture_option_disable",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "FurnitureChooseFenglinVilla": {
                             "enabled": false
