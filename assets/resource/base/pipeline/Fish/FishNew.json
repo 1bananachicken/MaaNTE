@@ -382,6 +382,7 @@
             "Fish/FishStoreGeneralBait.png"
         ],
         "threshold": 0.5,
+        // "threshold": 0.8, // 0.8 有点高了
         "action": "Click",
         "next": [
             "FishNewStoreChooseMaxSuccess",
@@ -434,7 +435,9 @@
             }
         },
         "action": "LongPress",
+        // "pre_delay": 500,  // pre或post都行
         "post_delay": 200 // 实测必须加上这个，也不知道为什么有些电脑上快速点击没用
+        "action": "Click"
     },
     "FishNewStoreChooseMaxSuccess": {
         "desc": "确认选中最大或鱼鳞币不足",

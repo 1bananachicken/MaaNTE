@@ -3,7 +3,7 @@
         {
             "name": "音频闪避",
             "entry": "SoundDodgeMain",
-            "description": "基于音频识别的自动闪避与反击，需要[color:red]“桌面端-前台”[/color]控制器",
+            "description": "基于音频识别的自动闪避与反击，需要“<span style='color:red'>桌面端-前台</span>”控制器",
             "option": [
                 "SoundDodgeEnable",
                 "SoundDodgeAllAttacks",
