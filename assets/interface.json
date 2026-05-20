@@ -59,7 +59,8 @@
     ],
     "resource": [
         {
-            "name": "$resource_official_label",
+            "name": "官服",
+            "label": "$resource_official_label",
             "path": [
                 "resource/base"
             ]
