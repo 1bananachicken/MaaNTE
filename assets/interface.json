@@ -86,7 +86,8 @@
         "resource/tasks/FountainCheckin.json",
         "resource/tasks/SoundDodge.json",
         "resource/tasks/AutoFScroll.json",
-        "resource/tasks/AutoPiano.json"
+        "resource/tasks/AutoPiano.json",
+        "resource/tasks/DatasetRecorder.json"
     ],
     "option": {}
 }
