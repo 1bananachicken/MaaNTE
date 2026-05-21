@@ -10,7 +10,7 @@
             }
         }
     },
-    "PinkPawHeist_Core1_Attack_Space":{
+    "PinkPawHeist_Core1_Attack_Space": {
         "recognition": {
             "type": "DirectHit"
         },
@@ -22,16 +22,21 @@
         },
         "pre_delay": 100,
         "post_delay": 100,
-        "next": ["PinkPawHeist_Core1_Attack_Mouse"]
+        "next": [
+            "PinkPawHeist_Core1_Attack_Mouse"
+        ]
     },
-    "PinkPawHeist_Core1_Attack_Mouse":{
+    "PinkPawHeist_Core1_Attack_Mouse": {
         "recognition": {
             "type": "DirectHit"
         },
         "action": {
             "type": "Click",
             "param": {
-                "target": [640,360],
+                "target": [
+                    640,
+                    360
+                ],
                 "contact": 0
             }
         },
@@ -49,7 +54,10 @@
         "focus": {
             "Node.Action.Starting": {
                 "content": "等待G层战斗1",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             }
         }
     },
@@ -63,7 +71,10 @@
         "focus": {
             "Node.Action.Starting": {
                 "content": "等待G层战斗2",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             }
         }
     },

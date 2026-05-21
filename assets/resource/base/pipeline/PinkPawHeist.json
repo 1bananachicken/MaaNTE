@@ -11,8 +11,8 @@
         ],
         "focus": {
             "Node.Action.Starting": {
-                "content": "{name} 开始执行，请确保设置了结束任务快捷键(F11)",
-                "display": "toast"
+                "content": "{name} 即将开始执行，请确保你设置了**结束任务**的**全局快捷键**！",
+                "display": "modal"
             }
         }
     },
@@ -46,12 +46,9 @@
         "action": {
             "type": "DoNothing"
         },
-        "timeout": 30000,
         "next": [
-            "PinkPawHeist_DetectXiaoZhi"
-        ],
-        "on_error": [
-            "PinkPawHeist_StopTask"
+            "PinkPawHeist_DetectXiaoZhi",
+            "[JumpBack]SceneAnyEnterWorld"
         ]
     },
     "PinkPawHeist_DetectXiaoZhi": {
@@ -59,8 +56,10 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": ["小吱", "小岐", "小妓"],
-                "threshold": 0.5,
+                "expected": [
+                    "小吱",
+                    "小岐"
+                ],
                 "roi": [
                     800,
                     380,
@@ -72,7 +71,6 @@
         "action": {
             "type": "DoNothing"
         },
-        "timeout": 30000,
         "next": [
             "PinkPawHeist_PressF"
         ],
@@ -81,16 +79,25 @@
         ],
         "focus": {
             "Node.Action.Starting": {
-                "content": "开始寻找小吱（最多等待2分钟）",
-                "display": ["log", "toast"]
+                "content": "开始寻找小吱",
+                "display": [
+                    "log",
+                    "toast"
+                ]
             },
             "Node.Action.Failed": {
-                "content": "❌ 2分钟内未找到小吱，任务终止",
-                "display": ["log", "toast"]
+                "content": "❌ 未找到小吱，请确保在小吱面前开始任务",
+                "display": [
+                    "log",
+                    "toast"
+                ]
             },
             "Node.Action.Succeeded": {
                 "content": "✅ 成功找到小吱，开始任务",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             }
         }
     },
@@ -212,11 +219,17 @@
         "focus": {
             "Node.Action.Starting": {
                 "content": "等待进入地图……",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             },
             "Node.Action.Succeeded": {
                 "content": "✅ 成功进入地图",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             }
         }
     },
@@ -240,5 +253,6 @@
             "type": "DoNothing"
         },
         "next": []
+        // next 由方案选项动态覆写
     }
 }
