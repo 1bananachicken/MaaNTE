@@ -94,7 +94,9 @@ class TetrisGamePlayer:
             if current_signature == last_piece_signature:
                 skip_count += 1
                 if skip_count >= 10:
-                    self._debug_log("Same piece signature repeated too long, forcing re-evaluation.")
+                    self._debug_log(
+                        "Same piece signature repeated too long, forcing re-evaluation."
+                    )
                     last_piece_signature = None
                     skip_count = 0
                 else:
@@ -120,7 +122,9 @@ class TetrisGamePlayer:
             planning_queue = planning_queue[:6]
 
             best_move = self._choose_best_current_piece_move(
-                settled_board, piece_state, planning_queue,
+                settled_board,
+                piece_state,
+                planning_queue,
             )
             if best_move is None:
                 best_move = self._find_best_move(settled_board, self.current_piece_name)
@@ -143,12 +147,17 @@ class TetrisGamePlayer:
             )
 
             planned_result = self._apply_internal_drop(
-                settled_board, self.current_piece_name,
-                best_move["rotation"], best_move["target_col"], apply=False,
+                settled_board,
+                self.current_piece_name,
+                best_move["rotation"],
+                best_move["target_col"],
+                apply=False,
             )
 
             self._rotate_and_standardize(controller, best_move["rotation"])
-            self._apply_move_no_feedback(controller, best_move["rotation"], best_move["target_col"])
+            self._apply_move_no_feedback(
+                controller, best_move["rotation"], best_move["target_col"]
+            )
 
             if self.fast_drop:
                 time.sleep(0.12)
@@ -176,7 +185,9 @@ class TetrisGamePlayer:
                     self.combo_count = 1
                 self.last_clear_time = now
                 self.total_lines_cleared += lines_cleared
-                self._debug_log(f"[Stats] Lines cleared: {lines_cleared}, Total: {self.total_lines_cleared}")
+                self._debug_log(
+                    f"[Stats] Lines cleared: {lines_cleared}, Total: {self.total_lines_cleared}"
+                )
             else:
                 if time.time() - self.last_clear_time > 5.0:
                     self.combo_count = 0
@@ -227,7 +238,9 @@ class TetrisGamePlayer:
                     img, self.new_piece_roi
                 )
                 if match is not None:
-                    if self._is_same_piece(match["piece"], current_piece, expected_next):
+                    if self._is_same_piece(
+                        match["piece"], current_piece, expected_next
+                    ):
                         if not self._sleep_with_stop(tasker, 0.01):
                             return None
                         continue
@@ -237,11 +250,15 @@ class TetrisGamePlayer:
                     img, self.new_piece_roi, min_similarity=0.80
                 )
                 if match is not None:
-                    if self._is_same_piece(match["piece"], current_piece, expected_next):
+                    if self._is_same_piece(
+                        match["piece"], current_piece, expected_next
+                    ):
                         if not self._sleep_with_stop(tasker, 0.01):
                             return None
                         continue
-                    self._debug_log("[NewPiece] Optimistic match succeeded before drop ready")
+                    self._debug_log(
+                        "[NewPiece] Optimistic match succeeded before drop ready"
+                    )
                     return self._build_new_piece_info(match)
 
             if not self._sleep_with_stop(tasker, 0.01):
@@ -331,11 +348,8 @@ class TetrisGamePlayer:
         }
 
     def _is_drop_ready(self, img) -> bool:
-        if self.context is not None:
-            result = self.scene_detector.check_drop(self.context, img)
-            matched = result is not None
-        else:
-            matched, score, _, _ = self.scene_gate._find_drop_button(img)
+        result = self.scene_detector.check_drop(self.context, img)
+        matched = result is not None
         if matched:
             self.drop_ready_hits = min(self.drop_ready_hits + 1, 3)
         else:
@@ -343,9 +357,6 @@ class TetrisGamePlayer:
         return self.drop_ready_hits >= 2
 
     def _is_result_screen(self, img) -> bool:
-        if self.context is None:
-            matched, score, _, _ = self.scene_gate._find_matchend(img)
-            return matched
         return self.scene_detector.check_matchend(self.context, img) is not None
 
     def _debug_log(self, *args):
@@ -405,7 +416,9 @@ class TetrisGamePlayer:
 
         if actual_rotation != self.current_rotation:
             clockwise_steps = (actual_rotation - self.current_rotation) % rotation_count
-            counterclockwise_steps = (self.current_rotation - actual_rotation) % rotation_count
+            counterclockwise_steps = (
+                self.current_rotation - actual_rotation
+            ) % rotation_count
             if clockwise_steps <= counterclockwise_steps:
                 for _ in range(clockwise_steps):
                     self._tap_key(controller, VK_K, hold=0.02)
@@ -420,8 +433,6 @@ class TetrisGamePlayer:
             self._tap_key(controller, VK_A, hold=0.02)
             time.sleep(0.01)
         self.current_col = 0
-
-
 
     def _update_active_piece_state(self, img) -> bool:
         play_state = self._scan_play_state(img)
@@ -467,7 +478,9 @@ class TetrisGamePlayer:
         shape = PIECES[piece_name][rotation]
         result = simulate_drop(board, shape, target_col)
         if result is None:
-            self._debug_log("[Board] Internal drop failed; keeping previous board state.")
+            self._debug_log(
+                "[Board] Internal drop failed; keeping previous board state."
+            )
             return None
         if apply:
             self.internal_board = result["board"]

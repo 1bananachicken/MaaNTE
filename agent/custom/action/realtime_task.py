@@ -5,6 +5,8 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
+from utils.logger import logger
+
 
 HOLDER_NODE_NAME = "__RealTimeTaskAction_Holder"
 
@@ -41,7 +43,7 @@ class RealTimeTaskAction(CustomAction):
         while not context.tasker.stopping:
             result = context.run_task(HOLDER_NODE_NAME, pipeline_override)
             if result is None:
-                print("RealTimeTaskAction: RunTask returned None, continue loop")
+                logger.debug("RealTimeTaskAction: RunTask returned None, continue loop")
 
-        print("RealTimeTaskAction: tasker stopping signal received, exit loop")
+        logger.debug("RealTimeTaskAction: tasker stopping signal received, exit loop")
         return CustomAction.RunResult(success=True)

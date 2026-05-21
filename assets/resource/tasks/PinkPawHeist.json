@@ -1,0 +1,103 @@
+{
+    "task": [
+        {
+            "name": "粉爪大劫案",
+            "entry": "PinkPawHeist_Main",
+            "description": "自动刷取粉爪大劫案，需要<span style='color:red'>“桌面端-前台”</span>控制器。",
+            "option": [
+                "PinkPawHeist_Loop",
+                "PinkPawHeist_Scheme"
+            ],
+            "controller": [
+                "Win32-Front"
+            ]
+        }
+    ],
+    "option": {
+        "PinkPawHeist_Loop": {
+            "type": "switch",
+            "label": "无限循环",
+            "description": "无限循环，直到手动结束任务。",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启"
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "option": [
+                        "PinkPawHeist_LoopCount"
+                    ]
+                }
+            ]
+        },
+        "PinkPawHeist_LoopCount": {
+            "type": "input",
+            "label": "循环次数",
+            "inputs": [
+                {
+                    "name": "count",
+                    "label": "循环次数",
+                    "default": "10",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9]\\d{0,3}$"
+                }
+            ],
+            "pipeline_override": {
+                "PinkPawHeist_CoreSequence": {
+                    "max_hit": "{count}"
+                }
+            }
+        },
+        "PinkPawHeist_Scheme": {
+            "type": "select",
+            "label": "地图方案",
+            "description": "选择本次战斗的地图移动方案。。",
+            "default_case": "Core2",
+            "cases": [
+                {
+                    "name": "Core1",
+                    "label": "方案一",
+                    "pipeline_override": {
+                        "PinkPawHeist_ExecuteScheme": {
+                            "next": [
+                                "PinkPawHeist_Scheme1"
+                            ]
+                        }
+                    },
+                    "option": [
+                        "PinkPawHeist_Scheme_Core1_desc"
+                    ]
+                },
+                {
+                    "name": "Core2",
+                    "label": "方案二",
+                    "pipeline_override": {
+                        "PinkPawHeist_ExecuteScheme": {
+                            "next": [
+                                "PinkPawHeist_Scheme2"
+                            ]
+                        }
+                    },
+                    "option": [
+                        "PinkPawHeist_Scheme_Core2_desc"
+                    ]
+                }
+            ]
+        },
+        "PinkPawHeist_Scheme_Core1_desc": {
+            "type": "input",
+            "label": "方案一说明",
+            "description": "<span style='color:orange'>目前极不稳定。</span><br><span style='color:green'>配队要求：</span>3号位为薄荷。推荐1娜娜莉3薄荷4早雾。<br><span style='color:green'>路线说明：</span>在G层进行搜索，并前往L1-01撤离点撤离。<br><span style='color:orange'>其它要求：</span>关闭游戏的移动镜头修正功能",
+            "inputs": []
+        },
+        "PinkPawHeist_Scheme_Core2_desc": {
+            "type": "input",
+            "label": "方案二说明",
+            "description": "<span style='color:orange'>更稳定收益更高，请设置画质到性能档位，关闭设置里的移动镜头修正！</span><br><span style='color:green'>配队要求：</span>1娜娜莉3早雾4狼<br><span style='color:green'>路线说明：</span>走藏品层路线撤离",
+            "inputs": []
+        }
+    }
+}

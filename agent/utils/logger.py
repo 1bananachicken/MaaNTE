@@ -219,6 +219,6 @@ def change_console_level(level="DEBUG"):
     logger.info(f"控制台日志等级已更改为: {level}")
 
 
-logger = setup_logger()
+logger = setup_logger(console_level="WARNING" if _is_mxu_client() else "INFO")
 
 __all__ = ["setup_logger", "change_console_level", "logger"]

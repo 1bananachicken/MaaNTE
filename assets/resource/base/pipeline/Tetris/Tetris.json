@@ -107,7 +107,7 @@
         "desc": "泯除方块 - 大世界无方块入口提示，无法进入",
         "recognition": "And",
         "all_of": [
-            "TetrisSceneWorldMarker"
+            "InWorld"
         ],
         "next": [
             "TetrisExitWithError"

@@ -7,7 +7,12 @@
         "recognition": {
             "type": "ColorMatch",
             "param": {
-                "roi": [395,33,500,35],
+                "roi": [
+                    399,
+                    43,
+                    486,
+                    14
+                ],
                 "method": 40,
                 "lower": [
                     78,
@@ -30,7 +35,12 @@
         "recognition": {
             "type": "ColorMatch",
             "param": {
-                "roi": [395,33,500,35],
+                "roi": [
+                    399,
+                    43,
+                    486,
+                    14
+                ],
                 "method": 40,
                 "lower": [
                     24,

@@ -11,8 +11,9 @@ from maa.custom_action import CustomAction
 from maa.context import Context
 from maa.pipeline import JRecognitionType, JOCR
 
-from ..utils.config import load_rhythm_config
+from utils.maafocus import PrintT
 
+from ..utils.config import load_rhythm_config
 
 logger = logging.getLogger(__name__)
 
@@ -128,7 +129,7 @@ class AutoRhythmVitalityOnResults(CustomAction):
             frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
         cost = _detect_cost_vitality(context, frame, cfg)
         _vitality_cost = cost
-        logger.info("结算页活力消耗: %d", cost)
+        logger.debug("结算页活力消耗: %d", cost)
         return CustomAction.RunResult(success=True)
 
 
@@ -153,11 +154,12 @@ class AutoRhythmRepeatDecision(CustomAction):
 
         _repeat_index += 1
 
-        logger.info(
-            "连打决策: 第 %d 次 | 目标次数=%s | Max=%s",
+        PrintT(
+            context,
+            "rhythm.repeat_decision",
             _repeat_index,
             auto_repeat_count if auto_repeat_count > 0 else "∞",
-            auto_repeat_max,
+            "ON" if auto_repeat_max else "OFF",
         )
 
         should_exit = False
@@ -179,20 +181,16 @@ class AutoRhythmRepeatDecision(CustomAction):
                 cost = _detect_cost_vitality(context, frame, cfg)
 
             if cost < vitality_threshold:
-                logger.info(
-                    "活力已耗尽 (消耗=%d < 阈值=%d)，停止连打",
-                    cost,
-                    vitality_threshold,
-                )
+                PrintT(context, "rhythm.vitality_exhausted", cost, vitality_threshold)
                 should_exit = True
             else:
-                logger.info("消耗活力 %d，继续连打", cost)
+                PrintT(context, "rhythm.vitality_continue", cost)
         elif auto_repeat_count > 0:
             if _repeat_index >= auto_repeat_count:
-                logger.info("已达到连打次数上限 (%d)", auto_repeat_count)
+                PrintT(context, "rhythm.max_repeat_reached", auto_repeat_count)
                 should_exit = True
         else:
-            logger.info("自动连打未启用，完成单次演奏后退出")
+            PrintT(context, "rhythm.auto_repeat_disabled")
             should_exit = True
 
         if should_exit:

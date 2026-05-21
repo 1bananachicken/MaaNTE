@@ -30,6 +30,7 @@
         "expected": [
             "点击空白区域关闭"
         ],
-        "action": "Click"
+        "action": "ClickKey",
+        "key": 27
     }
 }

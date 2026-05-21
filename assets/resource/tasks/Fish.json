@@ -1,7 +1,8 @@
 {
     "task": [
         {
-            "name": "钓鱼任务",
+            "name": "Fish",
+            "label": "$task_fish_label",
             "entry": "FishEntrance",
             "option": [
                 "FishLoopInfinite",
@@ -11,9 +12,10 @@
             ]
         },
         {
-            "name": "钓鱼任务（新）",
+            "name": "FishNew",
+            "label": "$task_fish_new_label",
             "entry": "FishNewEntrance",
-            "description": "重构的钓鱼功能。理论上目前能无限钓鱼。<br><span style='color:red'>仍无法直接处理被月卡打断的跨夜钓鱼，可以尝试设置定时任务来继续钓鱼，实际效果无法保证。</span><br>钓鱼功能仅自动买鱼饵和自动卖鱼抢占鼠标。<br>自动买鱼饵为识别到鱼饵不足时购买或切换为万能鱼饵（鱼饵识别阈值与本任务无关），卖鱼也是在鱼鳞币不足时尝试卖",
+            "description": "$task_fish_new_desc",
             "option": [
                 "FishSellAuto",
                 "FishBuyBaitAuto"
@@ -23,12 +25,12 @@
     "option": {
         "FishLoopTime": {
             "type": "input",
-            "label": "循环次数",
-            "description": "循环执行多少次钓鱼任务",
+            "label": "$task_fish_option_loop_time",
+            "description": "$task_fish_option_loop_time_desc",
             "inputs": [
                 {
                     "name": "max_hit",
-                    "label": "循环次数",
+                    "label": "$task_fish_option_loop_time",
                     "default": "5",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
@@ -42,12 +44,12 @@
         },
         "FishNumber": {
             "type": "input",
-            "label": "每次钓鱼数量",
-            "description": "设置每次循环自动钓鱼的数量，建议小于等于99",
+            "label": "$task_fish_option_count",
+            "description": "$task_fish_option_count_desc",
             "inputs": [
                 {
                     "name": "count",
-                    "label": "数量",
+                    "label": "$task_fish_option_count_input",
                     "default": "99",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
@@ -58,21 +60,18 @@
                     "custom_action_param": {
                         "count": "{count}"
                     }
-                },
-                "FishNewCast": {
-                    "max_hit": "{count}"
                 }
             }
         },
         "FishLoopInfinite": {
             "type": "switch",
-            "label": "无限循环",
-            "description": "启用后钓鱼任务将无限循环，直到手动停止。",
+            "label": "$task_fish_option_infinite",
+            "description": "$task_fish_option_infinite_desc",
             "default_case": "No",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "FishEntrance": {
                             "next": [
@@ -106,7 +105,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "禁用",
+                    "label": "$option_switch_case_no",
                     "option": [
                         "FishLoopTime"
                     ]
@@ -115,12 +114,12 @@
         },
         "FishSellAuto": {
             "type": "switch",
-            "label": "自动卖鱼",
-            "description": "是否启用自动卖鱼功能",
+            "label": "$task_fish_option_auto_sell",
+            "description": "$task_fish_option_auto_sell_desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "AutoSellFish": {
                             "enabled": true
@@ -132,7 +131,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "禁用",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "AutoSellFish": {
                             "enabled": false
@@ -146,12 +145,12 @@
         },
         "FishBuyBaitAuto": {
             "type": "switch",
-            "label": "自动买鱼饵",
-            "description": "每次自动购买99（上限）鱼饵",
+            "label": "$task_fish_option_auto_buy_bait",
+            "description": "$task_fish_option_auto_buy_bait_desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "AutoBuyFishBait": {
                             "enabled": true
@@ -169,7 +168,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "禁用",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "AutoBuyFishBait": {
                             "enabled": false
@@ -186,8 +185,8 @@
         },
         "FishBaitThreshold": {
             "type": "select",
-            "label": "鱼饵识别阈值",
-            "description": "如果无法识别点击鱼饵位置，请调低该数值",
+            "label": "$task_fish_option_bait_threshold",
+            "description": "$task_fish_option_bait_threshold_desc",
             "cases": [
                 {
                     "name": "0.8",
@@ -215,6 +214,26 @@
                         "AutoBuyFishBait": {
                             "custom_action_param": {
                                 "found_bait_threshold": 0.6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "0.5",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "0.4",
+                    "pipeline_override": {
+                        "AutoBuyFishBait": {
+                            "custom_action_param": {
+                                "found_bait_threshold": 0.4
                             }
                         }
                     }

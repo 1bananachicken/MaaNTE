@@ -4,47 +4,94 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [0, 0, 1280, 720],
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
                 "template": [
                     "auto_rhythm/scene_templates/playing/pause.png"
-                ],
-                "threshold": 0.7
+                ]
             }
         },
         "pre_delay": 0,
-        "post_delay": 0,
-        "next": []
+        "post_delay": 0
     },
     "RhythmSceneOnResults": {
         "desc": "判断正在结算界面",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "roi": [0, 0, 1280, 720],
-                "template": [
-                    "auto_rhythm/scene_templates/results/score.png"
+                "roi": [
+                    537,
+                    499,
+                    195,
+                    113
                 ],
-                "threshold": 0.7
+                "expected": [
+                    "得分"
+                ]
             }
         },
         "pre_delay": 0,
-        "post_delay": 0,
-        "next": []
+        "post_delay": 0
     },
     "RhythmSceneOnSongSelect": {
         "desc": "判断正在选歌界面",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [0, 0, 1280, 720],
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
                 "template": [
                     "auto_rhythm/scene_templates/song_select/logo.png"
-                ],
-                "threshold": 0.7
+                ]
             }
         },
         "pre_delay": 0,
-        "post_delay": 0,
-        "next": []
+        "post_delay": 0
+    },
+    "RhythmSceneStartButton": {
+        "desc": "选歌界面-开始演奏按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
+                "expected": [
+                    "开始演奏"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "RhythmSceneFindSong": {
+        "desc": "选歌界面-在歌曲列表中匹配指定歌曲",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    47,
+                    117,
+                    550,
+                    510
+                ],
+                "expected": [
+                    "迷星叫"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
     }
 }

@@ -6,5 +6,52 @@
             "count": 1,
             "freq": 2
         }
+    },
+    "MakeCoffeeStart": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1057,
+                    648,
+                    178,
+                    44
+                ],
+                "expected": [
+                    "开始营业"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "MakeCoffeeStar": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1204,
+                    109,
+                    29,
+                    27
+                ],
+                "template": "auto_make_coffee/star.png"
+            }
+        }
+    },
+    "MakeCoffeeClaim": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    681,
+                    539,
+                    187,
+                    38
+                ],
+                "expected": [
+                    "领取"
+                ]
+            }
+        }
     }
 }

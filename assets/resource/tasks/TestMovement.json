@@ -2,6 +2,7 @@
     "task": [
         {
             "name": "[测试] 视角转向",
+            "label": "[测试] 视角转向",
             "entry": "TestTurnEntry",
             "description": "鼠标相对位移转向。dx=100 ≈ 10度，正值右转，负值左转。",
             "option": [
