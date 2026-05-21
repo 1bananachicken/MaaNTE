@@ -4,6 +4,7 @@ import json
 
 from pathlib import Path
 from ..Common.utils import get_image, match_template_in_region, click_rect
+from utils import screen
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -39,15 +40,24 @@ class AutoBuyFishBait(CustomAction):
         buy_success_region = [569, 629, 145, 19]
         not_enough_shell_region = [1170, 585, 18, 16]
         shell_count_region = [961, 31, 70, 21]
+
+        fish_shop_region = screen.map_rect(fish_shop_region)
+        find_bait_success_region = screen.map_rect(find_bait_success_region)
+        select_max_region = screen.map_rect(select_max_region)
+        buy_region = screen.map_rect(buy_region)
+        buy_confirm_region = screen.map_rect(buy_confirm_region)
+        buy_success_region = screen.map_rect(buy_success_region)
+        not_enough_shell_region = screen.map_rect(not_enough_shell_region)
+        shell_count_region = screen.map_rect(shell_count_region)
         KEY_R = 82
         KEY_ESC = 27
         controller = context.tasker.controller  
         
-        found_bait_threshold = 0.8
+        found_bait_threshold = 0.7
         if argv.custom_action_param:
             try:
                 params = json.loads(argv.custom_action_param)
-                found_bait_threshold = params.get("found_bait_threshold", 0.8)
+                found_bait_threshold = params.get("found_bait_threshold", 0.7)
             except:
                 pass
         
@@ -59,10 +69,12 @@ class AutoBuyFishBait(CustomAction):
             found_bait, prob, x, y = match_template_in_region(img, fish_shop_region, self.bait_template, found_bait_threshold)
             print(f"Current found bait threshold: {found_bait_threshold}, match probability: {prob:.2f}, clicked on bait at ({x+15}, {y+5})")
             if found_bait:
+                controller.post_touch_move(x,y) # 先移动到指定位置再进行点击，否则可能会触发滑动买到别的东东
                 for _ in range(3):
                     click_rect(controller, [x, y, 30, 10])
                     time.sleep(0.1)
-                
+
+                time.sleep(1) # 120hz下可能会过快地出现触发检测。适当的延时
                 img = get_image(controller)
                 found_bait_success, _, _, _ = match_template_in_region(img, find_bait_success_region, self.find_bait_success_template, match_threshold)
                 if found_bait_success:
