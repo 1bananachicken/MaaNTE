@@ -117,9 +117,9 @@ class AutoFish(CustomAction):
                     img, settlement_region, self.settlement_template, 0.8
                 )
                 if m_settle:
-                    logger.debug(
-                        "Found settlement screen during check, pressing ESC to close..."
-                    )
+                    # logger.debug(
+                    #     "Found settlement screen during check, pressing ESC to close..."
+                    # )
                     press_esc()
                     wait_until_settlement_disappears()
                     continue
@@ -131,9 +131,9 @@ class AutoFish(CustomAction):
                     0.6,
                     green_mask=True,
                 )
-                logger.debug(
-                    f"Checking for FishGame screen, probability: {game_prob:.2f}"
-                )
+                # logger.debug(
+                #     f"Checking for FishGame screen, probability: {game_prob:.2f}"
+                # )
                 if m_game:
                     return True
 
@@ -141,7 +141,7 @@ class AutoFish(CustomAction):
                     img, prepare_region, self.prepare_start_template, 0.7
                 )
                 if m_prepare:
-                    logger.debug("On FishPrepare screen, pressing start...")
+                    # logger.debug("On FishPrepare screen, pressing start...")
                     controller.post_click(x + 15, y + 15)
                     time.sleep(1.5)
                     return True
@@ -172,9 +172,9 @@ class AutoFish(CustomAction):
                     m_need_bait, prob, _, _ = match_template_in_region(
                         img, need_bait_region, self.need_bait_template, 0.7
                     )
-                    logger.debug(f"Checking for bait, probability: {prob:.2f}")
+                    # logger.debug(f"Checking for bait, probability: {prob:.2f}")
                     if m_need_bait:
-                        logger.debug("Need bait! Switching to bait handler.")
+                        # logger.debug("Need bait! Switching to bait handler.")
                         # 缺少鱼饵不是异常退出：这里临时改写 FishGameStart 的后续节点，
                         # 让流水线去打开鱼饵界面，优先切换万能鱼饵，必要时再购买鱼饵。
                         context.override_next("FishGameStart", ["FishHandleBaitLack"])
@@ -182,7 +182,7 @@ class AutoFish(CustomAction):
 
                     time.sleep(0.1)
 
-                logger.debug("Casting...")
+                # logger.debug("Casting...")
 
                 wait_start = time.time()
                 m_settle_unexpected = False
@@ -193,7 +193,7 @@ class AutoFish(CustomAction):
                         return CustomAction.RunResult(success=False)
 
                     if time.time() - wait_start > 30:
-                        logger.debug("Timeout waiting for fish to hook, recasting...")
+                        # logger.debug("Timeout waiting for fish to hook, recasting...")
                         timeout_triggered = True
                         break
 
@@ -204,16 +204,16 @@ class AutoFish(CustomAction):
                         img, settlement_region, self.settlement_template, 0.8
                     )
                     if m_settle_unexpected:
-                        logger.debug(
-                            "Unexpected settlement screen detected! Breaking to clear it."
-                        )
+                        # logger.debug(
+                        #     "Unexpected settlement screen detected! Breaking to clear it."
+                        # )
                         break
 
                     m_catch, _, _, _ = match_template_in_region(
                         img, success_region, self.success_catch_template, 0.7
                     )
                     if m_catch:
-                        logger.debug("Fish hooked!")
+                        # logger.debug("Fish hooked!")
                         break
 
                 if m_settle_unexpected or timeout_triggered:
@@ -254,13 +254,13 @@ class AutoFish(CustomAction):
                             img, settlement_region, self.settlement_template, 0.8
                         )
                         if m_settle:
-                            logger.debug("Fish caught!")
+                            # logger.debug("Fish caught!")
                             break
                         m_escape, _, _, _ = match_template_in_region(
                             img, escape_region, self.escape_template, 0.8
                         )
                         if m_escape:
-                            logger.debug("Fish escaped! Recasting...")
+                            # logger.debug("Fish escaped! Recasting...")
                             break
 
                     m_left, _, x_left, _ = match_template_in_region(
@@ -330,7 +330,7 @@ class AutoFish(CustomAction):
                     continue
                 break
 
-            logger.debug("Finished.")
+            # logger.debug("Finished.")
 
             match_settle = False
             wait_settlement_start = time.time()
@@ -342,20 +342,20 @@ class AutoFish(CustomAction):
                 match_settle, settle_prob, _, _ = match_template_in_region(
                     img, settlement_region, self.settlement_template, 0.8
                 )
-                logger.debug(
-                    f"Checking for settlement screen, probability: {settle_prob:.2f}"
-                )
+                # logger.debug(
+                #     f"Checking for settlement screen, probability: {settle_prob:.2f}"
+                # )
                 if match_settle:
-                    logger.debug("Settlement screen detected.")
+                    # logger.debug("Settlement screen detected.")
                     break
                 time.sleep(0.1)
 
             if match_settle:
-                logger.debug("Closing settlement screen...")
+                # logger.debug("Closing settlement screen...")
                 for _ in range(5):
                     press_esc()
                     if wait_until_settlement_disappears():
-                        logger.debug("Settlement closed.")
+                        # logger.debug("Settlement closed.")
                         break
             else:
                 logger.debug("Settlement screen not detected, continuing immediately.")
