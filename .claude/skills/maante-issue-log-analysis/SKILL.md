@@ -84,12 +84,15 @@ description: 分析 MaaNTE 上游仓库公开 Issue（`https://github.com/1banan
 ### Agent 日志（Python 侧）
 
 - 模块归属：`agent/custom/action/` 下的 Python 自定义动作。
-- 主要内容：通过 `utils.logger` 输出的结构化日志，包含自定义动作执行细节、参数解析、识别结果。
+- 主要内容：
+    - **logger 日志**：通过 `utils.logger` 输出的结构化日志，包含自定义动作执行细节、参数解析、识别结果（MXU 模式下仅 WARNING+ 出现在 `mxu-agent*.log`）。
+    - **maafocus 消息**：通过 `maafocus.Print()/PrintT()` 发送的用户可见消息，经 MaaFramework focus 协议传入 `mxu-agent*.log` 和 `maa.log`。
 - 最适合看：
     - Python 自定义逻辑是否触发
     - 参数解析是否正确
+    - 用户看到什么进度/错误提示
     - 自定义识别/动作的执行流程
-- 日志级别和格式见 [maa-logging](../maa-logging/SKILL.md)。
+- 日志级别和格式见 [maa-logging](../maa-logging/SKILL.md)，maafocus 用法见 [python-action-guide](../python-action-guide/SKILL.md#用户可见消息maafocus)。
 
 ### `mxu-tauri.log`
 

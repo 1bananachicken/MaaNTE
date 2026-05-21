@@ -1,4 +1,3 @@
-from .AutoFish.auto_fish_new import *
 from .AutoFish.auto_fish import *
 from .AutoFish.auto_buy_fish_bait import *
 from .AutoFish.auto_sell_fish import *
@@ -19,7 +18,6 @@ from .furniture_claim import *
 from .auto_piano.action import *
 
 __all__ = [
-    "AutoFishNew",
     "AutoMakeCoffee",
     "AutoFish",
     "AutoBuyFishBait",

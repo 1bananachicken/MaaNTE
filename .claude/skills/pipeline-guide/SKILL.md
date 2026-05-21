@@ -200,7 +200,9 @@ MaaNTE 使用 v2 格式，recognition 和 action 放入二级字典：
 
 ### focus（用户提示消息）
 
-用于向用户展示任务进度或状态：
+用于向用户展示任务进度或状态。
+
+**Pipeline JSON `focus`**（纯 pipeline 层消息，不走 Python i18n）：
 
 ```jsonc
 "focus": {
@@ -208,13 +210,16 @@ MaaNTE 使用 v2 格式，recognition 和 action 放入二级字典：
 }
 ```
 
-或用于识别成功时通知：
+**Python 侧用户消息**应使用 `maafocus.Print()` / `PrintT()`（支持 i18n），详见 [python-action-guide](../python-action-guide/SKILL.md#用户可见消息maafocus)：
 
-```jsonc
-"focus": {
-    "Node.Recognition.Succeeded": "库存已满"
-}
+```python
+from utils.maafocus import PrintT
+PrintT(context, "tetris.task_done")
 ```
+
+两者通过同一条 MaaFramework focus 协议到达 MXU，但来源不同：
+- Pipeline JSON `focus` — 静态字符串，适合简单状态通知
+- `maafocus.Print()` — 支持 i18n 和动态参数，适合 Python 侧的用户消息
 
 ### on_error
 
@@ -262,6 +267,7 @@ MaaNTE 使用 v2 格式，recognition 和 action 放入二级字典：
 - [ ] ROI / target 坐标基于 1280×720
 - [ ] 自定义动作名与 Python `@AgentServer.custom_action("name")` 一致
 - [ ] 自定义识别/动作参数与 Python 代码中解析的参数名一致
+- [ ] 用户消息优先用 `maafocus.PrintT()`（Python 侧），简单通知用 JSON `focus`（pipeline 侧）
 - [ ] OCR `expected` 写完整文本
 - [ ] 使用 `post_wait_freezes` 或中间节点避免重复点击
 

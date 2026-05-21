@@ -2,10 +2,17 @@
     "RealTimeTeleportWitte": {
         "desc": "传送至维特海默塔",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "realtime_assist/teleport_target_witte.png",
-                "roi": [920, 0, 1280, 140],
+                "expected": [
+                    "维特海默塔"
+                ],
+                "roi": [
+                    920,
+                    0,
+                    1280,
+                    140
+                ],
                 "threshold": 0.8
             }
         },
@@ -19,10 +26,17 @@
     "RealTimeConfirmTeleportWitte": {
         "desc": "确认传送至维特海默塔",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "realtime_assist/teleport_btn_witte.png",
-                "roi": [930, 610, 350, 60],
+                "expected": [
+                    "传送"
+                ],
+                "roi": [
+                    930,
+                    610,
+                    350,
+                    60
+                ],
                 "threshold": 0.8
             }
         },
@@ -33,15 +47,24 @@
             }
         },
         "post_delay": 0,
-        "next": ["RealTimeFakeTrue"]
+        "next": [
+            "RealTimeFakeTrue"
+        ]
     },
     "RealTimeTeleportPhone": {
         "desc": "传送至电话亭",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "realtime_assist/teleport_target_phone.png",
-                "roi": [920, 0, 1280, 140],
+                "expected": [
+                    "传送点"
+                ],
+                "roi": [
+                    920,
+                    0,
+                    1280,
+                    140
+                ],
                 "threshold": 0.8
             }
         },
@@ -55,10 +78,17 @@
     "RealTimeConfirmTeleportPhone": {
         "desc": "确认传送至电话亭",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "realtime_assist/teleport_btn_phone.png",
-                "roi": [930, 610, 350, 60],
+                "expected": [
+                    "传送"
+                ],
+                "roi": [
+                    930,
+                    610,
+                    350,
+                    60
+                ],
                 "threshold": 0.8
             }
         },
@@ -69,6 +99,8 @@
             }
         },
         "post_delay": 0,
-        "next": ["RealTimeFakeTrue"]
+        "next": [
+            "RealTimeFakeTrue"
+        ]
     }
 }

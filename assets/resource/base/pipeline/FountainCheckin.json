@@ -9,7 +9,7 @@
     "FountainFindButton": {
         "desc": "识别喷泉打卡按钮",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
                     765,
@@ -17,10 +17,9 @@
                     210,
                     40
                 ],
-                "template": [
-                    "auto_fountain_checkin/find_fountain_button.png"
-                ],
-                "threshold": 0.7
+                "expected": [
+                    "纳库佩达之池"
+                ]
             }
         },
         "action": "ClickKey",
@@ -43,7 +42,7 @@
     "FountainMakeWish": {
         "desc": "识别许愿选项并按F",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
                     871,
@@ -51,10 +50,9 @@
                     239,
                     49
                 ],
-                "template": [
-                    "auto_fountain_checkin/fountain_make_wish.png"
-                ],
-                "threshold": 0.7
+                "expected": [
+                    "虔诚许愿"
+                ]
             }
         },
         "action": "Click",
@@ -96,10 +94,10 @@
     "FountainSkipStoryDialog": {
         "desc": "跳过剧情对话框",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": [
-                    "realtime_assist/skip_story_dialog.png"
+                "expected": [
+                    "是否跳过剧情"
                 ],
                 "roi": [
                     420,
@@ -120,9 +118,11 @@
     "FountainSkipStoryDialogConfirm": {
         "desc": "确认跳过剧情对话框确认按钮",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "realtime_assist/skip_story_dialog_confirm.png",
+                "expected": [
+                    "确认"
+                ],
                 "roi": [
                     700,
                     410,
@@ -167,7 +167,7 @@
     "FountainCheckinIfExit": {
         "desc": "识别喷泉打卡按钮，判断是否已退出",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
                     765,
@@ -175,8 +175,8 @@
                     210,
                     40
                 ],
-                "template": [
-                    "auto_fountain_checkin/find_fountain_button.png"
+                "expected": [
+                    "纳库佩达之池"
                 ],
                 "threshold": 0.7
             }

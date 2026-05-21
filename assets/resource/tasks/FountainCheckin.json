@@ -1,9 +1,10 @@
 {
     "task": [
         {
-            "name": "喷泉打卡",
+            "name": "FountainCheckin",
+            "label": "$task_fountain_label",
             "entry": "FountainCheckinEntrance",
-            "description": "识别并点击喷泉打卡按钮。<br><span style='color:red'>请移动到喷泉位置后再执行该任务。</span><br>",
+            "description": "$task_fountain_desc",
             "controller": [
                 "Win32-Front"
             ]

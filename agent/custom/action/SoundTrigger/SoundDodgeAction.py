@@ -10,6 +10,7 @@ from maa.context import Context
 from custom.action.Common.logger import get_logger
 from custom.action.SoundTrigger.DodgeCounterTrigger import Dodger
 from custom.action.SoundTrigger.SoundListener import Ear
+from utils.maafocus import PrintT
 
 logger = get_logger(__name__)
 
@@ -46,14 +47,14 @@ class Ctx:
         self.ear.on_dodge = self._on_dodge
         self.ear.on_counter = self._on_counter
         self.active = True
-        logger.info("Ctx initialized")
+        logger.debug("Ctx initialized")
 
     def enter(self):
         self._stop_event.clear()
         if not self.active or not self.ear:
             return False
         self.ear.start()
-        logger.info("Ctx entered")
+        logger.debug("Ctx entered")
         return True
 
     def exit(self):
@@ -63,7 +64,7 @@ class Ctx:
             self.ear = None
         self.dodger = None
         self.active = False
-        logger.info("Ctx exited")
+        logger.debug("Ctx exited")
 
     def _on_dodge(self):
         if self._stopped():
@@ -83,7 +84,7 @@ class SoundDodgeAction(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        logger.info("=== Sound Dodge Started ===")
+        PrintT(context, "sound_dodge.started")
 
         threshold = 0.13
         counter_threshold = 0.12
@@ -97,25 +98,25 @@ class SoundDodgeAction(CustomAction):
                     f"Invalid custom_action_param: {argv.custom_action_param!r}, error: {e}. Using defaults."
                 )
 
-        ctx = Ctx()
+        context = Ctx()
         try:
-            ctx.setup(
+            context.setup(
                 context.tasker.controller,
                 threshold=threshold,
                 counter_threshold=counter_threshold,
             )
-            if not ctx.enter():
+            if not context.enter():
                 return CustomAction.RunResult(success=False)
 
-            logger.info("monitor started, waiting for trigger...")
+            PrintT(context, "sound_dodge.monitoring")
             while not context.tasker.stopping:
                 time.sleep(0.1)
 
-            logger.info("interrupted")
+            PrintT(context, "sound_dodge.interrupted")
             return CustomAction.RunResult(success=True)
         except Exception as e:
-            logger.error(f"Error: {e}")
+            logger.error("Error: %s", e)
             return CustomAction.RunResult(success=False)
         finally:
-            ctx.exit()
-            logger.info("all done")
+            context.exit()
+            PrintT(context, "sound_dodge.done")

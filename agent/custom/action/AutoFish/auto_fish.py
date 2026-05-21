@@ -11,6 +11,7 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
+from utils.maafocus import PrintT
 
 logger = get_logger(__name__)
 
@@ -49,7 +50,7 @@ class AutoFish(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        logger.info("=== Autofish Action Started ===")
+        PrintT(context, "autofish.started")
         controller = context.tasker.controller
 
         fishing_count = 10
@@ -116,7 +117,9 @@ class AutoFish(CustomAction):
                     img, settlement_region, self.settlement_template, 0.8
                 )
                 if m_settle:
-                    logger.debug("Found settlement screen during check, pressing ESC to close...")
+                    logger.debug(
+                        "Found settlement screen during check, pressing ESC to close..."
+                    )
                     press_esc()
                     wait_until_settlement_disappears()
                     continue
@@ -128,7 +131,9 @@ class AutoFish(CustomAction):
                     0.6,
                     green_mask=True,
                 )
-                logger.debug(f"Checking for FishGame screen, probability: {game_prob:.2f}")
+                logger.debug(
+                    f"Checking for FishGame screen, probability: {game_prob:.2f}"
+                )
                 if m_game:
                     return True
 
@@ -149,7 +154,7 @@ class AutoFish(CustomAction):
         for i in range(fishing_count):
             if context.tasker.stopping:
                 return CustomAction.RunResult(success=False)
-            logger.info(f"=== Fishing {i + 1}/{fishing_count} ===")
+            PrintT(context, "autofish.progress", i + 1, fishing_count)
 
             if not ensure_fish_game():
                 return CustomAction.RunResult(success=False)
@@ -199,7 +204,9 @@ class AutoFish(CustomAction):
                         img, settlement_region, self.settlement_template, 0.8
                     )
                     if m_settle_unexpected:
-                        logger.debug("Unexpected settlement screen detected! Breaking to clear it.")
+                        logger.debug(
+                            "Unexpected settlement screen detected! Breaking to clear it."
+                        )
                         break
 
                     m_catch, _, _, _ = match_template_in_region(
@@ -353,5 +360,5 @@ class AutoFish(CustomAction):
             else:
                 logger.debug("Settlement screen not detected, continuing immediately.")
 
-        logger.info("All fishing tasks complete.")
+        PrintT(context, "autofish.all_done")
         return CustomAction.RunResult(success=True)

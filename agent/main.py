@@ -587,6 +587,8 @@ def agent(is_dev_mode=False):
 
         Tasker.set_log_dir("./debug")
 
+        from utils.i18n import init as i18n_init; i18n_init()
+
         if len(sys.argv) < 2:
             logger.error("缺少必要的 socket_id 参数")
             return

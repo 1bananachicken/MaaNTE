@@ -3,6 +3,7 @@ from maa.custom_action import CustomAction
 from maa.context import Context
 
 from utils.logger import logger
+from utils.maafocus import PrintT
 
 FURNITURE_LIST = [
     "仓鼠球",
@@ -42,7 +43,7 @@ class FurnitureClaim(CustomAction):
                             "FurnitureClaim": {"recogniton": {"param": roi}}
                         },
                     )
-                    logger.info(f"领取 {name}")
+                    PrintT(context, "furniture.claimed", name)
                 else:
                     logger.debug(f"识别到但无法领取 {name}")
             else:
