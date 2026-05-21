@@ -43,7 +43,7 @@ class FurnitureClaim(CustomAction):
                             "FurnitureClaim": {"recogniton": {"param": roi}}
                         },
                     )
-                    PrintT(ctx, "furniture.claimed", name)
+                    PrintT(context, "furniture.claimed", name)
                 else:
                     logger.debug(f"识别到但无法领取 {name}")
             else:

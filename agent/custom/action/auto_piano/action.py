@@ -11,7 +11,6 @@ from maa.custom_action import CustomAction
 
 from utils.maafocus import PrintT
 
-
 PROJECT_ROOT = Path(__file__).resolve().parents[4]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
@@ -43,10 +42,10 @@ class AutoPlayPiano(CustomAction):
         try:
             self._run(context, argv)
         except AutoPianoStopped:
-            PrintT(ctx, "auto_piano.stopped")
+            PrintT(context, "auto_piano.stopped")
             return CustomAction.RunResult(success=False)
         except Exception as exc:
-            PrintT(ctx, "auto_piano.failed", str(exc))
+            PrintT(context, "auto_piano.failed", str(exc))
             traceback.print_exc()
             return CustomAction.RunResult(success=False)
 

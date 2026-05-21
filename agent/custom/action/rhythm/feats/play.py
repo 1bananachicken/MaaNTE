@@ -321,7 +321,13 @@ class AutoRhythmPlay(CustomAction):
 
         scene_gate = SceneGate(cfg)
 
-        PrintT(ctx, "rhythm.playing_started", target_fps, "ON" if drum_available else "OFF", scene_lock_sec)
+        PrintT(
+            context,
+            "rhythm.playing_started",
+            target_fps,
+            "ON" if drum_available else "OFF",
+            scene_lock_sec,
+        )
 
         start_time = time.perf_counter()
         frame_count = 0
@@ -360,7 +366,7 @@ class AutoRhythmPlay(CustomAction):
                 key_scheduler.release_expired(now)
                 fire_and_log(now)
                 if context.tasker.stopping:
-                    PrintT(ctx, "rhythm.stopped")
+                    PrintT(context, "rhythm.stopped")
                     return CustomAction.RunResult(success=False)
 
                 elapsed_total = time.perf_counter() - start_time
@@ -475,11 +481,17 @@ class AutoRhythmPlay(CustomAction):
                 if now >= scene_lock_until:
                     gate_state, _ = scene_gate.step(context, frame)
                     if gate_state != STATE_PLAYING:
-                        PrintT(ctx, "rhythm.playing_ended", frame_count, elapsed_total)
+                        PrintT(
+                            context, "rhythm.playing_ended", frame_count, elapsed_total
+                        )
                         return CustomAction.RunResult(success=True)
-                    playing_result = context.run_recognition("RhythmSceneOnPlaying", frame)
+                    playing_result = context.run_recognition(
+                        "RhythmSceneOnPlaying", frame
+                    )
                     if not (playing_result and playing_result.hit):
-                        PrintT(ctx, "rhythm.playing_ended", frame_count, elapsed_total)
+                        PrintT(
+                            context, "rhythm.playing_ended", frame_count, elapsed_total
+                        )
                         return CustomAction.RunResult(success=True)
                     scene_lock_until = now + scene_lock_sec
 

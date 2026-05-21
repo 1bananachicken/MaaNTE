@@ -42,10 +42,10 @@ class AutoRhythmSelectSong(CustomAction):
 
         song_selector = SongSelector(cfg)
         if not song_selector.enabled:
-            PrintT(ctx, "rhythm.auto_select_disabled")
+            PrintT(context, "rhythm.auto_select_disabled")
             return CustomAction.RunResult(success=True)
 
-        PrintT(ctx, "rhythm.selecting")
+        PrintT(context, "rhythm.selecting")
 
         scene_gate = SceneGate(cfg)
         target_fps = int(cfg.get("run", {}).get("target_fps", 60))
@@ -56,7 +56,7 @@ class AutoRhythmSelectSong(CustomAction):
 
         while wait_count < max_wait_frames:
             if context.tasker.stopping:
-                PrintT(ctx, "rhythm.stopped_while_selecting")
+                PrintT(context, "rhythm.stopped_while_selecting")
                 return CustomAction.RunResult(success=False)
 
             controller.post_screencap().wait()
@@ -82,7 +82,7 @@ class AutoRhythmSelectSong(CustomAction):
                 )
                 sel_state = sel_info.get("state", "")
                 if sel_state == "done":
-                    PrintT(ctx, "rhythm.select_done")
+                    PrintT(context, "rhythm.select_done")
                     return CustomAction.RunResult(success=True)
                 elif sel_state == "failed":
                     logger.warning("自动选歌失败")

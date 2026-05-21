@@ -8,11 +8,13 @@ from maa.context import Context
 
 from utils.maafocus import PrintT
 
+
 def get_image(controller):
     job = controller.post_screencap()
     job.wait()
     img = controller.cached_image
     return img
+
 
 def click_rect(controller, rect):
     x, y, w, h = rect
@@ -23,11 +25,14 @@ def click_rect(controller, rect):
         time.sleep(0.001)
         controller.post_touch_up().wait()
 
+
 @AgentServer.custom_action("auto_make_coffee")
 class AutoMakeCoffee(CustomAction):
 
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
-        PrintT(ctx, "coffee.started")
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
+        PrintT(context, "coffee.started")
         controller = context.tasker.controller
         make_count = 10
         check_freq = 0.5
@@ -52,29 +57,37 @@ class AutoMakeCoffee(CustomAction):
         for count in range(make_count):
             if context.tasker.stopping:
                 return CustomAction.RunResult(success=False)
-            PrintT(ctx, "coffee.making", count + 1, make_count)
+            PrintT(context, "coffee.making", count + 1, make_count)
 
             # Step 1: 选择关卡
-            PrintT(ctx, "coffee.step_select_level")
+            PrintT(context, "coffee.step_select_level")
             click_rect(controller, select_level_target)
             time.sleep(1)
 
             # Step 2: 开始营业
-            PrintT(ctx, "coffee.step_wait_start")
+            PrintT(context, "coffee.step_wait_start")
             while True:
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
                 img = get_image(controller)
                 start_result = context.run_recognition("MakeCoffeeStart", img)
                 if start_result and start_result.hit:
-                    PrintT(ctx, "coffee.step_start_click")
-                    click_rect(controller, [start_result.box.x, start_result.box.y, start_result.box.w, start_result.box.h])
-                    time.sleep(3) # Post delay from JSON: 3000ms
+                    PrintT(context, "coffee.step_start_click")
+                    click_rect(
+                        controller,
+                        [
+                            start_result.box.x,
+                            start_result.box.y,
+                            start_result.box.w,
+                            start_result.box.h,
+                        ],
+                    )
+                    time.sleep(3)  # Post delay from JSON: 3000ms
                     break
                 time.sleep(check_freq)
 
             # Step 3: 达成营业额
-            PrintT(ctx, "coffee.step_wait_star")
+            PrintT(context, "coffee.step_wait_star")
             while True:
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
@@ -82,33 +95,41 @@ class AutoMakeCoffee(CustomAction):
                 img = get_image(controller)
                 star_result = context.run_recognition("MakeCoffeeStar", img)
                 if star_result and star_result.hit:
-                    PrintT(ctx, "coffee.step_star_click")
+                    PrintT(context, "coffee.step_star_click")
                     click_rect(controller, exit_roi)
                     time.sleep(1)
                     break
                 time.sleep(2)
 
             # Step 4: 点击领取
-            PrintT(ctx, "coffee.step_wait_claim")
+            PrintT(context, "coffee.step_wait_claim")
             while True:
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
                 img = get_image(controller)
                 claim_result = context.run_recognition("MakeCoffeeClaim", img)
                 if claim_result and claim_result.hit:
-                    PrintT(ctx, "coffee.step_claim_click")
-                    click_rect(controller, [claim_result.box.x, claim_result.box.y, claim_result.box.w, claim_result.box.h])
+                    PrintT(context, "coffee.step_claim_click")
+                    click_rect(
+                        controller,
+                        [
+                            claim_result.box.x,
+                            claim_result.box.y,
+                            claim_result.box.w,
+                            claim_result.box.h,
+                        ],
+                    )
                     time.sleep(1)
                     break
                 time.sleep(check_freq)
 
-            PrintT(ctx, "coffee.round_finished")
+            PrintT(context, "coffee.round_finished")
             controller.post_key_down(KEY_F)
             time.sleep(0.1)
             controller.post_key_up(KEY_F)
 
             time.sleep(2)
-            PrintT(ctx, "coffee.iteration_done")
+            PrintT(context, "coffee.iteration_done")
 
-        PrintT(ctx, "coffee.all_done")
+        PrintT(context, "coffee.all_done")
         return CustomAction.RunResult(success=True)

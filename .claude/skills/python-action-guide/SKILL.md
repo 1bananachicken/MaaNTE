@@ -122,7 +122,7 @@ class MyAction(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        PrintT(ctx, "my_action.started")
+        PrintT(context, "my_action.started")
 
         params = {}
         if argv.custom_action_param:
@@ -268,9 +268,9 @@ if detail and detail.hit and detail.best_result:
 ```python
 from utils.maafocus import PrintT
 
-PrintT(ctx, "tetris.task_started", " | ".join(parts))
-PrintT(ctx, "coffee.making", count + 1, make_count)
-PrintT(ctx, "rhythm.playing_started", fps, "ON", scene_lock)
+PrintT(context, "tetris.task_started", " | ".join(parts))
+PrintT(context, "coffee.making", count + 1, make_count)
+PrintT(context, "rhythm.playing_started", fps, "ON", scene_lock)
 ```
 
 首个参数是 i18n key（定义在 `assets/resource/locales/agent/zh_cn.json`），后续参数为 `%`-格式化值。
@@ -280,7 +280,7 @@ PrintT(ctx, "rhythm.playing_started", fps, "ON", scene_lock)
 ```python
 from utils.maafocus import Print
 
-Print(ctx, "纯文本消息，不做翻译")
+Print(context, "纯文本消息，不做翻译")
 ```
 
 ### 模块依赖
@@ -289,7 +289,7 @@ Print(ctx, "纯文本消息，不做翻译")
 
 ### 辅助类中无 context 的情况
 
-辅助类（如 `_KeyScheduler`、`MaaKeyboardBridge`）不持有 `ctx`，内部只用 `logger.debug()` 记录调试信息。用户消息由调用方（CustomAction.run()）发送。
+辅助类（如 `_KeyScheduler`、`MaaKeyboardBridge`）不持有 `context`，内部只用 `logger.debug()` 记录调试信息。用户消息由调用方（CustomAction.run()）发送。
 
 ### 管道 focus 消息（JSON 侧）
 

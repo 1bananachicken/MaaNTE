@@ -84,7 +84,7 @@ class SoundDodgeAction(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        PrintT(ctx, "sound_dodge.started")
+        PrintT(context, "sound_dodge.started")
 
         threshold = 0.13
         counter_threshold = 0.12
@@ -98,25 +98,25 @@ class SoundDodgeAction(CustomAction):
                     f"Invalid custom_action_param: {argv.custom_action_param!r}, error: {e}. Using defaults."
                 )
 
-        ctx = Ctx()
+        context = Ctx()
         try:
-            ctx.setup(
+            context.setup(
                 context.tasker.controller,
                 threshold=threshold,
                 counter_threshold=counter_threshold,
             )
-            if not ctx.enter():
+            if not context.enter():
                 return CustomAction.RunResult(success=False)
 
-            PrintT(ctx, "sound_dodge.monitoring")
+            PrintT(context, "sound_dodge.monitoring")
             while not context.tasker.stopping:
                 time.sleep(0.1)
 
-            PrintT(ctx, "sound_dodge.interrupted")
+            PrintT(context, "sound_dodge.interrupted")
             return CustomAction.RunResult(success=True)
         except Exception as e:
             logger.error("Error: %s", e)
             return CustomAction.RunResult(success=False)
         finally:
-            ctx.exit()
-            PrintT(ctx, "sound_dodge.done")
+            context.exit()
+            PrintT(context, "sound_dodge.done")

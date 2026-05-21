@@ -214,7 +214,7 @@ MaaNTE 使用 v2 格式，recognition 和 action 放入二级字典：
 
 ```python
 from utils.maafocus import PrintT
-PrintT(ctx, "tetris.task_done")
+PrintT(context, "tetris.task_done")
 ```
 
 两者通过同一条 MaaFramework focus 协议到达 MXU，但来源不同：

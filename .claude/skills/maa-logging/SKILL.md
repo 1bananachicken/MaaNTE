@@ -23,7 +23,7 @@ maafocus        → 用户可见消息（任务进度、状态变更、错误提
 ```
 
 - `logger.debug/info` 在 MXU 模式下**不会**出现在用户面前（console_level = WARNING）。
-- 所有面向用户的消息必须使用 `maafocus.Print(ctx, msg)` 或 `maafocus.PrintT(ctx, key, *args)`。
+- 所有面向用户的消息必须使用 `maafocus.Print(context, msg)` 或 `maafocus.PrintT(context, key, *args)`。
 - `maafocus.PrintT()` 自动通过 `utils.i18n.T()` 查翻译，支持多语言。
 - 详见 [python-action-guide](../python-action-guide/SKILL.md#用户可见消息maafocus)。
 
@@ -73,8 +73,8 @@ logger.info("冲咖啡任务开始")
 print("=== Auto Make Coffee Action Started ===")
 
 # Good — 用户能看的用 maafocus
-PrintT(ctx, "coffee.started")
-PrintT(ctx, "coffee.making", count + 1, make_count)
+PrintT(context, "coffee.started")
+PrintT(context, "coffee.making", count + 1, make_count)
 
 # Good — 开发者调试用 logger
 logger.debug("识别分数: prob=%.2f", prob)

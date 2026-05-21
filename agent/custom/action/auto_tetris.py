@@ -89,7 +89,7 @@ class AutoTetris(CustomAction):
                 parts.append("消耗所有活力: 是")
             if allow_speed_drop:
                 parts.append("允许速降: 是")
-            PrintT(ctx, "tetris.task_started", " | ".join(parts))
+            PrintT(context, "tetris.task_started", " | ".join(parts))
 
         if not use_all_vitality and _single_shot_done:
             tasker.post_stop()
@@ -107,16 +107,16 @@ class AutoTetris(CustomAction):
 
         if not success:
             _round_count = 0
-            PrintT(ctx, "tetris.task_failed")
+            PrintT(context, "tetris.task_failed")
             return CustomAction.RunResult(success=False)
 
         if not use_all_vitality:
             _round_count += 1
-            PrintT(ctx, "tetris.progress", _round_count, _target_round)
+            PrintT(context, "tetris.progress", _round_count, _target_round)
 
             if _round_count >= _target_round:
                 _single_shot_done = True
-                PrintT(ctx, "tetris.task_done")
+                PrintT(context, "tetris.task_done")
                 tasker.post_stop()
                 controller.post_key_down(27)
                 time.sleep(0.05)
@@ -153,7 +153,7 @@ class TetrisCheckVitalityAction(CustomAction):
                         vitality = int(numbers[-1])
 
         if vitality == 0:
-            PrintT(ctx, "tetris.vitality_exhausted")
+            PrintT(context, "tetris.vitality_exhausted")
             controller.post_key_down(27)
             time.sleep(0.05)
             controller.post_key_up(27)

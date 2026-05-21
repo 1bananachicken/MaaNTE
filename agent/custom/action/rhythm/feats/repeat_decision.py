@@ -15,7 +15,6 @@ from utils.maafocus import PrintT
 
 from ..utils.config import load_rhythm_config
 
-
 logger = logging.getLogger(__name__)
 
 _DEFAULT_ROI = (544, 622, 184, 46)
@@ -156,7 +155,7 @@ class AutoRhythmRepeatDecision(CustomAction):
         _repeat_index += 1
 
         PrintT(
-            ctx,
+            context,
             "rhythm.repeat_decision",
             _repeat_index,
             auto_repeat_count if auto_repeat_count > 0 else "∞",
@@ -182,16 +181,16 @@ class AutoRhythmRepeatDecision(CustomAction):
                 cost = _detect_cost_vitality(context, frame, cfg)
 
             if cost < vitality_threshold:
-                PrintT(ctx, "rhythm.vitality_exhausted", cost, vitality_threshold)
+                PrintT(context, "rhythm.vitality_exhausted", cost, vitality_threshold)
                 should_exit = True
             else:
-                PrintT(ctx, "rhythm.vitality_continue", cost)
+                PrintT(context, "rhythm.vitality_continue", cost)
         elif auto_repeat_count > 0:
             if _repeat_index >= auto_repeat_count:
-                PrintT(ctx, "rhythm.max_repeat_reached", auto_repeat_count)
+                PrintT(context, "rhythm.max_repeat_reached", auto_repeat_count)
                 should_exit = True
         else:
-            PrintT(ctx, "rhythm.auto_repeat_disabled")
+            PrintT(context, "rhythm.auto_repeat_disabled")
             should_exit = True
 
         if should_exit:

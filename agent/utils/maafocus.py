@@ -7,9 +7,9 @@ from utils.i18n import T
 _FOCUS_NODE = "_MAANTE_FOCUS_"
 
 
-def Print(ctx: Context, content: str):
-    """向 MXU 发送 focus 消息（原样文本，不做 i18n）。ctx 为 MaaFramework Context 对象。"""
-    if ctx is None:
+def Print(context: Context, content: str):
+    """向 MXU 发送 focus 消息（原样文本，不做 i18n）。context 为 MaaFramework Context 对象。"""
+    if context is None:
         logger.warning("context is None, skip sending focus")
         return
 
@@ -23,11 +23,11 @@ def Print(ctx: Context, content: str):
     }
 
     try:
-        ctx.run_action(_FOCUS_NODE, pipeline_override=pipeline_override)
+        context.run_action(_FOCUS_NODE, pipeline_override=pipeline_override)
     except Exception as e:
         logger.warning(f"failed to send focus: {e}")
 
 
-def PrintT(ctx: Context, key: str, *args):
+def PrintT(context: Context, key: str, *args):
     """向 MXU 发送 focus 消息（i18n 版本）。key 为翻译键，*args 为 %-格式化参数。"""
-    Print(ctx, T(key, *args))
+    Print(context, T(key, *args))
