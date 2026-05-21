@@ -4,7 +4,8 @@
 
 **⚠️ Recently, we have received a large amount of user feedback that some accounts have uploaded this software to personal cloud drives <span style="color:red">without authorization</span> to profit from it. Versions downloaded from such unofficial channels cannot guarantee safety, posing a risk of <span style="color:red">bundled viruses and Trojans</span>. Some criminals have even spread viruses directly under the guise of this software. Please remain highly vigilant and exercise caution! Never believe any claims that their distributed versions are "safe" or "virus-free". Software safety is only guaranteed through official channels.**
 
-**Our only official channel on Bilibili to obtain this software: [MaaNTE-Offical](https://space.bilibili.com/3546893080594665)**
+**Obtain to our official channel at Bilibili : [MaaNTE-Offical](https://space.bilibili.com/3546893080594665)**
+**Obtain to our official channel at Youtube : [MaaNTE-Offical](https://www.youtube.com/@MaaNTE-Official)**
 
 - Please only download this software from official channels.
 - If you downloaded this software from an unofficial channel, please delete it immediately to prevent your device from being infected by viruses.
