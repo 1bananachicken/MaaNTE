@@ -72,20 +72,47 @@
             "../agent/main.py"
         ]
     },
+    "group": [
+        {
+            "name": "Daily",
+            "label": "$group.Daily.label",
+            "default_expand": true
+        },
+        {
+            "name": "CityTycoon",
+            "label": "$group.CityTycoon.label",
+            "default_expand": true
+        },
+        {
+            "name": "HethereauHobbies",
+            "label": "$group.HethereauHobbies.label",
+            "default_expand": true
+        },
+        {
+            "name": "RealTimeAssist",
+            "label": "$group.RealTimeAssist.label",
+            "default_expand": true
+        }
+    ],
     "task": [],
     "import": [
-        "resource/tasks/WithdrawMoney.json",
-        "resource/tasks/Furniture.json",
+        //Daily
         "resource/tasks/ClaimRewards.json",
+        //CityTycoon
+        "resource/tasks/Furniture.json",
+        "resource/tasks/WithdrawMoney.json",
+        //HethereauHobbies
         "resource/tasks/Fish.json",
-        "resource/tasks/RealTime.json",
+        "resource/tasks/PinkPawHeist.json",
         "resource/tasks/MakeCoffee.json",
         "resource/tasks/Rhythm.json",
-        "resource/tasks/PinkPawHeist.json",
         "resource/tasks/Tetris.json",
-        "resource/tasks/FountainCheckin.json",
+        //RealTimeAssist
+        "resource/tasks/RealTime.json",
         "resource/tasks/SoundDodge.json",
         "resource/tasks/AutoFScroll.json",
+        //others
+        "resource/tasks/FountainCheckin.json",
         "resource/tasks/AutoPiano.json"
     ],
     "option": {}
