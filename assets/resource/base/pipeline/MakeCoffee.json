@@ -1,10 +1,574 @@
 {
     "AutoMakeCoffee": {
+        "desc": "自动做咖啡入口，默认使用旧版敲人模式",
+        "next": [
+            "AutoMakeCoffeeEvict"
+        ]
+    },
+    "AutoMakeCoffeeEvict": {
+        "desc": "旧版敲人/驱赶顾客做咖啡逻辑",
         "action": "Custom",
         "custom_action": "auto_make_coffee",
         "custom_action_param": {
             "count": 1,
             "freq": 2
         }
+    },
+    "MakeCoffeeOneOneLoopGate": {
+        "desc": "刷 1-1 大循环次数门控；循环次数由 MakeCoffeeLoopTime 覆盖 max_hit",
+        "max_hit": 1,
+        "next": [
+            "MakeCoffeeOneOneRound"
+        ]
+    },
+    "MakeCoffeeOneOneRound": {
+        "desc": "刷 1-1 单轮入口",
+        "next": [
+            "MakeCoffeeOneOneEnter"
+        ]
+    },
+    "MakeCoffeeOneOneEnter": {
+        "desc": "按 F 进入",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    640,
+                    0,
+                    1280,
+                    720
+                ],
+                "template": "auto_make_coffee/enter.png",
+                "threshold": 0.85
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    70
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "MakeCoffeeOneOneChooseLevel",
+            "[JumpBack]MakeCoffeeOneOneEnter"
+        ]
+    },
+    "MakeCoffeeOneOneChooseLevel": {
+        "desc": "选择 1-1 关卡",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    360
+                ],
+                "template": "auto_make_coffee/level_chose.png",
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "MakeCoffeeOneOneStartBusiness"
+        ]
+    },
+    "MakeCoffeeOneOneStartBusiness": {
+        "desc": "点击开始营业",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    900,
+                    600,
+                    380,
+                    120
+                ],
+                "template": "auto_make_coffee/start.png",
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
+        },
+        "next": [
+            "MakeCoffeeOneOneWaitTimer"
+        ]
+    },
+    "MakeCoffeeOneOneWaitTimer": {
+        "desc": "等待营业计时条出现，随后开始菜品点击序列",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    450,
+                    0,
+                    400,
+                    90
+                ],
+                "template": "auto_make_coffee/timer.png",
+                "threshold": 0.7
+            }
+        },
+        "next": [
+            "MakeCoffeeOneOneFood1Click1"
+        ]
+    },
+    "MakeCoffeeOneOneFood1Click1": {
+        "desc": "菜品 1 第一次点击",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param":{
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    360
+                ],
+                "template": "auto_make_coffee/food_1.png",
+                "threshold": 0.6
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    496,
+                    673
+                ],
+                "duration": 100
+            }
+        },
+        "next": [
+            "MakeCoffeeOneOneFood1Ready2"
+        ]
+    },
+    "MakeCoffeeOneOneFood1Ready2": {
+        "desc": "等待菜品 1 可进行第二次点击：羊角包原料区准备完成",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    306,
+                    463,
+                    245,
+                    141
+                ],
+                "template": "auto_make_coffee/food_1_ready_2.png",
+                "threshold": 0.7
+            }
+        },
+        "post_delay":10,
+        "next": [
+            "MakeCoffeeOneOneFood1Click2"
+        ]
+    },
+    "MakeCoffeeOneOneFood1Click2": {
+        "desc": "菜品 1 第二次点击",
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    408,
+                    536
+                ],
+                "duration": 100
+            }
+        },
+        "post_delay": 300,
+        "next": [
+            "MakeCoffeeOneOneFood1Ready3",
+            "[JumpBack]MakeCoffeeOneOneFood1Click2"
+        ]
+    },
+    "MakeCoffeeOneOneFood1Ready3": {
+        "desc": "等待菜品 1 可进行第三次点击：羊角包盘子准备完成",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    159,
+                    458,
+                    200,
+                    150
+                ],
+                "template": "auto_make_coffee/food_1_ready_3.png",
+                "threshold": 0.7
+            }
+        },
+        "post_delay":10,
+        "next": [
+            "MakeCoffeeOneOneFood1Click3"
+        ]
+    },
+    "MakeCoffeeOneOneFood1Click3": {
+        "desc": "菜品 1 第三次点击",
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    264,
+                    428
+                ],
+                "duration": 100
+            }
+        },
+        "post_delay": 300,
+        "next": [
+            "MakeCoffeeOneOneFood1EmptyAfter3",
+            "[JumpBack]MakeCoffeeOneOneFood1Click3"
+        ]
+    },
+    "MakeCoffeeOneOneFood1EmptyAfter3": {
+        "desc": "等待菜品 1 第三次点击完成：准备盘变为空盘",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    159,
+                    458,
+                    200,
+                    150
+                ],
+                "template": "auto_make_coffee/food_1_empty_after_3.png",
+                "threshold": 0.7
+            }
+        },
+        "post_delay":10,
+        "next": [
+            "MakeCoffeeOneOneFood2Click1"
+        ]
+    },
+    "MakeCoffeeOneOneFood2Click1": {
+        "desc": "菜品 2 第一次点击：直接点击",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param":{
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    360
+                ],
+                "template": "auto_make_coffee/food_2.png",
+                "threshold": 0.6
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    663,
+                    668
+                ],
+                "duration": 100
+            }
+        },
+        "next": [
+            "MakeCoffeeOneOneFood2Ready2"
+        ]
+    },
+    "MakeCoffeeOneOneFood2Ready2": {
+        "desc": "等待菜品 2 可进行第二次点击：杯子原料区准备完成",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    703,
+                    575,
+                    290,
+                    145
+                ],
+                "template": "auto_make_coffee/food_2_ready_2.png",
+                "threshold": 0.8
+            }
+        },
+        "post_delay":10,
+        "next": [
+            "MakeCoffeeOneOneFood2Click2"
+        ]
+    },
+    "MakeCoffeeOneOneFood2Click2": {
+        "desc": "菜品 2 第二次点击",
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    856,
+                    685
+                ],
+                "duration": 100
+            }
+        },
+        "post_delay": 300,
+        "next": [
+            "MakeCoffeeOneOneFood2Ready3",
+            "[JumpBack]MakeCoffeeOneOneFood2Click2"
+        ]
+    },
+    "MakeCoffeeOneOneFood2Ready3": {
+        "desc": "等待菜品 2 可进行第三次点击：杯装饮品托盘准备完成",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    516,
+                    454,
+                    250,
+                    155
+                ],
+                "template": "auto_make_coffee/food_2_ready_3.png",
+                "threshold": 0.8
+            }
+        },
+        "post_delay":10,
+        "next": [
+            "MakeCoffeeOneOneFood2Click3"
+        ]
+    },
+    "MakeCoffeeOneOneFood2Click3": {
+        "desc": "菜品 2 第三次点击",
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    697,
+                    445
+                ],
+                "duration": 100
+            }
+        },
+        "post_delay": 300,
+        "next": [
+            "MakeCoffeeOneOneFood2EmptyAfter3",
+            "[JumpBack]MakeCoffeeOneOneFood2Click3"
+        ]
+    },
+    "MakeCoffeeOneOneFood2EmptyAfter3": {
+        "desc": "等待菜品 2 第三次点击完成：准备盘变为空盘",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    516,
+                    454,
+                    250,
+                    155
+                ],
+                "template": "auto_make_coffee/food_2_empty_after_3.png",
+                "threshold": 0.8
+            }
+        },
+        "post_delay":10,
+        "next": [
+            "MakeCoffeeOneOneFood3Click1"
+        ]
+    },
+    "MakeCoffeeOneOneFood3Click1": {
+        "desc": "菜品 3 第一次点击",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    360
+                ],
+                "template": "auto_make_coffee/food_3.png",
+                "threshold": 0.6
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    113,
+                    659
+                ],
+                "duration": 100
+            }
+        },
+        "next": [
+            "MakeCoffeeOneOneFood3Ready2"
+        ]
+    },
+    "MakeCoffeeOneOneFood3Ready2": {
+        "desc": "等待菜品 3 可进行第二次点击：吐司原料区准备完成",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    0,
+                    472,
+                    205,
+                    125
+                ],
+                "template": "auto_make_coffee/food_3_ready_2.png",
+                "threshold": 0.7
+            }
+        },
+        "post_delay":10,
+        "next": [
+            "MakeCoffeeOneOneFood3Click2"
+        ]
+    },
+    "MakeCoffeeOneOneFood3Click2": {
+        "desc": "菜品 3 第二次点击",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param":{
+                "roi": [
+                    0,
+                    360,
+                    1280,
+                    720
+                ],
+                "template": "auto_make_coffee/food_3_ready_2.png",
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    135,
+                    526
+                ],
+                "duration": 100
+            }
+        },
+        "post_delay": 300,
+        "next": [
+            "MakeCoffeeOneOneFood3Ready3",
+            "[JumpBack]MakeCoffeeOneOneFood3Click2"
+        ]
+    },
+    "MakeCoffeeOneOneFood3Ready3": {
+        "desc": "等待菜品 3 可进行第三次点击：吐司盘子准备完成",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    151,
+                    455,
+                    214,
+                    155
+                ],
+                "template": "auto_make_coffee/food_3_ready_3.png",
+                "threshold": 0.7
+            }
+        },
+        "post_delay":10,
+        "next": [
+            "MakeCoffeeOneOneFood3Click3"
+        ]
+    },
+    "MakeCoffeeOneOneFood3Click3": {
+        "desc": "菜品 3 第三次点击",
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    155,
+                    431
+                ],
+                "duration": 100
+            }
+        },
+        "post_delay": 300,
+        "next": [
+            "MakeCoffeeOneOneFood3EmptyAfter3",
+            "[JumpBack]MakeCoffeeOneOneFood3Click3"
+        ]
+    },
+    "MakeCoffeeOneOneFood3EmptyAfter3": {
+        "desc": "等待菜品 3 第三次点击完成：准备盘变为空盘",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    151,
+                    455,
+                    214,
+                    155
+                ],
+                "template": "auto_make_coffee/food_3_empty_after_3.png",
+                "threshold": 0.7
+            }
+        },
+        "post_delay":10,
+        "next": [
+            "MakeCoffeeOneOneExitBusiness"
+        ]
+    },
+    "MakeCoffeeOneOneExitBusiness": {
+        "desc": "点击营业结束/退出按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    64,
+                    64
+                ],
+                "template": "auto_make_coffee/exit.png",
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "MakeCoffeeOneOneClaim"
+        ]
+    },
+    "MakeCoffeeOneOneClaim": {
+        "desc": "领取 1-1 奖励并回到下一轮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    681,
+                    539,
+                    187,
+                    38
+                ],
+                "template": "auto_make_coffee/claim.png",
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "duration": 100
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "MakeCoffeeOneOneLoopGate",
+            "MakeCoffeeTaskExit"
+        ]
+    },
+    "MakeCoffeeTaskExit": {
+        "desc": "自动做咖啡任务结束",
+        "action": "StopTask"
     }
 }

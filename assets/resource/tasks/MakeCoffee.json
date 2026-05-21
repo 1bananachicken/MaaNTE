@@ -4,25 +4,63 @@
             "name": "自动做咖啡",
             "entry": "AutoMakeCoffee",
             "option": [
+                "MakeCoffeeMode",
                 "MakeCoffeeLoopTime"
             ]
         }
     ],
     "option": {
+        "MakeCoffeeMode": {
+            "type": "switch",
+            "label": "做咖啡模式",
+            "description": "选择做咖啡的方式：敲人模式保留旧版 CustomAction，刷 1-1 模式改为 MaaFW pipeline 状态监测",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "敲人/驱赶顾客",
+                    "pipeline_override": {
+                        "AutoMakeCoffee": {
+                            "next": [
+                                "AutoMakeCoffeeEvict"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "刷 1-1（MaaFW 状态监测）",
+                    "pipeline_override": {
+                        "AutoMakeCoffee": {
+                            "next": [
+                                "MakeCoffeeOneOneLoopGate"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
         "MakeCoffeeLoopTime": {
             "type": "input",
+            "label": "循环次数",
+            "description": "设置自动做咖啡的循环次数",
             "inputs": [
                 {
                     "name": "循环次数",
                     "default": "10",
-                    "pipeline_type": "int"
+                    "pipeline_type": "int",
+                    "verify": "^[1-9]\\d*$"
                 }
             ],
             "pipeline_override": {
-                "AutoMakeCoffee": {
+                "AutoMakeCoffeeEvict": {
                     "custom_action_param": {
-                        "count": "{循环次数}"
+                        "count": "{循环次数}",
+                        "freq": 2
                     }
+                },
+                "MakeCoffeeOneOneLoopGate": {
+                    "max_hit": "{循环次数}"
                 }
             }
         }
