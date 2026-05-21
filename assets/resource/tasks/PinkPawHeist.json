@@ -3,7 +3,7 @@
         {
             "name": "粉爪大劫案",
             "entry": "PinkPawHeist_Main",
-            "description": "自动刷取粉爪大劫案，需要<span style='color:red'>"桌面端-前台"</span>控制器。",
+            "description": "自动刷取粉爪大劫案，需要<span style='color:red'>“桌面端-前台”</span>控制器。",
             "option": [
                 "PinkPawHeist_Loop",
                 "PinkPawHeist_Scheme"
@@ -18,7 +18,7 @@
             "type": "switch",
             "label": "无限循环",
             "description": "无限循环，直到手动结束任务。",
-            "default_case": "No",
+            "default_case": "Yes",
             "cases": [
                 {
                     "name": "Yes",
@@ -55,7 +55,7 @@
             "type": "select",
             "label": "地图方案",
             "description": "选择本次战斗的地图移动方案。。",
-            "default_case": "Core1",
+            "default_case": "Core2",
             "cases": [
                 {
                     "name": "Core1",
@@ -90,7 +90,7 @@
         "PinkPawHeist_Scheme_Core1_desc": {
             "type": "input",
             "label": "方案一说明",
-            "description": "<span style='color:orange'>目前极不稳定。</span><br><span style='color:green'>配队要求：</span>3号位为薄荷。推荐1娜娜莉3薄荷4早雾。<br><span style='color:green'>路线说明：</span>在G层进行搜索，并前往L1-01撤离点撤离。",
+            "description": "<span style='color:orange'>目前极不稳定。</span><br><span style='color:green'>配队要求：</span>3号位为薄荷。推荐1娜娜莉3薄荷4早雾。<br><span style='color:green'>路线说明：</span>在G层进行搜索，并前往L1-01撤离点撤离。<br><span style='color:orange'>其它要求：</span>关闭游戏的移动镜头修正功能",
             "inputs": []
         },
         "PinkPawHeist_Scheme_Core2_desc": {
