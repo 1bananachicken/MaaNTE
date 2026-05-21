@@ -3,7 +3,7 @@
         {
             "name": "粉爪大劫案",
             "entry": "PinkPawHeist_Main",
-            "description": "自动刷取粉爪大劫案，需要<span style='color:red'>“桌面端-前台”</span>控制器。",
+            "description": "自动刷取粉爪大劫案，需要<span style='color:red'>"桌面端-前台"</span>控制器。",
             "option": [
                 "PinkPawHeist_Loop",
                 "PinkPawHeist_Scheme"
@@ -40,7 +40,7 @@
                 {
                     "name": "count",
                     "label": "循环次数",
-                    "default": "1",
+                    "default": "10",
                     "pipeline_type": "int",
                     "verify": "^[1-9]\\d{0,3}$"
                 }

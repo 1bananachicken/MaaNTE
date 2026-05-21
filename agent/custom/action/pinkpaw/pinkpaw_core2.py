@@ -4,6 +4,11 @@ from maa.context import Context
 from maa.define import Status
 from datetime import datetime
 
+try:
+    from agent.custom.action.pinkpaw.pinkpaw_reward_logger import notify_pinkpaw_reward
+except ImportError:
+    from .pinkpaw_reward_logger import notify_pinkpaw_reward
+
 VK = {
     "W": 0x57,
     "A": 0x41,
@@ -958,6 +963,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             evac_result = ah.ctx.run_task("PinkPawHeist_EvacuateOnce")
             if evac_result.status.succeeded:
                 ah.delay(10000, check_reward=False)
+                notify_pinkpaw_reward(ah.ctx, success=True)
             else:
                 # ---------- 最后撤离2 ----------
 
@@ -1004,6 +1010,7 @@ class PinkPawHeistScheme2Action(CustomAction):
                 evac_result = ah.ctx.run_task("PinkPawHeist_EvacuateOnce")
                 if evac_result.status.succeeded:
                     ah.delay(10000, check_reward=False)
+                    notify_pinkpaw_reward(ah.ctx, success=True)
                 else:
                     # ---------- 最后撤离3 ----------
                     ah.delay(500)
@@ -1051,7 +1058,9 @@ class PinkPawHeistScheme2Action(CustomAction):
                     evac_result = ah.ctx.run_task("PinkPawHeist_EvacuateOnce")
                     if evac_result.status.succeeded:
                         ah.delay(10000, check_reward=False)
+                        notify_pinkpaw_reward(ah.ctx, success=True)
                     else:
+                        notify_pinkpaw_reward(ah.ctx, success=False)
                         self._exit_to_main(ah)
                         return CustomAction.RunResult(success=True)
                     return CustomAction.RunResult(success=True)
@@ -1080,6 +1089,9 @@ class PinkPawHeistScheme2Action(CustomAction):
             evac_result = ah.ctx.run_task("PinkPawHeist_Once")
             if evac_result.status.succeeded:
                 ah.delay(10000, check_reward=False)
+                notify_pinkpaw_reward(ah.ctx, success=True)
+            else:
+                notify_pinkpaw_reward(ah.ctx, success=False)
 
             return CustomAction.RunResult(success=True)
 
