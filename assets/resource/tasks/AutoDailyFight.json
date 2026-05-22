@@ -1,0 +1,30 @@
+{
+  "task": [
+    {
+      "name": "自动日常任务",
+      "label": "自动弹琴",
+      "description": "读取 MIDI 谱子并向当前目标窗口发送键盘演奏。",
+      "entry": "AutoPiano",
+      "default_check": false,
+      "option": [
+        "MidiScoreFile"
+      ]
+    }
+  ],
+  "option": {
+    "MidiScoreFile": {
+      "label": "MIDI 谱子",
+      "type": "select",
+      "default_case": "MidiScoreFile_Custom",
+      "cases": [
+        {
+          "name": "MidiScoreFile_Custom",
+          "label": "自定义路径",
+          "option": [
+            "MidiSettings_Custom"
+          ]
+        }
+      ]
+    }
+  }
+}
