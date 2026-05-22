@@ -134,7 +134,12 @@
             "param": {
                 "expected": [
                     "确认",
-                    "確認", //zh-tw+ja_jp
+                    "確認",
+                    "确定",
+                    "確定",
+                    "OK",
+                    "Ok",
+                    "CONFIRN",
                     "Confirm",
                     "확인"
                 ],

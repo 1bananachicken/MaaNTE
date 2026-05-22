@@ -308,7 +308,11 @@
             49
         ],
         "expected": [
-            "赋能总览"
+            "赋能总览",
+            "賦能總覽",
+            "Enhancement Overview",
+            "エンパワー一覧",
+            "지원 전체보기"
         ],
         "pre_delay": 1000,
         "action": "Click",

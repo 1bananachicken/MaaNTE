@@ -93,8 +93,12 @@
                 "expected": [ //E
                     "确认",
                     "確認",
-                    "Confirm",
+                    "确定",
                     "確定",
+                    "OK",
+                    "Ok",
+                    "CONFIRN",
+                    "Confirm",
                     "확인"
                 ],
                 "roi": [

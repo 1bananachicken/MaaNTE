@@ -65,12 +65,15 @@
                     44
                 ],
                 "expected": [
-                    "确定", //zh-cn
-                    "確定", //zh-tw
-                    "OK", //en
-                    "Ok", //en
-                    "確認", //jp
-                    "확인" //kr
+                    "确认",
+                    "確認",
+                    "确定",
+                    "確定",
+                    "OK",
+                    "Ok",
+                    "CONFIRN",
+                    "Confirm",
+                    "확인"
                 ],
                 "threshold": 0.8
             }
@@ -219,7 +222,12 @@
                 ],
                 "expected": [
                     "确认",
-                    "確認", //zh-tw+ja_jp
+                    "確認",
+                    "确定",
+                    "確定",
+                    "OK",
+                    "Ok",
+                    "CONFIRN",
                     "Confirm",
                     "확인"
                 ],
