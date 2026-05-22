@@ -96,24 +96,28 @@
     ],
     "task": [],
     "import": [
-        //Daily
+        // group:Daily
         "resource/tasks/ClaimRewards.json",
-        //CityTycoon
+        // group:CityTycoon
         "resource/tasks/Furniture.json",
         "resource/tasks/WithdrawMoney.json",
-        //HethereauHobbies
+        // group:HethereauHobbies
         "resource/tasks/Fish.json",
         "resource/tasks/PinkPawHeist.json",
         "resource/tasks/MakeCoffee.json",
         "resource/tasks/Rhythm.json",
         "resource/tasks/Tetris.json",
-        //RealTimeAssist
+        // group:RealTimeAssist
         "resource/tasks/RealTime.json",
         "resource/tasks/SoundDodge.json",
         "resource/tasks/AutoFScroll.json",
-        //others
+        // group:others
         "resource/tasks/FountainCheckin.json",
-        "resource/tasks/AutoPiano.json"
+        "resource/tasks/AutoPiano.json",
+        // preset
+        "resource/tasks/preset/FullDaily.json",
+        "resource/tasks/preset/QuickDaily.json",
+        "resource/tasks/preset/RealtimeAssistance.json"
     ],
     "option": {}
 }
