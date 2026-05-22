@@ -10,6 +10,8 @@
     "group.CityTycoon.label": "シティ名声",
     "group.HethereauHobbies.label": "シティライフ",
     "group.RealTimeAssist.label": "リアルタイム支援",
+    "preset.AFK.label": "放置タスク",
+    "preset.AFK.description": "長時間の放置プレイに適したタスク",
     "preset.FullDaily.label": "フルデイリー",
     "preset.FullDaily.description": "全てのデイリータスクを一通り実行します",
     "preset.QuickDaily.label": "クイックデイリー",

@@ -10,6 +10,8 @@
     "group.CityTycoon.label": "都市大亨",
     "group.HethereauHobbies.label": "都市闲趣",
     "group.RealTimeAssist.label": "实时辅助",
+    "preset.AFK.label": "挂机任务",
+    "preset.AFK.description": "适合挂机长时间进行的任务",
     "preset.FullDaily.label": "全套日常",
     "preset.FullDaily.description": "做一遍全套日常任务",
     "preset.QuickDaily.label": "快速日常",

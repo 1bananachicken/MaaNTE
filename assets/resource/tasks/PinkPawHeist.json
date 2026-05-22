@@ -1,7 +1,8 @@
 {
     "task": [
         {
-            "name": "粉爪大劫案",
+            "name": "PinkPawHeist",
+            "label": "粉爪大劫案",
             "entry": "PinkPawHeist_Main",
             "description": "自动刷取粉爪大劫案，需要<span style='color:red'>“桌面端-前台”</span>控制器。",
             "option": [

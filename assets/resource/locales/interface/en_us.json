@@ -10,6 +10,8 @@
     "group.CityTycoon.label": "City Tycoon",
     "group.HethereauHobbies.label": "Hethereau Hobbies",
     "group.RealTimeAssist.label": "Real-time Assistance",
+    "preset.AFK.label": "AFK Tasks",
+    "preset.AFK.description": "Suitable for long-running AFK tasks",
     "preset.FullDaily.label": "Full Daily",
     "preset.FullDaily.description": "Complete a full set of daily tasks",
     "preset.QuickDaily.label": "Quick Daily",
