@@ -156,6 +156,7 @@
             49
         ],
         "expected": [
+            // @i18n-skip 
             "%"
         ],
         "pre_delay": 0,
