@@ -132,13 +132,23 @@
             40
         ],
         "expected": [
-            "万能鱼饵"
+            "万能鱼饵",
+            "萬能魚餌",
+            "(?i)Universal\\s*Bait",
+            "万能釣り餌"
         ],
         "action": "ClickKey",
         "key": [
             27
         ],
         "post_wait_freezes": 1000
+    ,
+        "roi_offset": [
+            0,
+            0,
+            107,
+            0
+        ]
     },
     "FishUseBait": {
         "desc": "点击更换按钮使用万能鱼饵：说明万能鱼饵仍有库存，处理完成后重新开始钓鱼",
@@ -152,9 +162,19 @@
                     44
                 ],
                 "expected": [
-                    "更换"
+                    "更换",
+                    "更換",
+                    "(?i)Switch",
+                    "入れ替え"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    237,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -174,9 +194,19 @@
                     44
                 ],
                 "expected": [
-                    "购买"
+                    "购买",
+                    "購買",
+                    "(?i)Purchase",
+                    "購入"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    237,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -206,9 +236,19 @@
                     44
                 ],
                 "expected": [
-                    "购买"
+                    "购买",
+                    "購買",
+                    "(?i)Purchase",
+                    "購入"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    237,
+                    0
+                ]
             }
         },
         "action": "ClickKey",

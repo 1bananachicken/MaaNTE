@@ -5,7 +5,10 @@
             "type": "OCR",
             "param": {
                 "expected": [
-                    "维特海默塔"
+                    "维特海默塔",
+                    "維特海默塔",
+                    "(?i)Wertheimer\\s*Tower",
+                    "ヴェルテハイモー塔"
                 ],
                 "roi": [
                     920,
@@ -29,7 +32,10 @@
             "type": "OCR",
             "param": {
                 "expected": [
-                    "传送"
+                    "传送",
+                    "傳送",
+                    "(?i)Teleport",
+                    "転送"
                 ],
                 "roi": [
                     930,
@@ -57,7 +63,10 @@
             "type": "OCR",
             "param": {
                 "expected": [
-                    "传送点"
+                    "传送点",
+                    "傳送點",
+                    "(?i)Teleport\\s*Point",
+                    "転送ポイント"
                 ],
                 "roi": [
                     920,
@@ -81,7 +90,10 @@
             "type": "OCR",
             "param": {
                 "expected": [
-                    "传送"
+                    "传送",
+                    "傳送",
+                    "(?i)Teleport",
+                    "転送"
                 ],
                 "roi": [
                     930,

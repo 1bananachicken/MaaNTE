@@ -28,7 +28,10 @@
         "desc": "点击空白区域关闭",
         "recognition": "OCR",
         "expected": [
-            "点击空白区域关闭"
+            "点击空白区域关闭",
+            "點擊空白區域關閉",
+            "(?i)Press\\s*empty\\s*area\\s*to\\s*close",
+            "空白を押して閉じる"
         ],
         "action": "ClickKey",
         "key": 27

@@ -102,7 +102,10 @@
             55
         ],
         "expected": [
-            "点击空白区域关闭"
+            "点击空白区域关闭",
+            "點擊空白區域關閉",
+            "(?i)Press\\s*empty\\s*area\\s*to\\s*close",
+            "空白を押して閉じる"
         ],
         "action": "ClickKey",
         "key": [
@@ -111,6 +114,13 @@
         "focus": {
             "Node.Action.Succeeded": "钓到鱼了！"
         }
+    ,
+        "roi_offset": [
+            0,
+            0,
+            125,
+            0
+        ]
     },
     "FishNewTaskExit": {
         "desc": "钓鱼任务完成",
@@ -227,12 +237,22 @@
             40
         ],
         "expected": [
-            "万能鱼饵"
+            "万能鱼饵",
+            "萬能魚餌",
+            "(?i)Universal\\s*Bait",
+            "万能釣り餌"
         ],
         "pre_delay": 1000,
         "action": "ClickKey",
         "key": [
             27 // Esc
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            107,
+            0
         ]
     },
     "FishNewBaitExit": {
@@ -247,9 +267,19 @@
                     44
                 ],
                 "expected": [
-                    "购买"
+                    "购买",
+                    "購買",
+                    "(?i)Purchase",
+                    "購入"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    237,
+                    0
+                ]
             }
         },
         "action": "ClickKey",
@@ -276,9 +306,19 @@
                     59
                 ],
                 "expected": [
-                    "更换鱼饵"
+                    "更换鱼饵",
+                    "更換魚餌",
+                    "(?i)Switch\\s*Bait",
+                    "釣り餌交換"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    42,
+                    0
+                ]
             }
         },
         "pre_delay": 500,
@@ -303,9 +343,19 @@
                     44
                 ],
                 "expected": [
-                    "购买"
+                    "购买",
+                    "購買",
+                    "(?i)Purchase",
+                    "購入"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    237,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -335,9 +385,19 @@
                     48
                 ],
                 "expected": [
-                    "渔具商店"
+                    "渔具商店",
+                    "漁具商店",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
+                    "釣具店"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    135,
+                    0
+                ]
             }
         },
         "next": [
@@ -357,7 +417,17 @@
                     44
                 ],
                 "expected": [
-                    "更换"
+                    "更换",
+                    "更換",
+                    "(?i)Switch",
+                    "入れ替え"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    237,
+                    0
                 ]
             }
         },
@@ -402,9 +472,19 @@
                     48
                 ],
                 "expected": [
-                    "渔具商店"
+                    "渔具商店",
+                    "漁具商店",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
+                    "釣具店"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    135,
+                    0
+                ]
             }
         },
         "pre_delay": 500,
@@ -484,9 +564,19 @@
                     45
                 ],
                 "expected": [
-                    "购买"
+                    "购买",
+                    "購買",
+                    "(?i)Purchase",
+                    "購入"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    30,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -507,9 +597,19 @@
                     40
                 ],
                 "expected": [
-                    "确认"
+                    "确认",
+                    "確認",
+                    "(?i)Confirm",
+                    "確定"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    113,
+                    0
+                ]
             }
         },
         "pre_delay": 500,
@@ -531,9 +631,19 @@
                     57
                 ],
                 "expected": [
-                    "渔具商店"
+                    "渔具商店",
+                    "漁具商店",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
+                    "釣具店"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    223,
+                    0
+                ]
             }
         },
         "action": {
@@ -558,13 +668,23 @@
             38
         ],
         "expected": [
-            "货币不足无法购买"
+            "货币不足无法购买",
+            "貨幣不足無法購買",
+            "(?i)Insufficient\\s*currency\\s*\\.",
+            "通貨不足！購入できません"
         ],
         "focus": {
             "Node.Action.Succeeded": "鱼鳞币不足，尝试前往卖鱼"
         },
         "next": [
             "FishNewExitStoreSellFish"
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            86,
+            0
         ]
     },
     "FishNewExitStoreSellFish": {
@@ -579,9 +699,19 @@
                     57
                 ],
                 "expected": [
-                    "渔具商店"
+                    "渔具商店",
+                    "漁具商店",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
+                    "釣具店"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    223,
+                    0
+                ]
             }
         },
         "action": {
@@ -632,10 +762,20 @@
             55
         ],
         "expected": [
-            "渔获市场"
+            "渔获市场",
+            "漁獲市場",
+            "(?i)Fish\\s*Market",
+            "鮮魚市場"
         ],
         "next": [
             "FishNewFishingMasterPage1Sell1"
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            34,
+            0
         ]
     },
     "FishNewFishingMasterPage1Sell1": {
@@ -648,7 +788,10 @@
             33
         ],
         "expected": [
-            "收购"
+            "收购",
+            "收購",
+            "(?i)Sell",
+            "買取"
         ],
         "action": "Click",
         "post_wait_freezes": 200,
@@ -666,12 +809,21 @@
             37
         ],
         "expected": [
-            "快捷提交"
+            "快捷提交",
+            "(?i)Quick\\s*Submit",
+            "クイック納品"
         ],
         "action": "Click",
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell2"
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            54,
+            0
         ]
     },
     "FishNewFishingMasterPage1Sell2": {
@@ -684,7 +836,10 @@
             33
         ],
         "expected": [
-            "收购"
+            "收购",
+            "收購",
+            "(?i)Sell",
+            "買取"
         ],
         "action": "Click",
         "post_wait_freezes": 200,
@@ -702,12 +857,21 @@
             37
         ],
         "expected": [
-            "快捷提交"
+            "快捷提交",
+            "(?i)Quick\\s*Submit",
+            "クイック納品"
         ],
         "action": "Click",
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell3"
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            54,
+            0
         ]
     },
     "FishNewFishingMasterPage1Sell3": {
@@ -720,7 +884,10 @@
             33
         ],
         "expected": [
-            "收购"
+            "收购",
+            "收購",
+            "(?i)Sell",
+            "買取"
         ],
         "action": "Click",
         "post_wait_freezes": 200,
@@ -738,12 +905,21 @@
             37
         ],
         "expected": [
-            "快捷提交"
+            "快捷提交",
+            "(?i)Quick\\s*Submit",
+            "クイック納品"
         ],
         "action": "Click",
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterSwitchToPage2"
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            54,
+            0
         ]
     },
     "FishNewFishingMasterSwitchToPage2": {
@@ -776,7 +952,9 @@
             39
         ],
         "expected": [
-            "出售"
+            "出售",
+            "(?i)Sell",
+            "売却"
         ],
         "action": "Click",
         "post_wait_freezes": 1000,
@@ -796,9 +974,19 @@
                     40
                 ],
                 "expected": [
-                    "确认"
+                    "确认",
+                    "確認",
+                    "(?i)Confirm",
+                    "確定"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    113,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -817,13 +1005,23 @@
             36
         ],
         "expected": [
-            "暂未获得鱼"
+            "暂未获得鱼",
+            "暫未獲得魚",
+            "(?i)Fish\\s*not\\s*yet\\s*obtained",
+            "魚を獲得していません"
         ],
         "focus": {
             "Node.Action.Succeeded": "无鱼可卖，结束卖鱼"
         },
         "next": [
             "FishNewTaskExit"
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            136,
+            0
         ]
     },
     "FishNewFishingMasterExit": {
@@ -836,7 +1034,10 @@
             48
         ],
         "expected": [
-            "海上钓客"
+            "海上钓客",
+            "海上釣客",
+            "(?i)Sea\\s*Angler",
+            "海釣り"
         ],
         "action": "ClickKey",
         "key": [
@@ -844,6 +1045,13 @@
         ],
         "next": [
             "[Anchor]FishNewRestart"
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            15,
+            0
         ]
     }
 }

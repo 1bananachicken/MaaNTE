@@ -71,7 +71,10 @@
             52
         ],
         "expected": [
-            "未选择"
+            "未选择",
+            "未選擇",
+            "(?i)Not\\s*Selected",
+            "未選択"
         ],
         "action": "Click",
         "target_offset": [
@@ -86,6 +89,13 @@
         "next": [
             "FishChooseGeneralBait"
         ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            76,
+            0
+        ]
     },
     "FishScenePrepareToStore": {
         "desc": "从钓鱼准备界面进入装备鱼饵界面",
@@ -97,7 +107,10 @@
             52
         ],
         "expected": [
-            "未选择"
+            "未选择",
+            "未選擇",
+            "(?i)Not\\s*Selected",
+            "未選択"
         ],
         "action": "Click",
         "target_offset": [
@@ -111,6 +124,13 @@
         },
         "next": [
             "FishNewChooseGeneralBait"
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            76,
+            0
         ]
     },
     "FishSceneOnFishGame": {
@@ -140,7 +160,17 @@
                     51
                 ],
                 "expected": [
-                    "钓鱼准备"
+                    "钓鱼准备",
+                    "釣魚準備",
+                    "(?i)Fishing\\s*Preparations",
+                    "釣り準備"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    171,
+                    0
                 ]
             }
         },
@@ -160,7 +190,17 @@
                     83
                 ],
                 "expected": [
-                    "开始钓鱼"
+                    "开始钓鱼",
+                    "開始釣魚",
+                    "(?i)Start\\s*Fishing",
+                    "釣り開始"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    57,
+                    0
                 ]
             }
         },

@@ -17,7 +17,16 @@
                     46
                 ],
                 "expected": [
-                    "一咖舍" // "一"字可能识别不到
+                    "一咖舍",
+                    "(?i)The\\s*Cafe\\s*by\\s*Origen",
+                    "「壱のコーヒー」"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    155,
+                    0
                 ]
             }
         },
@@ -37,9 +46,18 @@
                     43
                 ],
                 "expected": [
-                    "提取收益"
+                    "提取收益",
+                    "(?i)Withdraw\\s*Earnings",
+                    "収益受取"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    174,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -58,9 +76,19 @@
                     44
                 ],
                 "expected": [
-                    "确定"
+                    "确定",
+                    "確定",
+                    "(?i)Confirm",
+                    "確認"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    149,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -80,9 +108,19 @@
                     22
                 ],
                 "expected": [
-                    "补货"
+                    "补货",
+                    "補貨",
+                    "(?i)Restock",
+                    "補充"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    32,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -101,7 +139,10 @@
                     20
                 ],
                 "expected": [
-                    "24小时"
+                    "24小时",
+                    "24小時",
+                    "(?i)24h",
+                    "24時間"
                 ],
                 "threshold": 0.8
             }
@@ -122,7 +163,17 @@
                     44
                 ],
                 "expected": [
-                    "补货"
+                    "补货",
+                    "補貨",
+                    "(?i)Restock",
+                    "補充"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    151,
+                    0
                 ]
             }
         },
@@ -143,7 +194,17 @@
                     34
                 ],
                 "expected": [
-                    "库存已满无法存入更多材料"
+                    "库存已满无法存入更多材料",
+                    "庫存已滿無法存入更多材料",
+                    "(?i)Inventory\\s*full\\s*\\.\\s*Cannot\\s*store\\s*more\\s*materials\\s*\\.",
+                    "空きがありません"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    166,
+                    0
                 ]
             }
         },
@@ -165,9 +226,19 @@
                     45
                 ],
                 "expected": [
-                    "送货上门"
+                    "送货上门",
+                    "送貨上門",
+                    "(?i)Door\\s*-\\s*to\\s*-\\s*Door\\s*Delivery",
+                    "配達"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    305,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -186,9 +257,19 @@
                     49
                 ],
                 "expected": [
-                    "确认"
+                    "确认",
+                    "確認",
+                    "(?i)Confirm",
+                    "確定"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    179,
+                    0
+                ]
             }
         },
         "action": "Click",
