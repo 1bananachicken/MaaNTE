@@ -1,0 +1,315 @@
+{
+    "$__mpe_config_PinkPawsHeistLevelOne": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1779001536510,
+            "isModifiedExternally": false,
+            "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\MaaNTE\\assets\\resource\\base\\pipeline\\AutoFight\\PinkPawsHeistLevelOne.json",
+            "savedViewport": {
+                "x": -1033,
+                "y": 174,
+                "zoom": 1.5
+            },
+            "filename": "PinkPawsHeistLevelOne",
+            "version": "v1.5.3"
+        }
+    },
+    "PPH_OneLevel_3_3_1": {
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    18
+                ]
+            }
+        },
+        "post_wait_freezes": 200,
+        "post_delay": 200,
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 309
+            }
+        }
+    },
+    "PPH_OneLevelMove_2_1": {
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "duration": 4000,
+                "key": 68
+            }
+        },
+        "next": [
+            "PPH_OneLevelMove_3_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1454,
+                "y": 41
+            }
+        }
+    },
+    "PPH_OneLevelMove_3_1": {
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "duration": 2000,
+                "key": 87
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1752,
+                "y": 40
+            }
+        }
+    },
+    "PPH_OneLevel_1_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    23,
+                    237,
+                    105,
+                    44
+                ],
+                "expected": [
+                    "本局收益"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "进入大劫案"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "PPH_OneLevelMove_1_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 809,
+                "y": 30
+            }
+        }
+    },
+    "logger_action_model_PPH": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "1"
+                    ]
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 12
+            }
+        }
+    },
+    "PPH_Action": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "info": [
+                        "开始粉爪大劫案"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "PPH_OneLevel_1_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 505,
+                "y": 47
+            }
+        }
+    },
+    "logger_action_model_副本3": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "1"
+                    ]
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 252,
+                "y": 12
+            }
+        }
+    },
+    "PPH_OneLevel_3_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    500,
+                    0,
+                    280,
+                    720
+                ],
+                "template": [
+                    "AF_image/1层门口标记.png"
+                ],
+                "threshold": [
+                    0.5
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 726
+            }
+        }
+    },
+    "PPH_OneLevelMove_1_1": {
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "duration": 4000,
+                "key": 87
+            }
+        },
+        "next": [
+            "PPH_OneLevelMove_2_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1132,
+                "y": 43
+            }
+        }
+    },
+    "PPH_OneLevel_3_2_clean": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_CountClean",
+                "custom_recognition_param": {
+                    "clean_node_name": "PPH_OneLevel_3_2",
+                    "target_number": 50
+                }
+            }
+        },
+        "next": [
+            "PPH_OneLevel_3_1",
+            "PPH_OneLevel_3_2",
+            "[JumpBack]PPH_OneLevel_3_3"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 762
+            }
+        }
+    },
+    "PPH_OneLevel_3_3": {
+        "pre_wait_freezes": 0,
+        "pre_delay": 10,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    640,
+                    320,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        740,
+                        320,
+                        1,
+                        1
+                    ]
+                ],
+                "only_hover": true,
+                "duration": [
+                    10
+                ]
+            }
+        },
+        "post_wait_freezes": 0,
+        "post_delay": 10,
+        "next": [
+            "PPH_OneLevel_3_3_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 262
+            }
+        }
+    },
+    "PPH_OneLevel_3_2": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_Count",
+                "custom_recognition_param": {
+                    "current_number": 0,
+                    "target_number": 30
+                }
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "next": [
+            "PPH_OneLevel_3_2_finish"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 1061
+            }
+        }
+    },
+    "PPH_OneLevel_3_2_finish": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "error": [
+                        "无法找到宝箱"
+                    ]
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 1132
+            }
+        }
+    }
+}

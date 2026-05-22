@@ -1,0 +1,1994 @@
+{
+    "$__mpe_config_AutoFight": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1779451105708,
+            "isModifiedExternally": false,
+            "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\MaaNTE\\assets\\resource\\base\\pipeline\\AutoFight\\AutoFight.json",
+            "savedViewport": {
+                "x": -1276,
+                "y": -31,
+                "zoom": 0.4
+            },
+            "filename": "AutoFight",
+            "version": "v1.5.3"
+        }
+    },
+    "DF_Action": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "DF_Action",
+                "custom_recognition_param": {}
+            }
+        },
+        "next": [
+            "DF_Action_clean"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5360,
+                "y": 569
+            }
+        }
+    },
+    "DF_Action_2_2": {
+        "$__mpe_code": {
+            "position": {
+                "x": 6015,
+                "y": 866
+            }
+        }
+    },
+    "DF_Action_clean": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_CountClean",
+                "custom_recognition_param": {
+                    "clean_node_name": "DF_Action_Repeat",
+                    "target_number": 1
+                }
+            }
+        },
+        "next": [
+            "DF_Action_Repeat",
+            "[JumpBack]DF_Action_2_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5631,
+                "y": 567
+            }
+        }
+    },
+    "DF_Action_Repeat": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_Count",
+                "custom_recognition_param": {
+                    "current_number": 0,
+                    "target_number": 1
+                }
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "$__mpe_code": {
+            "position": {
+                "x": 6023,
+                "y": 494
+            }
+        }
+    },
+    "AF_GetInInstanceMove_13_2": {
+        "$__mpe_code": {
+            "position": {
+                "x": 5846,
+                "y": 1054
+            }
+        }
+    },
+    "AF_Action_AutoFightSimple": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "开始简易战斗策略"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_AutoFightSimple"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2172,
+                "y": 1416
+            }
+        }
+    },
+    "AF_Action_FindBox": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "寻找宝箱"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_FindBox_2_1_clean"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 3140
+            }
+        }
+    },
+    "AF_Action_GetInInstance": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "开始进行入日常界面"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_GetInInstance_1_1",
+            "[JumpBack]AF_GetInInstance_1_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3852,
+                "y": 123
+            }
+        }
+    },
+    "AF_AutoFightCls": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "AF_AutoFightCls",
+                "custom_recognition_param": {
+                    "model": "best1.onnx"
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1212,
+                "y": 12
+            }
+        }
+    },
+    "AF_AutoFightClsTest": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "AF_AutoFightClsTest",
+                "custom_recognition_param": {
+                    "model": "best1.onnx"
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1452,
+                "y": 12
+            }
+        }
+    },
+    "AF_AutoFightSimple": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_CountClean",
+                "custom_recognition_param": {
+                    "clean_node_name": "AF_AutoFightSimple_finish",
+                    "target_number": 20
+                }
+            }
+        },
+        "next": [
+            "AF_AutoFightSimple_finish",
+            "[JumpBack]AF_挑战成功",
+            "[JumpBack]AF_FightSimple_1_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2492,
+                "y": 1421
+            }
+        }
+    },
+    "AF_AutoFightSimple_finish": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_Count",
+                "custom_recognition_param": {
+                    "current_number": 0,
+                    "target_number": 3
+                }
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "$__mpe_code": {
+            "position": {
+                "x": 2812,
+                "y": 1005
+            }
+        }
+    },
+    "AF_ChooseNormalInstance": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "AF_ChooseNormalInstance",
+                "custom_recognition_param": {
+                    "target_instance": [
+                        ""
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_ChooseNormalInstance_1_1",
+            "[JumpBack]AF_ChooseNormalInstance_1_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 3840
+            }
+        }
+    },
+    "AF_ChooseNormalInstance_1_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    216,
+                    516,
+                    192,
+                    62
+                ],
+                "expected": [
+                    "经验及甲硬币"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "选择一级副本类别"
+                    ]
+                }
+            }
+        },
+        "post_wait_freezes": 500,
+        "next": [
+            "AF_ChooseNormalInstance_2_1",
+            "[JumpBack]AF_ChooseNormalInstance_2_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 3749
+            }
+        }
+    },
+    "AF_ChooseNormalInstance_1_2": {
+        "max_hit": 2,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    135,
+                    86,
+                    1109,
+                    44
+                ],
+                "expected": [
+                    "弧盘突破材料"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "contact": 0
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 4132
+            }
+        }
+    },
+    "AF_ChooseNormalInstance_2_2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1096,
+                    184,
+                    136,
+                    48
+                ],
+                "expected": [
+                    "前往"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 4022
+            }
+        }
+    },
+    "AF_ChooseNormalInstance_副本14": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    216,
+                    516,
+                    192,
+                    62
+                ],
+                "expected": [
+                    "经验及甲硬币"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "选择目标副本"
+                    ]
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2412,
+                "y": 12
+            }
+        }
+    },
+    "AF_FightSimple_1_1": {
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "next": [
+            "AF_FightSimple_2_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2812,
+                "y": 1420
+            }
+        }
+    },
+    "AF_FightSimple_2_1": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    81
+                ]
+            }
+        },
+        "next": [
+            "AF_FightSimple_3_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3132,
+                "y": 1481
+            }
+        }
+    },
+    "AF_FightSimple_3_1": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    69
+                ]
+            }
+        },
+        "next": [
+            "AF_FightSimple_4_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3452,
+                "y": 1481
+            }
+        }
+    },
+    "AF_FightSimple_4_1": {
+        "action": {
+            "type": "Click"
+        },
+        "repeat": 12,
+        "repeat_delay": 50,
+        "next": [
+            "AF_FightSimple_5_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3772,
+                "y": 1451
+            }
+        }
+    },
+    "AF_FightSimple_5_1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "contact": 2
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 4092,
+                "y": 1480
+            }
+        }
+    },
+    "AF_FindBox_2_1": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_Count",
+                "custom_recognition_param": {
+                    "current_number": 0,
+                    "target_number": 20
+                }
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "next": [
+            "AF_FindBox_3_2_clean"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 2467
+            }
+        }
+    },
+    "AF_FindBox_2_1_clean": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_CountClean",
+                "custom_recognition_param": {
+                    "clean_node_name": "AF_FindBox_2_1",
+                    "target_number": 20
+                }
+            }
+        },
+        "next": [
+            "AF_FindBox_2_1",
+            "[JumpBack]AF_MoveScane_1_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 3138
+            }
+        }
+    },
+    "AF_FindBox_3_2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    592,
+                    25,
+                    92,
+                    111
+                ],
+                "template": [
+                    "AF_image/宝箱检测.png"
+                ],
+                "green_mask": true,
+                "threshold": [
+                    0.5
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "找到宝箱"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_FindBox_4_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 2098
+            }
+        }
+    },
+    "AF_FindBox_3_3": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_Count",
+                "custom_recognition_param": {
+                    "current_number": 0,
+                    "target_number": 50
+                }
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "next": [
+            "AF_FindBox_3_2_finish"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 1697
+            }
+        }
+    },
+    "AF_FindBox_3_2_clean": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_CountClean",
+                "custom_recognition_param": {
+                    "clean_node_name": "AF_FindBox_3_2",
+                    "target_number": 50
+                }
+            }
+        },
+        "next": [
+            "AF_FindBox_3_1",
+            "[JumpBack]AF_FindBox_3_2",
+            "AF_FindBox_3_3",
+            "[JumpBack]AF_FindBox_3_4"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 2543
+            }
+        }
+    },
+    "AF_FindBox_3_2_finish": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "error": [
+                        "无法找到宝箱"
+                    ]
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1612,
+                "y": 1775
+            }
+        }
+    },
+    "AF_FindBox_3_4": {
+        "pre_wait_freezes": 0,
+        "pre_delay": 10,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    640,
+                    320,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        740,
+                        420,
+                        1,
+                        1
+                    ]
+                ],
+                "only_hover": true,
+                "duration": [
+                    10
+                ]
+            }
+        },
+        "post_wait_freezes": 0,
+        "post_delay": 10,
+        "next": [
+            "AF_MoveScane_2_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 2857
+            }
+        }
+    },
+    "AF_FindBox_3_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    766,
+                    368,
+                    143,
+                    49
+                ],
+                "template": [
+                    "dg/12.png"
+                ],
+                "threshold": [
+                    0.5
+                ]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70
+            }
+        },
+        "next": [
+            "AF_GetReward_1_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 2512
+            }
+        }
+    },
+    "AF_FindBox_4_2": {
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "duration": 300,
+                "key": 87
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1612,
+                "y": 2181
+            }
+        }
+    },
+    "AF_GetInInstanceMove": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1055,
+                    617,
+                    82,
+                    44
+                ],
+                "expected": [
+                    "传送"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "AF_GetInInstanceMove_2_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 3756
+            }
+        }
+    },
+    "AF_GetInInstanceMove_10_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    21,
+                    168,
+                    141,
+                    73
+                ],
+                "expected": [
+                    "剩余敌人数"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3852,
+                "y": 3463
+            }
+        }
+    },
+    "AF_GetInInstanceMove_2_1": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "开始传送"
+                    ]
+                }
+            }
+        },
+        "timeout": 40000,
+        "next": [
+            "AF_GetInInstanceMove_3_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 3730
+            }
+        }
+    },
+    "AF_GetInInstanceMove_3_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    5,
+                    624,
+                    109,
+                    90
+                ],
+                "expected": [
+                    "Enter"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "到达目的地"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_GetInInstanceMove_4_1_副本1",
+            "[JumpBack]AF_GetInInstanceMove_4_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1612,
+                "y": 3728
+            }
+        }
+    },
+    "AF_GetInInstanceMove_4_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    746,
+                    359,
+                    220,
+                    63
+                ],
+                "expected": [
+                    "胡迪尼的魔术舞台"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "到达门口"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_GetInInstanceMove_5_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 4271
+            }
+        }
+    },
+    "AF_GetInInstanceMove_4_1_副本1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    763,
+                    365,
+                    219,
+                    53
+                ],
+                "template": [
+                    "AF_image/魔术舞台.png"
+                ],
+                "threshold": [
+                    0.5
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "到达门口"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_GetInInstanceMove_5_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 3656
+            }
+        }
+    },
+    "AF_GetInInstanceMove_4_2": {
+        "action": {
+            "type": "KeyDown",
+            "param": {
+                "key": 87
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 4041
+            }
+        }
+    },
+    "AF_GetInInstanceMove_5_1": {
+        "action": {
+            "type": "KeyUp",
+            "param": {
+                "key": 87
+            }
+        },
+        "next": [
+            "AF_GetInInstanceMove_6_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2252,
+                "y": 3759
+            }
+        }
+    },
+    "AF_GetInInstanceMove_6_1": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    70
+                ]
+            }
+        },
+        "next": [
+            "AF_GetInInstanceMove_7_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2572,
+                "y": 3759
+            }
+        }
+    },
+    "AF_GetInInstanceMove_7_1": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "选择2级副本"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_GetInInstanceMove_8_1",
+            "[JumpBack]AF_GetInInstanceMove_8_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2892,
+                "y": 3744
+            }
+        }
+    },
+    "AF_GetInInstanceMove_8_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    844,
+                    76,
+                    346,
+                    57
+                ],
+                "expected": [
+                    "合订本"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "选择指定副本"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_GetInInstanceMove_9_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3212,
+                "y": 3682
+            }
+        }
+    },
+    "AF_GetInInstanceMove_8_2": {
+        "max_hit": 2,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    62,
+                    428,
+                    71,
+                    21
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3212,
+                "y": 4006
+            }
+        }
+    },
+    "AF_GetInInstanceMove_9_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    985,
+                    633,
+                    79,
+                    38
+                ],
+                "expected": [
+                    "进入"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "AF_GetInInstanceMove_10_1",
+            "AF_GetInInstanceMove_10_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3532,
+                "y": 3710
+            }
+        }
+    },
+    "AF_GetInInstance_1_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1044,
+                    148,
+                    84,
+                    44
+                ],
+                "expected": [
+                    "鉴别等级"
+                ]
+            }
+        },
+        "next": [
+            "AF_GetInInstance_2_1",
+            "[JumpBack]AF_GetInInstance_2_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4172,
+                "y": 98
+            }
+        }
+    },
+    "AF_GetInInstance_1_2": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 4172,
+                "y": 348
+            }
+        }
+    },
+    "AF_GetInInstance_2_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    62,
+                    21,
+                    105,
+                    40
+                ],
+                "expected": [
+                    "探索指南"
+                ]
+            }
+        },
+        "next": [
+            "AF_GetInInstance_3_1",
+            "[JumpBack]AF_GetInInstance_3_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4492,
+                "y": 70
+            }
+        }
+    },
+    "AF_GetInInstance_2_2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1153,
+                    535,
+                    73,
+                    35
+                ],
+                "expected": [
+                    "探索指南"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1168,
+                    494,
+                    46,
+                    30
+                ],
+                "contact": 0
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 4492,
+                "y": 320
+            }
+        }
+    },
+    "AF_GetInInstance_3_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    216,
+                    516,
+                    192,
+                    62
+                ],
+                "expected": [
+                    "经验及甲硬币"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "进入日常界面"
+                    ]
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 4812,
+                "y": 12
+            }
+        }
+    },
+    "AF_GetInInstance_3_2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    64,
+                    18,
+                    109,
+                    46
+                ],
+                "expected": [
+                    "探索指南"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    51,
+                    329,
+                    40,
+                    48
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 4812,
+                "y": 322
+            }
+        }
+    },
+    "AF_MoveScane_1_1": {
+        "pre_wait_freezes": 0,
+        "pre_delay": 10,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    640,
+                    320,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        640,
+                        700,
+                        1,
+                        1
+                    ]
+                ],
+                "only_hover": true,
+                "duration": [
+                    10
+                ]
+            }
+        },
+        "post_wait_freezes": 0,
+        "post_delay": 10,
+        "next": [
+            "AF_MoveScane_2_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 3059
+            }
+        }
+    },
+    "AF_MoveScane_2_1": {
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    18
+                ]
+            }
+        },
+        "post_wait_freezes": 0,
+        "post_delay": 10,
+        "next": [
+            "新建节点4"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1612,
+                "y": 3058
+            }
+        }
+    },
+    "AF_Move_W": {
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "duration": 3000,
+                "key": 87
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 12
+            }
+        }
+    },
+    "AF_挑战成功": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    567,
+                    140,
+                    140,
+                    40
+                ],
+                "expected": [
+                    "挑战成功"
+                ],
+                "only_rec": true
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "$__mpe_code": {
+            "position": {
+                "x": 2812,
+                "y": 573
+            }
+        }
+    },
+    "UF_GetImage": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_GetImage"
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 252,
+                "y": 12
+            }
+        }
+    },
+    "action_logger": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    216,
+                    516,
+                    192,
+                    62
+                ],
+                "expected": [
+                    "经验及甲硬币"
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "选择目标副本"
+                    ]
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2172,
+                "y": 12
+            }
+        }
+    },
+    "logger_action_model": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "1"
+                    ]
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 492,
+                "y": 12
+            }
+        }
+    },
+    "rotate": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MouseMoveAction",
+                "custom_action_param": {
+                    "dx": "500"
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 732,
+                "y": 12
+            }
+        }
+    },
+    "AF_GetReward_1_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/14.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    836,
+                    467,
+                    1,
+                    1
+                ]
+            }
+        },
+        "next": [
+            "AF_GetReward_2_1",
+            "AF_GetReward_2_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 870
+            }
+        }
+    },
+    "AF_GetReward_2_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/15.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "key": 27
+            }
+        },
+        "next": [
+            "AF_GetReward_3_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 839
+            }
+        }
+    },
+    "AF_GetReward_2_2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/16.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    439,
+                    618,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 1111
+            }
+        }
+    },
+    "新建节点1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    99,
+                    35,
+                    1070,
+                    628
+                ],
+                "template": [
+                    "AF_image/宝箱检测.png"
+                ],
+                "green_mask": true
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2652,
+                "y": 12
+            }
+        }
+    },
+    "AF_GetInInstanceMove_10_2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    554,
+                    230,
+                    174,
+                    48
+                ],
+                "expected": [
+                    "体力不足"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    494,
+                    456,
+                    57,
+                    24
+                ]
+            }
+        },
+        "next": [
+            "AF_GetInInstanceMove_11_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 3852,
+                "y": 3727
+            }
+        }
+    },
+    "新建节点23": {
+        "recognition": {
+            "type": "NeuralNetworkClassify",
+            "param": {
+                "expected": 0,
+                "model": "best.onnx",
+                "labels": [
+                    "['attack', 'none']"
+                ]
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    16
+                ]
+            }
+        },
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "$__mpe_code": {
+            "position": {
+                "x": 3132,
+                "y": 12
+            }
+        }
+    },
+    "新建节点23_副本8": {
+        "recognition": {
+            "type": "NeuralNetworkClassify",
+            "param": {
+                "expected": [
+                    0
+                ],
+                "model": "best.onnx",
+                "labels": [
+                    "['attack', 'none']"
+                ]
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "get attack"
+                    ]
+                }
+            }
+        },
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "$__mpe_code": {
+            "position": {
+                "x": 3372,
+                "y": 12
+            }
+        }
+    },
+    "新建节点24": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    16
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 12
+            }
+        }
+    },
+    "新建节点4": {
+        "pre_delay": 0,
+        "action": {
+            "type": "KeyUp",
+            "param": {
+                "key": 18
+            }
+        },
+        "post_delay": 10,
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 3089
+            }
+        }
+    },
+    "AF_GetInInstanceMove_11_1": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "repeat": 3,
+        "next": [
+            "AF_GetInInstanceMove_12_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4172,
+                "y": 3731
+            }
+        }
+    },
+    "无体力退出": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/10.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    533,
+                    462,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 12
+            }
+        }
+    },
+    "日常副本挑战成功": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    567,
+                    140,
+                    140,
+                    40
+                ],
+                "expected": [
+                    "挑战成功"
+                ],
+                "only_rec": true
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "$__mpe_code": {
+            "position": {
+                "x": 2892,
+                "y": 12
+            }
+        }
+    },
+    "AF_GetReward_3_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/13.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    531,
+                    466,
+                    2,
+                    1
+                ]
+            }
+        },
+        "next": [
+            "AF_GetReward_4_1",
+            "AF_GetReward_4_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 837
+            }
+        }
+    },
+    "血条验证": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    368,
+                    191,
+                    544,
+                    192
+                ],
+                "template": [
+                    "AF_image/血条.png"
+                ],
+                "green_mask": true,
+                "threshold": [
+                    0.3
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "get  target"
+                    ]
+                }
+            }
+        },
+        "post_delay": 0,
+        "$__mpe_code": {
+            "position": {
+                "x": 3612,
+                "y": 12
+            }
+        }
+    },
+    "进入": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/11png.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    1025,
+                    653,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1692,
+                "y": 12
+            }
+        }
+    },
+    "AF_GetReward_5_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/9.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    1075,
+                    251,
+                    1,
+                    1
+                ]
+            }
+        },
+        "next": [
+            "AF_GetReward_6_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1292,
+                "y": 869
+            }
+        }
+    },
+    "AF_GetReward_6_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/8.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "key": 27
+            }
+        },
+        "next": [
+            "AF_GetReward_7_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1612,
+                "y": 867
+            }
+        }
+    },
+    "AF_GetReward_7_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/7.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    775,
+                    471,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1932,
+                "y": 862
+            }
+        }
+    },
+    "AF_GetReward_4_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/15.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "key": 27
+            }
+        },
+        "next": [
+            "AF_GetReward_5_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 872
+            }
+        }
+    },
+    "AF_GetReward_4_2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/16.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    439,
+                    618,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 573
+            }
+        }
+    },
+    "AF_GetInInstanceMove_12_1": {
+        "next": [
+            "DF_Action_Repeat",
+            "[JumpBack]AF_GetInInstanceMove_13_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5474,
+                "y": 966
+            }
+        }
+    },
+    "AF_ChooseNormalInstance_2_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1055,
+                    617,
+                    82,
+                    44
+                ],
+                "expected": [
+                    "传送"
+                ]
+            }
+        },
+        "next": [
+            "AF_GetInInstanceMove"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 3758
+            }
+        }
+    }
+}
