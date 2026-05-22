@@ -7,8 +7,8 @@ on:
         description: "自动请求评审的 GitHub 用户名（可留空）"
         required: false
   schedule:
-    # 每天 UTC 03:00 自动运行（可按需调整）
-    - cron: "0 3 * * *"
+    # 每天 UTC 10:00 自动运行（可按需调整）  测试
+    - cron: "0 10 * * *"
 
 permissions:
   contents: write
@@ -21,7 +21,7 @@ env:
 
 jobs:
   sync-ocr-expected:
-    if: github.event_name == 'workflow_dispatch' || github.repository == '1bananachicken/MaaNTE'
+    if: github.event_name == 'workflow_dispatch' || github.repository == 'EeeMaoY/MaaNTE'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

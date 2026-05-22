@@ -601,18 +601,19 @@ def resolve_lang_ids(
                 # 只把它视为已解析，不进入 unresolved_texts
                 pass
             else:
-                # Third fallback: if ambigous IDs have identical rows in all languages, pick anyone (smallest ID)
+                # Third fallback: if ambigous IDs have identical rows in all languages, pick smallest ID
                 rows = [
                     tuple(tables[lang].get(lid, "") for lang in LANG_ORDER)
                     for lid in candidates
                 ]
                 if len(set(rows)) == 1:
-                    lang_id = min(candidates)  # Choose smallest ID
-                    if lang_id not in resolved_set:
-                        resolved_in_order.append(lang_id)
-                        resolved_set.add(lang_id)
+                    lang_id = min(candidates)
                 else:
-                    unresolved_texts.append(text)
+                    # Rows differ — pick the first candidate (sorted by key)
+                    lang_id = sorted(candidates)[0]
+                if lang_id not in resolved_set:
+                    resolved_in_order.append(lang_id)
+                    resolved_set.add(lang_id)
 
     return resolved_in_order, unresolved_texts
 
