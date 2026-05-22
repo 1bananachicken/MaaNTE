@@ -35,7 +35,13 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "强制开启",
+                "expected": [
+                    "强制开启",
+                    "強制開啟",
+                    "Force Open",
+                    "強制解錠",
+                    "강제 오픈"
+                ],
                 "roi": [
                     800,
                     379,
@@ -57,7 +63,13 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "确认撤离",
+                "expected": [
+                    "确认撤离",
+                    "確認撤离",
+                    "Confirm Retreat",
+                    "撤退確定",
+                    "철수 확인"
+                ],
                 "roi": [
                     710,
                     490,
@@ -77,12 +89,12 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "确认撤离",
-                "roi": [
-                    710,
-                    490,
-                    120,
-                    30
+                "expected": [
+                    "确认撤离",
+                    "確認撤离",
+                    "Confirm Retreat",
+                    "撤退確定",
+                    "철수 확인"
                 ],
                 "threshold": 0.8
             }
@@ -156,7 +168,10 @@
         "focus": {
             "Node.Action.Starting": {
                 "content": "",
-                "display": ["log", "toast"]
+                "display": [
+                    "log",
+                    "toast"
+                ]
             }
         }
     }
