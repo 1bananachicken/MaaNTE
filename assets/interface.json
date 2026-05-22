@@ -116,8 +116,8 @@
         "resource/tasks/AutoPiano.json",
         // preset
         "resource/tasks/preset/AFK.json",
-        "resource/tasks/preset/FullDaily.json",
-        "resource/tasks/preset/QuickDaily.json",
+        // "resource/tasks/preset/FullDaily.json",
+        // "resource/tasks/preset/QuickDaily.json",
         "resource/tasks/preset/RealtimeAssistance.json"
     ],
     "option": {}
