@@ -11,10 +11,11 @@ sys.path.append(script_dir)
 
 from configure import configure_ocr_model
 
+
 def load_json_with_comments(path):
     with open(path, "r", encoding="utf-8") as f:
         text = f.read()
-    text = re.sub(r"^\s*//.*$", "", text, flags=re.MULTILINE)
+    text = re.sub(r"^(?![^\"\n]*\")\s*//.*$", "", text, flags=re.MULTILINE)
     return json.loads(text)
 
 
