@@ -7,8 +7,8 @@ on:
         description: "自动请求评审的 GitHub 用户名（可留空）"
         required: false
   schedule:
-    # 每天 UTC 10:00 自动运行（可按需调整）  测试
-    - cron: "0 10 * * *"
+    # 每天 UTC 11:00 自动运行（可按需调整）  测试
+    - cron: "0 11 * * *"
 
 permissions:
   contents: write
