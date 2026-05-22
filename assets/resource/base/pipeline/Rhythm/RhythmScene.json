@@ -31,8 +31,7 @@
                 ],
                 "expected": [
                     "得分",
-                    "SCORE",
-                    "Score",
+                    "(?i)Score",
                     "スコア",
                     "점수"
                 ]
@@ -74,8 +73,7 @@
                 "expected": [
                     "开始演奏",
                     "開始演奏",
-                    "PLAY",
-                    "Play",
+                    "(?i)Play",
                     "演奏を開始する",
                     "연주 시작"
                 ]
@@ -97,7 +95,7 @@
                 ],
                 "expected": [
                     "迷星叫",
-                    "Mayoiuta"
+                    "(?i)Mayoiuta"
                 ]
             }
         },

@@ -20,7 +20,7 @@
                 "expected": [
                     "纳库佩达之池",
                     "納庫佩達之池",
-                    "Nacupeda's Pool",
+                    "(?i)Nacupeda\\s*'\\s*s\\s*Pool",
                     "ナクペイダの池",
                     "나쿠펜다의 연못"
                 ]
@@ -57,7 +57,7 @@
                 "expected": [
                     "虔诚许愿",
                     "虔誠許願",
-                    "Make a Sincere Wish",
+                    "(?i)Make\\s*a\\s*Sincere\\s*Wish",
                     "敬虔な願い",
                     "간절히 소원 빌기"
                 ]
@@ -135,12 +135,14 @@
                 "expected": [
                     "确认",
                     "確認",
-                    "确定",
+                    "(?i)Confirm",
                     "確定",
+                    "确定",
                     "OK",
-                    "Ok",
+                    "确认记录",
+                    "確認記錄",
+                    "記録更新",
                     "CONFIRN",
-                    "Confirm",
                     "확인"
                 ],
                 "roi": [
@@ -150,6 +152,13 @@
                     70
                 ],
                 "threshold": 0.7
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    36,
+                    0
+                ]
             }
         },
         "action": {
@@ -198,7 +207,7 @@
                 "expected": [
                     "纳库佩达之池",
                     "納庫佩達之池",
-                    "Nacupeda's Pool",
+                    "(?i)Nacupeda\\s*'\\s*s\\s*Pool",
                     "ナクペイダの池",
                     "나쿠펜다의 연못"
                 ],

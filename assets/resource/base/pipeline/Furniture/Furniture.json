@@ -19,7 +19,7 @@
         "expected": [
             "房产",
             "房產",
-            "Property",
+            "(?i)Property",
             "不動産",
             "부동산"
         ],
@@ -101,7 +101,7 @@
         "expected": [
             "维纳公寓",
             "維納公寓",
-            "Wiener Apartments",
+            "(?i)Wiener\\s*Apartments",
             "メゾンVINA",
             "위너 아파트"
         ],
@@ -123,8 +123,7 @@
         ],
         "expected": [
             "伊登公寓",
-            "伊登公寓",
-            "Eden Apartments",
+            "(?i)Eden\\s*Apartments",
             "レジスEDEN",
             "에덴 아파트"
         ],
@@ -147,7 +146,7 @@
         "expected": [
             "天景空馆",
             "天景空館",
-            "Skyview Halls",
+            "(?i)Skyview\\s*Halls",
             "天景の館",
             "천공의 집"
         ],
@@ -170,7 +169,7 @@
         "expected": [
             "金都云邸",
             "金都雲邸",
-            "Golden Capital",
+            "(?i)Golden\\s*Capital",
             "パレス雲都",
             "금빛 헤리티지"
         ],
@@ -193,7 +192,7 @@
         "expected": [
             "峰林别墅",
             "峰林別墅",
-            "Fenglin Villa",
+            "(?i)Fenglin\\s*Villa",
             "シルヴァ邸苑",
             "봉우리 별장"
         ],
@@ -223,7 +222,7 @@
         "expected": [
             "前往购买",
             "前往購買",
-            "Purchase",
+            "(?i)Purchase",
             "購入へ",
             "구매하러 이동"
         ],
@@ -245,8 +244,7 @@
         ],
         "expected": [
             "回去看看",
-            "VISIT",
-            "Visit",
+            "(?i)Visit",
             "マップで確認",
             "돌아가서 살펴보기"
         ],
@@ -267,8 +265,7 @@
         "expected": [
             "传送",
             "傳送",
-            "TELEPORT",
-            "Teleport",
+            "(?i)Teleport",
             "転送",
             "텔레포트"
         ],
@@ -310,7 +307,7 @@
         "expected": [
             "赋能总览",
             "賦能總覽",
-            "Enhancement Overview",
+            "(?i)Enhancement\\s*Overview",
             "エンパワー一覧",
             "지원 전체보기"
         ],

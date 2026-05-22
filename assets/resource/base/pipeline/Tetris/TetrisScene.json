@@ -12,8 +12,7 @@
                 ],
                 "expected": [
                     "退出",
-                    "EXIT",
-                    "Exit",
+                    "(?i)Exit",
                     "終了",
                     "나쿠펜다의 연못"
                 ]
@@ -78,7 +77,7 @@
                 "expected": [
                     "泯除方块",
                     "泯除方塊",
-                    "Tetrominoes",
+                    "(?i)Tetrominoes",
                     "排除パズル",
                     "테트로미노"
                 ]
@@ -136,7 +135,7 @@
                 "expected": [
                     "单人游戏",
                     "單人遊戲",
-                    "Solo",
+                    "(?i)Solo",
                     "シングルプレイ",
                     "싱글플레이"
                 ]
@@ -160,8 +159,9 @@
                 "expected": [
                     "多人游戏",
                     "多人遊戲",
-                    "Multiplayer",
+                    "(?i)Multi",
                     "マルチプレイ",
+                    "(?i)Multiplayer",
                     "멀티플레이 게임"
                 ]
             }
@@ -219,7 +219,7 @@
                 "expected": [
                     "开始匹配",
                     "開始匹配",
-                    "Start Matchmaking",
+                    "(?i)Start\\s*Matchmaking",
                     "マッチング開始",
                     "매칭 시작"
                 ]
@@ -257,8 +257,9 @@
                 "expected": [
                     "匹配进行中",
                     "匹配進行中",
-                    "Matchmaking",
+                    "(?i)Matchmaking\\s*…",
                     "マッチング中",
+                    "Matchmaking",
                     "매칭 중"
                 ]
             }

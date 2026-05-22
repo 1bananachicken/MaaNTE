@@ -28,7 +28,7 @@
                 "expected": [
                     "猎人等级",
                     "獵人等級",
-                    "Hunter Level",
+                    "(?i)Hunter\\s*Level",
                     "ハンターレベル",
                     "헌터 레벨"
                 ],
@@ -52,7 +52,7 @@
                 ],
                 "expected": [
                     "探索指南",
-                    "Exploration Guide",
+                    "(?i)Exploration\\s*Guide",
                     "探検ガイド",
                     "탐색 안내서"
                 ],
@@ -74,7 +74,7 @@
                 "expected": [
                     "历练奖赏",
                     "歷練獎賞",
-                    "Experience Rewards",
+                    "(?i)Experience\\s*Rewards",
                     "鍛錬の証",
                     "수련 보상"
                 ],
@@ -96,7 +96,7 @@
                 "expected": [
                     "弧盘研募",
                     "弧盤研募",
-                    "Arc Research",
+                    "(?i)Arc\\s*Research",
                     "弧盤研究プロジェクト",
                     "아크 연구 모집"
                 ],
@@ -118,8 +118,7 @@
                 "expected": [
                     "活动",
                     "活動",
-                    "EVENT",
-                    "Event",
+                    "(?i)Event",
                     "イベント",
                     "이벤트"
                 ],
@@ -140,7 +139,7 @@
                 ],
                 "expected": [
                     "背包",
-                    "Inventory",
+                    "(?i)Inventory",
                     "バッグ",
                     "가방"
                 ],
@@ -160,13 +159,24 @@
                     40
                 ],
                 "expected": [
-                    "信息",
-                    "INFO",
-                    "Info",
+                    "个人信息",
+                    "個人資訊",
+                    "(?i)Profile",
                     "情報",
+                    "信息",
+                    "資訊",
+                    "(?i)Info",
+                    "メッセージ",
                     "정보"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    165,
+                    0
+                ]
             }
         }
     },
@@ -183,7 +193,7 @@
                 ],
                 "expected": [
                     "都市大亨",
-                    "City Tycoon",
+                    "(?i)City\\s*Tycoon",
                     "シティ名声",
                     "도시 타이쿤"
                 ],

@@ -17,10 +17,11 @@
                     46
                 ],
                 "expected": [
-                    "咖舍", // "一"字可能识别不到 //zh-
-                    "The Cafe by Origen", //en
-                    "壱のコーヒー", //jp
-                    "별미 카페" //kr
+                    "一咖舍",
+                    "(?i)The\\s*Cafe\\s*by\\s*Origen",
+                    "壱のコーヒー",
+                    "咖舍",
+                    "별미 카페"
                 ]
             }
         },
@@ -40,11 +41,10 @@
                     43
                 ],
                 "expected": [
-                    "提取收益", //zh-cn
-                    "提取收益", //zh-tw
-                    "Withdraw Earnings", //en
-                    "収益受取", //jp
-                    "수익 인출" //kr
+                    "提取收益",
+                    "(?i)Withdraw\\s*Earnings",
+                    "収益受取",
+                    "수익 인출"
                 ],
                 "threshold": 0.8
             }
@@ -67,15 +67,24 @@
                 "expected": [
                     "确认",
                     "確認",
-                    "确定",
+                    "(?i)Confirm",
                     "確定",
+                    "确定",
                     "OK",
-                    "Ok",
+                    "确认记录",
+                    "確認記錄",
+                    "記録更新",
                     "CONFIRN",
-                    "Confirm",
                     "확인"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    29,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -95,11 +104,11 @@
                     22
                 ],
                 "expected": [
-                    "补货", //zh-cn
-                    "補貨", //zh-tw
-                    "Restock", //en
-                    "補充", //jp
-                    "재고 보충" //kr
+                    "补货",
+                    "補貨",
+                    "(?i)Restock",
+                    "補充",
+                    "재고 보충"
                 ],
                 "threshold": 0.8
             }
@@ -120,11 +129,12 @@
                     20
                 ],
                 "expected": [
-                    "24小时", //zh-cn
-                    "24小時", //zh-tw
-                    "24 h", //en
-                    "24時間", //jp
-                    "24시간" //kr
+                    "24小时",
+                    "24小時",
+                    "(?i)24h",
+                    "24時間",
+                    "24 h",
+                    "24시간"
                 ],
                 "threshold": 0.8
             }
@@ -147,7 +157,7 @@
                 "expected": [
                     "补货",
                     "補貨",
-                    "Restock",
+                    "(?i)Restock",
                     "補充",
                     "재고 보충"
                 ]
@@ -170,11 +180,21 @@
                     34
                 ],
                 "expected": [
+                    "库存已满无法存入更多材料",
+                    "庫存已滿無法存入更多材料",
+                    "(?i)Inventory\\s*full\\s*\\.\\s*Cannot\\s*store\\s*more\\s*materials\\s*\\.",
+                    "空きがありません",
                     "库存已满",
                     "庫存已滿",
                     "Inventory full",
-                    "空きがありません",
                     "재고가 가득 차서"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    381,
+                    0
                 ]
             }
         },
@@ -198,11 +218,22 @@
                 "expected": [
                     "送货上门",
                     "送貨上門",
-                    "Delivery",
+                    "(?i)Door\\s*-\\s*to\\s*-\\s*Door\\s*Delivery",
+                    "配達",
+                    "交付",
+                    "(?i)Delivery",
+                    "引き渡し",
                     "宅配",
                     "배송하기"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    305,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -223,15 +254,24 @@
                 "expected": [
                     "确认",
                     "確認",
-                    "确定",
+                    "(?i)Confirm",
                     "確定",
+                    "确定",
                     "OK",
-                    "Ok",
+                    "确认记录",
+                    "確認記錄",
+                    "記録更新",
                     "CONFIRN",
-                    "Confirm",
                     "확인"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    34,
+                    0
+                ]
             }
         },
         "action": "Click",

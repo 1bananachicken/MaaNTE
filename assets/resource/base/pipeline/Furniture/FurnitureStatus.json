@@ -10,7 +10,7 @@
         "expected": [
             "仓鼠球",
             "倉鼠球",
-            "Hamster Ball",
+            "(?i)Hamster\\s*Ball",
             "ハムスターボール",
             "햄스터 볼"
         ],

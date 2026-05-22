@@ -18,7 +18,7 @@
                 "expected": [
                     "强制开启",
                     "強制開啟",
-                    "Force Open",
+                    "(?i)Force\\s*Open",
                     "強制解錠",
                     "강제 오픈"
                 ],
@@ -45,8 +45,7 @@
                 "expected": [
                     "开门",
                     "開門",
-                    "OPEN",
-                    "Open",
+                    "(?i)Open",
                     "ドアを開ける",
                     "문 열기"
                 ],
@@ -66,16 +65,23 @@
             "param": {
                 "expected": [
                     "本局收益",
-                    "本局收益",
+                    "(?i)Round\\s*Earnings",
+                    "今回の収益",
                     "This Round Profit",
-                    "本局收益",
-                    "이 라운드 수익" //E
+                    "이 라운드 수익"
                 ],
                 "roi": [
                     30,
                     250,
                     100,
                     20
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    63,
+                    0
                 ]
             }
         },
@@ -90,15 +96,17 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": [ //E
+                "expected": [
                     "确认",
                     "確認",
-                    "确定",
+                    "(?i)Confirm",
                     "確定",
+                    "确定",
                     "OK",
-                    "Ok",
+                    "确认记录",
+                    "確認記錄",
+                    "記録更新",
                     "CONFIRN",
-                    "Confirm",
                     "확인"
                 ],
                 "roi": [
@@ -108,6 +116,13 @@
                     30
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    18,
+                    0
+                ]
             }
         },
         "action": {

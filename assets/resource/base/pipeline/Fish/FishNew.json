@@ -104,8 +104,11 @@
         "expected": [
             "点击空白区域关闭",
             "點擊空白區域關閉",
-            "Press empty area to close",
+            "(?i)Press\\s*empty\\s*area\\s*to\\s*close",
             "空白を押して閉じる",
+            "关闭",
+            "關閉",
+            "(?i)Close",
             "閉じる",
             "빈 곳을 터치해 닫기"
         ],
@@ -135,13 +138,23 @@
                     40
                 ],
                 "expected": [
+                    "需要装备鱼饵才可以钓鱼",
+                    "需要裝備魚餌才可以釣魚",
+                    "(?i)Equip\\s*bait\\s*before\\s*fishing\\s*\\.",
+                    "釣りをするには釣り餌を装着する必要があります",
                     "需要装备鱼饵",
                     "需要裝備魚餌",
-                    "Equip bait before fishing.",
-                    "釣り餌を装着する必要", //釣りをするには釣り餌を装着する必要があります
+                    "釣り餌を装着する必要",
                     "미끼를 장착해야 낚시할 수 있습니다"
                 ],
                 "threshold": 0.5
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    220,
+                    0
+                ]
             }
         },
         "post_delay": 2000, // 等中间文字消失
@@ -246,7 +259,7 @@
         "expected": [
             "万能鱼饵",
             "萬能魚餌",
-            "Universal Bait",
+            "(?i)Universal\\s*Bait",
             "万能釣り餌",
             "만능 미끼"
         ],
@@ -270,7 +283,7 @@
                 "expected": [
                     "购买",
                     "購買",
-                    "Purchase",
+                    "(?i)Purchase",
                     "購入",
                     "구매"
                 ],
@@ -303,7 +316,7 @@
                 "expected": [
                     "更换鱼饵",
                     "更換魚餌",
-                    "Switch Bait",
+                    "(?i)Switch\\s*Bait",
                     "釣り餌交換",
                     "미끼 교체"
                 ],
@@ -334,7 +347,7 @@
                 "expected": [
                     "购买",
                     "購買",
-                    "Purchase",
+                    "(?i)Purchase",
                     "購入",
                     "구매"
                 ],
@@ -370,7 +383,7 @@
                 "expected": [
                     "渔具商店",
                     "漁具商店",
-                    "Fishing Tackle Shop",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
                     "釣具店",
                     "낚시용품 상점"
                 ],
@@ -396,10 +409,15 @@
                 "expected": [
                     "更换",
                     "更換",
-                    "Switch",
-                    "変更",
-                    "切り替え",
+                    "(?i)Switch",
                     "入れ替え",
+                    "替换",
+                    "替換",
+                    "(?i)Swap",
+                    "変更",
+                    "切换",
+                    "切換",
+                    "切り替え",
                     "교체"
                 ]
             }
@@ -447,7 +465,7 @@
                 "expected": [
                     "渔具商店",
                     "漁具商店",
-                    "Fishing Tackle Shop",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
                     "釣具店",
                     "낚시용품 상점"
                 ],
@@ -537,7 +555,7 @@
                 "expected": [
                     "购买",
                     "購買",
-                    "Purchase",
+                    "(?i)Purchase",
                     "購入",
                     "구매"
                 ],
@@ -564,15 +582,24 @@
                 "expected": [
                     "确认",
                     "確認",
-                    "确定",
+                    "(?i)Confirm",
                     "確定",
+                    "确定",
                     "OK",
-                    "Ok",
+                    "确认记录",
+                    "確認記錄",
+                    "記録更新",
                     "CONFIRN",
-                    "Confirm",
                     "확인"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    22,
+                    0
+                ]
             }
         },
         "pre_delay": 500,
@@ -596,7 +623,7 @@
                 "expected": [
                     "渔具商店",
                     "漁具商店",
-                    "Fishing Tackle Shop",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
                     "釣具店",
                     "낚시용품 상점"
                 ],
@@ -627,8 +654,12 @@
         "expected": [
             "货币不足无法购买",
             "貨幣不足無法購買",
-            "Insufficient currency",
+            "(?i)Insufficient\\s*currency\\s*\\.",
             "通貨不足！購入できません",
+            "当前货币不足",
+            "當前貨幣不足",
+            "(?i)Insufficient\\s*Currency",
+            "通貨が足りません",
             "화폐 부족, 구매 불가"
         ],
         "focus": {
@@ -652,7 +683,7 @@
                 "expected": [
                     "渔具商店",
                     "漁具商店",
-                    "Fishing Tackle Shop",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
                     "釣具店",
                     "낚시용품 상점"
                 ],
@@ -709,7 +740,7 @@
         "expected": [
             "渔获市场",
             "漁獲市場",
-            "Fish Market",
+            "(?i)Fish\\s*Market",
             "鮮魚市場",
             "어획물 시장"
         ],
@@ -729,7 +760,7 @@
         "expected": [
             "收购",
             "收購",
-            "Sell",
+            "(?i)Sell",
             "買取",
             "매입"
         ],
@@ -750,7 +781,7 @@
         ],
         "expected": [
             "快捷提交",
-            "Quick Submit",
+            "(?i)Quick\\s*Submit",
             "クイック納品",
             "빠른 제출"
         ],
@@ -772,7 +803,7 @@
         "expected": [
             "收购",
             "收購",
-            "Sell",
+            "(?i)Sell",
             "買取",
             "매입"
         ],
@@ -793,7 +824,7 @@
         ],
         "expected": [
             "快捷提交",
-            "Quick Submit",
+            "(?i)Quick\\s*Submit",
             "クイック納品",
             "빠른 제출"
         ],
@@ -815,7 +846,7 @@
         "expected": [
             "收购",
             "收購",
-            "Sell",
+            "(?i)Sell",
             "買取",
             "매입"
         ],
@@ -836,7 +867,7 @@
         ],
         "expected": [
             "快捷提交",
-            "Quick Submit",
+            "(?i)Quick\\s*Submit",
             "クイック納品",
             "빠른 제출"
         ],
@@ -877,7 +908,7 @@
         ],
         "expected": [
             "出售",
-            "Sell",
+            "(?i)Sell",
             "売却",
             "판매"
         ],
@@ -901,15 +932,24 @@
                 "expected": [
                     "确认",
                     "確認",
-                    "确定",
+                    "(?i)Confirm",
                     "確定",
+                    "确定",
                     "OK",
-                    "Ok",
+                    "确认记录",
+                    "確認記錄",
+                    "記録更新",
                     "CONFIRN",
-                    "Confirm",
                     "확인"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    22,
+                    0
+                ]
             }
         },
         "action": "Click",
@@ -930,7 +970,7 @@
         "expected": [
             "暂未获得鱼",
             "暫未獲得魚",
-            "Fish not yet obtained",
+            "(?i)Fish\\s*not\\s*yet\\s*obtained",
             "魚を獲得していません",
             "어획물 없음"
         ],
@@ -953,7 +993,7 @@
         "expected": [
             "海上钓客",
             "海上釣客",
-            "Sea Angler",
+            "(?i)Sea\\s*Angler",
             "海釣り",
             "바다 낚시꾼"
         ],

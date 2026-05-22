@@ -73,7 +73,7 @@
         "expected": [
             "未选择",
             "未選擇",
-            "Not Selected",
+            "(?i)Not\\s*Selected",
             "未選択",
             "미선택"
         ],
@@ -103,7 +103,7 @@
         "expected": [
             "未选择",
             "未選擇",
-            "Not Selected",
+            "(?i)Not\\s*Selected",
             "未選択",
             "미선택"
         ],
@@ -150,7 +150,7 @@
                 "expected": [
                     "钓鱼准备",
                     "釣魚準備",
-                    "Fishing Preparations",
+                    "(?i)Fishing\\s*Preparations",
                     "釣り準備",
                     "낚시 준비"
                 ]
@@ -174,7 +174,7 @@
                 "expected": [
                     "开始钓鱼",
                     "開始釣魚",
-                    "Start Fishing",
+                    "(?i)Start\\s*Fishing",
                     "釣り開始",
                     "낚시 시작"
                 ]
