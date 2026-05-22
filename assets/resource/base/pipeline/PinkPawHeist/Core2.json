@@ -15,7 +15,13 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "强制开启",
+                "expected": [
+                    "强制开启",
+                    "強制開啟",
+                    "Force Open",
+                    "強制解錠",
+                    "강제 오픈"
+                ],
                 "roi": [
                     800,
                     359,
@@ -36,12 +42,13 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "开门",
-                "roi": [
-                    800,
-                    379,
-                    80,
-                    25
+                "expected": [
+                    "开门",
+                    "開門",
+                    "OPEN",
+                    "Open",
+                    "ドアを開ける",
+                    "문 열기"
                 ],
                 "threshold": 0.8
             }
@@ -57,7 +64,13 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "本局收益",
+                "expected": [
+                    "本局收益",
+                    "本局收益",
+                    "This Round Profit",
+                    "本局收益",
+                    "이 라운드 수익" //E
+                ],
                 "roi": [
                     30,
                     250,
@@ -77,7 +90,13 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "确认",
+                "expected": [ //E
+                    "确认",
+                    "確認",
+                    "Confirm",
+                    "確定",
+                    "확인"
+                ],
                 "roi": [
                     710,
                     460,

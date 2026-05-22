@@ -17,7 +17,11 @@
             71
         ],
         "expected": [
-            "房产"
+            "房产",
+            "房產",
+            "Property",
+            "不動産",
+            "부동산"
         ],
         "action": "Click",
         "next": [
@@ -95,7 +99,11 @@
             562
         ],
         "expected": [
-            "维纳公寓"
+            "维纳公寓",
+            "維納公寓",
+            "Wiener Apartments",
+            "メゾンVINA",
+            "위너 아파트"
         ],
         "action": "Click",
         "next": [
@@ -114,7 +122,11 @@
             562
         ],
         "expected": [
-            "伊登公寓"
+            "伊登公寓",
+            "伊登公寓",
+            "Eden Apartments",
+            "レジスEDEN",
+            "에덴 아파트"
         ],
         "action": "Click",
         "next": [
@@ -133,7 +145,11 @@
             562
         ],
         "expected": [
-            "天景空馆"
+            "天景空馆",
+            "天景空館",
+            "Skyview Halls",
+            "天景の館",
+            "천공의 집"
         ],
         "action": "Click",
         "next": [
@@ -152,7 +168,11 @@
             562
         ],
         "expected": [
-            "金都云邸"
+            "金都云邸",
+            "金都雲邸",
+            "Golden Capital",
+            "パレス雲都",
+            "금빛 헤리티지"
         ],
         "action": "Click",
         "next": [
@@ -171,7 +191,11 @@
             562
         ],
         "expected": [
-            "峰林别墅"
+            "峰林别墅",
+            "峰林別墅",
+            "Fenglin Villa",
+            "シルヴァ邸苑",
+            "봉우리 별장"
         ],
         "action": "Click",
         "next": [
@@ -197,7 +221,11 @@
             60
         ],
         "expected": [
-            "前往购买"
+            "前往购买",
+            "前往購買",
+            "Purchase",
+            "購入へ",
+            "구매하러 이동"
         ],
         "focus": {
             "Node.Recognition.Succeeded": "当前房产未购买，前往下一个"
@@ -216,7 +244,11 @@
             60
         ],
         "expected": [
-            "回去看看"
+            "回去看看",
+            "VISIT",
+            "Visit",
+            "マップで確認",
+            "돌아가서 살펴보기"
         ],
         "action": "Click",
         "next": [
@@ -233,7 +265,12 @@
             97
         ],
         "expected": [
-            "传送"
+            "传送",
+            "傳送",
+            "TELEPORT",
+            "Teleport",
+            "転送",
+            "텔레포트"
         ],
         "action": "Click",
         "next": [
@@ -293,7 +330,11 @@
                     49
                 ],
                 "expected": [
-                    "赋能总览"
+                    "赋能总览",
+                    "賦能總覽",
+                    "Enhancement Overview",
+                    "エンパワー一覧",
+                    "지원 전체보기"
                 ]
             }
         ],

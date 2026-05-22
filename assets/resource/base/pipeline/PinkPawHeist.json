@@ -58,7 +58,9 @@
             "param": {
                 "expected": [
                     "小吱",
-                    "小岐"
+                    "Chiz",
+                    "ちぃちゃん",
+                    "치즈"
                 ],
                 "roi": [
                     800,
@@ -130,7 +132,12 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "我要参加",
+                "expected": [
+                    "我要参加",
+                    "I'm in",
+                    "参加する",
+                    "참가하기"
+                ],
                 "roi": [
                     910,
                     325,
@@ -173,7 +180,14 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "进入",
+                "expected": [
+                    "进入",
+                    "進入",
+                    "ENTER",
+                    "Enter",
+                    "入る",
+                    "들어가기"
+                ],
                 "roi": [
                     900,
                     620,
@@ -198,7 +212,12 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "本局收益",
+                "expected": [
+                    "本局收益",
+                    "Round Earnings",
+                    "今回の収益",
+                    "본 라운드 수익"
+                ],
                 "roi": [
                     30,
                     250,

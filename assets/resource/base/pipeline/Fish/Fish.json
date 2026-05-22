@@ -1,4 +1,4 @@
-{
+{ //// $本文件OCR i18n更新未全部完成$
     "FishEntrance": {
         "desc": "钓鱼功能入口",
         "action": "DoNothing",
@@ -132,7 +132,11 @@
             40
         ],
         "expected": [
-            "万能鱼饵"
+            "万能鱼饵",
+            "萬能魚餌",
+            "Universal Bait",
+            "万能釣り餌",
+            "만능 미끼"
         ],
         "action": "ClickKey",
         "key": [
