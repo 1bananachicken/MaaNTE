@@ -96,7 +96,7 @@
         "PinkPawHeist_Scheme_Core2_desc": {
             "type": "input",
             "label": "方案二说明",
-            "description": "<span style='color:orange'>更稳定收益更高，请设置画质到性能档位，帧率设置120帧，关闭设置里的移动镜头修正！到小吱旁边启动！</span><br><span style='color:green'>配队要求：</span>1娜娜莉3早雾4狼<br><span style='color:green'>路线说明：</span>走藏品层路线撤离",
+            "description": "<span style='color:orange'>更稳定收益更高，请设置画质到性能档位，帧率设置120帧，关闭设置里的移动镜头修正！到小吱旁边启动！</span><br><span style='color:green'>配队要求：</span>1娜娜莉2女主3早雾4狼（没有娜娜莉可换埃德加）<br><span style='color:green'>路线说明：</span>走藏品层路线撤离",
             "inputs": []
         }
     }
