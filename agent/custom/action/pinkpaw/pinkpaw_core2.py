@@ -276,7 +276,10 @@ class ActionHelper:
 
             # 2. 剩余时间不足 0.4 秒时，直接一次性睡完
             if time_left <= 0.4:
-                time.sleep(min(0.05, time_left))
+                sleep_time = min(0.05, time_left)
+                if sleep_time <= 0:
+                    break
+                time.sleep(sleep_time)
                 continue
 
             # 3. 只有当 check_reward 为 True 时，才进行检测
