@@ -17,7 +17,11 @@
             71
         ],
         "expected": [
-            "房产"
+            "房产",
+            "房產",
+            "(?i)Property",
+            "不動産",
+            "부동산"
         ],
         "action": "Click",
         "next": [
@@ -95,7 +99,11 @@
             562
         ],
         "expected": [
-            "维纳公寓"
+            "维纳公寓",
+            "維納公寓",
+            "(?i)Wiener\\s*Apartments",
+            "メゾンVINA",
+            "위너 아파트"
         ],
         "action": "Click",
         "next": [
@@ -114,7 +122,10 @@
             562
         ],
         "expected": [
-            "伊登公寓"
+            "伊登公寓",
+            "(?i)Eden\\s*Apartments",
+            "レジスEDEN",
+            "에덴 아파트"
         ],
         "action": "Click",
         "next": [
@@ -133,7 +144,11 @@
             562
         ],
         "expected": [
-            "天景空馆"
+            "天景空馆",
+            "天景空館",
+            "(?i)Skyview\\s*Halls",
+            "天景の館",
+            "천공의 집"
         ],
         "action": "Click",
         "next": [
@@ -152,7 +167,11 @@
             562
         ],
         "expected": [
-            "金都云邸"
+            "金都云邸",
+            "金都雲邸",
+            "(?i)Golden\\s*Capital",
+            "パレス雲都",
+            "금빛 헤리티지"
         ],
         "action": "Click",
         "next": [
@@ -171,7 +190,11 @@
             562
         ],
         "expected": [
-            "峰林别墅"
+            "峰林别墅",
+            "峰林別墅",
+            "(?i)Fenglin\\s*Villa",
+            "シルヴァ邸苑",
+            "봉우리 별장"
         ],
         "action": "Click",
         "next": [
@@ -197,7 +220,11 @@
             60
         ],
         "expected": [
-            "前往购买"
+            "前往购买",
+            "前往購買",
+            "(?i)Purchase",
+            "購入へ",
+            "구매하러 이동"
         ],
         "focus": {
             "Node.Recognition.Succeeded": "当前房产未购买，前往下一个"
@@ -216,7 +243,10 @@
             60
         ],
         "expected": [
-            "回去看看"
+            "回去看看",
+            "(?i)Visit",
+            "マップで確認",
+            "돌아가서 살펴보기"
         ],
         "action": "Click",
         "next": [
@@ -233,7 +263,11 @@
             97
         ],
         "expected": [
-            "传送"
+            "传送",
+            "傳送",
+            "(?i)Teleport",
+            "転送",
+            "텔레포트"
         ],
         "action": "Click",
         "next": [
@@ -271,7 +305,11 @@
             49
         ],
         "expected": [
-            "赋能总览"
+            "赋能总览",
+            "賦能總覽",
+            "(?i)Enhancement\\s*Overview",
+            "エンパワー一覧",
+            "지원 전체보기"
         ],
         "pre_delay": 1000,
         "action": "Click",
@@ -293,7 +331,11 @@
                     49
                 ],
                 "expected": [
-                    "赋能总览"
+                    "赋能总览",
+                    "賦能總覽",
+                    "Enhancement Overview",
+                    "エンパワー一覧",
+                    "지원 전체보기"
                 ]
             }
         ],
