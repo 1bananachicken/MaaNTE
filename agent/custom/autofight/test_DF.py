@@ -22,21 +22,21 @@ class DF_Action(CustomRecognition):
         logger.debug(f'正在运行节点{argv.node_name}')
         target_instance = custom_recognition_param.get("target_instance")
         repeat_instance = custom_recognition_param.get("repeat_instance")
-
-        if target_instance is None:
-            logger.error(f'未选择刷取目标')
-            return CustomRecognition.AnalyzeResult(box=(0, 0, 100, 100),detail="Finish")
-        if repeat_instance is None:
-            repeat_instance = 1
+        print(1)
+        # if target_instance is None:
+        #     logger.error(f'未选择刷取目标')
+        #     return CustomRecognition.AnalyzeResult(box=(0, 0, 100, 100),detail="Finish")
+        # if repeat_instance is None:
+        #     repeat_instance = 1
         ppover = {
 
-            "DF_Action_clean": {
-                "recognition": {
-                    "param": {
-                        "custom_recognition_param": {"clean_node_name":"DF_Action_Repeat","target_number":repeat_instance}
-                    }
-                }
-            },
+            # "DF_TargetNumber_clean": {
+            #     "recognition": {
+            #         "param": {
+            #             "custom_recognition_param": {"clean_node_name":"DF_TargetNumber","target_number":repeat_instance}
+            #         }
+            #     }
+            # },
 
 
             "DF_Action_2_2": {
@@ -44,13 +44,13 @@ class DF_Action(CustomRecognition):
             },
 
 
-            "AF_ChooseNormalInstance": {
-                "recognition": {
-                    "param": {
-                        "custom_recognition_param": {"target_instance": target_instance, "repeat_time": repeat_instance}
-                    }
-                }
-            },
+            # "AF_ChooseNormalInstance": {
+            #     "recognition": {
+            #         "param": {
+            #             "custom_recognition_param": {"target_instance": target_instance}
+            #         }
+            #     }
+            # },
             "AF_GetInInstance_3_1": {
                 "next": ["AF_ChooseNormalInstance"]
             },

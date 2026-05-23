@@ -21,7 +21,6 @@ class AF_ChooseNormalInstance(CustomRecognition):
         logger.debug("##########_##########_##########")
         logger.debug(f'正在运行节点{argv.node_name}')
         target_instance = custom_recognition_param.get("target_instance")
-        repeat_time = custom_recognition_param.get("repeat_time")
         normal_dict = {
             "合订本": ["经验及甲硬币", 0],
             "万花筒": ["经验及甲硬币", 1],

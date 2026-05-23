@@ -3,94 +3,16 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1779451105708,
+            "lastSyncTime": 1779545820810,
             "isModifiedExternally": false,
             "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\MaaNTE\\assets\\resource\\base\\pipeline\\AutoFight\\AutoFight.json",
             "savedViewport": {
-                "x": -1276,
-                "y": -31,
-                "zoom": 0.4
+                "x": -3032,
+                "y": -500,
+                "zoom": 0.46
             },
             "filename": "AutoFight",
             "version": "v1.5.3"
-        }
-    },
-    "DF_Action": {
-        "recognition": {
-            "type": "Custom",
-            "param": {
-                "custom_recognition": "DF_Action",
-                "custom_recognition_param": {}
-            }
-        },
-        "next": [
-            "DF_Action_clean"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 5360,
-                "y": 569
-            }
-        }
-    },
-    "DF_Action_2_2": {
-        "$__mpe_code": {
-            "position": {
-                "x": 6015,
-                "y": 866
-            }
-        }
-    },
-    "DF_Action_clean": {
-        "recognition": {
-            "type": "Custom",
-            "param": {
-                "custom_recognition": "UF_CountClean",
-                "custom_recognition_param": {
-                    "clean_node_name": "DF_Action_Repeat",
-                    "target_number": 1
-                }
-            }
-        },
-        "next": [
-            "DF_Action_Repeat",
-            "[JumpBack]DF_Action_2_2"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 5631,
-                "y": 567
-            }
-        }
-    },
-    "DF_Action_Repeat": {
-        "recognition": {
-            "type": "Custom",
-            "param": {
-                "custom_recognition": "UF_Count",
-                "custom_recognition_param": {
-                    "current_number": 0,
-                    "target_number": 1
-                }
-            }
-        },
-        "pre_wait_freezes": 0,
-        "pre_delay": 0,
-        "post_wait_freezes": 0,
-        "post_delay": 0,
-        "$__mpe_code": {
-            "position": {
-                "x": 6023,
-                "y": 494
-            }
-        }
-    },
-    "AF_GetInInstanceMove_13_2": {
-        "$__mpe_code": {
-            "position": {
-                "x": 5846,
-                "y": 1054
-            }
         }
     },
     "AF_Action_AutoFightSimple": {
@@ -110,8 +32,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 2172,
-                "y": 1416
+                "x": 3372,
+                "y": 855
             }
         }
     },
@@ -132,8 +54,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 12,
-                "y": 3140
+                "x": 7052,
+                "y": 2579
             }
         }
     },
@@ -155,8 +77,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 3852,
-                "y": 123
+                "x": 972,
+                "y": 2104
             }
         }
     },
@@ -170,10 +92,13 @@
                 }
             }
         },
+        "next": [
+            "AF_Action_FindBox"
+        ],
         "$__mpe_code": {
             "position": {
-                "x": 1212,
-                "y": 12
+                "x": 6732,
+                "y": 2577
             }
         }
     },
@@ -189,7 +114,7 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 1452,
+                "x": 972,
                 "y": 12
             }
         }
@@ -212,8 +137,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 2492,
-                "y": 1421
+                "x": 3692,
+                "y": 860
             }
         }
     },
@@ -234,8 +159,8 @@
         "post_delay": 0,
         "$__mpe_code": {
             "position": {
-                "x": 2812,
-                "y": 1005
+                "x": 4012,
+                "y": 444
             }
         }
     },
@@ -257,8 +182,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 12,
-                "y": 3840
+                "x": 2252,
+                "y": 2430
             }
         }
     },
@@ -295,8 +220,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 332,
-                "y": 3749
+                "x": 2572,
+                "y": 2560
             }
         }
     },
@@ -312,7 +237,7 @@
                     44
                 ],
                 "expected": [
-                    "弧盘突破材料"
+                    ""
                 ]
             }
         },
@@ -324,8 +249,33 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 332,
-                "y": 4132
+                "x": 2572,
+                "y": 2206
+            }
+        }
+    },
+    "AF_ChooseNormalInstance_2_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1055,
+                    617,
+                    82,
+                    44
+                ],
+                "expected": [
+                    "传送"
+                ]
+            }
+        },
+        "next": [
+            "AF_GetInInstanceMove"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2892,
+                "y": 2670
             }
         }
     },
@@ -349,8 +299,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 652,
-                "y": 4022
+                "x": 2892,
+                "y": 2403
             }
         }
     },
@@ -382,7 +332,7 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 2412,
+                "x": 1932,
                 "y": 12
             }
         }
@@ -397,8 +347,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 2812,
-                "y": 1420
+                "x": 4012,
+                "y": 859
             }
         }
     },
@@ -416,8 +366,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 3132,
-                "y": 1481
+                "x": 4332,
+                "y": 920
             }
         }
     },
@@ -435,8 +385,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 3452,
-                "y": 1481
+                "x": 4652,
+                "y": 920
             }
         }
     },
@@ -451,8 +401,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 3772,
-                "y": 1451
+                "x": 4972,
+                "y": 890
             }
         }
     },
@@ -465,8 +415,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 4092,
-                "y": 1480
+                "x": 5292,
+                "y": 919
             }
         }
     },
@@ -490,8 +440,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 652,
-                "y": 2467
+                "x": 7692,
+                "y": 1871
             }
         }
     },
@@ -512,154 +462,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 332,
-                "y": 3138
-            }
-        }
-    },
-    "AF_FindBox_3_2": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    592,
-                    25,
-                    92,
-                    111
-                ],
-                "template": [
-                    "AF_image/宝箱检测.png"
-                ],
-                "green_mask": true,
-                "threshold": [
-                    0.5
-                ]
-            }
-        },
-        "action": {
-            "type": "Custom",
-            "param": {
-                "custom_action": "UF_ActionLogger",
-                "custom_action_param": {
-                    "debug": [
-                        "找到宝箱"
-                    ]
-                }
-            }
-        },
-        "next": [
-            "AF_FindBox_4_2"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 1292,
-                "y": 2098
-            }
-        }
-    },
-    "AF_FindBox_3_3": {
-        "recognition": {
-            "type": "Custom",
-            "param": {
-                "custom_recognition": "UF_Count",
-                "custom_recognition_param": {
-                    "current_number": 0,
-                    "target_number": 50
-                }
-            }
-        },
-        "pre_wait_freezes": 0,
-        "pre_delay": 0,
-        "post_wait_freezes": 0,
-        "post_delay": 0,
-        "next": [
-            "AF_FindBox_3_2_finish"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 1292,
-                "y": 1697
-            }
-        }
-    },
-    "AF_FindBox_3_2_clean": {
-        "recognition": {
-            "type": "Custom",
-            "param": {
-                "custom_recognition": "UF_CountClean",
-                "custom_recognition_param": {
-                    "clean_node_name": "AF_FindBox_3_2",
-                    "target_number": 50
-                }
-            }
-        },
-        "next": [
-            "AF_FindBox_3_1",
-            "[JumpBack]AF_FindBox_3_2",
-            "AF_FindBox_3_3",
-            "[JumpBack]AF_FindBox_3_4"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 972,
-                "y": 2543
-            }
-        }
-    },
-    "AF_FindBox_3_2_finish": {
-        "action": {
-            "type": "Custom",
-            "param": {
-                "custom_action": "UF_ActionLogger",
-                "custom_action_param": {
-                    "error": [
-                        "无法找到宝箱"
-                    ]
-                }
-            }
-        },
-        "$__mpe_code": {
-            "position": {
-                "x": 1612,
-                "y": 1775
-            }
-        }
-    },
-    "AF_FindBox_3_4": {
-        "pre_wait_freezes": 0,
-        "pre_delay": 10,
-        "action": {
-            "type": "Swipe",
-            "param": {
-                "begin": [
-                    640,
-                    320,
-                    1,
-                    1
-                ],
-                "end": [
-                    [
-                        740,
-                        420,
-                        1,
-                        1
-                    ]
-                ],
-                "only_hover": true,
-                "duration": [
-                    10
-                ]
-            }
-        },
-        "post_wait_freezes": 0,
-        "post_delay": 10,
-        "next": [
-            "AF_MoveScane_2_1"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 1292,
-                "y": 2857
+                "x": 7372,
+                "y": 2577
             }
         }
     },
@@ -692,8 +496,154 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1292,
-                "y": 2512
+                "x": 8332,
+                "y": 1537
+            }
+        }
+    },
+    "AF_FindBox_3_2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    540,
+                    30,
+                    190,
+                    111
+                ],
+                "template": [
+                    "AF_image/宝箱检测.png"
+                ],
+                "green_mask": true,
+                "threshold": [
+                    0.5
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "找到宝箱"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_FindBox_4_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 8332,
+                "y": 1882
+            }
+        }
+    },
+    "AF_FindBox_3_2_clean": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_CountClean",
+                "custom_recognition_param": {
+                    "clean_node_name": "AF_FindBox_3_2",
+                    "target_number": 100
+                }
+            }
+        },
+        "next": [
+            "AF_FindBox_3_1",
+            "[JumpBack]AF_FindBox_3_2",
+            "AF_FindBox_3_3",
+            "[JumpBack]AF_FindBox_3_4"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 8012,
+                "y": 1947
+            }
+        }
+    },
+    "AF_FindBox_3_2_finish": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "error": [
+                        "无法找到宝箱"
+                    ]
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 8652,
+                "y": 1214
+            }
+        }
+    },
+    "AF_FindBox_3_3": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_Count",
+                "custom_recognition_param": {
+                    "current_number": 0,
+                    "target_number": 50
+                }
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "next": [
+            "AF_FindBox_3_2_finish"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 8332,
+                "y": 1136
+            }
+        }
+    },
+    "AF_FindBox_3_4": {
+        "pre_wait_freezes": 0,
+        "pre_delay": 10,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    640,
+                    320,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        790,
+                        420,
+                        1,
+                        1
+                    ]
+                ],
+                "only_hover": true,
+                "duration": [
+                    10
+                ]
+            }
+        },
+        "post_wait_freezes": 0,
+        "post_delay": 10,
+        "next": [
+            "AF_MoveScane_2_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 8332,
+                "y": 2296
             }
         }
     },
@@ -707,8 +657,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 1612,
-                "y": 2181
+                "x": 8652,
+                "y": 1965
             }
         }
     },
@@ -735,8 +685,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 972,
-                "y": 3756
+                "x": 3212,
+                "y": 2668
             }
         }
     },
@@ -755,10 +705,89 @@
                 ]
             }
         },
+        "next": [
+            "AF_Move_W"
+        ],
         "$__mpe_code": {
             "position": {
-                "x": 3852,
-                "y": 3463
+                "x": 6092,
+                "y": 2570
+            }
+        }
+    },
+    "AF_GetInInstanceMove_10_2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    554,
+                    230,
+                    174,
+                    48
+                ],
+                "expected": [
+                    "体力不足"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    494,
+                    456,
+                    57,
+                    24
+                ]
+            }
+        },
+        "next": [
+            "AF_GetInInstanceMove_11_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6092,
+                "y": 2275
+            }
+        }
+    },
+    "AF_GetInInstanceMove_11_1": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "repeat": 3,
+        "next": [
+            "AF_GetInInstanceMove_12_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6412,
+                "y": 2279
+            }
+        }
+    },
+    "AF_GetInInstanceMove_12_1": {
+        "next": [
+            "DF_TargetNumber",
+            "[JumpBack]AF_GetInInstanceMove_13_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 6732,
+                "y": 2323
+            }
+        }
+    },
+    "AF_GetInInstanceMove_13_2": {
+        "$__mpe_code": {
+            "position": {
+                "x": 7052,
+                "y": 2379
             }
         }
     },
@@ -780,8 +809,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1292,
-                "y": 3730
+                "x": 3532,
+                "y": 2642
             }
         }
     },
@@ -817,8 +846,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1612,
-                "y": 3728
+                "x": 3852,
+                "y": 2640
             }
         }
     },
@@ -853,8 +882,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1932,
-                "y": 4271
+                "x": 4172,
+                "y": 2096
             }
         }
     },
@@ -892,8 +921,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1932,
-                "y": 3656
+                "x": 4172,
+                "y": 2650
             }
         }
     },
@@ -906,8 +935,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 1932,
-                "y": 4041
+                "x": 4172,
+                "y": 2420
             }
         }
     },
@@ -923,8 +952,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 2252,
-                "y": 3759
+                "x": 4492,
+                "y": 2370
             }
         }
     },
@@ -942,8 +971,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 2572,
-                "y": 3759
+                "x": 4812,
+                "y": 2370
             }
         }
     },
@@ -965,8 +994,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 2892,
-                "y": 3744
+                "x": 5132,
+                "y": 2355
             }
         }
     },
@@ -1001,8 +1030,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 3212,
-                "y": 3682
+                "x": 5452,
+                "y": 2293
             }
         }
     },
@@ -1021,8 +1050,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 3212,
-                "y": 4006
+                "x": 5452,
+                "y": 2617
             }
         }
     },
@@ -1050,8 +1079,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 3532,
-                "y": 3710
+                "x": 5772,
+                "y": 2321
             }
         }
     },
@@ -1076,8 +1105,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 4172,
-                "y": 98
+                "x": 1292,
+                "y": 2311
             }
         }
     },
@@ -1092,8 +1121,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 4172,
-                "y": 348
+                "x": 1292,
+                "y": 2096
             }
         }
     },
@@ -1118,8 +1147,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 4492,
-                "y": 70
+                "x": 1612,
+                "y": 2409
             }
         }
     },
@@ -1152,8 +1181,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 4492,
-                "y": 320
+                "x": 1612,
+                "y": 2096
             }
         }
     },
@@ -1183,10 +1212,13 @@
                 }
             }
         },
+        "next": [
+            "AF_ChooseNormalInstance"
+        ],
         "$__mpe_code": {
             "position": {
-                "x": 4812,
-                "y": 12
+                "x": 1932,
+                "y": 2407
             }
         }
     },
@@ -1218,8 +1250,256 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 4812,
-                "y": 322
+                "x": 1932,
+                "y": 2126
+            }
+        }
+    },
+    "AF_GetReward_1_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/14.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    836,
+                    467,
+                    1,
+                    1
+                ]
+            }
+        },
+        "next": [
+            "AF_GetReward_2_1",
+            "AF_GetReward_2_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 8652,
+                "y": 1572
+            }
+        }
+    },
+    "AF_GetReward_2_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/15.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "key": 27
+            }
+        },
+        "next": [
+            "AF_GetReward_3_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 8972,
+                "y": 1541
+            }
+        }
+    },
+    "AF_GetReward_2_2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/16.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    439,
+                    618,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 8972,
+                "y": 1813
+            }
+        }
+    },
+    "AF_GetReward_3_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/13.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    531,
+                    466,
+                    2,
+                    1
+                ]
+            }
+        },
+        "next": [
+            "AF_GetReward_4_1",
+            "AF_GetReward_4_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 9292,
+                "y": 1539
+            }
+        }
+    },
+    "AF_GetReward_4_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/15.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "key": 27
+            }
+        },
+        "next": [
+            "AF_GetReward_5_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 9612,
+                "y": 1508
+            }
+        }
+    },
+    "AF_GetReward_4_2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/16.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    439,
+                    618,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 9612,
+                "y": 1780
+            }
+        }
+    },
+    "AF_GetReward_5_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/9.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    1075,
+                    251,
+                    1,
+                    1
+                ]
+            }
+        },
+        "next": [
+            "AF_GetReward_6_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 9932,
+                "y": 1505
+            }
+        }
+    },
+    "AF_GetReward_6_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/8.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                "key": 27
+            }
+        },
+        "next": [
+            "AF_GetReward_7_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 10252,
+                "y": 1503
+            }
+        }
+    },
+    "AF_GetReward_7_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "dg/7.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    775,
+                    471,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 10572,
+                "y": 1498
             }
         }
     },
@@ -1256,8 +1536,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 972,
-                "y": 3059
+                "x": 8012,
+                "y": 2498
             }
         }
     },
@@ -1279,8 +1559,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1612,
-                "y": 3058
+                "x": 8652,
+                "y": 2497
             }
         }
     },
@@ -1288,14 +1568,17 @@
         "action": {
             "type": "LongPressKey",
             "param": {
-                "duration": 3000,
+                "duration": 4500,
                 "key": 87
             }
         },
+        "next": [
+            "AF_AutoFightCls"
+        ],
         "$__mpe_code": {
             "position": {
-                "x": 972,
-                "y": 12
+                "x": 6412,
+                "y": 2578
             }
         }
     },
@@ -1321,8 +1604,75 @@
         "post_delay": 0,
         "$__mpe_code": {
             "position": {
-                "x": 2812,
-                "y": 573
+                "x": 4012,
+                "y": 12
+            }
+        }
+    },
+    "DF_Action": {
+        "desc": "日常刷本功能入口",
+        "next": [
+            "DF_TargetNumber_clean"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 2003
+            }
+        }
+    },
+    "DF_Action_2_2": {
+        "next": [
+            "AF_Action_GetInInstance"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 652,
+                "y": 2141
+            }
+        }
+    },
+    "DF_TargetNumber": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_Count",
+                "custom_recognition_param": {
+                    "current_number": 0,
+                    "target_number": 1
+                }
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "$__mpe_code": {
+            "position": {
+                "x": 7052,
+                "y": 1978
+            }
+        }
+    },
+    "DF_TargetNumber_clean": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_CountClean",
+                "custom_recognition_param": {
+                    "clean_node_name": "DF_TargetNumber",
+                    "target_number": 1
+                }
+            }
+        },
+        "next": [
+            "DF_TargetNumber",
+            "[JumpBack]DF_Action_2_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 2024
             }
         }
     },
@@ -1368,7 +1718,7 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 2172,
+                "x": 1692,
                 "y": 12
             }
         }
@@ -1409,89 +1759,6 @@
             }
         }
     },
-    "AF_GetReward_1_1": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "dg/14.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "target": [
-                    836,
-                    467,
-                    1,
-                    1
-                ]
-            }
-        },
-        "next": [
-            "AF_GetReward_2_1",
-            "AF_GetReward_2_2"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 12,
-                "y": 870
-            }
-        }
-    },
-    "AF_GetReward_2_1": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "dg/15.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "LongPressKey",
-            "param": {
-                "key": 27
-            }
-        },
-        "next": [
-            "AF_GetReward_3_1"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 332,
-                "y": 839
-            }
-        }
-    },
-    "AF_GetReward_2_2": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "dg/16.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "target": [
-                    439,
-                    618,
-                    1,
-                    1
-                ]
-            }
-        },
-        "$__mpe_code": {
-            "position": {
-                "x": 332,
-                "y": 1111
-            }
-        }
-    },
     "新建节点1": {
         "recognition": {
             "type": "TemplateMatch",
@@ -1513,44 +1780,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 2652,
+                "x": 2172,
                 "y": 12
-            }
-        }
-    },
-    "AF_GetInInstanceMove_10_2": {
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    554,
-                    230,
-                    174,
-                    48
-                ],
-                "expected": [
-                    "体力不足"
-                ]
-            }
-        },
-        "action": {
-            "type": "Click",
-            "param": {
-                "target": [
-                    494,
-                    456,
-                    57,
-                    24
-                ]
-            }
-        },
-        "next": [
-            "AF_GetInInstanceMove_11_1"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 3852,
-                "y": 3727
             }
         }
     },
@@ -1579,7 +1810,7 @@
         "post_delay": 0,
         "$__mpe_code": {
             "position": {
-                "x": 3132,
+                "x": 2652,
                 "y": 12
             }
         }
@@ -1614,7 +1845,7 @@
         "post_delay": 0,
         "$__mpe_code": {
             "position": {
-                "x": 3372,
+                "x": 2892,
                 "y": 12
             }
         }
@@ -1646,28 +1877,8 @@
         "post_delay": 10,
         "$__mpe_code": {
             "position": {
-                "x": 1932,
-                "y": 3089
-            }
-        }
-    },
-    "AF_GetInInstanceMove_11_1": {
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": [
-                    27
-                ]
-            }
-        },
-        "repeat": 3,
-        "next": [
-            "AF_GetInInstanceMove_12_1"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 4172,
-                "y": 3731
+                "x": 8972,
+                "y": 2528
             }
         }
     },
@@ -1693,7 +1904,7 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 1932,
+                "x": 1452,
                 "y": 12
             }
         }
@@ -1718,39 +1929,8 @@
         "post_delay": 0,
         "$__mpe_code": {
             "position": {
-                "x": 2892,
+                "x": 2412,
                 "y": 12
-            }
-        }
-    },
-    "AF_GetReward_3_1": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "dg/13.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "target": [
-                    531,
-                    466,
-                    2,
-                    1
-                ]
-            }
-        },
-        "next": [
-            "AF_GetReward_4_1",
-            "AF_GetReward_4_2"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 652,
-                "y": 837
             }
         }
     },
@@ -1788,7 +1968,7 @@
         "post_delay": 0,
         "$__mpe_code": {
             "position": {
-                "x": 3612,
+                "x": 3132,
                 "y": 12
             }
         }
@@ -1815,179 +1995,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 1692,
+                "x": 1212,
                 "y": 12
-            }
-        }
-    },
-    "AF_GetReward_5_1": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "dg/9.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "target": [
-                    1075,
-                    251,
-                    1,
-                    1
-                ]
-            }
-        },
-        "next": [
-            "AF_GetReward_6_1"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 1292,
-                "y": 869
-            }
-        }
-    },
-    "AF_GetReward_6_1": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "dg/8.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "LongPressKey",
-            "param": {
-                "key": 27
-            }
-        },
-        "next": [
-            "AF_GetReward_7_1"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 1612,
-                "y": 867
-            }
-        }
-    },
-    "AF_GetReward_7_1": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "dg/7.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "target": [
-                    775,
-                    471,
-                    1,
-                    1
-                ]
-            }
-        },
-        "$__mpe_code": {
-            "position": {
-                "x": 1932,
-                "y": 862
-            }
-        }
-    },
-    "AF_GetReward_4_1": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "dg/15.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "LongPressKey",
-            "param": {
-                "key": 27
-            }
-        },
-        "next": [
-            "AF_GetReward_5_1"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 972,
-                "y": 872
-            }
-        }
-    },
-    "AF_GetReward_4_2": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "dg/16.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "LongPress",
-            "param": {
-                "target": [
-                    439,
-                    618,
-                    1,
-                    1
-                ]
-            }
-        },
-        "$__mpe_code": {
-            "position": {
-                "x": 972,
-                "y": 573
-            }
-        }
-    },
-    "AF_GetInInstanceMove_12_1": {
-        "next": [
-            "DF_Action_Repeat",
-            "[JumpBack]AF_GetInInstanceMove_13_2"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 5474,
-                "y": 966
-            }
-        }
-    },
-    "AF_ChooseNormalInstance_2_1": {
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    1055,
-                    617,
-                    82,
-                    44
-                ],
-                "expected": [
-                    "传送"
-                ]
-            }
-        },
-        "next": [
-            "AF_GetInInstanceMove"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 652,
-                "y": 3758
             }
         }
     }
