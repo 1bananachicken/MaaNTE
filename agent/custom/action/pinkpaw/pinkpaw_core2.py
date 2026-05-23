@@ -650,7 +650,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_up("W")
             ah.delay(100)
             ah.key_down("A")
-            ah.delay(6200)
+            ah.delay(6120)
             ah.key_up("A")
             ah.delay(100)
             # 偷左边展柜藏品
@@ -831,7 +831,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.delay(100)
 
             ah.key_down("S")
-            for _ in range(13):
+            for _ in range(12):
                 ah.click_key("F")
                 ah.delay(200)
             ah.key_up("S")
