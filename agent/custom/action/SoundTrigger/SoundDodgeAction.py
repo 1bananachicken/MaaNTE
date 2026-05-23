@@ -98,14 +98,14 @@ class SoundDodgeAction(CustomAction):
                     f"Invalid custom_action_param: {argv.custom_action_param!r}, error: {e}. Using defaults."
                 )
 
-        context = Ctx()
+        ctx = Ctx()
         try:
-            context.setup(
+            ctx.setup(
                 context.tasker.controller,
                 threshold=threshold,
                 counter_threshold=counter_threshold,
             )
-            if not context.enter():
+            if not ctx.enter():
                 return CustomAction.RunResult(success=False)
 
             PrintT(context, "sound_dodge.monitoring")
@@ -118,5 +118,5 @@ class SoundDodgeAction(CustomAction):
             logger.error("Error: %s", e)
             return CustomAction.RunResult(success=False)
         finally:
-            context.exit()
+            ctx.exit()
             PrintT(context, "sound_dodge.done")
