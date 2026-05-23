@@ -24,13 +24,22 @@ VK = {
     "Esc": 0x1B,
 }
 
+REWARD_OCR_DELAY_MS = 3000
+POST_REWARD_DELAY_MS = 7000
+
 
 class StopActionException(Exception):
     pass
 
 
+class TaskerStoppedException(Exception):
+    pass
+
+
 def _is_hit(result) -> bool:
     """检查识别节点是否命中（状态 == 成功 0）"""
+    if result is None:
+        return False
     if result.status.succeeded is False:
         return False
     return True
@@ -43,8 +52,53 @@ class ActionHelper:
         self.last_check_time = 0  # 增加记录上次检测时间的变量
         self.fail_count = 0
 
+    def is_stopping(self) -> bool:
+        tasker = getattr(self.ctx, "tasker", None)
+        if tasker is None:
+            return False
+        stopping = getattr(tasker, "stopping", False)
+        if callable(stopping):
+            stopping = stopping()
+        return bool(stopping)
+
+    def raise_if_stopped(self):
+        if self.is_stopping():
+            raise TaskerStoppedException(
+                "PinkPawHeistScheme2Action stopped by Maa tasker."
+            )
+
+    def release_controls(self):
+        controller = getattr(getattr(self.ctx, "tasker", None), "controller", None)
+        if controller is None:
+            return
+
+        for key in ("W", "A", "S", "D", "E", "Space"):
+            vk = VK.get(key)
+            if vk is None:
+                continue
+            try:
+                controller.post_key_up(vk).wait()
+            except Exception as exc:
+                print(f"[PinkPawHeist] failed to release {key}: {exc}")
+
+        try:
+            controller.post_key_up(2).wait()
+        except Exception as exc:
+            print(f"[PinkPawHeist] failed to release right mouse button: {exc}")
+
+    def run_task(self, task_name, pipeline_override=None):
+        self.raise_if_stopped()
+        if pipeline_override is None:
+            result = self.ctx.run_task(task_name)
+        else:
+            result = self.ctx.run_task(task_name, pipeline_override=pipeline_override)
+        self.raise_if_stopped()
+        return result
+
     # ---------- 按键类操作 ----------
     def _call_key(self, node_type, key_str, extra=None):
+        if node_type != "KeyUp":
+            self.raise_if_stopped()
         vk = VK.get(key_str)
         if vk is None:
             return False
@@ -53,7 +107,10 @@ class ActionHelper:
             param.update(extra)
         node_name = f"PinkPawHeist_{node_type}"
         override = {node_name: {"action": {"type": node_type, "param": param}}}
-        return self.ctx.run_task(node_name, pipeline_override=override) is not None
+        ret = self.ctx.run_task(node_name, pipeline_override=override) is not None
+        if node_type != "KeyUp":
+            self.raise_if_stopped()
+        return ret
 
     def click_key(self, key_str):
         return self._call_key("ClickKey", key_str)
@@ -66,6 +123,7 @@ class ActionHelper:
 
     # ---------- 鼠标操作 ----------
     def move_to(self, x, y, duration_ms=None):
+        self.raise_if_stopped()
         dx, dy = x - self.mx, y - self.my
         if dx * dx + dy * dy < 4:
             self.mx, self.my = x, y
@@ -86,21 +144,25 @@ class ActionHelper:
             }
         }
         ret = self.ctx.run_task("PinkPawHeist_MouseMove", pipeline_override=override)
+        self.raise_if_stopped()
         if ret:
             self.mx, self.my = x, y
         return ret
 
     def click(self, x, y):
+        self.raise_if_stopped()
         self.move_to(x, y)
         override = {
             "PinkPawHeist_Click": {
                 "action": {"type": "Click", "param": {"target": [x, y]}}
             }
         }
-        return (
+        ret = (
             self.ctx.run_task("PinkPawHeist_Click", pipeline_override=override)
             is not None
         )
+        self.raise_if_stopped()
+        return ret
 
     # ---------- 等待检测（铁门、撤离点） ----------
     def _check_until(self, node_name, timeout_ms):
@@ -108,6 +170,7 @@ class ActionHelper:
 
         start = time.monotonic()
         while time.monotonic() - start < timeout_ms / 1000.0:
+            self.raise_if_stopped()
             if _is_hit(self.ctx.run_task(f"PinkPawHeist_{node_name}")):
                 return True
             self.delay(200)
@@ -129,10 +192,13 @@ class ActionHelper:
 
     def check_monster(self) -> bool:
         """检测当前帧是否有敌方（使用 run_recognition）"""
+        self.raise_if_stopped()
         # 获取当前截图
         image = self.ctx.tasker.controller.post_screencap().wait().get()
+        self.raise_if_stopped()
         # 运行识别节点（只做识别，不执行动作）
         result = self.ctx.run_recognition("PinkPawHeist_CheckMonsterOnce", image)
+        self.raise_if_stopped()
         # 判断是否命中（颜色区域存在）
         return result is not None and result.hit
 
@@ -142,6 +208,7 @@ class ActionHelper:
 
         start = time.monotonic()
         while time.monotonic() - start < timeout / 1000.0:
+            self.raise_if_stopped()
             if self.check_monster():
                 return True
             self.delay(200)
@@ -150,7 +217,9 @@ class ActionHelper:
     def attack_cycle(self, times=3, loot=False):
         """执行一轮攻击（Space + 鼠标点击）"""
         for _ in range(times):
+            self.raise_if_stopped()
             self.ctx.run_task("PinkPawHeist_Core1_Attack_Space")
+            self.raise_if_stopped()
         if loot:
             self.click_key("F")
 
@@ -171,6 +240,7 @@ class ActionHelper:
 
         no_monster_start = None
         while True:
+            self.raise_if_stopped()
             if self.check_monster():
                 no_monster_start = None
                 self.attack_cycle(times=attack_cycles, loot=loot)
@@ -184,6 +254,7 @@ class ActionHelper:
 
         if role_to_switch_back:
             for _ in range(3):
+                self.raise_if_stopped()
                 self.click_key(role_to_switch_back)
                 self.delay(200)
         return True
@@ -195,6 +266,7 @@ class ActionHelper:
         end_time = start + (ms / 1000.0)
 
         while True:
+            self.raise_if_stopped()
             now = time.monotonic()
             time_left = end_time - now
 
@@ -204,8 +276,8 @@ class ActionHelper:
 
             # 2. 剩余时间不足 0.4 秒时，直接一次性睡完
             if time_left <= 0.4:
-                time.sleep(time_left)
-                break
+                time.sleep(min(0.05, time_left))
+                continue
 
             # 3. 只有当 check_reward 为 True 时，才进行检测
             if check_reward and (now - self.last_check_time > 2.0):
@@ -215,6 +287,7 @@ class ActionHelper:
                 result = self.ctx.run_task(
                     "PinkPawHeist_CheckReward", pipeline_override=override
                 )
+                self.raise_if_stopped()
 
                 # 判断是否命中
                 if result is None or result.status.succeeded is False:
@@ -279,7 +352,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_up("S")
 
             # ----- 第一场战斗（怪堆） -----
-            ah.ctx.run_task("PinkPawHeist_Core1_Log_FightG1")
+            ah.run_task("PinkPawHeist_Core1_Log_FightG1")
             for _ in range(3):
                 ah.click_key("1")
                 ah.delay(200)
@@ -361,7 +434,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.delay(1800)
             ah.key_up("E")
             ah.delay(200)
-            ah.ctx.run_task("PinkPawHeist_Core1_Log_FightG2")
+            ah.run_task("PinkPawHeist_Core1_Log_FightG2")
 
             ah.fight_until_no_monster(
                 timeout_no_monster=10000,
@@ -403,7 +476,11 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_up("S")
             ah.delay(300)
             ah.key_down("A")
-            ah.delay(3000)
+            ah.delay(100)
+            ah.key_down("S")
+            ah.delay(2800)
+            ah.key_up("S")
+            ah.delay(100)
             ah.key_up("A")
             ah.delay(300)
 
@@ -446,7 +523,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.delay(2500)
             ah.key_up("W")
             # 躲第二道激光
-            ah.delay(200)
+            ah.delay(300)
             ah.key_down("W")
             ah.delay(10000)
             ah.key_up("W")
@@ -458,25 +535,34 @@ class PinkPawHeistScheme2Action(CustomAction):
 
             # ---------- 移动至G1激光层 ----------
             ah.key_down("W")
-            ah.delay(9300)
+            ah.delay(7300)
             # 开始躲激光
-            current_ctrl = ah.ctx.tasker.controller
-            current_ctrl.post_key_down(32).wait()
-            ah.delay(200)
-            current_ctrl.post_key_up(32).wait()
-            ah.delay(200)
-            current_ctrl.post_key_down(32).wait()
-            ah.delay(200)
-            current_ctrl.post_key_up(32).wait()
-            ah.delay(200)
             ah.key_up("W")
             ah.delay(200)
             ah.key_down("D")
-            ah.delay(2750)
+            ah.delay(2500)
+            ah.key_down("W")
+            for _ in range(4):
+                ah.click_key("F")
+                ah.delay(200)
+            ah.key_up("W")
+            ah.delay(200)
             ah.key_up("D")
             ah.delay(200)
             ah.key_down("W")
-            ah.delay(900)
+            ah.delay(3300)
+            ah.key_up("W")
+            ah.delay(200)
+            ah.key_down("D")
+            ah.delay(3000)
+            ah.key_up("D")
+            ah.delay(400)
+            ah.key_down("A")
+            ah.delay(400)
+            ah.key_up("A")
+            ah.delay(500)
+            ah.key_down("W")
+            ah.delay(500)
             current_ctrl = ah.ctx.tasker.controller
             current_ctrl.post_key_down(32).wait()
             ah.delay(200)
@@ -488,8 +574,16 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.delay(1450)
             ah.key_up("W")
             ah.delay(200)
+            ah.key_down("A")
+            ah.delay(500)
+            ah.key_up("A")
+            ah.delay(200)
+            ah.key_down("W")
+            ah.delay(2000)
+            ah.key_up("W")
+            ah.delay(200)
             ah.key_down("D")
-            ah.delay(1400)
+            ah.delay(1500)
             current_ctrl = ah.ctx.tasker.controller
             current_ctrl.post_key_down(32).wait()
             ah.delay(200)
@@ -498,16 +592,16 @@ class PinkPawHeistScheme2Action(CustomAction):
             current_ctrl.post_key_down(32).wait()
             ah.delay(200)
             current_ctrl.post_key_up(32).wait()
-            ah.delay(1500)
+            ah.delay(2500)
             ah.key_up("D")
             ah.delay(200)
             ah.key_down("W")
-            ah.delay(650)
+            ah.delay(580)
             ah.key_up("W")
             ah.delay(200)
             # 出激光房
             ah.key_down("D")
-            ah.delay(3200)
+            ah.delay(3000)
             ah.key_up("D")
             ah.delay(200)
             ah.key_down("W")
@@ -624,7 +718,9 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.delay(100)
 
             ah.key_down("W")
-            ah.delay(4000)
+            for _ in range(12):
+                ah.click_key("F")
+                ah.delay(200)
             ah.key_up("W")
             ah.delay(100)
 
@@ -776,7 +872,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_down("S")
             ah.delay(800)
             ah.key_up("S")
-            ah.delay(5500)
+            ah.delay(8500)
 
             ah.key_down("A")
             ah.delay(7500)
@@ -931,7 +1027,9 @@ class PinkPawHeistScheme2Action(CustomAction):
             current_ctrl.post_key_down(2).wait()  # 按下右键
             ah.delay(200)
             current_ctrl.post_key_up(2).wait()
-            ah.delay(300)
+            for _ in range(2):
+                ah.click_key("F")
+                ah.delay(200)
             current_ctrl.post_key_down(32).wait()
             ah.delay(200)
             current_ctrl.post_key_up(32).wait()
@@ -960,10 +1058,11 @@ class PinkPawHeistScheme2Action(CustomAction):
                 ah.click_key("F")
                 ah.delay(200)
             ah.delay(1500, check_reward=False)
-            evac_result = ah.ctx.run_task("PinkPawHeist_EvacuateOnce")
+            evac_result = ah.run_task("PinkPawHeist_EvacuateOnce")
             if evac_result.status.succeeded:
-                ah.delay(10000, check_reward=False)
+                ah.delay(REWARD_OCR_DELAY_MS, check_reward=False)
                 notify_pinkpaw_reward(ah.ctx, success=True)
+                ah.delay(POST_REWARD_DELAY_MS, check_reward=False)
             else:
                 # ---------- 最后撤离2 ----------
 
@@ -1007,10 +1106,11 @@ class PinkPawHeistScheme2Action(CustomAction):
                     ah.click_key("F")
                     ah.delay(200)
                 ah.delay(1500, check_reward=False)
-                evac_result = ah.ctx.run_task("PinkPawHeist_EvacuateOnce")
+                evac_result = ah.run_task("PinkPawHeist_EvacuateOnce")
                 if evac_result.status.succeeded:
-                    ah.delay(10000, check_reward=False)
+                    ah.delay(REWARD_OCR_DELAY_MS, check_reward=False)
                     notify_pinkpaw_reward(ah.ctx, success=True)
+                    ah.delay(POST_REWARD_DELAY_MS, check_reward=False)
                 else:
                     # ---------- 最后撤离3 ----------
                     ah.delay(500)
@@ -1055,10 +1155,11 @@ class PinkPawHeistScheme2Action(CustomAction):
                         ah.delay(200)
 
                     ah.delay(1500, check_reward=False)
-                    evac_result = ah.ctx.run_task("PinkPawHeist_EvacuateOnce")
+                    evac_result = ah.run_task("PinkPawHeist_EvacuateOnce")
                     if evac_result.status.succeeded:
-                        ah.delay(10000, check_reward=False)
+                        ah.delay(REWARD_OCR_DELAY_MS, check_reward=False)
                         notify_pinkpaw_reward(ah.ctx, success=True)
+                        ah.delay(POST_REWARD_DELAY_MS, check_reward=False)
                     else:
                         notify_pinkpaw_reward(ah.ctx, success=False)
                         self._exit_to_main(ah)
@@ -1066,6 +1167,10 @@ class PinkPawHeistScheme2Action(CustomAction):
                     return CustomAction.RunResult(success=True)
                 return CustomAction.RunResult(success=True)
             return CustomAction.RunResult(success=True)
+        except TaskerStoppedException as e:
+            print(f"[PinkPawHeist] stopped by tasker: {e}")
+            ah.release_controls()
+            return CustomAction.RunResult(success=False)
         except StopActionException as e:
             # 捕获到终止异常，直接结束
             print(f"[PinkPawHeist] 流程提前终止: {e}")
@@ -1086,12 +1191,9 @@ class PinkPawHeistScheme2Action(CustomAction):
             for _ in range(4):
                 ah.click_key("Esc")
                 ah.delay(2000, check_reward=False)
-            evac_result = ah.ctx.run_task("PinkPawHeist_Once")
-            if evac_result.status.succeeded:
-                ah.delay(10000, check_reward=False)
-                notify_pinkpaw_reward(ah.ctx, success=True)
-            else:
-                notify_pinkpaw_reward(ah.ctx, success=False)
+            evac_result = ah.run_task("PinkPawHeist_Once")
+            ah.delay(10000, check_reward=False)
+            notify_pinkpaw_reward(ah.ctx, success=False)
 
             return CustomAction.RunResult(success=True)
 
