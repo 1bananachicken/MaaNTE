@@ -19,6 +19,7 @@ from .Movement.character_move import *
 from .Common.alt_click import *
 from .furniture_claim import *
 from .auto_piano.action import *
+from .withdraw_money_choose_item import *
 
 __all__ = [
     "AutoMakeCoffee",
@@ -40,4 +41,5 @@ __all__ = [
     "AltClick",
     "FurnitureClaim",
     "AutoPlayPiano",
+    "WithdrawMoneyChooseItem",
 ]
