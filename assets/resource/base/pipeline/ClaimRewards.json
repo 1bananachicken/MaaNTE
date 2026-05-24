@@ -43,7 +43,7 @@
     "ClaimRewardsActivityPoints": {
         "desc": "领取活跃度点数",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
                     174,
@@ -51,8 +51,12 @@
                     988,
                     404
                 ],
-                "template": [
-                    "Common/Button/ClaimButton.png"
+                "expected": [
+                    "领取",
+                    "領取",
+                    "(?i)Claim",
+                    "受け取る",
+                    "수령"
                 ],
                 "threshold": 0.8
             }
@@ -103,7 +107,7 @@
     "ClaimRewardsBattlePassExp": {
         "desc": "领取环期赏令经验",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
                     1007,
@@ -111,8 +115,12 @@
                     219,
                     52
                 ],
-                "template": [
-                    "Common/Button/ClaimAllButton.png"
+                "expected": [
+                    "全部领取",
+                    "全部領取",
+                    "(?i)Claim\\s*All",
+                    "一括受取",
+                    "모두 수령"
                 ],
                 "threshold": 0.8
             }
@@ -145,7 +153,7 @@
     "ClaimRewardsBattlePassRewards": {
         "desc": "领取历练奖赏",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
                     782,
@@ -153,8 +161,12 @@
                     217,
                     49
                 ],
-                "template": [
-                    "Common/Button/ClaimAllButtonBlackPink.png"
+                "expected": [
+                    "全部领取",
+                    "全部領取",
+                    "(?i)Claim\\s*All",
+                    "一括受取",
+                    "모두 수령"
                 ],
                 "threshold": 0.8
             }

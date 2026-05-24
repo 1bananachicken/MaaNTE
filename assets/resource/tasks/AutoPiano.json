@@ -1,0 +1,70 @@
+{
+  "task": [
+    {
+      "name": "AutoPiano",
+      "label": "$task_auto_piano_label",
+      "description": "$task_auto_piano_desc",
+      "entry": "AutoPiano",
+      "default_check": false,
+      "option": [
+        "MidiScoreFile"
+      ]
+    }
+  ],
+  "option": {
+    "MidiScoreFile": {
+      "label": "$task_auto_piano_option_midi_score",
+      "type": "select",
+      "default_case": "MidiScoreFile_Custom",
+      "cases": [
+        {
+          "name": "MidiScoreFile_Custom",
+          "label": "$task_auto_piano_option_custom_path_case",
+          "option": [
+            "MidiSettings_Custom"
+          ]
+        }
+      ]
+    },
+    "MidiSettings_Custom": {
+      "label": "$task_auto_piano_option_midi_custom_path",
+      "type": "input",
+      "inputs": [
+        {
+          "name": "SongPath",
+          "label": "$task_auto_piano_input_song_path_label",
+          "description": "$task_auto_piano_input_song_path_desc",
+          "default": "songs/example.mid",
+          "pipeline_type": "string",
+          "verify": "^.+\\.(mid|midi)$",
+          "pattern_msg": "$task_auto_piano_input_song_path_pattern_msg"
+        },
+        {
+          "name": "Speed",
+          "label": "$task_auto_piano_input_speed_label",
+          "default": "1.0",
+          "pipeline_type": "string",
+          "verify": "^(?:[1-9]\\d*(?:\\.\\d+)?|0\\.\\d+)$",
+          "pattern_msg": "$task_auto_piano_input_speed_pattern_msg"
+        },
+        {
+          "name": "Transpose",
+          "label": "$task_auto_piano_input_transpose_label",
+          "default": "0",
+          "pipeline_type": "string",
+          "verify": "^-?\\d+$",
+          "pattern_msg": "$task_auto_piano_input_transpose_pattern_msg"
+        }
+      ],
+      "pipeline_override": {
+        "AutoPiano": {
+          "custom_action_param": {
+            "song": "{SongPath}",
+            "speed": "{Speed}",
+            "transpose": "{Transpose}"
+          }
+        }
+      }
+    }
+  }
+}

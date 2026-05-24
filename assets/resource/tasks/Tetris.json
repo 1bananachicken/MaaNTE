@@ -1,9 +1,10 @@
 {
     "task": [
         {
-            "name": "泯除方块",
+            "name": "Tetris",
+            "label": "$task_tetris_label",
             "entry": "TetrisEntrance",
-            "description": "<font color='red'>该任务功能中游戏内棋盘完全由内部ai自主维护，而非获取屏幕图像，在运行该任务时请不要对游戏画面进行操作，以免ai决策与实际游戏状态不符</font>",
+            "description": "$task_tetris_desc",
             "option": [
                 "TetrisAutoRepeat_Single",
                 "TetrisAllowSpeedDrop"
@@ -13,12 +14,12 @@
     "option": {
         "TetrisAutoRepeat_Single": {
             "type": "switch",
-            "label": "自动连打",
-            "description": "启用后自动重复多轮，关闭则仅进行一轮",
+            "label": "$task_tetris_option_auto_repeat",
+            "description": "$task_tetris_option_auto_repeat_desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "option": [
                         "TetrisConsumeAllVitality_Single"
                     ],
@@ -32,7 +33,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "关闭",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
@@ -40,7 +41,9 @@
                                 "use_all_vitality": false,
                                 "repeat_count": 1
                             },
-                            "on_error": ["TetrisExit"]
+                            "on_error": [
+                                "TetrisExit"
+                            ]
                         }
                     }
                 }
@@ -49,12 +52,12 @@
         },
         "TetrisConsumeAllVitality_Single": {
             "type": "switch",
-            "label": "消耗所有活力",
-            "description": "启用后自动识别活力值，活力耗尽时自动停止；关闭则按指定轮数连打",
+            "label": "$task_tetris_option_consume_vitality",
+            "description": "$task_tetris_option_consume_vitality_desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "TetrisHandleGameActive": {
                             "custom_action_param": {
@@ -70,7 +73,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "关闭",
+                    "label": "$option_switch_case_no",
                     "option": [
                         "TetrisRepeatCount_Single"
                     ],
@@ -88,12 +91,12 @@
         },
         "TetrisRepeatCount_Single": {
             "type": "input",
-            "label": "连打轮数",
-            "description": "自动连打轮数",
+            "label": "$task_tetris_option_repeat_count",
+            "description": "$task_tetris_option_repeat_count_desc",
             "inputs": [
                 {
                     "name": "repeat_count",
-                    "label": "轮数",
+                    "label": "$task_tetris_option_repeat_count_input",
                     "default": "5",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
@@ -114,12 +117,12 @@
         },
         "TetrisAllowSpeedDrop": {
             "type": "switch",
-            "label": "允许速降",
-            "description": "启用后方块平移/旋转结束后自动按空格键快速下落",
+            "label": "$task_tetris_option_speed_drop",
+            "description": "$task_tetris_option_speed_drop_desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "TetrisEntrance": {
                             "custom_action_param": {
@@ -130,7 +133,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "关闭"
+                    "label": "$option_switch_case_no"
                 }
             ],
             "default_case": "No"

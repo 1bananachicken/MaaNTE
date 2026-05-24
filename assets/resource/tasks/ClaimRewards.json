@@ -1,9 +1,10 @@
 {
     "task": [
         {
-            "name": "领取奖励",
+            "name": "ClaimRewards",
+            "label": "$task_claim_rewards_label",
             "entry": "ClaimRewardsEntrance",
-            "description": "自动领取活跃度/环期赏令的奖励。",
+            "description": "$task_claim_rewards_desc",
             "controller": [
                 "Win32",
                 "Win32-Front"
@@ -17,11 +18,11 @@
     "option": {
         "ClaimRewardsActivity": {
             "type": "switch",
-            "label": "领取活跃度奖励",
+            "label": "$task_claim_rewards_option_activity",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "ClaimRewardsActivity": {
                             "enabled": true
@@ -30,7 +31,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "禁用",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "ClaimRewardsActivity": {
                             "enabled": false
@@ -42,11 +43,11 @@
         },
         "ClaimRewardsBattlePass": {
             "type": "switch",
-            "label": "领取环期赏令奖励",
+            "label": "$task_claim_rewards_option_battle_pass",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "ClaimRewardsBattlePass": {
                             "enabled": true
@@ -55,7 +56,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "禁用",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "ClaimRewardsBattlePass": {
                             "enabled": false

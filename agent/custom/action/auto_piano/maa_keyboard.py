@@ -1,6 +1,7 @@
 import time
 import ctypes
 from .key_mapping import NOTE_KEY_MAPPING
+from utils.logger import logger
 
 user32 = ctypes.windll.user32
 WM_KEYDOWN = 0x0100
@@ -71,11 +72,11 @@ class MaaKeyboardBridge:
             hwnd = user32.FindWindowW(None, title)
             if hwnd:
                 self.hwnd = hwnd
-                print(f"【成功】已连接到游戏窗口: '{title}' (HWND: {self.hwnd})")
+                logger.info("已连接到游戏窗口: '%s' (HWND: %s)", title, self.hwnd)
                 break  # 找到了就立刻停止搜索
 
         if not self.hwnd:
-            print(f"【警告】未找到列表中的任何窗口，请检查游戏是否运行！列表: {WINDOW_TITLES}")
+            logger.warning("未找到列表中的任何窗口，请检查游戏是否运行！列表: %s", WINDOW_TITLES)
 
     def _force_send_key(self, vk_code, is_down):
         """带有强行唤醒的底层发送器"""
