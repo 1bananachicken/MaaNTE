@@ -3,13 +3,13 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1779545820810,
+            "lastSyncTime": 1779628631811,
             "isModifiedExternally": false,
             "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\MaaNTE\\assets\\resource\\base\\pipeline\\AutoFight\\AutoFight.json",
             "savedViewport": {
-                "x": -3032,
-                "y": -500,
-                "zoom": 0.46
+                "x": -3465,
+                "y": -2274,
+                "zoom": 0.99
             },
             "filename": "AutoFight",
             "version": "v1.5.3"
@@ -506,9 +506,9 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    540,
-                    30,
-                    190,
+                    592,
+                    25,
+                    92,
                     111
                 ],
                 "template": [
@@ -841,7 +841,7 @@
             }
         },
         "next": [
-            "AF_GetInInstanceMove_4_1_副本1",
+            "AF_GetInInstanceMove_4_1",
             "[JumpBack]AF_GetInInstanceMove_4_2"
         ],
         "$__mpe_code": {
@@ -862,7 +862,10 @@
                     63
                 ],
                 "expected": [
-                    "胡迪尼的魔术舞台"
+                    "胡迪尼的魔术舞台",
+                    "胡迪尼的诡计舞台",
+                    "泡影罐头工厂",
+                    "兔子洞"
                 ]
             }
         },
@@ -882,8 +885,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 4172,
-                "y": 2096
+                "x": 4190,
+                "y": 2665
             }
         }
     },
@@ -921,8 +924,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 4172,
-                "y": 2650
+                "x": 4451,
+                "y": 2848
             }
         }
     },
