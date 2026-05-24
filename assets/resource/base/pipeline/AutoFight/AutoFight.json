@@ -88,7 +88,7 @@
             "param": {
                 "custom_recognition": "AF_AutoFightCls",
                 "custom_recognition_param": {
-                    "model": "best1.onnx"
+                    "model": "best2.onnx"
                 }
             }
         },
@@ -108,7 +108,7 @@
             "param": {
                 "custom_recognition": "AF_AutoFightClsTest",
                 "custom_recognition_param": {
-                    "model": "best1.onnx"
+                    "model": "best2.onnx"
                 }
             }
         },
