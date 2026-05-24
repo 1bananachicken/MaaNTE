@@ -229,53 +229,29 @@ description: 分析 MaaNTE 上游仓库公开 Issue（`https://github.com/1banan
 
 ### 控制器不匹配
 
-- 用户描述"功能比别人少"或"某个任务找不到" → 先查 `assets/resource/tasks/<TaskName>.json` 中 `controller` 字段的限制
-- 实时辅助、闪避反击、粉爪大劫案 需要 `Win32-Front`；领取奖励、一咖舍收益 需要 `Win32`
-- 主页控制器切换按钮已知有问题 → 用户必须在"设置 > 连接设置"中更改
-- 前台控制器（`Seize`）会抢占鼠标，这是 by design
+- 用户描述"功能比别人少"或"某个任务找不到" → 先查 `assets/resource/tasks/<TaskName>.json` 中 `controller` 字段的限制。详见 `KNOWLEDGE.md#controller-mismatch`。
 
 ### 识别失败
 
-- `next` 列表中的识别连续失败直到超时：常见于当前画面不在预期分支、模板/OCR 失配、漏了中间节点、被弹窗打断
-- 某个"兜底返回/退出"节点连续成功但流程没有前进：常见于 Pipeline 对当前状态判断错了
-- OCR 模型加载失败（`Failed to load det or rec`、`ocrer_ is null`）：检查 `assets/resource/model/ocr/` 是否有模型文件
-- 用户日志与当前主线代码不一致，且主线已修复：先确认用户版本，必要时切到对应 tag 核对旧逻辑
+- `next` 列表中的识别连续失败直到超时：常见于当前画面不在预期分支、模板/OCR 失配、漏了中间节点、被弹窗打断。
+- 某个"兜底返回/退出"节点连续成功但流程没有前进：常见于 Pipeline 对当前状态判断错了。
+- OCR 模型加载失败（`Failed to load det or rec`、`ocrer_ is null`）：检查 `assets/resource/model/ocr/` 是否有模型文件。
+- 用户日志与当前主线代码不一致，且主线已修复：先确认用户版本，必要时切到对应 tag 核对旧逻辑。
 
 ### 游戏环境干扰
 
-- 帧生成 / 超分辨率等画质增强功能开启 → 模板匹配和 OCR 结果不可靠
-- Windows 显示缩放 ≠ 100% → 点击坐标偏移
-- 游戏非 1280x720 窗口模式 → 识别基准坐标偏移
-- 非简体中文游戏语言 → OCR 训练数据不匹配
-- MaaNTE 路径含中文/全角字符 → 资源加载可能失败
+- 帧生成 / 超分辨率等画质增强功能开启 → 模板匹配和 OCR 结果不可靠。详见 `KNOWLEDGE.md#game-settings-interference`。
+- Windows 显示缩放 ≠ 100%、非 1280x720 窗口、非简体中文、路径含中文等环境问题 → 详见 `KNOWLEDGE.md#environmental-requirements`。
 
-### 钓鱼特定
+### 功能特定 guardrails
 
-- 买鱼饵点错商品：ROI 范围过大导致相邻 UI 被误识别；降低 `鱼饵识别阈值` 可作为临时方案
-- 卖鱼仅在 120 FPS 下可靠
-- 隔夜钓鱼被月卡弹窗打断 → 已知限制
-- 鱼饵不足导致任务提前结束 → by design，非 bug
-
-### 做咖啡特定
-
-- "没有收益/没有全连击" → 需要娜娜莉和白藏的城市技能，这是游戏机制不是 bug
-
-### 实时辅助特定
-
-- "窗口乱飞" → 必须使用前台控制器（`Seize` 鼠标模式）
-- 传送失败 → 仅支持两个特定传送点
-
-### 粉爪大劫案特定
-
-- 功能标记为"极不稳定"，只有一个方案且需要特定队伍
-- 容错超时后退出至主菜单是 by design
+- 钓鱼（买饵误识别、FPS 要求、月卡弹窗、鱼饵不足）、做咖啡（角色技能依赖）、实时辅助（传送点限制、快捷键依赖）、粉爪大劫案（不稳定、队伍要求）→ 详见 `KNOWLEDGE.md` 中各功能对应章节。这些规则在分析相关 issue 前必须套用。
 
 ### 证据与环境
 
-- issue 文字说"卡死/误点"，但对应 `task_id` 最终 `Tasker.Task.Succeeded`：先明确"本次日志没有复现出用户描述的问题"，再分析可能性
-- 如果 `gui.log` 或 `mxu-web-*.log` 说"任务出错"，但对应 `task_id` 的 `maa.log` 实际 `AllTasksCompleted`，要明确写"本次日志未复现用户描述的问题"
-- MaaNTE 每次启动会清理旧日志 → 用户如果在复现后重启过 MaaNTE，关键日志可能已丢失
-- `on_error/` 截图缺失但日志有 `Save image`：可能是用户未上传对应分卷，或被日志清理逻辑在重启时删除
+- issue 文字说"卡死/误点"，但对应 `task_id` 最终 `Tasker.Task.Succeeded`：先明确"**本次日志未复现出用户描述的问题**"，再分析可能性。
+- MaaNTE 每次启动会清理旧日志 → 用户如果在复现后重启过 MaaNTE，关键日志可能已丢失。详见 `KNOWLEDGE.md#log-collection-timing`。
+- `on_error/` 截图缺失但日志有 `Save image`：可能是用户未上传对应分卷，或被日志清理逻辑在重启时删除。
 
 ## Correlating With Code
 
