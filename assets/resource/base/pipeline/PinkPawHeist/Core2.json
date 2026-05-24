@@ -1,0 +1,134 @@
+{
+    "PinkPawHeist_Scheme2": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "PinkPawHeistScheme2Action"
+            }
+        }
+    },
+    "PinkPawHeist_CheckGate2Once": {
+        "desc": "单次检测铁门",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "强制开启",
+                    "強制開啟",
+                    "(?i)Force\\s*Open",
+                    "強制解錠",
+                    "강제 오픈"
+                ],
+                "roi": [
+                    800,
+                    359,
+                    80,
+                    25
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [],
+        "timeout": 1500
+    },
+    "PinkPawHeist_CheckDoorOnce": {
+        "desc": "单次检测开门",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "开门",
+                    "開門",
+                    "(?i)Open",
+                    "ドアを開ける",
+                    "문 열기"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [],
+        "timeout": 1500
+    },
+    "PinkPawHeist_CheckReward": {
+        "desc": "识别在地图",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "本局收益",
+                    "(?i)Round\\s*Earnings",
+                    "今回の収益",
+                    "This Round Profit",
+                    "이 라운드 수익"
+                ],
+                "roi": [
+                    30,
+                    250,
+                    100,
+                    20
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    63,
+                    0
+                ]
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 100,
+        "next": []
+    },
+    "PinkPawHeist_Once": {
+        "desc": "撤离确认",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "确认记录",
+                    "確認記錄",
+                    "(?i)Confirm",
+                    "記録更新",
+                    "确认",
+                    "確認",
+                    "確定",
+                    "确定",
+                    "OK",
+                    "CONFIRN",
+                    "확인"
+                ],
+                "roi": [
+                    710,
+                    460,
+                    120,
+                    30
+                ],
+                "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    18,
+                    0
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "timeout": 5000,
+        "next": []
+    }
+}

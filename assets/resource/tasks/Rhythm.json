@@ -1,7 +1,8 @@
 {
     "task": [
         {
-            "name": "超强音",
+            "name": "Rhythm",
+            "label": "$task_rhythm_label",
             "entry": "RhythmEntrance",
             "option": [
                 "自动选曲",
@@ -13,24 +14,23 @@
     "option": {
         "自动选曲": {
             "type": "switch",
-            "label": "自动选曲",
-            "description": "启用后自动选择歌曲（迷星叫），关闭则手动指定目标歌曲",
+            "label": "$task_rhythm_option_auto_select",
+            "description": "$task_rhythm_option_auto_select_desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "RhythmSelectSong": {
                             "custom_action_param": {
-                                "auto_select": true,
-                                "song_name": ""
+                                "auto_select": true
                             }
                         }
                     }
                 },
                 {
                     "name": "No",
-                    "label": "关闭",
+                    "label": "$option_switch_case_no",
                     "option": [
                         "演奏目标歌曲选择"
                     ]
@@ -40,16 +40,20 @@
         },
         "演奏目标歌曲选择": {
             "type": "select",
-            "label": "目标歌曲",
-            "description": "选择要演奏的歌曲",
+            "label": "$task_rhythm_option_song_select",
+            "description": "$task_rhythm_option_song_select_desc",
             "cases": [
                 {
                     "name": "Heroic_Appearance",
-                    "label": "Heroic_Appearance",
+                    "label": "Heroic Appearance",
                     "pipeline_override": {
-                        "RhythmSelectSong": {
-                            "custom_action_param": {
-                                "song_name": "Heroic_Appearance"
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "HeroicAppearance"
+                                    ]
+                                }
                             }
                         }
                     }
@@ -58,31 +62,43 @@
                     "name": "Destiny",
                     "label": "Destiny",
                     "pipeline_override": {
-                        "RhythmSelectSong": {
-                            "custom_action_param": {
-                                "song_name": "Destiny"
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "Destiny"
+                                    ]
+                                }
                             }
                         }
                     }
                 },
                 {
                     "name": "Everlasting_Dazing_Summer_Short",
-                    "label": "Everlasting_Dazing_Summer(Short_Ver.)",
+                    "label": "Everlasting Dazing Summer(Short Ver.)",
                     "pipeline_override": {
-                        "RhythmSelectSong": {
-                            "custom_action_param": {
-                                "song_name": "Everlasting_Dazing_Summer(Short_Ver.)"
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "ShortVer"
+                                    ]
+                                }
                             }
                         }
                     }
                 },
                 {
                     "name": "Everlasting_Dazing_Summer",
-                    "label": "Everlasting_Dazing_Summer",
+                    "label": "Everlasting Dazing Summer",
                     "pipeline_override": {
-                        "RhythmSelectSong": {
-                            "custom_action_param": {
-                                "song_name": "Everlasting_Dazing_Summer"
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "EverlastingDazingSummer"
+                                    ]
+                                }
                             }
                         }
                     }
@@ -91,31 +107,35 @@
                     "name": "迷星叫",
                     "label": "迷星叫",
                     "pipeline_override": {
-                        "RhythmSelectSong": {
-                            "custom_action_param": {
-                                "song_name": "迷星叫"
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "迷星叫"
+                                    ]
+                                }
                             }
                         }
                     }
                 }
             ],
-            "default_case": "Heroic_Appearance"
+            "default_case": "迷星叫"
         },
         "自动连打": {
             "type": "switch",
-            "label": "自动连打",
-            "description": "启用后连续演奏指定次数，关闭则仅演奏一次",
+            "label": "$task_rhythm_option_auto_play",
+            "description": "$task_rhythm_option_auto_play_desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "option": [
                         "连打模式"
                     ]
                 },
                 {
                     "name": "No",
-                    "label": "关闭",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "RhythmRepeatCheck": {
                             "custom_action_param": {
@@ -130,12 +150,12 @@
         },
         "连打模式": {
             "type": "switch",
-            "label": "连打直到活力耗尽",
-            "description": "开启后自动连打直到活力耗尽，关闭则使用固定次数",
+            "label": "$task_rhythm_option_play_mode",
+            "description": "$task_rhythm_option_play_mode_desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "Max",
+                    "label": "$task_rhythm_option_play_mode_case_max",
                     "pipeline_override": {
                         "RhythmRepeatCheck": {
                             "custom_action_param": {
@@ -146,7 +166,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "固定次数",
+                    "label": "$task_rhythm_option_play_mode_case_fixed",
                     "option": [
                         "连打次数"
                     ]
@@ -156,12 +176,12 @@
         },
         "连打次数": {
             "type": "input",
-            "label": "连打次数",
-            "description": "连续演奏的次数",
+            "label": "$task_rhythm_option_play_count",
+            "description": "$task_rhythm_option_play_count_desc",
             "inputs": [
                 {
                     "name": "auto_repeat_count",
-                    "label": "次数",
+                    "label": "$task_rhythm_option_play_count_input",
                     "default": "5",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
@@ -178,12 +198,12 @@
         },
         "目标帧率": {
             "type": "input",
-            "label": "目标帧率",
-            "description": "演奏循环的每秒帧率，建议30~120",
+            "label": "$task_rhythm_option_fps",
+            "description": "$task_rhythm_option_fps_desc",
             "inputs": [
                 {
                     "name": "target_fps",
-                    "label": "FPS",
+                    "label": "$task_rhythm_option_fps_input",
                     "default": "60",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"

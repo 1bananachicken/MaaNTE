@@ -9,6 +9,7 @@ from maa.context import Context
 from maa.pipeline import JOCR, JRecognitionType
 
 from .Tetris.feats.play import TetrisGamePlayer
+from utils.maafocus import PrintT
 
 _round_count = 0
 _target_round = 0
@@ -88,7 +89,7 @@ class AutoTetris(CustomAction):
                 parts.append("消耗所有活力: 是")
             if allow_speed_drop:
                 parts.append("允许速降: 是")
-            print(f"[泯除方块] 任务开始 | {' | '.join(parts)}")
+            PrintT(context, "tetris.task_started", " | ".join(parts))
 
         if not use_all_vitality and _single_shot_done:
             tasker.post_stop()
@@ -106,16 +107,16 @@ class AutoTetris(CustomAction):
 
         if not success:
             _round_count = 0
-            print("[泯除方块] 任务异常结束")
+            PrintT(context, "tetris.task_failed")
             return CustomAction.RunResult(success=False)
 
         if not use_all_vitality:
             _round_count += 1
-            print(f"[泯除方块] 进度: {_round_count}/{_target_round}")
+            PrintT(context, "tetris.progress", _round_count, _target_round)
 
             if _round_count >= _target_round:
                 _single_shot_done = True
-                print("[泯除方块] 任务完成")
+                PrintT(context, "tetris.task_done")
                 tasker.post_stop()
                 controller.post_key_down(27)
                 time.sleep(0.05)
@@ -152,7 +153,7 @@ class TetrisCheckVitalityAction(CustomAction):
                         vitality = int(numbers[-1])
 
         if vitality == 0:
-            print("[泯除方块] 活力耗尽，任务完成")
+            PrintT(context, "tetris.vitality_exhausted")
             controller.post_key_down(27)
             time.sleep(0.05)
             controller.post_key_up(27)
