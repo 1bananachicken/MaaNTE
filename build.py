@@ -247,7 +247,7 @@ def step_download_maa_framework(os_arch):
     print("\n" + "=" * 60)
     print("[3/12] 下载 MaaFramework")
     print("=" * 60)
-    print(DEPS_DIR / "bin")
+
     if (DEPS_DIR / "bin").exists():
         print(f"  {DEPS_DIR}/bin 已存在，跳过下载（如需重新下载请删除 {DEPS_DIR}）")
         return
@@ -258,7 +258,7 @@ def step_download_maa_framework(os_arch):
         f"{MAA_FRAMEWORK_VERSION}/MAA-win-{arch_str}-{MAA_FRAMEWORK_VERSION}.zip"
     )
     zip_path = ROOT / f"maa-framework-{arch_str}.zip"
-    # download(url, zip_path)
+    download(url, zip_path)
     DEPS_DIR.mkdir(parents=True, exist_ok=True)
     shutil.unpack_archive(zip_path, DEPS_DIR)
     zip_path.unlink()
@@ -591,9 +591,9 @@ def main():
         # 3. MaaFramework
         step_download_maa_framework(os_arch)
 
-        # # 4. MFAAvalonia
-        # if not skip_mfa:
-        #     step_download_mfa(os_arch, platform_tag)
+        # 4. MFAAvalonia
+        if not skip_mfa:
+            step_download_mfa(os_arch, platform_tag)
 
         # 5. MXU
         if not skip_mxu:
@@ -612,9 +612,9 @@ def main():
             print(f"Python 未安装: {python_exe}，请先运行 build.py (不带 --skip-download)")
             sys.exit(1)
 
-    # # 8. 安装 (MFAA 版本)
-    # if not skip_mfa:
-    #     step_install(python_exe, args.tag, platform_tag)
+    # 8. 安装 (MFAA 版本)
+    if not skip_mfa:
+        step_install(python_exe, args.tag, platform_tag)
 
     # 9. 安装 (MXU 版本)
     if not skip_mxu:
