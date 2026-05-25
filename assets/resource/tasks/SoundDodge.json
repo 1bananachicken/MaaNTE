@@ -13,6 +13,9 @@
             ],
             "controller": [
                 "Win32-Front"
+            ],
+            "group": [
+                "RealTimeAssist"
             ]
         }
     ],
