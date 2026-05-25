@@ -12,7 +12,7 @@
     "task_withdraw_money_desc": "Auto collect cafe earnings, supports auto switching products based on weather vane",
     "task_withdraw_money_option_restock": "auto restock",
     "task_withdraw_money_option_restock_desc": "Enable Auto-Replenishment",
-    "task_withdraw_money_option_choose_product": "Switch Product",
+    "task_withdraw_money_option_choose_product": "Switch Product (frontend mode only)",
     "task_withdraw_money_option_choose_product_desc": "Auto list products by weather vane earnings (character skills not considered)",
     "task_furniture_label": "Furniture Claim ",
     "task_furniture_desc": "Claim 3 known furniture items in sequence (Hamster Ball / Mianmian / Damaged Wooden Box). Note: Does not guarantee claiming newly placed furniture.",

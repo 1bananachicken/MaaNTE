@@ -12,7 +12,7 @@
     "task_withdraw_money_desc": "이카페 수익 자동 수령, 풍향계에 따른 상품 자동 교체 지원",
     "task_withdraw_money_option_restock": "자동 보충",
     "task_withdraw_money_option_restock_desc": "자동 보충 기능 사용 여부",
-    "task_withdraw_money_option_choose_product": "상품 교체",
+    "task_withdraw_money_option_choose_product": "상품 교체 (포그라운드 모드만 가능)",
     "task_withdraw_money_option_choose_product_desc": "풍향계 수익에 따라 상품 자동 배치 (캐릭터 스킬 미고려)",
     "task_furniture_label": "가구 수령",
     "task_furniture_desc": "알려진 가구 3종(햄스터 볼 / 미엔미엔 / 부서진 나무 상자)을 순서대로 인식하여 수령합니다. 새로 배치된 가구의 수령은 보장하지 않습니다.",

@@ -25,7 +25,8 @@
                 ]
             }
         },
-        "action": "Click",
+        "action": "LongPress", //click默认模式失效
+        "duration": 100,
         "next": [
             "WithdrawMoneyWithdraw"
         ]

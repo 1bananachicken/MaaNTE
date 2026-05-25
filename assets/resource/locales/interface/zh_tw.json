@@ -14,7 +14,7 @@
     "task_withdraw_money_desc": "自動領取一咖舍收益，支援根據風向標自動替換商品",
     "task_withdraw_money_option_restock": "自動補貨",
     "task_withdraw_money_option_restock_desc": "是否啟用自動補貨功能",
-    "task_withdraw_money_option_choose_product": "替換商品",
+    "task_withdraw_money_option_choose_product": "替換商品（僅前台模式可用）",
     "task_withdraw_money_option_choose_product_desc": "按風向標後的收益自動上架商品（不考慮角色技能）",
     "task_claim_rewards_label": "領取獎勵",
     "task_claim_rewards_desc": "自動領取活耀度/環期賞令的獎勵。",

@@ -32,7 +32,7 @@ def _click_rect(controller, rect):
     cx = rect[0] + rect[2] // 2
     cy = rect[1] + rect[3] // 2
     controller.post_touch_down(cx, cy).wait()
-    time.sleep(0.001)
+    time.sleep(0.05)  # 间隔太短概率失效
     controller.post_touch_up().wait()
 
 
