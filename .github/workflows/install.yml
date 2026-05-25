@@ -177,10 +177,13 @@ jobs:
 
           echo "Patching soundcard ole32 → ole32.dll..."
           ./install-mxu/python/python.exe -c "
-import soundcard
+import sys, soundcard
 from pathlib import Path
 p = Path(soundcard.__path__[0]) / 'mediafoundation.py'
 c = p.read_text()
+if \"_ffi.dlopen('ole32')\" not in c:
+    print(f'ERROR: expected ole32 patch target not found in {p}. soundcard may have changed.')
+    sys.exit(1)
 c = c.replace(\"_ffi.dlopen('ole32')\", \"_ffi.dlopen('ole32.dll')\")
 p.write_text(c)
 print('Patched:', p)
