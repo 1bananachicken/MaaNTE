@@ -107,6 +107,9 @@ class AF_AutoFightCls(CustomRecognition):
 
         context.tasker.controller.post_key_down(83).wait()
         use_key_81 = True
+        time_key_81 = None
+        time_key_69 = None
+        wait_time = 10
         while True:
 
             if click_middle:
@@ -119,9 +122,20 @@ class AF_AutoFightCls(CustomRecognition):
             )
             # print(reco_detail.all_results[0].label)
             if use_key_81:
-                context.tasker.controller.post_click_key(81).wait()
+                if time_key_81 is None:
+                    context.tasker.controller.post_click_key(81).wait()
+                    time_key_81 = time.time()
+                elif (time.time() - time_key_81) >= wait_time:
+                    context.tasker.controller.post_click_key(81).wait()
+                    time_key_81 = time.time()  # 重置时间
             else:
-                context.tasker.controller.post_click_key(69).wait()
+                if time_key_69 is None:
+                    context.tasker.controller.post_click_key(69).wait()
+                    time_key_69 = time.time()
+                elif (time.time() - time_key_69) >= wait_time:
+                    context.tasker.controller.post_click_key(69).wait()
+                    time_key_69 = time.time()  # 重置时间
+
             use_key_81 = not use_key_81  # 切换标志
 
             # context.tasker.controller.post_click_key(83).wait()
