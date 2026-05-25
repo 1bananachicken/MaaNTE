@@ -119,7 +119,7 @@ MULTILANG_OCR_LIBRARY = {
     "PinkPawHeist_AfterStory": {
         "desc": "在详情页点进入按钮",
         "expected": [
-            "进入", "進入", "入る"
+            "进入", "進入", "入る",
             r"(?i)ENTER", r"(?i)Enter",
             "들어가기"
         ]
@@ -281,7 +281,7 @@ MULTILANG_OCR_LIBRARY = {
         "desc": "在Esc菜单内的猎人等级",
         "expected": [
             "猎人等级", "獵人等級", "人等",
-            r"(?i)HUNTER\*sLEVEL", r"(?i)Hunter\s*Level",
+            r"(?i)HUNTER\s*LEVEL", r"(?i)Hunter\s*Level",
             "ハンターレベル", "ハンター", "レベル",
             "헌터 레벨", "헌터", "레벨"
         ]
