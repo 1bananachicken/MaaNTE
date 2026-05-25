@@ -591,9 +591,9 @@ def main():
         # 3. MaaFramework
         step_download_maa_framework(os_arch)
 
-        # 4. MFAAvalonia
-        if not skip_mfa:
-            step_download_mfa(os_arch, platform_tag)
+        # # 4. MFAAvalonia
+        # if not skip_mfa:
+        #     step_download_mfa(os_arch, platform_tag)
 
         # 5. MXU
         if not skip_mxu:

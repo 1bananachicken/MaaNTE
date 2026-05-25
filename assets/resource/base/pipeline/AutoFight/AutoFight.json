@@ -3,13 +3,13 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1779628631811,
+            "lastSyncTime": 1779708741414,
             "isModifiedExternally": false,
             "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\MaaNTE\\assets\\resource\\base\\pipeline\\AutoFight\\AutoFight.json",
             "savedViewport": {
-                "x": -3465,
-                "y": -2274,
-                "zoom": 0.99
+                "x": -5010,
+                "y": -905,
+                "zoom": 0.7
             },
             "filename": "AutoFight",
             "version": "v1.5.3"
@@ -506,10 +506,10 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    592,
+                    540,
                     25,
-                    92,
-                    111
+                    190,
+                    110
                 ],
                 "template": [
                     "AF_image/宝箱检测.png"
@@ -885,8 +885,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 4190,
-                "y": 2665
+                "x": 4170,
+                "y": 2715
             }
         }
     },
@@ -925,7 +925,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 4451,
-                "y": 2848
+                "y": 2685
             }
         }
     },

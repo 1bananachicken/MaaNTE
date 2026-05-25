@@ -89,7 +89,7 @@ class AF_AutoFightCls(CustomRecognition):
         finish_ocr_pipeline = JOCR()
         finish_ocr_pipeline.expected =["挑战成功"]
         finish_ocr_pipeline.roi =[567,140,140,40]
-        finish_ocr_pipeline.threshold = 0.5
+        finish_ocr_pipeline.threshold = 0.7
         finish_ocr_pipeline.only_rec = True
         t1 = time.time()
 
@@ -106,7 +106,7 @@ class AF_AutoFightCls(CustomRecognition):
         click_middle = True
 
         context.tasker.controller.post_key_down(83).wait()
-
+        use_key_81 = True
         while True:
 
             if click_middle:
@@ -118,8 +118,11 @@ class AF_AutoFightCls(CustomRecognition):
                 pipeline_override=pipeline_override_one ,
             )
             # print(reco_detail.all_results[0].label)
-            context.tasker.controller.post_click_key(81).wait()
-            context.tasker.controller.post_click_key(69).wait()
+            if use_key_81:
+                context.tasker.controller.post_click_key(81).wait()
+            else:
+                context.tasker.controller.post_click_key(69).wait()
+            use_key_81 = not use_key_81  # 切换标志
 
             # context.tasker.controller.post_click_key(83).wait()
 
