@@ -1,0 +1,50 @@
+{
+    "TestTurnEntry": {
+        "desc": "视角转向测试入口",
+        "action": "DoNothing",
+        "next": ["TestTurnRun"]
+    },
+    "TestTurnRun": {
+        "desc": "执行视角转向：鼠标相对位移",
+        "action": "Custom",
+        "custom_action": "mouse_relative_move",
+        "custom_action_param": {
+            "dx": 900,
+            "dy": 0,
+            "steps": 30,
+            "step_delay": 0.03,
+            "align": true
+        },
+        "next": []
+    },
+    "TestMoveForwardEntry": {
+        "desc": "前进测试入口",
+        "action": "DoNothing",
+        "next": ["TestMoveForwardRun"]
+    },
+    "TestMoveForwardRun": {
+        "desc": "执行前进：按住 W 键",
+        "action": "Custom",
+        "custom_action": "character_move",
+        "custom_action_param": {
+            "key": "W",
+            "duration": 1.0
+        },
+        "next": []
+    },
+    "TestMoveBackwardEntry": {
+        "desc": "后退测试入口",
+        "action": "DoNothing",
+        "next": ["TestMoveBackwardRun"]
+    },
+    "TestMoveBackwardRun": {
+        "desc": "执行后退：按住 S 键",
+        "action": "Custom",
+        "custom_action": "character_move",
+        "custom_action_param": {
+            "key": "S",
+            "duration": 1.0
+        },
+        "next": []
+    }
+}

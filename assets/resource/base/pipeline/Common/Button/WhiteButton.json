@@ -1,0 +1,20 @@
+{
+    // 适用于：我的房产界面的“回去看看”和“前往购买”按钮
+    "ButtonWhiteBackground": {
+        "desc": "按钮白色背景",
+        "recognition": "ColorMatch",
+        "method": 40,
+        "lower": [
+            0,
+            0,
+            194
+        ],
+        "upper": [
+            0,
+            0,
+            210
+        ],
+        "pre_delay": 0,
+        "post_delay": 0
+    }
+}

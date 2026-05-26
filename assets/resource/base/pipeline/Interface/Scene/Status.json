@@ -1,10 +1,10 @@
 {
-    "InWorld":{
-        "desc":"在大世界界面",
-        "recognition":{
+    "InWorld": {
+        "desc": "在大世界界面",
+        "recognition": {
             "type": "And",
             "param": {
-                "all_of":[
+                "all_of": [
                     "EscMenuButton",
                     "TasksMenuButton"
                 ]
@@ -26,7 +26,11 @@
                     165
                 ],
                 "expected": [
-                    "猎人等级"
+                    "猎人等级",
+                    "獵人等級",
+                    "(?i)Hunter\\s*Level",
+                    "ハンターレベル",
+                    "헌터 레벨"
                 ],
                 "threshold": 0.8
             }
@@ -35,8 +39,8 @@
         "post_delay": 0,
         "rate_limit": 0
     },
-    "InExplorationGuideMenu":{
-        "desc":"在探索指南菜单内",
+    "InExplorationGuideMenu": {
+        "desc": "在探索指南菜单内",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -47,14 +51,17 @@
                     40
                 ],
                 "expected": [
-                    "探索指南"
+                    "探索指南",
+                    "(?i)Exploration\\s*Guide",
+                    "探検ガイド",
+                    "탐색 안내서"
                 ],
                 "threshold": 0.8
             }
         }
     },
-    "InBattlePassMenu":{
-        "desc":"在环期赏令菜单内（第一页）",
+    "InBattlePassMenu": {
+        "desc": "在环期赏令菜单内（第一页）",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -65,14 +72,18 @@
                     40
                 ],
                 "expected": [
-                    "历练奖赏"
+                    "历练奖赏",
+                    "歷練獎賞",
+                    "(?i)Experience\\s*Rewards",
+                    "鍛錬の証",
+                    "수련 보상"
                 ],
                 "threshold": 0.8
             }
         }
     },
-    "InScarboroughFairMenu":{
-        "desc":"在斯卡布罗集市内",
+    "InScarboroughFairMenu": {
+        "desc": "在斯卡布罗集市内",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -83,14 +94,18 @@
                     34
                 ],
                 "expected": [
-                    "弧盘研募"
+                    "弧盘研募",
+                    "弧盤研募",
+                    "(?i)Arc\\s*Research",
+                    "弧盤研究プロジェクト",
+                    "아크 연구 모집"
                 ],
                 "threshold": 0.8
             }
         }
     },
-    "InEventsMenu":{
-        "desc":"在活动菜单内",
+    "InEventsMenu": {
+        "desc": "在活动菜单内",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -101,14 +116,18 @@
                     40
                 ],
                 "expected": [
-                    "活动"
+                    "活动",
+                    "活動",
+                    "(?i)Event",
+                    "イベント",
+                    "이벤트"
                 ],
                 "threshold": 0.8
             }
         }
     },
-    "InBagMenu":{
-        "desc":"在背包菜单内",
+    "InBagMenu": {
+        "desc": "在背包菜单内",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -119,14 +138,17 @@
                     40
                 ],
                 "expected": [
-                    "背包"
+                    "背包",
+                    "(?i)Inventory",
+                    "バッグ",
+                    "가방"
                 ],
                 "threshold": 0.8
             }
         }
     },
-    "InCharactersMenu":{
-        "desc":"在角色菜单内",
+    "InCharactersMenu": {
+        "desc": "在角色菜单内",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -137,13 +159,29 @@
                     40
                 ],
                 "expected": [
-                    "信息"
+                    "个人信息",
+                    "個人資訊",
+                    "(?i)Profile",
+                    "情報",
+                    "信息",
+                    "資訊",
+                    "(?i)Info",
+                    "メッセージ",
+                    "정보"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    165,
+                    0
+                ]
             }
         }
-    },"InCityTycoonMenu":{
-        "desc":"在都市大亨菜单内",
+    },
+    "InCityTycoonMenu": {
+        "desc": "在都市大亨菜单内",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -154,7 +192,10 @@
                     40
                 ],
                 "expected": [
-                    "都市大亨"
+                    "都市大亨",
+                    "(?i)City\\s*Tycoon",
+                    "シティ名声",
+                    "도시 타이쿤"
                 ],
                 "threshold": 0.8
             }

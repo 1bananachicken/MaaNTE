@@ -1,0 +1,118 @@
+{
+    "task": [
+        {
+            "name": "SoundDodge",
+            "label": "$task_sound_dodge_label",
+            "entry": "SoundDodgeMain",
+            "description": "$task_sound_dodge_desc",
+            "option": [
+                "SoundDodgeEnable",
+                "SoundDodgeAllAttacks",
+                "SoundDodgeThreshold",
+                "SoundCounterThreshold"
+            ],
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "RealTimeAssist"
+            ]
+        }
+    ],
+    "option": {
+        "SoundDodgeEnable": {
+            "type": "switch",
+            "label": "$task_sound_dodge_option_enable",
+            "description": "$task_sound_dodge_option_enable_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {}
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "SoundDodgeMain": {
+                            "custom_action_param": {
+                                "enable_sound_trigger": false
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "SoundDodgeAllAttacks": {
+            "type": "switch",
+            "label": "$task_sound_dodge_option_dodge_only",
+            "description": "$task_sound_dodge_option_dodge_only_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$task_sound_dodge_option_dodge_only_case_yes",
+                    "pipeline_override": {
+                        "SoundDodgeMain": {
+                            "custom_action_param": {
+                                "dodge_all_attacks": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$task_sound_dodge_option_dodge_only_case_no",
+                    "pipeline_override": {
+                        "SoundDodgeMain": {
+                            "custom_action_param": {
+                                "dodge_all_attacks": false
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "SoundDodgeThreshold": {
+            "type": "input",
+            "label": "$task_sound_dodge_option_dodge_threshold",
+            "description": "$task_sound_dodge_option_dodge_threshold_desc",
+            "inputs": [
+                {
+                    "name": "threshold",
+                    "default": "0.13",
+                    "pipeline_type": "string",
+                    "verify": "^0\\.\\d+$|^1\\.0*$"
+                }
+            ],
+            "pipeline_override": {
+                "SoundDodgeMain": {
+                    "custom_action_param": {
+                        "threshold": "{threshold}"
+                    }
+                }
+            }
+        },
+        "SoundCounterThreshold": {
+            "type": "input",
+            "label": "$task_sound_dodge_option_counter_threshold",
+            "description": "$task_sound_dodge_option_counter_threshold_desc",
+            "inputs": [
+                {
+                    "name": "counter_threshold",
+                    "default": "0.12",
+                    "pipeline_type": "string",
+                    "verify": "^0\\.\\d+$|^1\\.0*$"
+                }
+            ],
+            "pipeline_override": {
+                "SoundDodgeMain": {
+                    "custom_action_param": {
+                        "counter_attack_threshold": "{counter_threshold}"
+                    }
+                }
+            }
+        }
+    }
+}

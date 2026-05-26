@@ -288,6 +288,9 @@ ClientBin/
 *.pfx
 *.publishsettings
 orleans.codegen.cs
+*.ico
+# debug midi files
+*.mid  
 
 # Including strong name files can present a security risk
 # (https://github.com/github/gitignore/pull/2483#issue-259490424)
@@ -447,6 +450,7 @@ deps/tools/*
 !deps/tools/*.schema.json
 build
 install
+install-mxu
 
 # Tools
 tools/ImageCropper/**/*.png
@@ -459,6 +463,15 @@ assets/resource/base/model/detect/sos_nodes.onnx
 .claude/
 .nicegui/
 assets/resource/base/model/navi/pointer_model.onnx
-assets/resource/base/image/map/*.npz
-assets/resource/base/image/map/map_chunks_cache/*
+assets/resource/base/image/map/*
 assets/resource/base/model/depth/*
+
+# local gui test
+MFA/
+MXU/
+deps_maafw.zip
+test/
+output/
+
+# Models
+assets/resource/base/model/*

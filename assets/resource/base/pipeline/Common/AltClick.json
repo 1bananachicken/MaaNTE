@@ -1,0 +1,30 @@
+{
+    "__AltClickAltKeyDownAction": {
+        "desc": "alt按键",
+        "pre_delay": 0,
+        "action": "KeyDown",
+        "key": 18,
+        "post_delay": 0
+    },
+    "__AltClickAltKeyUpAction": {
+        "desc": "alt按键",
+        "pre_delay": 0,
+        "action": "KeyUp",
+        "key": 18,
+        "post_delay": 0
+    },
+    "__AltClickMouseClickAction": {
+        "desc": "鼠标点击",
+        "pre_delay": 200, // delay = 0 有极小概率SeizeInput点不上，特别是性能较差的电脑
+        "action": "Click",
+        "post_delay": 200
+    },
+    "__AltClickTest": {
+        "recognition": "And",
+        "all_of": [
+            "EscMenuButton"
+        ],
+        "action": "Custom",
+        "custom_action": "alt_click"
+    }
+}

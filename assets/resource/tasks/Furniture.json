@@ -1,0 +1,151 @@
+{
+    "task": [
+        {
+            "name": "Furniture",
+            "label": "$task_furniture_label",
+            "entry": "FurnitureEntrance",
+            "description": "$task_furniture_desc",
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "Daily",
+                "CityTycoon"
+            ],
+            "option": [
+                "FurnitureChooseWienerApartments",
+                "FurnitureChooseEdenApartments",
+                "FurnitureChooseSkyviewHalls",
+                "FurnitureChooseGoldenCapital",
+                "FurnitureChooseFenglinVilla"
+            ]
+        }
+    ],
+    "option": {
+        "FurnitureChooseWienerApartments": {
+            "type": "switch",
+            "label": "$task_furniture_option_wiener",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "FurnitureChooseWienerApartments": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "FurnitureChooseWienerApartments": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "FurnitureChooseEdenApartments": {
+            "type": "switch",
+            "label": "$task_furniture_option_eden",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "FurnitureChooseEdenApartments": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "FurnitureChooseEdenApartments": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "FurnitureChooseSkyviewHalls": {
+            "type": "switch",
+            "label": "$task_furniture_option_skyview",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "FurnitureChooseSkyviewHalls": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "FurnitureChooseSkyviewHalls": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "FurnitureChooseGoldenCapital": {
+            "type": "switch",
+            "label": "$task_furniture_option_golden_capital",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "FurnitureChooseGoldenCapital": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "FurnitureChooseGoldenCapital": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "FurnitureChooseFenglinVilla": {
+            "type": "switch",
+            "label": "$task_furniture_option_fenglin",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "FurnitureChooseFenglinVilla": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "FurnitureChooseFenglinVilla": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,34 @@
+{
+    "preset": [
+        {
+            "name": "QuickDaily",
+            "label": "$preset.QuickDaily.label",
+            "description": "$preset.QuickDaily.description",
+            "task": [
+                {
+                    "name": "Furniture",
+                    "option": {
+                        "FurnitureChooseWienerApartments": "Yes",
+                        "FurnitureChooseEdenApartments": "No",
+                        "FurnitureChooseSkyviewHalls": "No",
+                        "FurnitureChooseGoldenCapital": "No",
+                        "FurnitureChooseFenglinVilla": "No"
+                    }
+                },
+                {
+                    "name": "WithdrawMoney",
+                    "option": {
+                        "Restock": "No"
+                    }
+                },
+                {
+                    "name": "ClaimRewards",
+                    "option": {
+                        "ClaimRewardsActivity": "Yes",
+                        "ClaimRewardsBattlePass": "Yes"
+                    }
+                }
+            ]
+        }
+    ]
+}

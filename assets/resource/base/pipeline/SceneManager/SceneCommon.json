@@ -18,8 +18,22 @@
                 100,
                 100
             ],
-            "time": 600
+            "time": 600,
+            "threshold": 0.85
         },
         "post_delay": 0
+    },
+    "__ScenePrivateLoading": {
+        "desc": "判断当前在加载场景中",
+        "recognition": "TemplateMatch",
+        "template": [
+            "Common/Scene/SceneLoading.png"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "[JumpBack]__ScenePrivateLoading",
+            "__ScenePrivateNextTrue"
+        ]
     }
 }
