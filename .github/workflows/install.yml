@@ -224,6 +224,13 @@ jobs:
             cp maante.ico install-mxu/logo.ico
           fi
 
+      - name: Remove deps directory to reduce package size
+        shell: bash
+        run: |
+          echo "Removing deps directory to reduce package size..."
+          rm -rf install-mxu/deps
+          echo "Deps directory removed. Package size reduced by ~171MB."
+
       - uses: actions/upload-artifact@v4
         with:
           name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
