@@ -103,6 +103,7 @@
     "import": [
         // group:Daily
         "resource/tasks/ClaimRewards.json",
+        "resource/tasks/AutoDailyFight.json",
         // group:CityTycoon
         "resource/tasks/Furniture.json",
         "resource/tasks/WithdrawMoney.json",
@@ -126,7 +127,7 @@
         // "resource/tasks/preset/FullDaily.json",
         // "resource/tasks/preset/QuickDaily.json",
         "resource/tasks/preset/RealtimeAssistance.json",
-        "resource/tasks/AutoDailyFight.json",
+
         "resource/tasks/AutoPiano.json"
     ],
     "option": {}
