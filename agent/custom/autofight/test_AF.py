@@ -111,7 +111,8 @@ class AF_AutoFightCls(CustomRecognition):
         time_key_69 = None
         wait_time = 10
         while True:
-
+            if context.tasker.stopping:
+                return CustomRecognition.AnalyzeResult(box=(0, 0, 100, 100), detail="Finish")
             if click_middle:
                 context.tasker.controller.post_click(360, 103, 2)
             new_image = context.tasker.controller.post_screencap().wait().get()
@@ -190,7 +191,7 @@ class AF_AutoFightCls(CustomRecognition):
             if finsh_index.best_result is not None:
                 print(finsh_index.best_result.text)
                 break
-            if t2 - t1 > 20:
+            if t2 - t1 > 40:
                 break
 
         context.tasker.controller.post_key_up(83).wait()
