@@ -72,22 +72,60 @@
             "../agent/main.py"
         ]
     },
+    "group": [
+        {
+            "name": "Daily",
+            "label": "$group.Daily.label",
+            "default_expand": true
+        },
+        {
+            "name": "CityTycoon",
+            "label": "$group.CityTycoon.label",
+            "default_expand": true
+        },
+        {
+            "name": "HethereauHobbies",
+            "label": "$group.HethereauHobbies.label",
+            "default_expand": true
+        },
+        {
+            "name": "RealTimeAssist",
+            "label": "$group.RealTimeAssist.label",
+            "default_expand": true
+        },
+        {
+            "name": "DatasetCollection",
+            "label": "$group.DatasetCollection.label",
+            "default_expand": true
+        }
+    ],
     "task": [],
     "import": [
-        "resource/tasks/WithdrawMoney.json",
-        "resource/tasks/Furniture.json",
+        // group:Daily
         "resource/tasks/ClaimRewards.json",
+        // group:CityTycoon
+        "resource/tasks/Furniture.json",
+        "resource/tasks/WithdrawMoney.json",
+        // group:HethereauHobbies
         "resource/tasks/Fish.json",
-        "resource/tasks/RealTime.json",
+        "resource/tasks/PinkPawHeist.json",
         "resource/tasks/MakeCoffee.json",
         "resource/tasks/Rhythm.json",
-        "resource/tasks/PinkPawHeist.json",
         "resource/tasks/Tetris.json",
-        "resource/tasks/FountainCheckin.json",
+        // group:RealTimeAssist
+        "resource/tasks/RealTime.json",
         "resource/tasks/SoundDodge.json",
         "resource/tasks/AutoFScroll.json",
+        // group:others
+        "resource/tasks/FountainCheckin.json",
         "resource/tasks/AutoPiano.json",
-        "resource/tasks/DatasetRecorder.json"
+        // group:DatasetCollection
+        "resource/tasks/AutonomousDrivingDataset.json",
+        // preset
+        "resource/tasks/preset/AFK.json",
+        // "resource/tasks/preset/FullDaily.json",
+        // "resource/tasks/preset/QuickDaily.json",
+        "resource/tasks/preset/RealtimeAssistance.json"
     ],
     "option": {}
 }

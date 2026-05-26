@@ -15,7 +15,13 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "强制开启",
+                "expected": [
+                    "强制开启",
+                    "強制開啟",
+                    "(?i)Force\\s*Open",
+                    "強制解錠",
+                    "강제 오픈"
+                ],
                 "roi": [
                     800,
                     359,
@@ -36,12 +42,12 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "开门",
-                "roi": [
-                    800,
-                    379,
-                    80,
-                    25
+                "expected": [
+                    "开门",
+                    "開門",
+                    "(?i)Open",
+                    "ドアを開ける",
+                    "문 열기"
                 ],
                 "threshold": 0.8
             }
@@ -57,12 +63,25 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "本局收益",
+                "expected": [
+                    "本局收益",
+                    "(?i)Round\\s*Earnings",
+                    "今回の収益",
+                    "This Round Profit",
+                    "이 라운드 수익"
+                ],
                 "roi": [
                     30,
                     250,
                     100,
                     20
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    63,
+                    0
                 ]
             }
         },
@@ -77,7 +96,19 @@
         "recognition": {
             "type": "OCR",
             "param": {
-                "expected": "确认",
+                "expected": [
+                    "确认记录",
+                    "確認記錄",
+                    "(?i)Confirm",
+                    "記録更新",
+                    "确认",
+                    "確認",
+                    "確定",
+                    "确定",
+                    "OK",
+                    "CONFIRN",
+                    "확인"
+                ],
                 "roi": [
                     710,
                     460,
@@ -85,6 +116,13 @@
                     30
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    18,
+                    0
+                ]
             }
         },
         "action": {

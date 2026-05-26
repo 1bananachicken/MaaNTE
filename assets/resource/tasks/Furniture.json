@@ -8,6 +8,10 @@
             "controller": [
                 "Win32-Front"
             ],
+            "group": [
+                "Daily",
+                "CityTycoon"
+            ],
             "option": [
                 "FurnitureChooseWienerApartments",
                 "FurnitureChooseEdenApartments",
