@@ -5,7 +5,9 @@
             "label": "$task_autofscroll_label",
             "entry": "AutoFScroll",
             "description": "$task_autofscroll_desc",
-            "group": ["RealTimeAssist"]
+            "group": [
+                "RealTimeAssist"
+            ]
         }
     ]
 }

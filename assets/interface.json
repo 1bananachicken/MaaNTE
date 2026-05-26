@@ -92,6 +92,11 @@
             "name": "RealTimeAssist",
             "label": "$group.RealTimeAssist.label",
             "default_expand": true
+        },
+        {
+            "name": "DatasetCollection",
+            "label": "$group.DatasetCollection.label",
+            "default_expand": true
         }
     ],
     "task": [],
@@ -114,6 +119,8 @@
         // group:others
         "resource/tasks/FountainCheckin.json",
         "resource/tasks/AutoPiano.json",
+        // group:DatasetCollection
+        "resource/tasks/AutonomousDrivingDataset.json",
         // preset
         "resource/tasks/preset/AFK.json",
         // "resource/tasks/preset/FullDaily.json",

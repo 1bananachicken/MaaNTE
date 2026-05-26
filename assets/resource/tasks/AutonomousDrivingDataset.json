@@ -1,0 +1,56 @@
+{
+  "task": [
+    {
+      "name": "AutonomousDrivingDatasetCollection",
+      "label": "$task_auto_drive_dataset_recorder_label",
+      "description": "$task_auto_drive_dataset_recorder_desc",
+      "entry": "AutonomousDrivingDatasetRecorder",
+      "default_check": false,
+      "option": [
+        "DatasetRecorderSettings"
+      ],
+      "group": [
+        "DatasetCollection"
+      ]
+    }
+  ],
+  "option": {
+    "DatasetRecorderSettings": {
+      "label": "$task_auto_drive_dataset_option_settings",
+      "type": "input",
+      "inputs": [
+        {
+          "name": "OutputDir",
+          "label": "$task_auto_drive_dataset_input_output_dir_label",
+          "default": "debug/dataset",
+          "pipeline_type": "string",
+          "verify": "^.+$"
+        },
+        {
+          "name": "DurationSeconds",
+          "label": "$task_auto_drive_dataset_input_duration_label",
+          "default": "60",
+          "pipeline_type": "int",
+          "verify": "^\\d+$",
+          "description": "$task_auto_drive_dataset_input_duration_desc"
+        },
+        {
+          "name": "StartDelaySeconds",
+          "label": "$task_auto_drive_dataset_input_start_delay_label",
+          "default": "1",
+          "pipeline_type": "int",
+          "verify": "^\\d+$"
+        }
+      ],
+      "pipeline_override": {
+        "AutonomousDrivingDatasetRecorder": {
+          "custom_action_param": {
+            "output_dir": "{OutputDir}",
+            "duration_seconds": "{DurationSeconds}",
+            "start_delay_seconds": "{StartDelaySeconds}"
+          }
+        }
+      }
+    }
+  }
+}

@@ -10,6 +10,7 @@
     "group.CityTycoon.label": "シティ名声",
     "group.HethereauHobbies.label": "シティライフ",
     "group.RealTimeAssist.label": "リアルタイム支援",
+    "group.DatasetCollection.label": "データセットコレクション",
     "preset.AFK.label": "放置タスク",
     "preset.AFK.description": "長時間の放置プレイに適したタスク",
     "preset.FullDaily.label": "フルデイリー",
@@ -133,5 +134,12 @@
     "task_auto_piano_input_speed_label": "再生速度",
     "task_auto_piano_input_transpose_label": "移調",
     "task_auto_piano_input_speed_pattern_msg": "0より大きい数値を入力してください。例：1.0、1.25。",
-    "task_auto_piano_input_transpose_pattern_msg": "半音数を整数で入力してください。例：-12、0、7。"
+    "task_auto_piano_input_transpose_pattern_msg": "半音数を整数で入力してください。例：-12、0、7。",
+    "task_auto_drive_dataset_recorder_label": "自動運転データセット収集",
+    "task_auto_drive_dataset_recorder_desc": "このタスクを開始する前に、ミニマップの目的地が設定されていることを確認してください。デフォルトの録画時間は 60 秒で、1 秒あたり 2 回サンプリングします。",
+    "task_auto_drive_dataset_option_settings": "録画設定",
+    "task_auto_drive_dataset_input_output_dir_label": "出力ディレクトリ",
+    "task_auto_drive_dataset_input_duration_label": "録画時間",
+    "task_auto_drive_dataset_input_duration_desc": "録画時間。デフォルトは 60 秒です。",
+    "task_auto_drive_dataset_input_start_delay_label": "開始遅延"
 }

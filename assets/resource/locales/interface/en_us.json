@@ -10,6 +10,7 @@
     "group.CityTycoon.label": "City Tycoon",
     "group.HethereauHobbies.label": "Hethereau Hobbies",
     "group.RealTimeAssist.label": "Real-time Assistance",
+    "group.DatasetCollection.label": "DatasetCollection",
     "preset.AFK.label": "AFK Tasks",
     "preset.AFK.description": "Suitable for long-running AFK tasks",
     "preset.FullDaily.label": "Full Daily",
@@ -133,5 +134,12 @@
     "task_auto_piano_input_speed_label": "Playback Speed",
     "task_auto_piano_input_transpose_label": "Transpose",
     "task_auto_piano_input_speed_pattern_msg": "Please enter a number greater than 0, e.g. 1.0 or 1.25.",
-    "task_auto_piano_input_transpose_pattern_msg": "Please enter an integer number of semitones, e.g. -12, 0, 7."
+    "task_auto_piano_input_transpose_pattern_msg": "Please enter an integer number of semitones, e.g. -12, 0, 7.",
+    "task_auto_drive_dataset_recorder_label": "Autonomous Driving Dataset Collection",
+    "task_auto_drive_dataset_recorder_desc": "Before starting this task, make sure the minimap destination is set. The default recording duration is 60 seconds, with 2 samples per second.",
+    "task_auto_drive_dataset_option_settings": "Recording Settings",
+    "task_auto_drive_dataset_input_output_dir_label": "Output Directory",
+    "task_auto_drive_dataset_input_duration_label": "Recording Duration",
+    "task_auto_drive_dataset_input_duration_desc": "Recording duration, 60 seconds by default.",
+    "task_auto_drive_dataset_input_start_delay_label": "Start Delay"
 }
