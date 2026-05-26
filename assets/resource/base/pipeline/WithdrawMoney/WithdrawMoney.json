@@ -157,8 +157,9 @@
         ]
     },
     "WithdrawMoneyItemsListExit": {
+        "desc": "点击商品列表退出按钮",
         "recognition": {
-            "type": "ColorMatch",
+            "type": "TemplateMatch",
             "param": {
                 "roi": [
                     354,
@@ -166,23 +167,15 @@
                     49,
                     51
                 ],
-                "method": 40,
-                "lower": [
-                    109,
-                    3,
-                    198
-                ],
-                "upper": [
-                    150,
-                    5,
-                    204
-                ],
-                "connected": true,
-                "count": 10
+                "template": [
+                    "WithdrawMoney/WithdrawMoneyItemsListExit.png"
+                ]
             }
         },
         "action": "Click",
-        "next": []
+        "next": [
+            "点击补货"
+        ]
     },
     "点击补货": {
         "recognition": {
