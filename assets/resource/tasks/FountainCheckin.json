@@ -1,0 +1,13 @@
+{
+    "task": [
+        {
+            "name": "FountainCheckin",
+            "label": "$task_fountain_label",
+            "entry": "FountainCheckinEntrance",
+            "description": "$task_fountain_desc",
+            "controller": [
+                "Win32-Front"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,145 @@
+{
+    "task": [
+        {
+            "name": "Tetris",
+            "label": "$task_tetris_label",
+            "entry": "TetrisEntrance",
+            "description": "$task_tetris_desc",
+            "option": [
+                "TetrisAutoRepeat_Single",
+                "TetrisAllowSpeedDrop"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ]
+        }
+    ],
+    "option": {
+        "TetrisAutoRepeat_Single": {
+            "type": "switch",
+            "label": "$task_tetris_option_auto_repeat",
+            "description": "$task_tetris_option_auto_repeat_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "option": [
+                        "TetrisConsumeAllVitality_Single"
+                    ],
+                    "pipeline_override": {
+                        "TetrisHandleGameActive": {
+                            "custom_action_param": {
+                                "mode": "single"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "TetrisHandleGameActive": {
+                            "custom_action_param": {
+                                "mode": "single",
+                                "use_all_vitality": false,
+                                "repeat_count": 1
+                            },
+                            "on_error": [
+                                "TetrisExit"
+                            ]
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
+        },
+        "TetrisConsumeAllVitality_Single": {
+            "type": "switch",
+            "label": "$task_tetris_option_consume_vitality",
+            "description": "$task_tetris_option_consume_vitality_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "TetrisHandleGameActive": {
+                            "custom_action_param": {
+                                "mode": "single",
+                                "use_all_vitality": true
+                            },
+                            "next": [
+                                "[JumpBack]TetrisCheckVitality",
+                                "TetrisExit"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "option": [
+                        "TetrisRepeatCount_Single"
+                    ],
+                    "pipeline_override": {
+                        "TetrisHandleGameActive": {
+                            "custom_action_param": {
+                                "mode": "single",
+                                "use_all_vitality": false
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
+        },
+        "TetrisRepeatCount_Single": {
+            "type": "input",
+            "label": "$task_tetris_option_repeat_count",
+            "description": "$task_tetris_option_repeat_count_desc",
+            "inputs": [
+                {
+                    "name": "repeat_count",
+                    "label": "$task_tetris_option_repeat_count_input",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "TetrisHandleGameActive": {
+                    "custom_action_param": {
+                        "mode": "single",
+                        "use_all_vitality": false,
+                        "repeat_count": "{repeat_count}"
+                    },
+                    "on_error": [
+                        "TetrisExit"
+                    ]
+                }
+            }
+        },
+        "TetrisAllowSpeedDrop": {
+            "type": "switch",
+            "label": "$task_tetris_option_speed_drop",
+            "description": "$task_tetris_option_speed_drop_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "TetrisEntrance": {
+                            "custom_action_param": {
+                                "allow_speed_drop": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no"
+                }
+            ],
+            "default_case": "No"
+        }
+    }
+}

@@ -1,0 +1,342 @@
+{
+    "TetrisSceneExit": {
+        "desc": "泯除方块 - 检测退出按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    536,
+                    601,
+                    197,
+                    39
+                ],
+                "expected": [
+                    "退出",
+                    "(?i)Exit",
+                    "終了",
+                    "나쿠펜다의 연못"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    },
+    "TetrisSceneGameIdle": {
+        "desc": "泯除方块 - 检测游戏场景标记（游戏空闲）",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    3,
+                    74,
+                    198,
+                    103
+                ],
+                "expected": [
+                    // @i18n-skip
+                    "TETROMINOES"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    },
+    "TetrisSceneLoading": {
+        "desc": "泯除方块 - 检测加载界面",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1167,
+                    638,
+                    100,
+                    70
+                ],
+                "expected": [
+                    // @i18n-skip
+                    "%"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "TetrisSceneWorldPrompt": {
+        "desc": "泯除方块 - 检测大世界方块入口提示",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    700,
+                    315,
+                    240,
+                    170
+                ],
+                "expected": [
+                    "泯除方块",
+                    "泯除方塊",
+                    "(?i)Tetrominoes",
+                    "排除パズル",
+                    "테트로미노"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "TetrisSceneWorldWithPrompt": {
+        "desc": "泯除方块 - 大世界场景且有方块入口提示",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld",
+                    "TetrisSceneWorldPrompt"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    },
+    "TetrisScenePrepareOneMarker": {
+        "desc": "泯除方块 - 检测准备界面一标记",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    779,
+                    151,
+                    245,
+                    366
+                ],
+                "template": [
+                    "Tetris/prepare_one_marker.png"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    },
+    "TetrisScenePrepareOneSingle": {
+        "desc": "泯除方块 - 检测单人模式入口",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    807,
+                    154,
+                    413,
+                    169
+                ],
+                "expected": [
+                    "单人游戏",
+                    "單人遊戲",
+                    "(?i)Solo",
+                    "シングルプレイ",
+                    "싱글플레이"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    },
+    "TetrisScenePrepareOneMulti": {
+        "desc": "泯除方块 - 检测多人模式入口",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    808,
+                    321,
+                    428,
+                    180
+                ],
+                "expected": [
+                    "多人游戏",
+                    "多人遊戲",
+                    "(?i)Multi",
+                    "マルチプレイ",
+                    "(?i)Multiplayer",
+                    "멀티플레이 게임"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "TetrisScenePrepareOne": {
+        "desc": "泯除方块 - 检测准备界面一（任一模板匹配）",
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "TetrisScenePrepareOneMarker",
+                    "TetrisScenePrepareOneSingle",
+                    "TetrisScenePrepareOneMulti"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "TetrisScenePrepareTwoMarker": {
+        "desc": "泯除方块 - 检测准备界面二标记",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    809,
+                    142,
+                    422,
+                    499
+                ],
+                "template": [
+                    "Tetris/prepare_two_marker.png"
+                ],
+                "threshold": 0.74
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    },
+    "TetrisSceneStartMatch": {
+        "desc": "泯除方块 - 检测开始匹配按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1046,
+                    656,
+                    142,
+                    36
+                ],
+                "expected": [
+                    "开始匹配",
+                    "開始匹配",
+                    "(?i)Start\\s*Matchmaking",
+                    "マッチング開始",
+                    "매칭 시작"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    },
+    "TetrisScenePrepareTwo": {
+        "desc": "泯除方块 - 检测准备界面二（任一模板匹配）",
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "TetrisScenePrepareTwoMarker",
+                    "TetrisSceneStartMatch"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "TetrisSceneMatching": {
+        "desc": "泯除方块 - 检测匹配中界面",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    403,
+                    18,
+                    179,
+                    112
+                ],
+                "expected": [
+                    "匹配进行中",
+                    "匹配進行中",
+                    "(?i)Matchmaking\\s*…",
+                    "マッチング中",
+                    "Matchmaking",
+                    "매칭 중"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "TetrisSceneReturn": {
+        "desc": "泯除方块 - 检测返回按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1195,
+                    16,
+                    50,
+                    50
+                ],
+                "template": [
+                    "Tetris/return.png"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "TetrisSceneDrop": {
+        "desc": "泯除方块 - 检测下落按钮（游戏中标志）",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    270,
+                    425,
+                    92,
+                    97
+                ],
+                "template": [
+                    "Tetris/drop.png"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "TetrisSceneMatchend": {
+        "desc": "泯除方块 - 检测对局结束界面",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    355,
+                    11,
+                    354,
+                    122
+                ],
+                "expected": [
+                    // @i18n-skip
+                    "Matchend"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "TetrisSceneGameActive": {
+        "desc": "泯除方块 - 检测游戏中（下落按钮可见）",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "TetrisSceneDrop"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": []
+    }
+}

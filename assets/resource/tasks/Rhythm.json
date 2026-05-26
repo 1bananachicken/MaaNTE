@@ -1,0 +1,224 @@
+{
+    "task": [
+        {
+            "name": "Rhythm",
+            "label": "$task_rhythm_label",
+            "entry": "RhythmEntrance",
+            "option": [
+                "自动选曲",
+                "自动连打",
+                "目标帧率"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ]
+        }
+    ],
+    "option": {
+        "自动选曲": {
+            "type": "switch",
+            "label": "$task_rhythm_option_auto_select",
+            "description": "$task_rhythm_option_auto_select_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "RhythmSelectSong": {
+                            "custom_action_param": {
+                                "auto_select": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "option": [
+                        "演奏目标歌曲选择"
+                    ]
+                }
+            ],
+            "default_case": "No"
+        },
+        "演奏目标歌曲选择": {
+            "type": "select",
+            "label": "$task_rhythm_option_song_select",
+            "description": "$task_rhythm_option_song_select_desc",
+            "cases": [
+                {
+                    "name": "Heroic_Appearance",
+                    "label": "Heroic Appearance",
+                    "pipeline_override": {
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "HeroicAppearance"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Destiny",
+                    "label": "Destiny",
+                    "pipeline_override": {
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "Destiny"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Everlasting_Dazing_Summer_Short",
+                    "label": "Everlasting Dazing Summer(Short Ver.)",
+                    "pipeline_override": {
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "ShortVer"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Everlasting_Dazing_Summer",
+                    "label": "Everlasting Dazing Summer",
+                    "pipeline_override": {
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "EverlastingDazingSummer"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迷星叫",
+                    "label": "迷星叫",
+                    "pipeline_override": {
+                        "RhythmSceneFindSong": {
+                            "recognition": {
+                                "param": {
+                                    "expected": [
+                                        "迷星叫"
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "迷星叫"
+        },
+        "自动连打": {
+            "type": "switch",
+            "label": "$task_rhythm_option_auto_play",
+            "description": "$task_rhythm_option_auto_play_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "option": [
+                        "连打模式"
+                    ]
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "RhythmRepeatCheck": {
+                            "custom_action_param": {
+                                "auto_repeat_count": 0,
+                                "auto_repeat_max": false
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
+        },
+        "连打模式": {
+            "type": "switch",
+            "label": "$task_rhythm_option_play_mode",
+            "description": "$task_rhythm_option_play_mode_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$task_rhythm_option_play_mode_case_max",
+                    "pipeline_override": {
+                        "RhythmRepeatCheck": {
+                            "custom_action_param": {
+                                "auto_repeat_max": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$task_rhythm_option_play_mode_case_fixed",
+                    "option": [
+                        "连打次数"
+                    ]
+                }
+            ],
+            "default_case": "No"
+        },
+        "连打次数": {
+            "type": "input",
+            "label": "$task_rhythm_option_play_count",
+            "description": "$task_rhythm_option_play_count_desc",
+            "inputs": [
+                {
+                    "name": "auto_repeat_count",
+                    "label": "$task_rhythm_option_play_count_input",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "RhythmRepeatCheck": {
+                    "custom_action_param": {
+                        "auto_repeat_count": "{auto_repeat_count}",
+                        "auto_repeat_max": false
+                    }
+                }
+            }
+        },
+        "目标帧率": {
+            "type": "input",
+            "label": "$task_rhythm_option_fps",
+            "description": "$task_rhythm_option_fps_desc",
+            "inputs": [
+                {
+                    "name": "target_fps",
+                    "label": "$task_rhythm_option_fps_input",
+                    "default": "60",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "RhythmPlaying": {
+                    "custom_action_param": {
+                        "target_fps": "{target_fps}"
+                    }
+                }
+            }
+        }
+    }
+}

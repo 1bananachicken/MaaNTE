@@ -1,0 +1,12 @@
+{
+  "AutonomousDrivingDatasetRecorder": {
+    "enabled": true,
+    "action": "Custom",
+    "custom_action": "autonomous_driving_dataset_recorder",
+    "custom_action_param": {
+      "output_dir": "debug/dataset",
+      "duration_seconds": 60,
+      "start_delay_seconds": 5
+    }
+  }
+}

@@ -1,0 +1,233 @@
+{
+    "FountainCheckinEntrance": {
+        "desc": "喷泉打卡入口",
+        "next": [
+            "FountainFindButton",
+            "FountainCheckinNotFound"
+        ]
+    },
+    "FountainFindButton": {
+        "desc": "识别喷泉打卡按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    765,
+                    373,
+                    210,
+                    40
+                ],
+                "expected": [
+                    "纳库佩达之池",
+                    "納庫佩達之池",
+                    "(?i)Nacupeda\\s*'\\s*s\\s*Pool",
+                    "ナクペイダの池",
+                    "나쿠펜다의 연못"
+                ]
+            }
+        },
+        "action": "ClickKey",
+        "key": 70,
+        "post_delay": 500,
+        "next": [
+            "FountainWaitAnimation"
+        ]
+    },
+    "FountainWaitAnimation": {
+        "desc": "等待动画结束，轮询许愿选项",
+        "next": [
+            "FountainMakeWish",
+            "FountainSkipStory",
+            "FountainSkipStoryDialog",
+            "FountainCheckinIfExit"
+        ],
+        "timeout": 5000
+    },
+    "FountainMakeWish": {
+        "desc": "识别许愿选项并按F",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    871,
+                    415,
+                    239,
+                    49
+                ],
+                "expected": [
+                    "虔诚许愿",
+                    "虔誠許願",
+                    "(?i)Make\\s*a\\s*Sincere\\s*Wish",
+                    "敬虔な願い",
+                    "간절히 소원 빌기"
+                ]
+            }
+        },
+        "action": "Click",
+        "post_delay": 2000,
+        "next": [
+            "FountainCheckinAnyExit",
+            "FountainSkipStoryDialog",
+            "FountainSkipStoryDialogConfirm",
+            "FountainCheckinIfExit"
+        ]
+    },
+    "FountainSkipStory": {
+        "desc": "长时间未识别到许愿选项，尝试跳过剧情",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1218,
+                    24,
+                    39,
+                    37
+                ],
+                "template": [
+                    "realtime_assist/skip_story_btn.png"
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 0,
+        "next": [
+            "FountainCheckinAnyExit",
+            "FountainSkipStoryDialog",
+            "FountainWaitAnimation"
+        ]
+    },
+    "FountainSkipStoryDialog": {
+        "desc": "跳过剧情对话框",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "是否跳过剧情",
+                    "是否跳過劇情",
+                    "Skip Story",
+                    "ストーリーをスキップしますか",
+                    "스토리를 스킵하시겠습니까"
+                ],
+                "roi": [
+                    420,
+                    275,
+                    450,
+                    50
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": "DoNothing",
+        "post_delay": 0,
+        "next": [
+            "FountainSkipStoryDialogConfirm",
+            "FountainWaitAnimation"
+        ]
+    },
+    "FountainSkipStoryDialogConfirm": {
+        "desc": "确认跳过剧情对话框确认按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "确认记录",
+                    "確認記錄",
+                    "(?i)Confirm",
+                    "記録更新",
+                    "确认",
+                    "確認",
+                    "確定",
+                    "确定",
+                    "OK",
+                    "CONFIRN",
+                    "확인"
+                ],
+                "roi": [
+                    700,
+                    410,
+                    250,
+                    70
+                ],
+                "threshold": 0.7
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    36,
+                    0
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 300,
+        "next": [
+            "FountainCheckinIfExit",
+            "FountainWaitAnimation"
+        ]
+    },
+    "FountainCheckinAnyExit": {
+        "desc": "Esc退出",
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 27 // ESC
+            }
+        },
+        "post_wait_freezes": {
+            "target": [
+                0,
+                0,
+                100,
+                100
+            ],
+            "time": 600
+        },
+        "post_delay": 0,
+        "next": [
+            "FountainCheckinIfExit"
+        ]
+    },
+    "FountainCheckinIfExit": {
+        "desc": "识别喷泉打卡按钮，判断是否已退出",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    765,
+                    373,
+                    210,
+                    40
+                ],
+                "expected": [
+                    "纳库佩达之池",
+                    "納庫佩達之池",
+                    "(?i)Nacupeda\\s*'\\s*s\\s*Pool",
+                    "ナクペイダの池",
+                    "나쿠펜다의 연못"
+                ],
+                "threshold": 0.7
+            }
+        },
+        "next": [
+            "FountainCheckinExit"
+        ]
+    },
+    "FountainCheckinNotFound": {
+        "desc": "未识别到喷泉打卡标识",
+        "next": [
+            "FountainCheckinExit"
+        ],
+        "focus": {
+            "Node.Action.Succeeded": "❌ 未能找到喷泉打卡图标，请移动到喷泉位置再次进行该任务"
+        }
+    },
+    "FountainCheckinExit": {
+        "desc": "喷泉打卡任务出口"
+    }
+}
