@@ -1,0 +1,78 @@
+{
+    "WithdrawMoneyGreyBackground": {
+        "desc": "商品列表角标12345的灰色背景",
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    27,
+                    90,
+                    391,
+                    596
+                ],
+                "method": 40,
+                "lower": [
+                    120,
+                    10,
+                    52
+                ],
+                "upper": [
+                    120,
+                    10,
+                    52
+                ],
+                "connected": true,
+                "count": 20
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "WithdrawMoneySwipeDown": {
+        "desc": "商品列表向下滑动",
+        "action": "Swipe",
+        "begin": [
+            220,
+            600
+        ],
+        "end": [
+            220,
+            200
+        ],
+        "duration": 500,
+        "end_hold": 600
+    },
+    "WithdrawMoneyItemValue": {
+        "desc": "商品列表数值/h",
+        "recognition": {
+            "type": "OCR",
+            "only_rec": true,
+            "param": {
+                "roi": [
+                    27,
+                    90,
+                    391,
+                    596
+                ],
+                "expected": [
+                    "/h"
+                ]
+            }
+        }
+    },
+    "WithdrawMoneySwipeUp": {
+        "desc": "商品列表向上滑动",
+        "action": "Swipe",
+        "begin": [
+            220,
+            200
+        ],
+        "end": [
+            220,
+            600
+        ],
+        "duration": 500,
+        "end_hold": 600
+    }
+}
