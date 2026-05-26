@@ -24,7 +24,8 @@ print(f"set cwd: {os.getcwd()}")
 if current_script_dir not in sys.path:
     sys.path.insert(0, current_script_dir)
 
-from utils import logger
+from utils import setup_logger
+logger = setup_logger()
 import utils.screen as screen
 
 MAAHUB_ACCENT_NAME = "custom-9e8de7d9-ab2b-4784-a082-63110b986d90"
