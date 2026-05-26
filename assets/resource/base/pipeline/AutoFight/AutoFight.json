@@ -3,19 +3,19 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1779709469861,
+            "lastSyncTime": 1779796880380,
             "isModifiedExternally": false,
             "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\MaaNTE\\assets\\resource\\base\\pipeline\\AutoFight\\AutoFight.json",
             "savedViewport": {
-                "x": -4498,
-                "y": -482,
-                "zoom": 0.61
+                "x": -5364,
+                "y": -851,
+                "zoom": 0.7
             },
             "filename": "AutoFight",
             "version": "v1.5.3"
         }
     },
-    "AF_FindBox_4_2": {
+    "AF_FindBox_4_3": {
         "pre_wait_freezes": 0,
         "pre_delay": 10,
         "action": {
@@ -48,8 +48,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 8939,
-                "y": 1720
+                "x": 8972,
+                "y": 2089
             }
         }
     },
@@ -59,9 +59,9 @@
             "param": {
                 "roi": [
                     620,
-                    25,
                     40,
-                    110
+                    40,
+                    80
                 ],
                 "template": [
                     "AF_image/宝箱检测.png"
@@ -89,8 +89,75 @@
         ],
         "$__mpe_code": {
             "position": {
+                "x": 8972,
+                "y": 1675
+            }
+        }
+    },
+    "AF_FindBox_5_2_finish": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "error": [
+                        "无法找到宝箱"
+                    ]
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 9292,
+                "y": 1520
+            }
+        }
+    },
+    "AF_FindBox_4_2": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_Count",
+                "custom_recognition_param": {
+                    "current_number": 0,
+                    "target_number": 100
+                }
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "next": [
+            "AF_FindBox_5_2_finish"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 8972,
+                "y": 1274
+            }
+        }
+    },
+    "AF_FindBox_4_2_clean": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_CountClean",
+                "custom_recognition_param": {
+                    "clean_node_name": "AF_FindBox_4_2",
+                    "target_number": 100
+                }
+            }
+        },
+        "next": [
+            "AF_FindBox_4_1",
+            "AF_FindBox_4_2",
+            "[JumpBack]AF_FindBox_4_3"
+        ],
+        "$__mpe_code": {
+            "position": {
                 "x": 8652,
-                "y": 1136
+                "y": 1666
             }
         }
     },
@@ -134,7 +201,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 7052,
-                "y": 2290
+                "y": 2076
             }
         }
     },
@@ -157,7 +224,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 972,
-                "y": 2553
+                "y": 2487
             }
         }
     },
@@ -177,7 +244,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 6732,
-                "y": 2288
+                "y": 2074
             }
         }
     },
@@ -262,7 +329,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 2252,
-                "y": 2222
+                "y": 2275
             }
         }
     },
@@ -300,7 +367,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 2572,
-                "y": 1887
+                "y": 2439
             }
         }
     },
@@ -329,7 +396,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 2572,
-                "y": 2270
+                "y": 2085
             }
         }
     },
@@ -354,7 +421,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 2892,
-                "y": 1896
+                "y": 2549
             }
         }
     },
@@ -379,7 +446,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 2892,
-                "y": 2160
+                "y": 2282
             }
         }
     },
@@ -499,7 +566,7 @@
             }
         }
     },
-    "AF_FindBox_2_1": {
+    "AF_FindBox_2_2": {
         "recognition": {
             "type": "Custom",
             "param": {
@@ -520,7 +587,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 7692,
-                "y": 1637
+                "y": 1998
             }
         }
     },
@@ -536,13 +603,14 @@
             }
         },
         "next": [
-            "AF_FindBox_2_1",
+            "AF_FindBox_5_1",
+            "AF_FindBox_2_2",
             "[JumpBack]AF_MoveScane_1_1"
         ],
         "$__mpe_code": {
             "position": {
                 "x": 7372,
-                "y": 2288
+                "y": 2074
             }
         }
     },
@@ -575,8 +643,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 8972,
-                "y": 1410
+                "x": 9292,
+                "y": 1175
             }
         }
     },
@@ -611,13 +679,12 @@
             }
         },
         "next": [
-            "AF_FindBox_4_1",
-            "[JumpBack]AF_FindBox_4_2"
+            "AF_FindBox_4_2_clean"
         ],
         "$__mpe_code": {
             "position": {
                 "x": 8332,
-                "y": 1192
+                "y": 1584
             }
         }
     },
@@ -640,7 +707,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 8012,
-                "y": 1713
+                "y": 2074
             }
         }
     },
@@ -658,8 +725,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 8607,
-                "y": 1661
+                "x": 8652,
+                "y": 1916
             }
         }
     },
@@ -683,8 +750,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 8321,
-                "y": 1595
+                "x": 8332,
+                "y": 1998
             }
         }
     },
@@ -721,8 +788,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 8419,
-                "y": 2024
+                "x": 8652,
+                "y": 2162
             }
         }
     },
@@ -736,8 +803,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 8972,
-                "y": 1163
+                "x": 9292,
+                "y": 1814
             }
         }
     },
@@ -765,7 +832,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 3212,
-                "y": 1894
+                "y": 2547
             }
         }
     },
@@ -790,7 +857,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 6092,
-                "y": 2281
+                "y": 2067
             }
         }
     },
@@ -826,7 +893,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 6092,
-                "y": 1986
+                "y": 2331
             }
         }
     },
@@ -846,7 +913,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 6412,
-                "y": 1990
+                "y": 2335
             }
         }
     },
@@ -858,7 +925,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 6732,
-                "y": 2034
+                "y": 2379
             }
         }
     },
@@ -866,7 +933,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 7052,
-                "y": 2014
+                "y": 2359
             }
         }
     },
@@ -889,7 +956,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 3532,
-                "y": 1868
+                "y": 2521
             }
         }
     },
@@ -926,7 +993,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 3852,
-                "y": 1866
+                "y": 2519
             }
         }
     },
@@ -966,7 +1033,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 4172,
-                "y": 1630
+                "y": 2257
             }
         }
     },
@@ -1005,7 +1072,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 4172,
-                "y": 2184
+                "y": 1872
             }
         }
     },
@@ -1019,7 +1086,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 4172,
-                "y": 1954
+                "y": 2613
             }
         }
     },
@@ -1036,7 +1103,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 4492,
-                "y": 2237
+                "y": 2295
             }
         }
     },
@@ -1055,7 +1122,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 4812,
-                "y": 2237
+                "y": 2295
             }
         }
     },
@@ -1078,7 +1145,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 5132,
-                "y": 2222
+                "y": 2280
             }
         }
     },
@@ -1114,7 +1181,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 5452,
-                "y": 2220
+                "y": 2286
             }
         }
     },
@@ -1134,7 +1201,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 5452,
-                "y": 1930
+                "y": 1996
             }
         }
     },
@@ -1163,7 +1230,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 5772,
-                "y": 2248
+                "y": 2314
             }
         }
     },
@@ -1189,7 +1256,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 1292,
-                "y": 2355
+                "y": 2522
             }
         }
     },
@@ -1205,7 +1272,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 1292,
-                "y": 2605
+                "y": 2307
             }
         }
     },
@@ -1231,7 +1298,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 1612,
-                "y": 2257
+                "y": 2550
             }
         }
     },
@@ -1265,7 +1332,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 1612,
-                "y": 2507
+                "y": 2237
             }
         }
     },
@@ -1301,7 +1368,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 1932,
-                "y": 2199
+                "y": 2252
             }
         }
     },
@@ -1334,7 +1401,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 1932,
-                "y": 2509
+                "y": 2562
             }
         }
     },
@@ -1364,8 +1431,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 9292,
-                "y": 1445
+                "x": 9612,
+                "y": 1210
             }
         }
     },
@@ -1389,8 +1456,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 9612,
-                "y": 1699
+                "x": 9932,
+                "y": 1179
             }
         }
     },
@@ -1416,8 +1483,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 9612,
-                "y": 1400
+                "x": 9932,
+                "y": 1451
             }
         }
     },
@@ -1447,8 +1514,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 9932,
-                "y": 1697
+                "x": 10252,
+                "y": 1177
             }
         }
     },
@@ -1472,8 +1539,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 10252,
-                "y": 1732
+                "x": 10572,
+                "y": 1146
             }
         }
     },
@@ -1499,8 +1566,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 10252,
-                "y": 1433
+                "x": 10572,
+                "y": 1418
             }
         }
     },
@@ -1529,8 +1596,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 10572,
-                "y": 1729
+                "x": 10892,
+                "y": 1143
             }
         }
     },
@@ -1554,8 +1621,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 10892,
-                "y": 1727
+                "x": 11212,
+                "y": 1141
             }
         }
     },
@@ -1581,8 +1648,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 11212,
-                "y": 1722
+                "x": 11532,
+                "y": 1136
             }
         }
     },
@@ -1620,7 +1687,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 8012,
-                "y": 2209
+                "y": 2324
             }
         }
     },
@@ -1642,8 +1709,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 9199,
-                "y": 2198
+                "x": 9292,
+                "y": 2338
             }
         }
     },
@@ -1661,7 +1728,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 6412,
-                "y": 2289
+                "y": 2075
             }
         }
     },
@@ -1700,7 +1767,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 12,
-                "y": 2638
+                "y": 2661
             }
         }
     },
@@ -1711,7 +1778,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 652,
-                "y": 2590
+                "y": 2524
             }
         }
     },
@@ -1733,7 +1800,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 7052,
-                "y": 2536
+                "y": 2559
             }
         }
     },
@@ -1755,7 +1822,7 @@
         "$__mpe_code": {
             "position": {
                 "x": 332,
-                "y": 2627
+                "y": 2650
             }
         }
     },
@@ -1960,8 +2027,8 @@
         "post_delay": 10,
         "$__mpe_code": {
             "position": {
-                "x": 9499,
-                "y": 2217
+                "x": 9612,
+                "y": 2369
             }
         }
     },
