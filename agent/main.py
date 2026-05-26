@@ -198,13 +198,6 @@ def _apply_maahub_ui_config(config: dict) -> bool:
         config["settings"] = settings
         changed = True
 
-    if settings.get("theme") != "dark":
-        settings["theme"] = "dark"
-        changed = True
-    if settings.get("accentColor") != MAAHUB_ACCENT_NAME:
-        settings["accentColor"] = MAAHUB_ACCENT_NAME
-        changed = True
-
     custom_accents = config.setdefault("customAccents", [])
     if not isinstance(custom_accents, list):
         custom_accents = []
@@ -223,6 +216,15 @@ def _apply_maahub_ui_config(config: dict) -> bool:
         ),
         None,
     )
+
+    is_first_maahub_startup = accent_index is None
+
+    if is_first_maahub_startup and settings.get("theme") != "dark":
+        settings["theme"] = "dark"
+        changed = True
+    if settings.get("accentColor") != MAAHUB_ACCENT_NAME:
+        settings["accentColor"] = MAAHUB_ACCENT_NAME
+        changed = True
 
     accent_config = json.loads(json.dumps(MAAHUB_ACCENT, ensure_ascii=False))
     if accent_index is None:
