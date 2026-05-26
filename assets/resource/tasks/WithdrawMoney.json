@@ -12,6 +12,10 @@
             "controller": [
                 "Win32",
                 "Win32-Front"
+            ],
+            "group": [
+                "Daily",
+                "CityTycoon"
             ]
         }
     ],

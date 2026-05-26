@@ -9,6 +9,9 @@
                 "FishNumber",
                 "FishSellAuto",
                 "FishBuyBaitAuto"
+            ],
+            "group": [
+                "HethereauHobbies"
             ]
         },
         {
@@ -19,6 +22,9 @@
             "option": [
                 "FishSellAuto",
                 "FishBuyBaitAuto"
+            ],
+            "group": [
+                "HethereauHobbies"
             ]
         }
     ],
