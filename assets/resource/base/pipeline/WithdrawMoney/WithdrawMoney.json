@@ -174,7 +174,8 @@
         },
         "action": "Click",
         "next": [
-            "点击补货"
+            "点击补货",
+            "WithdrawMoneyExit"
         ]
     },
     "点击补货": {
