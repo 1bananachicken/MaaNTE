@@ -84,15 +84,29 @@ This software is open-sourced under [GNU Affero General Public License v3.0 only
   - 🔨 Chase away all customers
 - 💰 Auto Collect One Coffee House Revenue
   - 📦 Auto Restock
+  - 🏷️ Auto switch products based on weather vane
+- 🪑 Auto Furniture Claim
+  - 🏠 Supports 5 apartments: Wiener, Eden, Skyview, Golden Capital, Fenglin
 - 💎 Auto Claim Rewards
   - 🎁 Activity Points
   - 📅 Cycle Bounty
+- 🐾 Pink Paw Heist
+  - 🔄 Infinite loop farming
+  - 📊 Reward statistics & logging
+- 🧩 Auto Tetris
+  - 🤖 Built-in AI decision engine
+  - 🔁 Auto replay until stamina runs out
 - 🕛 Real-time Assistance
   - 🗼 Auto Teleport
   - ⏩ Auto Skip Story
 - ⚔️ Auto Dodge
   - 🛡️ Audio-based auto dodge/counter
 - 🎵 Auto Rhythm Game
+  - 🥁 Loop play Mayoiuta
+- 🎹 Auto Piano
+  - 📂 Supports custom MIDI import
+- 📋 Task Presets
+  - ⚡ Quick Daily / 📆 Full Daily / 💤 AFK / 🗺️ Real-time Assist
 
 ## ❓FAQ
 
