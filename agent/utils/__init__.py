@@ -1,4 +1,8 @@
 from .logger import *
 from .pienv import *
 from . import screen
-from .time import *
+
+try:
+    from .time import *
+except ImportError:
+    logger.warning("utils module import failed")
