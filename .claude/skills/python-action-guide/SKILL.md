@@ -235,6 +235,113 @@ if result and result.box:
     x, y, w, h = result.box.x, result.box.y, result.box.w, result.box.h
 ```
 
+### RecognitionDetail 结构
+
+`context.run_recognition()` 返回 `RecognitionDetail`（`maa.define.RecognitionDetail`），结构如下：
+
+```python
+@dataclass
+class RecognitionDetail:
+    reco_id: int
+    name: str
+    algorithm: Union[AlgorithmEnum, str]
+    hit: bool                              # 是否有命中
+    box: Optional[Rect]                    # 最佳命中的 box
+    all_results: List[RecognitionResult]   # 全部原始结果
+    filtered_results: List[RecognitionResult]  # 过滤后的结果（常用）
+    best_result: Optional[RecognitionResult]   # 最佳结果
+    raw_detail: Dict
+    raw_image: numpy.ndarray
+    draw_images: List[numpy.ndarray]
+```
+
+关键方法/属性：
+
+```python
+result = context.run_recognition("MyNode", image)
+
+# 是否存在命中
+if result and result.hit:
+    # 遍历所有命中（正确的多结果方式，不是 .all）
+    for r in result.filtered_results:
+        # r.box  — Rect(x, y, w, h)
+        # 根据算法类型，r 还有不同属性：
+        #   OCRResult:        r.text (str), r.score (float)
+        #   ColorMatchResult: r.count (int)
+        #   TemplateMatchResult: r.score (float)
+
+# result.box — 最佳命中的 Rect（快捷方式）
+# result.box.x, result.box.y, result.box.w, result.box.h 都是 int
+```
+
+### 多结果模式
+
+**点击所有命中 rect（如 ColorMatch connected 组件、OCR 多匹配）：**
+
+```python
+def _filtered_boxes(result):
+    """返回 filtered_results 中所有命中的 Rect 列表"""
+    if result is None or not result.hit:
+        return []
+    return [r.box for r in result.filtered_results if r.box is not None]
+
+result = context.run_recognition("SomeColorMatch", image)
+for box in _filtered_boxes(result):
+    cx, cy = box.x + box.w // 2, box.y + box.h // 2
+    controller.post_touch_down(cx, cy).wait()
+    time.sleep(0.001)
+    controller.post_touch_up().wait()
+```
+
+**遍历 OCR 多结果并提取文本：**
+
+```python
+result = context.run_recognition("SomeOCRNode", image)
+for r in result.filtered_results if result else []:
+    text = getattr(r, "text", "")           # OCRResult 有 .text，其他类型无
+    box = r.box                              # Rect
+    # 处理 text 和 box ...
+```
+
+**常见错误：**
+- ~~`result.all`~~ → 不存在，应该用 `result.filtered_results`
+- ~~`box.text`~~ → `Rect` 没有 `.text`，应该用 `getattr(r, "text", "")` 在结果对象上取
+- ~~`ColorMatchResult.box.text`~~ → ColorMatchResult 只有 `.box`（Rect）和 `.count`（int），无 `.text`
+
+**`box` 类型注意**：MaaFramework Python 绑定返回的 `.box` 实际是 `list [x,y,w,h]` 而非 `Rect` 对象（虽然类型标注为 `Rect`），转换时需兼容：
+
+```python
+def _box_to_rect(box):
+    if isinstance(box, (list, tuple)):
+        return list(box)
+    return [box.x, box.y, box.w, box.h]
+```
+
+**真实 `raw_detail` 结构参考（ColorMatch）：**
+
+```json
+{
+  "reco_id": 400000008,
+  "algorithm": "ColorMatch",
+  "box": [256, 384, 19, 18],
+  "detail": {
+    "all": [
+      {"box": [256, 384, 19, 18], "count": 185},
+      {"box": [256, 531, 19, 17], "count": 182}
+    ],
+    "best": {"box": [256, 384, 19, 18], "count": 185},
+    "filtered": [
+      {"box": [256, 384, 19, 18], "count": 185},
+      {"box": [256, 531, 19, 17], "count": 182}
+    ]
+  }
+}
+```
+
+- `result.filtered_results[i].box` → `list [x,y,w,h]`
+- `result.filtered_results[i].count` → `int`（ColorMatch）/ `result.filtered_results[i].text` → `str`（OCR）
+- `result.raw_detail` 包含完整 JSON-serializable dict，可作为兜底访问
+
 ### context.run_recognition_direct
 
 在 Python 中直接调用 MaaFramework 识别算法（无需 Pipeline 节点定义）：

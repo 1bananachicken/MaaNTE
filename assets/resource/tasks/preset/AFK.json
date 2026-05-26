@@ -1,0 +1,40 @@
+{
+    "preset": [
+        {
+            "name": "AFK",
+            "label": "$preset.AFK.label",
+            "description": "$preset.AFK.description",
+            "task": [
+                {
+                    "name": "Fish",
+                    "option": {
+                        "FishLoopInfinite": "Yes",
+                        "FishNumber": {
+                            "count": 99
+                        },
+                        "FishSellAuto": "Yes",
+                        "FishBuyBaitAuto": "Yes"
+                    },
+                    "enabled": false
+                },
+                {
+                    "name": "FishNew",
+                    "option": {
+                        "FishSellAuto": "Yes",
+                        "FishBuyBaitAuto": "Yes",
+                        "FishBaitThreshold": "0.8"
+                    },
+                    "enabled": false
+                },
+                {
+                    "name": "PinkPawHeist",
+                    "option": {
+                        "PinkPawHeist_Loop": "Yes",
+                        "PinkPawHeist_Scheme": "Core2"
+                    },
+                    "enabled": false
+                }
+            ]
+        }
+    ]
+}
