@@ -406,6 +406,8 @@ def _run_pip_command(cmd_args: list, operation_name: str) -> bool:
 def install_requirements(
     req_file="requirements.txt", pip_config: dict | None = None
 ) -> bool:
+    if not Path.exists(Path(project_root_dir) / "deps"):
+        return True
     req_path = Path(project_root_dir) / req_file  # 确保相对于项目根目录
     if not req_path.exists():
         logger.error(f"{req_file} 文件不存在于 {req_path.resolve()}")
