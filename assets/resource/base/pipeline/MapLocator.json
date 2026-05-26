@@ -1,7 +1,26 @@
 {
     "MapLocator": {
         "action": "Custom",
-        "custom_action": "map_locator"
+        "custom_action": "map_locator",
+        "custom_action_param": {
+            "debug": false
+        }
+    },
+    "MapLocatorNcc": {
+        "action": "Custom",
+        "custom_action": "map_locator_ncc",
+        "custom_action_param": {
+            "debug": true,
+            "min_score": 0.52,
+            "local_min_score": 0.46,
+            "local_trust_score": 0.9,
+            "global_check_interval": 4,
+            "relocate_score": 0.62,
+            "relocate_confirm_frames": 2,
+            "template_scales": [0.96, 1.0, 1.04],
+            "global_search_long_side": 1600,
+            "global_refine_radius": 520
+        }
     },
     "MapLocatorPyramid": {
         "action": "Custom",
