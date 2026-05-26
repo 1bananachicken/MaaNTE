@@ -54,7 +54,7 @@ def _resolve_output_dir(value: Any) -> Path:
     path = Path(str(value)).expanduser()
     if path.is_absolute():
         return path
-    return Path(__file__).resolve().parents[3] / path
+    return Path(__file__).resolve().parents[4] / path
 
 
 def _make_session_dir(base_dir: Path) -> Path:
@@ -120,12 +120,14 @@ def _save_sample(
     return path
 
 
-@AgentServer.custom_action("dataset_recorder")
-class DatasetRecorderAction(CustomAction):
+@AgentServer.custom_action("autonomous_driving_dataset_recorder")
+class AutonomousDrivingDatasetRecorder(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         params = _parse_params(argv.custom_action_param)
         dataset_dir = _resolve_output_dir(params.get("output_dir"))
+        print(f"Dataset recorder output directory: {dataset_dir}")
         output_dir = _make_session_dir(dataset_dir)
+        print(f"Dataset recorder session directory: {output_dir}")
 
         try:
             duration_seconds = max(0.0, float(params.get("duration_seconds", 60.0)))

@@ -19,7 +19,7 @@ from .Movement.character_move import *
 from .Common.alt_click import *
 from .furniture_claim import *
 from .auto_piano.action import *
-from .dataset_recorder import *
+from .DatasetCollection.autonomous_driving_dataset_recorder import *
 
 __all__ = [
     "AutoMakeCoffee",
@@ -41,5 +41,5 @@ __all__ = [
     "AltClick",
     "FurnitureClaim",
     "AutoPlayPiano",
-    "DatasetRecorderAction",
+    "AutonomousDrivingDatasetRecorder",
 ]
