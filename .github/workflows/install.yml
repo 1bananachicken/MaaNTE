@@ -166,6 +166,15 @@ jobs:
             cp -rpvn install/deps/. install-mxu/deps/
           fi
       
+      - name: Pre-install all dependencies
+        shell: bash
+        run: |
+          echo "Pre-installing all dependencies into embedded Python..."
+          ./install-mxu/python/python.exe -m pip install \
+            --no-index \
+            --find-links install-mxu/deps \
+            -r requirements.txt
+
       - name: Install and patch soundcard
         shell: bash
         run: |
