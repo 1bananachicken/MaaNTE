@@ -9,7 +9,8 @@
             60
         ],
         "template": [
-            "Common/Button/ScarboroughFair.png"
+            "Common/Button/ScarboroughFair.png",
+            "Common/Button/ScarboroughFairWithRedDot.png"
         ],
         "green_mask": true,
         "pre_delay": 0,

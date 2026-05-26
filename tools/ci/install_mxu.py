@@ -4,11 +4,20 @@ import shutil
 import sys
 import json
 import os
+import re
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(script_dir)
 
 from configure import configure_ocr_model
+
+
+def load_json_with_comments(path):
+    with open(path, "r", encoding="utf-8") as f:
+        text = f.read()
+    text = re.sub(r"^\s*//.*$", "", text, flags=re.MULTILINE)
+    return json.loads(text)
+
 
 working_dir = Path(__file__).parent.parent.parent
 install_path = working_dir / Path("install-mxu")
@@ -57,8 +66,7 @@ def install_resource():
         install_path,
     )
 
-    with open(install_path / "interface.json", "r", encoding="utf-8") as f:
-        interface = json.load(f)
+    interface = load_json_with_comments(install_path / "interface.json")
 
     interface["version"] = version.lstrip("v")
     interface["title"] = f"MaaNTE {version} | 异环小助手"
@@ -82,8 +90,7 @@ def install_agent():
         dirs_exist_ok=True,
     )
 
-    with open(install_path / "interface.json", "r", encoding="utf-8") as f:
-        interface = json.load(f)
+    interface = load_json_with_comments(install_path / "interface.json")
 
     if sys.platform.startswith("win"):
         interface["agent"]["child_exec"] = r"./python/python.exe"

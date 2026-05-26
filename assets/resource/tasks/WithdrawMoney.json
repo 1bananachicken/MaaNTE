@@ -6,11 +6,16 @@
             "entry": "WithdrawMoneyEntrance",
             "description": "$task_withdraw_money_desc",
             "option": [
-                "Restock"
+                "Restock",
+                "ChooseProduct"
             ],
             "controller": [
                 "Win32",
                 "Win32-Front"
+            ],
+            "group": [
+                "Daily",
+                "CityTycoon"
             ]
         }
     ],
@@ -40,6 +45,32 @@
                 }
             ],
             "default_case": "No"
+        },
+        "ChooseProduct": {
+            "type": "switch",
+            "label": "$task_withdraw_money_option_choose_product",
+            "description": "$task_withdraw_money_option_choose_product_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "WithdrawMoneyEnterItemList": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "WithdrawMoneyEnterItemList": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
         }
     }
 }
