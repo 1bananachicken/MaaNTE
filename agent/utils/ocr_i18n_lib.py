@@ -332,7 +332,7 @@ MULTILANG_OCR_LIBRARY = {
         "desc": "在角色菜单内",
         "expected": [
             "个人信息", "個人資訊", "信息", "資訊",
-            r"(?i)PROFILE", r"(?i)Profile" r"(?i)INFO", r"(?i)Info",
+            r"(?i)PROFILE", r"(?i)Profile", r"(?i)INFO", r"(?i)Info",
             "メッセージ", "情報", "정보"
         ]
     },
