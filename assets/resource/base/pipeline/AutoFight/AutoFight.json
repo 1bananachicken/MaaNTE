@@ -3,162 +3,16 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1779796880380,
+            "lastSyncTime": 1779898544361,
             "isModifiedExternally": false,
             "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\MaaNTE\\assets\\resource\\base\\pipeline\\AutoFight\\AutoFight.json",
             "savedViewport": {
-                "x": -5364,
-                "y": -851,
-                "zoom": 0.7
+                "x": -813,
+                "y": -1937,
+                "zoom": 0.92
             },
             "filename": "AutoFight",
             "version": "v1.5.3"
-        }
-    },
-    "AF_FindBox_4_3": {
-        "pre_wait_freezes": 0,
-        "pre_delay": 10,
-        "action": {
-            "type": "Swipe",
-            "param": {
-                "begin": [
-                    640,
-                    320,
-                    1,
-                    1
-                ],
-                "end": [
-                    [
-                        650,
-                        420,
-                        1,
-                        1
-                    ]
-                ],
-                "only_hover": true,
-                "duration": [
-                    10
-                ]
-            }
-        },
-        "post_wait_freezes": 0,
-        "post_delay": 10,
-        "next": [
-            "AF_MoveScane_2_1"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 8972,
-                "y": 2089
-            }
-        }
-    },
-    "AF_FindBox_4_1": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    620,
-                    40,
-                    40,
-                    80
-                ],
-                "template": [
-                    "AF_image/宝箱检测.png"
-                ],
-                "green_mask": true,
-                "threshold": [
-                    0.5
-                ]
-            }
-        },
-        "action": {
-            "type": "Custom",
-            "param": {
-                "custom_action": "UF_ActionLogger",
-                "custom_action_param": {
-                    "debug": [
-                        "精细找到宝箱"
-                    ]
-                }
-            }
-        },
-        "next": [
-            "AF_FindBox_5_1",
-            "[JumpBack]AF_FindBox_5_2"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 8972,
-                "y": 1675
-            }
-        }
-    },
-    "AF_FindBox_5_2_finish": {
-        "action": {
-            "type": "Custom",
-            "param": {
-                "custom_action": "UF_ActionLogger",
-                "custom_action_param": {
-                    "error": [
-                        "无法找到宝箱"
-                    ]
-                }
-            }
-        },
-        "$__mpe_code": {
-            "position": {
-                "x": 9292,
-                "y": 1520
-            }
-        }
-    },
-    "AF_FindBox_4_2": {
-        "recognition": {
-            "type": "Custom",
-            "param": {
-                "custom_recognition": "UF_Count",
-                "custom_recognition_param": {
-                    "current_number": 0,
-                    "target_number": 100
-                }
-            }
-        },
-        "pre_wait_freezes": 0,
-        "pre_delay": 0,
-        "post_wait_freezes": 0,
-        "post_delay": 0,
-        "next": [
-            "AF_FindBox_5_2_finish"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 8972,
-                "y": 1274
-            }
-        }
-    },
-    "AF_FindBox_4_2_clean": {
-        "recognition": {
-            "type": "Custom",
-            "param": {
-                "custom_recognition": "UF_CountClean",
-                "custom_recognition_param": {
-                    "clean_node_name": "AF_FindBox_4_2",
-                    "target_number": 100
-                }
-            }
-        },
-        "next": [
-            "AF_FindBox_4_1",
-            "AF_FindBox_4_2",
-            "[JumpBack]AF_FindBox_4_3"
-        ],
-        "$__mpe_code": {
-            "position": {
-                "x": 8652,
-                "y": 1666
-            }
         }
     },
     "AF_Action_AutoFightSimple": {
@@ -1297,8 +1151,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 1612,
-                "y": 2550
+                "x": 1603,
+                "y": 2542
             }
         }
     },
@@ -1307,10 +1161,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    1153,
-                    535,
-                    73,
-                    35
+                    912,
+                    265,
+                    320,
+                    328
                 ],
                 "expected": [
                     "探索指南"
@@ -1320,11 +1174,11 @@
         "action": {
             "type": "Click",
             "param": {
-                "target": [
-                    1168,
-                    494,
-                    46,
-                    30
+                "target_offset": [
+                    16,
+                    -51,
+                    -30,
+                    13
                 ],
                 "contact": 0
             }
@@ -2147,6 +2001,152 @@
             "position": {
                 "x": 1212,
                 "y": 12
+            }
+        }
+    },
+    "AF_FindBox_4_3": {
+        "pre_wait_freezes": 0,
+        "pre_delay": 10,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    640,
+                    320,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        650,
+                        420,
+                        1,
+                        1
+                    ]
+                ],
+                "only_hover": true,
+                "duration": [
+                    10
+                ]
+            }
+        },
+        "post_wait_freezes": 0,
+        "post_delay": 10,
+        "next": [
+            "AF_MoveScane_2_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 8972,
+                "y": 2089
+            }
+        }
+    },
+    "AF_FindBox_4_1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    620,
+                    25,
+                    40,
+                    110
+                ],
+                "template": [
+                    "AF_image/宝箱检测.png"
+                ],
+                "green_mask": true,
+                "threshold": [
+                    0.35
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "精细找到宝箱"
+                    ]
+                }
+            }
+        },
+        "next": [
+            "AF_FindBox_5_1",
+            "[JumpBack]AF_FindBox_5_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 8972,
+                "y": 1675
+            }
+        }
+    },
+    "AF_FindBox_5_2_finish": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "error": [
+                        "无法找到宝箱"
+                    ]
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 9292,
+                "y": 1520
+            }
+        }
+    },
+    "AF_FindBox_4_2": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_Count",
+                "custom_recognition_param": {
+                    "current_number": 0,
+                    "target_number": 100
+                }
+            }
+        },
+        "pre_wait_freezes": 0,
+        "pre_delay": 0,
+        "post_wait_freezes": 0,
+        "post_delay": 0,
+        "next": [
+            "AF_FindBox_5_2_finish"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 8972,
+                "y": 1274
+            }
+        }
+    },
+    "AF_FindBox_4_2_clean": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "UF_CountClean",
+                "custom_recognition_param": {
+                    "clean_node_name": "AF_FindBox_4_2",
+                    "target_number": 100
+                }
+            }
+        },
+        "next": [
+            "AF_FindBox_4_1",
+            "AF_FindBox_4_2",
+            "[JumpBack]AF_FindBox_4_3"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 8652,
+                "y": 1666
             }
         }
     }

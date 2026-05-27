@@ -190,6 +190,8 @@ class AF_AutoFightCls(CustomRecognition):
 
             if finsh_index.best_result is not None:
                 print(finsh_index.best_result.text)
+                while  time.time()-time_key_69<=7 and time.time()-time_key_81<=7:
+                    time.sleep(1)
                 break
             if t2 - t1 > 40:
                 break
