@@ -147,8 +147,7 @@
                     "釣り餌を装着する必要",
                     "미끼를 장착해야 낚시할 수 있습니다"
                 ],
-                "threshold": 0.5
-            ,
+                "threshold": 0.5,
                 "roi_offset": [
                     0,
                     0,
@@ -592,8 +591,7 @@
                     "CONFIRN",
                     "확인"
                 ],
-                "threshold": 0.8
-            ,
+                "threshold": 0.8,
                 "roi_offset": [
                     0,
                     0,
@@ -942,8 +940,7 @@
                     "CONFIRN",
                     "확인"
                 ],
-                "threshold": 0.8
-            ,
+                "threshold": 0.8,
                 "roi_offset": [
                     0,
                     0,
