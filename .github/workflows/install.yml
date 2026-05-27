@@ -1,3 +1,5 @@
+name: install
+
 on:
   push:
     tags:
@@ -104,7 +106,7 @@ jobs:
           tag: ${{ env.MAA_FRAMEWORK_VERSION }}
           out-file-path: "deps"
           extract: true
-      
+
       - name: Download MXU
         id: download_mxu
         uses: robinraju/release-downloader@v1
@@ -156,7 +158,7 @@ jobs:
         shell: bash
         run: |
           ./install/python/python.exe tools/ci/download_deps.py --deps-dir install/deps
-      
+
       - name: Create MXU version
         shell: bash
         run: |
@@ -165,7 +167,7 @@ jobs:
           if [ -d "install/deps" ]; then
             cp -rpvn install/deps/. install-mxu/deps/
           fi
-      
+
       - name: Pre-install all dependencies
         shell: bash
         run: |
