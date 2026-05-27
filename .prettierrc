@@ -8,19 +8,14 @@
     "endOfLine": "auto",
     "overrides": [
         {
-            "files": [
-                "**/*.yml",
-                "**/*.yaml"
-            ],
+            "files": ["**/*.yml", "**/*.yaml"],
             "options": {
                 "parser": "yaml",
                 "tabWidth": 2
             }
         },
         {
-            "files": [
-                "*.json"
-            ],
+            "files": ["*.json"],
             "options": {
                 "parser": "json",
                 "useTabs": false,

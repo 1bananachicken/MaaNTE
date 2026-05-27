@@ -16,15 +16,23 @@
             "url": "/deps/tools/pipeline.schema.json"
         },
         {
-            "fileMatch": ["/assets/interface.json", "/install/interface.json"],
+            "fileMatch": [
+                "/assets/interface.json",
+                "/install/interface.json"
+            ],
             "url": "/deps/tools/interface.schema.json"
         },
         {
-            "fileMatch": ["/assets/resource/tasks/**/*.json", "/install/resource/tasks/**/*.json"],
+            "fileMatch": [
+                "/assets/resource/tasks/**/*.json",
+                "/install/resource/tasks/**/*.json"
+            ],
             "url": "/deps/tools/interface_import.schema.json"
         },
         {
-            "fileMatch": ["/install/config/maa_pi_config.json"],
+            "fileMatch": [
+                "/install/config/maa_pi_config.json"
+            ],
             "url": "/deps/tools/interface_config.schema.json"
         }
     ],
@@ -35,6 +43,7 @@
         "**/assets/**/*.json": "jsonc"
     },
     "[json][jsonc][yaml]": {
+        "editor.formatOnSave": true,
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "[python]": {
@@ -44,5 +53,8 @@
     "[markdown]": {
         "editor.formatOnSave": true,
         "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "[toml]": {
+        "editor.defaultFormatter": "tamasfe.even-better-toml"
     }
 }
