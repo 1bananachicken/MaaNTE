@@ -57,7 +57,7 @@ class Win32Config:
     keyboard: str = ""
 
     @classmethod
-    def from_dict(cls, data: Any) -> "Win32Config | None":
+    def from_dict(cls, data: Any) -> Win32Config | None:
         if not isinstance(data, dict):
             return None
         return cls(
@@ -76,7 +76,7 @@ class MacOSConfig:
     input: str = ""
 
     @classmethod
-    def from_dict(cls, data: Any) -> "MacOSConfig | None":
+    def from_dict(cls, data: Any) -> MacOSConfig | None:
         if not isinstance(data, dict):
             return None
         return cls(
@@ -91,7 +91,7 @@ class PlayCoverConfig:
     uuid: str = ""
 
     @classmethod
-    def from_dict(cls, data: Any) -> "PlayCoverConfig | None":
+    def from_dict(cls, data: Any) -> PlayCoverConfig | None:
         if not isinstance(data, dict):
             return None
         return cls(uuid=_as_string(data.get("uuid")))
@@ -105,7 +105,7 @@ class GamepadConfig:
     screencap: str = ""
 
     @classmethod
-    def from_dict(cls, data: Any) -> "GamepadConfig | None":
+    def from_dict(cls, data: Any) -> GamepadConfig | None:
         if not isinstance(data, dict):
             return None
         return cls(
@@ -137,7 +137,7 @@ class Controller:
     wlroots: Any = None
 
     @classmethod
-    def from_dict(cls, data: Any) -> "Controller":
+    def from_dict(cls, data: Any) -> Controller:
         if not isinstance(data, dict):
             raise TypeError("PI_CONTROLLER is not a JSON object")
         return cls(
@@ -172,7 +172,7 @@ class Resource:
     option: list[str] = field(default_factory=list)
 
     @classmethod
-    def from_dict(cls, data: Any) -> "Resource":
+    def from_dict(cls, data: Any) -> Resource:
         if not isinstance(data, dict):
             raise TypeError("PI_RESOURCE is not a JSON object")
         return cls(
@@ -322,34 +322,34 @@ def resource_paths() -> list[str]:
 
 
 __all__ = [
-    "ENV_INTERFACE_VERSION",
-    "ENV_CLIENT_NAME",
-    "ENV_CLIENT_VERSION",
     "ENV_CLIENT_LANGUAGE",
     "ENV_CLIENT_MAAFW_VERSION",
-    "ENV_VERSION",
+    "ENV_CLIENT_NAME",
+    "ENV_CLIENT_VERSION",
     "ENV_CONTROLLER",
+    "ENV_INTERFACE_VERSION",
     "ENV_RESOURCE",
-    "Win32Config",
+    "ENV_VERSION",
+    "Controller",
+    "Env",
+    "GamepadConfig",
     "MacOSConfig",
     "PlayCoverConfig",
-    "GamepadConfig",
-    "Controller",
     "Resource",
-    "Env",
-    "init",
-    "get",
-    "interface_version",
-    "client_name",
-    "client_version",
+    "Win32Config",
     "client_language",
     "client_maafw_version",
-    "project_version",
+    "client_name",
+    "client_version",
     "controller",
-    "resource",
-    "controller_type",
     "controller_name",
-    "resource_name",
+    "controller_type",
+    "get",
+    "init",
+    "interface_version",
+    "project_version",
+    "resource",
     "resource_label",
+    "resource_name",
     "resource_paths",
 ]

@@ -1,7 +1,6 @@
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-
+from maa.custom_action import CustomAction
 from utils.logger import logger
 from utils.maafocus import PrintT
 

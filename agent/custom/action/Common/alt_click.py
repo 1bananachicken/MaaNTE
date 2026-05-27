@@ -1,7 +1,6 @@
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-
+from maa.custom_action import CustomAction
 from utils.logger import logger
 
 
@@ -10,7 +9,6 @@ class AltClick(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-
         if argv.box is None:
             logger.error("No target box from recognition")
             return CustomAction.RunResult(success=False)

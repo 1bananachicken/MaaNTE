@@ -7,7 +7,7 @@
     "welcome": "$welcome.file",
     "github": "https://github.com/1bananachicken/MaaNTE",
     "icon": "logo.ico",
-    "version": "0.0.4",
+    "version": "1.0.0",
     "mirrorchyan_rid": "MaaNTE",
     "mirrorchyan_multiplatform": true,
     "languages": {

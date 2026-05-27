@@ -221,4 +221,4 @@ def change_console_level(level="DEBUG"):
 
 logger = setup_logger(console_level="WARNING" if _is_mxu_client() else "INFO")
 
-__all__ = ["setup_logger", "change_console_level", "logger"]
+__all__ = ["change_console_level", "logger", "setup_logger"]

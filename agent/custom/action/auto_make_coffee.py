@@ -1,11 +1,9 @@
-import time
 import json
-import random
+import time
 
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-
+from maa.custom_action import CustomAction
 from utils.maafocus import PrintT
 
 
@@ -28,7 +26,6 @@ def click_rect(controller, rect):
 
 @AgentServer.custom_action("auto_make_coffee")
 class AutoMakeCoffee(CustomAction):
-
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:

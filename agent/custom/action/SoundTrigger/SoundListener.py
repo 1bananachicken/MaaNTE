@@ -2,7 +2,6 @@ import os
 import threading
 import time
 import warnings
-from typing import Callable, Optional
 
 import librosa
 import numpy as np
@@ -45,7 +44,7 @@ class Ear:
         self.stop_check = stop_check
 
         self._running = threading.Event()
-        self._thread: Optional[threading.Thread] = None
+        self._thread: threading.Thread | None = None
         self._last_trigger = 0.0
         self._trigger_cd = 0.5
 

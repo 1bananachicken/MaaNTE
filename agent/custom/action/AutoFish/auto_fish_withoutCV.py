@@ -1,12 +1,10 @@
-from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
-from maa.context import Context
-
-import time
 import json
 
+from maa.agent.agent_server import AgentServer
+from maa.context import Context
+from maa.custom_action import CustomAction
 from utils.logger import logger
-from utils.maafocus import Print, PrintT
+from utils.maafocus import PrintT
 
 # 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
 CURSOR_PX_PER_SEC = (

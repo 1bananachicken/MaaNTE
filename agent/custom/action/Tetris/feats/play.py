@@ -6,18 +6,18 @@ from ...Common.utils import get_image
 from ..utils.board import (
     BOARD_COLS,
     BOARD_ROWS,
+    evaluate_board,
     extract_board_crop,
     simulate_drop,
-    evaluate_board,
 )
 from ..utils.pieces import PIECES, rotation_distance
 from ..utils.scene import (
-    SceneGate,
     VK_A,
     VK_D,
     VK_J,
     VK_K,
     VK_SPACE,
+    SceneGate,
 )
 from ..utils.scene_detector import TetrisSceneDetector
 
@@ -188,9 +188,8 @@ class TetrisGamePlayer:
                 self._debug_log(
                     f"[Stats] Lines cleared: {lines_cleared}, Total: {self.total_lines_cleared}"
                 )
-            else:
-                if time.time() - self.last_clear_time > 5.0:
-                    self.combo_count = 0
+            elif time.time() - self.last_clear_time > 5.0:
+                self.combo_count = 0
 
             self.current_piece_name = next_piece_info["piece"]
             self.current_rotation = next_piece_info["rotation"]
@@ -307,8 +306,6 @@ class TetrisGamePlayer:
     def _scan_play_state(self, img):
         if img is None or not isinstance(img, np.ndarray):
             return None
-
-        from ..utils.board import extract_board_crop
 
         board_crop = extract_board_crop(img)
         if board_crop is None or board_crop.size == 0:
@@ -542,7 +539,7 @@ class TetrisGamePlayer:
         best_move = None
         for rotation_index, shape in enumerate(PIECES[piece_name]):
             width = max(col for _, col in shape) + 1
-            for target_col in range(0, BOARD_COLS - width + 1):
+            for target_col in range(BOARD_COLS - width + 1):
                 result = simulate_drop(board, shape, target_col)
                 if result is None:
                     continue
@@ -588,7 +585,7 @@ class TetrisGamePlayer:
         candidates = []
         for rotation_index, shape in enumerate(PIECES[piece_name]):
             width = max(col for _, col in shape) + 1
-            for target_col in range(0, BOARD_COLS - width + 1):
+            for target_col in range(BOARD_COLS - width + 1):
                 result = simulate_drop(board, shape, target_col)
                 if result is None:
                     continue
@@ -700,7 +697,7 @@ class TetrisGamePlayer:
 
         for rotation_index, shape in enumerate(PIECES[piece_name]):
             width = max(col for _, col in shape) + 1
-            for target_col in range(0, BOARD_COLS - width + 1):
+            for target_col in range(BOARD_COLS - width + 1):
                 if not self._is_move_feasible(
                     board,
                     piece_name,

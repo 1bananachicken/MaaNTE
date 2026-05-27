@@ -128,8 +128,10 @@ MaaNTE开发者群: 1092630280
 
 0. 配置环境
 
-- 安装 python>=3.11
-- 建议使用vscode作为IDE进行开发，并安装 [vscode插件“maa-support”](https://marketplace.visualstudio.com/items?itemName=nekosu.maa-support) 进行调试
+- 安装 Python （版本需与 `tools/ci/setup_embed_python.py` 中版本一致）
+- 建议使用 VSCode 作为 IDE 进行开发  
+  VSCode 打开项目时会自动提示安装所需插件，包括代码格式化和调试插件，需要点击安装  
+  使用 [VSCode插件 “maa-support”](https://marketplace.visualstudio.com/items?itemName=nekosu.maa-support) 进行调试
 
 1. Fork项目
 
@@ -141,11 +143,11 @@ MaaNTE开发者群: 1092630280
 git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 ```
 
-3. 下载MaaFramework的 [release包](https://github.com/MaaXYZ/MaaFramework/releases)，解压到 `deps` 文件夹中
+3. 下载 MaaFramework 的 [release包](https://github.com/MaaXYZ/MaaFramework/releases)，解压到 `deps` 文件夹中 （默认不需要手动下载，启动时会自动检测并下载）
 
 4. 提交PR
 
-- 新功能开发请提交到dev分支
+- 新功能开发请提交到 dev 分支
 
 更多开发文档可以参考 [M9A文档站](https://1999.fan/zh_cn/develop/development.html)
 

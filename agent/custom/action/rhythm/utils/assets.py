@@ -29,7 +29,9 @@ def _get_image_root() -> Path:
             candidates.append(p2)
 
     if candidates:
-        logger.debug("图像资源根目录: %s (共 %d 个候选)", candidates[0], len(candidates))
+        logger.debug(
+            "图像资源根目录: %s (共 %d 个候选)", candidates[0], len(candidates)
+        )
         _image_root_cache = candidates[0]
         return candidates[0]
 

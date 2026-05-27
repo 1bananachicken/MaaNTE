@@ -4,11 +4,9 @@ import time
 from typing import Any
 
 import cv2
-
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-
+from maa.custom_action import CustomAction
 from utils.maafocus import PrintT
 
 from ..utils.config import load_rhythm_config
@@ -84,7 +82,7 @@ class AutoRhythmSelectSong(CustomAction):
                 if sel_state == "done":
                     PrintT(context, "rhythm.select_done")
                     return CustomAction.RunResult(success=True)
-                elif sel_state == "failed":
+                if sel_state == "failed":
                     logger.warning("自动选歌失败")
                     return CustomAction.RunResult(success=False)
 

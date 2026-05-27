@@ -2,15 +2,17 @@ import json
 import time
 
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
+from maa.custom_action import CustomAction
 
 _KEY_MAP = {"W": 87, "A": 65, "S": 83, "D": 68}
 
 
 @AgentServer.custom_action("character_move")
 class CharacterMoveAction(CustomAction):
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
         controller = context.tasker.controller
 
         params = {}

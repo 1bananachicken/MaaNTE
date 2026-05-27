@@ -1,15 +1,14 @@
-import cv2
 import time
-
 from pathlib import Path
-from ..Common.utils import get_image, match_template_in_region, click_rect
-from utils import screen
 
+import cv2
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-
+from maa.custom_action import CustomAction
+from utils import screen
 from utils.maafocus import PrintT
+
+from ..Common.utils import click_rect, get_image, match_template_in_region
 
 
 @AgentServer.custom_action("auto_sell_fish")
@@ -125,15 +124,13 @@ class AutoSellFish(CustomAction):
                         click_rect(controller, confirm_sell_region, 0.2)
                         time.sleep(0.5)
                         break
-                    elif sell_fail:
+                    if sell_fail:
                         PrintT(context, "autofish.no_fish_sell_close")
                         controller.post_click_key(KEY_ESC).wait()
                         return CustomAction.RunResult(success=True)
-                    else:
-                        time.sleep(0.1)
+                    time.sleep(0.1)
                 break
-            else:
-                time.sleep(0.1)
+            time.sleep(0.1)
 
         while True:
             img = get_image(controller)
@@ -146,8 +143,7 @@ class AutoSellFish(CustomAction):
                 time.sleep(0.5)
                 controller.post_click_key(KEY_ESC).wait()
                 break
-            else:
-                time.sleep(1)
+            time.sleep(1)
 
         PrintT(context, "autofish.all_done")
         return CustomAction.RunResult(success=True)

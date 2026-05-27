@@ -1,7 +1,7 @@
 import random
 import threading
 import time
-from typing import Callable, Optional
+from collections.abc import Callable
 
 VK_SHIFT = 0xA0
 
@@ -12,6 +12,7 @@ def _log():
     global logger
     if logger is None:
         from custom.action.Common.logger import get_logger
+
         logger = get_logger(__name__)
     return logger
 
@@ -20,8 +21,8 @@ class Dodger:
     def __init__(
         self,
         controller=None,
-        dodge_fn: Optional[Callable] = None,
-        counter_fn: Optional[Callable] = None,
+        dodge_fn: Callable | None = None,
+        counter_fn: Callable | None = None,
         stop_check=None,
     ):
         self.controller = controller
@@ -89,7 +90,9 @@ class Dodger:
     def _default_counter(self):
         key = random.choice([0x31, 0x32, 0x33, 0x34])
         key_name = chr(key)
-        _log().info(f"执行按键: {key_name}按下 -> {key_name}释放 -> 左Shift按下 -> 左Shift释放")
+        _log().info(
+            f"执行按键: {key_name}按下 -> {key_name}释放 -> 左Shift按下 -> 左Shift释放"
+        )
         self._click_key(key)
         time.sleep(0.02)
         self._click_key(VK_SHIFT)

@@ -1,17 +1,16 @@
-import cv2
-import time
 import json
-
+import time
 from pathlib import Path
-from ..Common.utils import get_image, match_template_in_region
-from ..Common.logger import get_logger
-from utils import screen
 
+import cv2
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-
+from maa.custom_action import CustomAction
+from utils import screen
 from utils.maafocus import PrintT
+
+from ..Common.logger import get_logger
+from ..Common.utils import get_image, match_template_in_region
 
 logger = get_logger(__name__)
 

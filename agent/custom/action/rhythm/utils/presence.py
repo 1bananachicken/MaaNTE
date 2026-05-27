@@ -18,7 +18,6 @@ _PIPELINE_NODES = {
 
 
 class SceneGate:
-
     def __init__(self, cfg: dict[str, Any]) -> None:
         sc = cfg.get("scene") or {}
         self._state_confirm_frames = max(1, int(sc.get("state_confirm_frames", 2)))

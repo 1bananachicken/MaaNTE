@@ -5,12 +5,10 @@ import time
 from typing import Any
 
 import cv2
-
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-from maa.pipeline import JRecognitionType, JOCR
-
+from maa.custom_action import CustomAction
+from maa.pipeline import JOCR, JRecognitionType
 from utils.maafocus import PrintT
 
 from ..utils.config import load_rhythm_config
@@ -62,7 +60,6 @@ def _detect_cost_vitality(context: Context, frame: Any, cfg: dict[str, Any]) -> 
             if frame is None or frame.size == 0:
                 continue
             if len(frame.shape) == 3 and frame.shape[2] == 4:
-
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
 
         detail = context.run_recognition_direct(

@@ -2,8 +2,8 @@ import json
 import time
 
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
+from maa.custom_action import CustomAction
 
 _KEY_W = 87
 _ALIGN_DURATION = 0.1
@@ -11,7 +11,9 @@ _ALIGN_DURATION = 0.1
 
 @AgentServer.custom_action("mouse_relative_move")
 class MouseMoveAction(CustomAction):
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
         controller = context.tasker.controller
 
         params = {}
@@ -27,8 +29,7 @@ class MouseMoveAction(CustomAction):
         step_delay = params.get("step_delay", 0.03)
         align = params.get("align", True)
 
-        if steps < 1:
-            steps = 1
+        steps = max(steps, 1)
 
         step_x = dx / steps
         step_y = dy / steps

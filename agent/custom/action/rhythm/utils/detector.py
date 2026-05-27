@@ -1,15 +1,15 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 import logging
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from typing import Any
 
 import cv2
 import numpy as np
 from numpy.typing import NDArray
 
-from .assets import list_drum_templates, _get_image_root, read_image
+from .assets import _get_image_root, list_drum_templates, read_image
 from .lanes import LaneLayout
 
 logger = logging.getLogger(__name__)
@@ -104,7 +104,11 @@ class DrumDetector:
         frame_bgr: NDArray[np.uint8],
         layout: LaneLayout,
     ) -> tuple[float, list[DrumCandidate]]:
-        if not self._enabled_lanes[lane_idx] or not self._template_loaded[lane_idx] or self._templates[lane_idx] is None:
+        if (
+            not self._enabled_lanes[lane_idx]
+            or not self._template_loaded[lane_idx]
+            or self._templates[lane_idx] is None
+        ):
             return 0.0, []
 
         tpl = self._templates[lane_idx]
@@ -130,7 +134,9 @@ class DrumDetector:
         roi = frame_bgr[ry0:ry1, rx0:rx1]
         result = cv2.matchTemplate(roi, tpl, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, max_loc = cv2.minMaxLoc(result)
-        candidate_threshold = self._thresholds[lane_idx] - self._candidate_threshold_margin
+        candidate_threshold = (
+            self._thresholds[lane_idx] - self._candidate_threshold_margin
+        )
         ys, xs = np.where(result >= candidate_threshold)
 
         candidates: list[DrumCandidate] = []
@@ -153,7 +159,8 @@ class DrumDetector:
             if len(candidates) >= self._max_candidates_per_lane:
                 break
             duplicate = any(
-                abs(candidate.center_y - kept.center_y) < self._candidate_nms_distance_px
+                abs(candidate.center_y - kept.center_y)
+                < self._candidate_nms_distance_px
                 for kept in candidates
             )
             if not duplicate:

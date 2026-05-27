@@ -1,18 +1,19 @@
 import os
-import sys
 import platform
 import shutil
+import stat  # 用于在 macOS/Linux 上设置文件权限
 import subprocess
+import sys
+import tarfile
+import urllib.error
 import urllib.request
 import zipfile
-import tarfile
-import stat  # 用于在 macOS/Linux 上设置文件权限
 
 sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
 print(os.getcwd())
 # --- 配置 ---
 # 可以根据需要修改这些值
-PYTHON_VERSION_TARGET = "3.12.10"  # 目标 Python 版本
+PYTHON_VERSION_TARGET = "3.14.5"  # 目标 Python 版本
 # python-build-standalone 的发布标签，需要与 PYTHON_VERSION_TARGET 兼容
 # 前往 https://github.com/indygreg/python-build-standalone/releases 查看最新标签和可用版本
 PYTHON_BUILD_STANDALONE_RELEASE_TAG = "20250409"
@@ -71,17 +72,16 @@ def get_python_executable_path(base_dir, os_type):
     """获取已安装 Python 环境中的可执行文件路径"""
     if os_type == "Windows":
         return os.path.join(base_dir, "python.exe")
-    elif os_type == "Darwin":  # macOS
+    if os_type == "Darwin":  # macOS
         # python-build-standalone 通常包含 python 和 python3
         # 我们优先使用 python3 (通常 python 是指向 python3 的符号链接)
         py3_path = os.path.join(base_dir, "bin", "python3")
         py_path = os.path.join(base_dir, "bin", "python")
         if os.path.exists(py3_path):
             return py3_path
-        elif os.path.exists(py_path):  # 作为备选
+        if os.path.exists(py_path):  # 作为备选
             return py_path
-        else:
-            return None  # 未找到
+        return None  # 未找到
     return None
 
 

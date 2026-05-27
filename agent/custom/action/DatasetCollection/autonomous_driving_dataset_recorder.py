@@ -4,17 +4,15 @@ import time
 from datetime import datetime
 from pathlib import Path
 from typing import Any
-from PIL import Image
 
 import cv2
 import numpy as np
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-
+from maa.custom_action import CustomAction
+from PIL import Image
 from utils.logger import logger
 from utils.maafocus import Print
-
 
 _KEY_LABELS = {
     0: "none",
@@ -122,7 +120,9 @@ def _save_sample(
 
 @AgentServer.custom_action("autonomous_driving_dataset_recorder")
 class AutonomousDrivingDatasetRecorder(CustomAction):
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
         params = _parse_params(argv.custom_action_param)
         dataset_dir = _resolve_output_dir(params.get("output_dir"))
         print(f"Dataset recorder output directory: {dataset_dir}")
@@ -218,5 +218,7 @@ class AutonomousDrivingDatasetRecorder(CustomAction):
             if wait_time > 0:
                 time.sleep(wait_time)
 
-        Print(context, f"Dataset recorder stopped: saved={saved_count}, dir={output_dir}")
+        Print(
+            context, f"Dataset recorder stopped: saved={saved_count}, dir={output_dir}"
+        )
         return CustomAction.RunResult(success=True)

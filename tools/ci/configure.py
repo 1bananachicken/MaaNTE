@@ -1,6 +1,5 @@
-from pathlib import Path
-
 import shutil
+from pathlib import Path
 
 assets_dir = Path(__file__).parent.parent.parent / "assets"
 

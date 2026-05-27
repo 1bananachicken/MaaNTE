@@ -1,12 +1,9 @@
-maafw==v5.10.4
+maafw>=5.10.5
 loguru
 pillow
-pytz
-requests
 opencv-python
 librosa
-numpy
+# numpy 从 scipy 依赖安装
 scipy
-scikit-learn
 soundcard
 mido

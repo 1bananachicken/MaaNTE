@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 MaaNTE 本地自动化构建脚本
 一键完成：下载依赖 → 配置资源 → 安装 → 打包
@@ -15,16 +14,15 @@ MaaNTE 本地自动化构建脚本
     python build.py --output-dir ./output  # 指定输出目录
 """
 
-import os
-import sys
-import json
-import shutil
-import zipfile
-import tarfile
-import platform
 import argparse
+import os
+import platform
+import shutil
 import subprocess
+import sys
+import tarfile
 import urllib.request
+import zipfile
 from pathlib import Path
 
 # ---------------------------------------------------------------------------
@@ -64,6 +62,7 @@ sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
 
 # ========== 辅助函数 ==========
 
+
 def run(cmd, cwd=None, check=True):
     """运行命令并实时输出"""
     print(f"  RUN: {' '.join(cmd)}")
@@ -74,9 +73,7 @@ def run(cmd, cwd=None, check=True):
 
 def run_capture(cmd, cwd=None):
     """运行命令并捕获输出"""
-    result = subprocess.run(
-        cmd, cwd=cwd or ROOT, capture_output=True, text=True
-    )
+    result = subprocess.run(cmd, cwd=cwd or ROOT, capture_output=True, text=True)
     if result.returncode != 0:
         print(f"  STDERR: {result.stderr}")
     return result
@@ -107,7 +104,12 @@ def get_platform():
         proc_id = os.environ.get("PROCESSOR_IDENTIFIER", "")
         if "ARMv8" in proc_id or "ARM64" in proc_id:
             os_arch = "ARM64"
-        arch_map = {"AMD64": "AMD64", "x86_64": "AMD64", "ARM64": "ARM64", "aarch64": "ARM64"}
+        arch_map = {
+            "AMD64": "AMD64",
+            "x86_64": "AMD64",
+            "ARM64": "ARM64",
+            "aarch64": "ARM64",
+        }
     elif os_type == "Darwin":
         arch_map = {"x86_64": "x86_64", "arm64": "arm64", "aarch64": "arm64"}
     elif os_type == "Linux":
@@ -124,6 +126,7 @@ def get_platform():
 
 
 # ========== 各步骤 ==========
+
 
 def step_setup_python(os_type, os_arch):
     """步骤1: 安装嵌入式 Python + pip"""
@@ -180,7 +183,7 @@ def step_setup_python(os_type, os_arch):
             os_slug = (
                 "unknown-linux-gnu"
                 if pbs_arch == "x86_64"
-                else f"aarch64-unknown-linux-gnu"
+                else "aarch64-unknown-linux-gnu"
             )
 
         fname = (
@@ -330,15 +333,24 @@ def step_convert_icon():
     # 尝试 ImageMagick
     magick_cmd = "magick" if platform.system() == "Windows" else "convert"
     try:
-        result = run_capture([magick_cmd, "convert", str(logo_path),
-                              "-define", "icon:auto-resize=256,128,64,48,32,24,16",
-                              str(ico_path)])
+        result = run_capture(
+            [
+                magick_cmd,
+                "convert",
+                str(logo_path),
+                "-define",
+                "icon:auto-resize=256,128,64,48,32,24,16",
+                str(ico_path),
+            ]
+        )
         if result.returncode == 0:
             print(f"  图标转换成功: {ico_path}")
         else:
             print("  ImageMagick 不可用，跳过 ICO 转换。请手动安装 ImageMagick。")
     except FileNotFoundError:
-        print("  ImageMagick 未安装，跳过 ICO 转换。安装命令: choco install imagemagick")
+        print(
+            "  ImageMagick 未安装，跳过 ICO 转换。安装命令: choco install imagemagick"
+        )
 
 
 def step_modify_icons(os_arch):
@@ -361,7 +373,9 @@ def step_modify_icons(os_arch):
     rcedit_path = ROOT / "rcedit.exe"
     if not rcedit_path.exists():
         print("  下载 rcedit...")
-        rcedit_url = "https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe"
+        rcedit_url = (
+            "https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe"
+        )
         download(rcedit_url, rcedit_path)
 
     # 修改 MFAAvalonia 图标
@@ -468,7 +482,7 @@ def step_copy_mxu():
         print(f"  复制: {mxu_exe} -> {INSTALL_MXU_DIR / 'MaaNTE.exe'}")
     elif (MXU_DIR / "mxu").exists():
         shutil.copy2(MXU_DIR / "mxu", INSTALL_MXU_DIR / "MaaNTE")
-        print(f"  复制: mxu -> MaaNTE")
+        print("  复制: mxu -> MaaNTE")
 
 
 def step_copy_icons():
@@ -533,25 +547,43 @@ def step_package(platform_tag, tag, output_dir, mxu=False):
 
 # ========== 主入口 ==========
 
+
 def main():
     global MAA_FRAMEWORK_VERSION, MFAA_VERSION, MXU_VERSION
 
     parser = argparse.ArgumentParser(description="MaaNTE 本地自动化构建脚本")
     parser.add_argument("--tag", default="v0.0.1", help="版本号 (默认: v0.0.1)")
-    parser.add_argument("--mode", default="all", choices=["mfaa", "mxu", "all"],
-                        help="构建模式 (默认: all)")
-    parser.add_argument("--compress", default="true", choices=["true", "false"],
-                        help="是否打包压缩包 (默认: true)")
+    parser.add_argument(
+        "--mode",
+        default="all",
+        choices=["mfaa", "mxu", "all"],
+        help="构建模式 (默认: all)",
+    )
+    parser.add_argument(
+        "--compress",
+        default="true",
+        choices=["true", "false"],
+        help="是否打包压缩包 (默认: true)",
+    )
     parser.add_argument("--skip-download", action="store_true", help="跳过所有下载步骤")
     parser.add_argument("--skip-icon", action="store_true", help="跳过图标转换与安装")
     parser.add_argument("--skip-package", action="store_true", help="跳过最终打包")
-    parser.add_argument("--output-dir", default=str(ROOT / "output"), help="输出目录 (默认: ./output)")
-    parser.add_argument("--maa-version", default=MAA_FRAMEWORK_VERSION,
-                        help=f"MaaFramework 版本 (默认: {MAA_FRAMEWORK_VERSION})")
-    parser.add_argument("--mfa-version", default=MFAA_VERSION,
-                        help=f"MFAAvalonia 版本 (默认: {MFAA_VERSION})")
-    parser.add_argument("--mxu-version", default=MXU_VERSION,
-                        help=f"MXU 版本 (默认: {MXU_VERSION})")
+    parser.add_argument(
+        "--output-dir", default=str(ROOT / "output"), help="输出目录 (默认: ./output)"
+    )
+    parser.add_argument(
+        "--maa-version",
+        default=MAA_FRAMEWORK_VERSION,
+        help=f"MaaFramework 版本 (默认: {MAA_FRAMEWORK_VERSION})",
+    )
+    parser.add_argument(
+        "--mfa-version",
+        default=MFAA_VERSION,
+        help=f"MFAAvalonia 版本 (默认: {MFAA_VERSION})",
+    )
+    parser.add_argument(
+        "--mxu-version", default=MXU_VERSION, help=f"MXU 版本 (默认: {MXU_VERSION})"
+    )
 
     args = parser.parse_args()
     MAA_FRAMEWORK_VERSION = args.maa_version
@@ -567,7 +599,9 @@ def main():
     submodules_ok = (ASSETS_DIR / "MaaCommonAssets" / ".git").exists()
     if not submodules_ok:
         print("正在初始化 git 子模块...")
-        r = subprocess.run(["git", "submodule", "update", "--init", "--recursive"], cwd=ROOT)
+        r = subprocess.run(
+            ["git", "submodule", "update", "--init", "--recursive"], cwd=ROOT
+        )
         if r.returncode != 0:
             print("警告: git submodule 初始化失败，OCR 模型可能无法正确配置")
 
@@ -607,9 +641,13 @@ def main():
         if not args.skip_icon:
             step_modify_icons(os_arch)
     else:
-        python_exe = PYTHON_DIR / ("python.exe" if os_type == "Windows" else "bin/python3")
+        python_exe = PYTHON_DIR / (
+            "python.exe" if os_type == "Windows" else "bin/python3"
+        )
         if not python_exe.exists():
-            print(f"Python 未安装: {python_exe}，请先运行 build.py (不带 --skip-download)")
+            print(
+                f"Python 未安装: {python_exe}，请先运行 build.py (不带 --skip-download)"
+            )
             sys.exit(1)
 
     # 8. 安装 (MFAA 版本)
@@ -655,9 +693,13 @@ def main():
         print(f"MXU 安装目录: {INSTALL_MXU_DIR}")
     if not skip_package:
         if not skip_mfa:
-            print(f"打包文件: {Path(args.output_dir) / f'MaaNTE-{platform_tag}-{args.tag}'}")
+            print(
+                f"打包文件: {Path(args.output_dir) / f'MaaNTE-{platform_tag}-{args.tag}'}"
+            )
         if not skip_mxu:
-            print(f"MXU 打包文件: {Path(args.output_dir) / f'MaaNTE-{platform_tag}-{args.tag}-MXU'}")
+            print(
+                f"MXU 打包文件: {Path(args.output_dir) / f'MaaNTE-{platform_tag}-{args.tag}-MXU'}"
+            )
     print("=" * 60)
 
 

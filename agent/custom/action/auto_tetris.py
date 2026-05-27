@@ -4,12 +4,12 @@ import time
 
 import cv2
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
+from maa.custom_action import CustomAction
 from maa.pipeline import JOCR, JRecognitionType
+from utils.maafocus import PrintT
 
 from .Tetris.feats.play import TetrisGamePlayer
-from utils.maafocus import PrintT
 
 _round_count = 0
 _target_round = 0

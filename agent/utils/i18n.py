@@ -1,6 +1,5 @@
 """i18n 翻译模块。加载 locales/ 下的语言 JSON，提供 T() 查 key 和 RenderHTML()。"""
 
-import html
 import json
 import os
 from pathlib import Path

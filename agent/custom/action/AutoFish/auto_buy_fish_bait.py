@@ -1,17 +1,16 @@
-import cv2
-import time
 import json
-
+import time
 from pathlib import Path
-from ..Common.utils import get_image, match_template_in_region, click_rect
-from utils import screen
 
+import cv2
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-
+from maa.custom_action import CustomAction
+from utils import screen
 from utils.logger import logger
 from utils.maafocus import PrintT
+
+from ..Common.utils import click_rect, get_image, match_template_in_region
 
 
 @AgentServer.custom_action("auto_buy_fish_bait")
@@ -102,9 +101,8 @@ class AutoBuyFishBait(CustomAction):
                 if found_bait_success:
                     time.sleep(0.5)
                     break
-                else:
-                    PrintT(context, "autofish.bait_retry_click")
-                    time.sleep(1)
+                PrintT(context, "autofish.bait_retry_click")
+                time.sleep(1)
             else:
                 PrintT(context, "autofish.bait_not_found")
                 controller.post_click_key(KEY_R).wait()
@@ -124,9 +122,8 @@ class AutoBuyFishBait(CustomAction):
                     time.sleep(0.1)
                 time.sleep(1)
                 break
-            else:
-                PrintT(context, "autofish.select_max_retry")
-                time.sleep(1)
+            PrintT(context, "autofish.select_max_retry")
+            time.sleep(1)
 
         while True:
             img = get_image(controller)
@@ -140,9 +137,8 @@ class AutoBuyFishBait(CustomAction):
                     time.sleep(0.1)
                 time.sleep(0.5)
                 break
-            else:
-                PrintT(context, "autofish.buy_button_retry")
-                time.sleep(1)
+            PrintT(context, "autofish.buy_button_retry")
+            time.sleep(1)
 
         for _ in range(5):
             img = get_image(controller)
@@ -156,9 +152,8 @@ class AutoBuyFishBait(CustomAction):
                     time.sleep(0.1)
                 time.sleep(0.5)
                 break
-            else:
-                PrintT(context, "autofish.buy_confirm_retry")
-                time.sleep(1)
+            PrintT(context, "autofish.buy_confirm_retry")
+            time.sleep(1)
 
         while True:
             img = get_image(controller)
@@ -171,8 +166,7 @@ class AutoBuyFishBait(CustomAction):
                 time.sleep(0.5)
                 controller.post_click_key(KEY_ESC).wait()
                 break
-            else:
-                PrintT(context, "autofish.buy_success_retry")
-                time.sleep(1)
+            PrintT(context, "autofish.buy_success_retry")
+            time.sleep(1)
 
         return CustomAction.RunResult(success=True)

@@ -10,22 +10,28 @@
                 "FishSellAuto",
                 "FishBuyBaitAuto"
             ],
-            "group": [
-                "HethereauHobbies"
-            ]
+            "group": ["HethereauHobbies"]
         },
         {
             "name": "FishNew",
             "label": "$task_fish_new_label",
             "entry": "FishNewEntrance",
             "description": "$task_fish_new_desc",
+            "option": ["FishSellAuto", "FishBuyBaitAuto"],
+            "group": ["HethereauHobbies"]
+        },
+        {
+            "name": "FishFork2",
+            "label": "task_fish_fork_2_label",
+            "description": "钓鱼 - 分支 2",
+            "entry": "FishFork2",
             "option": [
-                "FishSellAuto",
-                "FishBuyBaitAuto"
+                "钓鱼通用设置",
+                "溜鱼设置",
+                "卖鱼买换饵开关",
+                "卖鱼买换饵设置"
             ],
-            "group": [
-                "HethereauHobbies"
-            ]
+            "group": ["HethereauHobbies"]
         }
     ],
     "option": {
@@ -80,9 +86,7 @@
                     "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "FishEntrance": {
-                            "next": [
-                                "FishLoopStart"
-                            ]
+                            "next": ["FishLoopStart"]
                         },
                         "FishGameStart": {
                             "next": [
@@ -98,23 +102,17 @@
                             ]
                         },
                         "AutoBuyFishBait": {
-                            "next": [
-                                "FishLoopStart"
-                            ]
+                            "next": ["FishLoopStart"]
                         },
                         "FishBaitHandled": {
-                            "next": [
-                                "FishLoopStart"
-                            ]
+                            "next": ["FishLoopStart"]
                         }
                     }
                 },
                 {
                     "name": "No",
                     "label": "$option_switch_case_no",
-                    "option": [
-                        "FishLoopTime"
-                    ]
+                    "option": ["FishLoopTime"]
                 }
             ]
         },
@@ -168,9 +166,7 @@
                             "enabled": true
                         }
                     },
-                    "option": [
-                        "FishBaitThreshold"
-                    ]
+                    "option": ["FishBaitThreshold"]
                 },
                 {
                     "name": "No",
@@ -245,6 +241,97 @@
                     }
                 }
             ]
+        },
+        "钓鱼通用设置": {
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "终止时间",
+                    "label": "终止时间",
+                    "description": "到达时间后终止该节点，支持 ISO 8601 格式。如果时间早于当前时间，自动改为明天的该时间。示例: `2076-05-04T03:02:01` `03:14:25`",
+                    "pipeline_type": "string",
+                    "default": ""
+                }
+            ],
+            "pipeline_override": {
+                "FishFork2": {
+                    "attach": {
+                        "终止时间": "{终止时间}"
+                    }
+                }
+            }
+        },
+        "溜鱼设置": {
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "溜鱼_midpoint_pix_range",
+                    "label": "溜鱼中点停顿范围 (pix)",
+                    "pipeline_type": "int",
+                    "default": "5"
+                },
+                {
+                    "name": "溜鱼_midpoint_sleep_time",
+                    "label": "溜鱼中点停顿时间 (ms)",
+                    "pipeline_type": "int",
+                    "default": "5"
+                }
+            ],
+            "pipeline_override": {
+                "FishFork2": {
+                    "attach": {
+                        "溜鱼_midpoint_pix_range": "{溜鱼_midpoint_pix_range}",
+                        "溜鱼_midpoint_sleep_time": "{溜鱼_midpoint_sleep_time}"
+                    }
+                }
+            }
+        },
+        "卖鱼买换饵开关": {
+            "type": "switch",
+            "label": "自动卖鱼买换饵 (抢占鼠标)",
+            "description": "无饵或满舱时，按顺序执行 `卖鱼` `买饵` `换饵`。由于涉及点击操作，会抢占鼠标",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "pipeline_override": {
+                        "FishFork2": {
+                            "attach": {
+                                "卖鱼买换饵开关": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "pipeline_override": {
+                        "FishFork2": {
+                            "attach": {
+                                "卖鱼买换饵开关": false
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
+        },
+        "卖鱼买换饵设置": {
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "买饵次数",
+                    "label": "买饵次数",
+                    "description": "次数 `n` 代表买 `n * 99` 个饵",
+                    "pipeline_type": "int",
+                    "default": "4"
+                }
+            ],
+            "pipeline_override": {
+                "FishFork2": {
+                    "attach": {
+                        "买饵次数": "{买饵次数}"
+                    }
+                }
+            }
         }
     }
 }

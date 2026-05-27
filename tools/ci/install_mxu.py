@@ -1,10 +1,9 @@
-from pathlib import Path
-
-import shutil
-import sys
 import json
 import os
 import re
+import shutil
+import sys
+from pathlib import Path
 
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(script_dir)
@@ -21,16 +20,16 @@ def load_json_with_comments(path):
 
 working_dir = Path(__file__).parent.parent.parent
 install_path = working_dir / Path("install-mxu")
-version = len(sys.argv) > 1 and sys.argv[1] or "v0.0.1"
+version = (len(sys.argv) > 1 and sys.argv[1]) or "v0.0.1"
 
 
 def install_deps():
-    """安装 MaaFramework 依赖到 maafw 目录（MXU 要求的目录结构）
+    """
+    安装 MaaFramework 依赖到 maafw 目录（MXU 要求的目录结构）
 
     MXU 要求将 MaaFramework 的 bin 文件夹内容解压到 maafw 文件夹中。
     参考: https://github.com/MistEO/MXU#依赖文件
     """
-
     # MaaFramework 运行库 → maafw/
     shutil.copytree(
         working_dir / "deps" / "bin",
@@ -53,7 +52,6 @@ def install_deps():
 
 
 def install_resource():
-
     configure_ocr_model()
 
     shutil.copytree(

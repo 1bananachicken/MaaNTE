@@ -1,9 +1,8 @@
-# -*- coding: utf-8 -*-
-
-import os
-import sys
 import json
+import os
+import re
 import subprocess
+import sys
 from pathlib import Path
 
 # utf-8
@@ -25,8 +24,9 @@ if current_script_dir not in sys.path:
     sys.path.insert(0, current_script_dir)
 
 from utils import setup_logger
+
 logger = setup_logger()
-import utils.screen as screen
+from utils import screen
 
 MAAHUB_ACCENT_NAME = "custom-9e8de7d9-ab2b-4784-a082-63110b986d90"
 MAAHUB_ACCENT = {
@@ -48,7 +48,7 @@ MAAHUB_ACCENT = {
 }
 
 # 路径兼容性检测 —— 最早执行，检测含中文/全角字符/中文符号的路径
-import re
+
 _cwd = os.getcwd()
 if re.search(r"[一-鿿　-〿＀-￯]", _cwd):
     logger.warning(
@@ -97,7 +97,7 @@ def ensure_venv_and_relaunch_if_needed():
                 check=True,
                 capture_output=True,
             )
-            logger.info(f"创建成功")
+            logger.info("创建成功")
         except subprocess.CalledProcessError as e:
             logger.error(
                 f"创建失败: {e.stderr.decode(errors='ignore') if e.stderr else e.stdout.decode(errors='ignore')}"
@@ -128,7 +128,7 @@ def ensure_venv_and_relaunch_if_needed():
         logger.error("虚拟环境创建可能失败或虚拟环境结构异常。")
         sys.exit(1)
 
-    logger.info(f"正在使用虚拟环境Python重新启动")
+    logger.info("正在使用虚拟环境Python重新启动")
 
     try:
         # Use absolute path to this script when relaunching inside the venv.
@@ -169,6 +169,7 @@ def read_config(config_name: str, default_config: dict) -> dict:
 
     Returns:
         配置字典
+
     """
     config_dir = Path("./config")
     config_dir.mkdir(exist_ok=True)
@@ -240,6 +241,7 @@ def _apply_maahub_ui_config(config: dict) -> bool:
 
 def ensure_mxu_ui_config() -> None:
     import stat
+
     config_dir = Path(project_root_dir) / "config"
     config_dir.mkdir(exist_ok=True)
     config_path = config_dir / "mxu-MaaNTE.json"
@@ -258,7 +260,7 @@ def ensure_mxu_ui_config() -> None:
         config = {}
 
     changed = _apply_maahub_ui_config(config)
-    
+
     if not changed:
         return
 
@@ -268,7 +270,7 @@ def ensure_mxu_ui_config() -> None:
             f.write("\n")
     except Exception:
         logger.exception("写入 mxu-MaaNTE.json 失败")
-    
+
     os.chmod(config_path, stat.S_IREAD)
 
 
@@ -394,9 +396,8 @@ def _run_pip_command(cmd_args: list, operation_name: str) -> bool:
         if return_code == 0:
             logger.info(f"{operation_name} 完成")
             return True
-        else:
-            logger.error(f"{operation_name} 时出错。返回码: {return_code}")
-            return False
+        logger.error(f"{operation_name} 时出错。返回码: {return_code}")
+        return False
 
     except Exception as e:
         logger.exception(f"{operation_name} 时发生未知异常: {e}")
@@ -433,10 +434,9 @@ def install_requirements(
             "--no-index",  # 禁止在线索引
         ]
 
-        if _run_pip_command(cmd, f"从本地deps安装依赖"):
+        if _run_pip_command(cmd, "从本地deps安装依赖"):
             return True
-        else:
-            logger.warning("本地deps安装失败，回退到纯在线安装")
+        logger.warning("本地deps安装失败，回退到纯在线安装")
 
     # 回退到在线安装
     primary_mirror = pip_config.get("mirror", "") if pip_config else ""
@@ -467,28 +467,25 @@ def install_requirements(
 
         if _run_pip_command(cmd, f"从 {req_path.name} 安装依赖"):
             return True
-        else:
-            logger.error("在线安装失败")
-            return False
-    else:
-        # 如果没有配置主镜像源，使用pip的本地全局配置
-        cmd = [
-            sys.executable,
-            "-m",
-            "pip",
-            "install",
-            "-U",
-            "-r",
-            str(req_path),
-            "--no-warn-script-location",
-            "--break-system-packages",
-        ]
+        logger.error("在线安装失败")
+        return False
+    # 如果没有配置主镜像源，使用pip的本地全局配置
+    cmd = [
+        sys.executable,
+        "-m",
+        "pip",
+        "install",
+        "-U",
+        "-r",
+        str(req_path),
+        "--no-warn-script-location",
+        "--break-system-packages",
+    ]
 
-        if _run_pip_command(cmd, f"从 {req_path.name} 安装依赖 (本地全局配置)"):
-            return True
-        else:
-            logger.error("使用pip本地全局配置安装失败")
-            return False
+    if _run_pip_command(cmd, f"从 {req_path.name} 安装依赖 (本地全局配置)"):
+        return True
+    logger.error("使用pip本地全局配置安装失败")
+    return False
 
 
 def check_and_install_dependencies():
@@ -545,7 +542,9 @@ def _check_game_resolution():
     scale_x, scale_y = screen.scaling_factors()
 
     if (w, h) == (screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT):
-        logger.info(f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})")
+        logger.info(
+            f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})"
+        )
     else:
         logger.warning(
             f"当前窗口分辨率: {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
@@ -568,8 +567,9 @@ def agent(is_dev_mode=False):
             del sys.modules[module_name]
 
         # 动态导入 utils 的所有内容
-        import utils
         import importlib
+
+        import utils
 
         importlib.reload(utils)
 
@@ -584,15 +584,19 @@ def agent(is_dev_mode=False):
             change_console_level("DEBUG")
             logger.info("开发模式：日志等级已设置为DEBUG")
 
-
+        logger.debug("导入 maa 模块")
         from maa.agent.agent_server import AgentServer
         from maa.tasker import Tasker
 
+        logger.debug("导入 custom 模块")
         import custom
 
         Tasker.set_log_dir("./debug")
 
-        from utils.i18n import init as i18n_init; i18n_init()
+        logger.debug("导入 utils.i18n 模块")
+        from utils.i18n import init as i18n_init
+
+        i18n_init()
 
         if len(sys.argv) < 2:
             logger.error("缺少必要的 socket_id 参数")
@@ -611,11 +615,13 @@ def agent(is_dev_mode=False):
             AgentServer.shut_down()
         logger.info("AgentServer关闭")
     except ImportError as e:
-        logger.error(f"导入模块失败: {e}")
+        import traceback
+
+        logger.error(f"导入模块失败: {e!r}\n{traceback.format_exc()}")
         logger.error("考虑重新配置环境")
         sys.exit(1)
     except Exception as e:
-        logger.exception("agent运行过程中发生异常")
+        logger.exception(f"agent运行过程中发生异常: {e}")
         raise
 
 

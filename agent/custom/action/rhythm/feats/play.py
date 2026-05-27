@@ -4,19 +4,15 @@ import time
 from typing import Any
 
 import cv2
-import numpy as np
-from numpy.typing import NDArray
-
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-
+from maa.custom_action import CustomAction
 from utils.maafocus import PrintT
 
 from ..utils.config import load_rhythm_config
-from ..utils.lanes import build_lane_layout, LaneLayout
 from ..utils.detector import DrumDetector
-from ..utils.presence import SceneGate, STATE_PLAYING
+from ..utils.lanes import LaneLayout, build_lane_layout
+from ..utils.presence import STATE_PLAYING, SceneGate
 
 logger = logging.getLogger(__name__)
 
@@ -228,7 +224,6 @@ def _normalize_same_frame_chords(
 
 @AgentServer.custom_action("auto_rhythm_play")
 class AutoRhythmPlay(CustomAction):
-
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:

@@ -1,8 +1,9 @@
-import time
-from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
-from maa.context import Context
 import ctypes
+import time
+
+from maa.agent.agent_server import AgentServer
+from maa.context import Context
+from maa.custom_action import CustomAction
 
 
 @AgentServer.custom_action("auto_f_scroll")
@@ -33,7 +34,7 @@ class AutoFScroll(CustomAction):
                     # 参数: dwFlags, dx, dy, dwData(滚轮幅度), dwExtraInfo
                     # -120 代表向下滚动一格
                     ctypes.windll.user32.mouse_event(MOUSEEVENTF_WHEEL, 0, 0, -120, 0)
-                except Exception as e:
+                except Exception:
                     pass
 
                 time.sleep(0.1)

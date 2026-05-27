@@ -8,7 +8,6 @@ from pathlib import Path
 from maa.agent.agent_server import AgentServer
 from maa.context import Context
 from maa.custom_action import CustomAction
-
 from utils.maafocus import PrintT
 
 PROJECT_ROOT = Path(__file__).resolve().parents[4]

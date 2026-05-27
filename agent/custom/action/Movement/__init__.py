@@ -1,4 +1,4 @@
-from .mouse_move import *
 from .character_move import *
+from .mouse_move import *
 
-__all__ = ["MouseMoveAction", "CharacterMoveAction"]
+__all__ = ["CharacterMoveAction", "MouseMoveAction"]

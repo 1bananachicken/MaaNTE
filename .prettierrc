@@ -1,10 +1,7 @@
 {
-    "plugins": [
-        "prettier-plugin-multiline-arrays"
-    ],
-    "multilineArraysWrapThreshold": 1,
+    "multilineArraysWrapThreshold": 4,
     "tabWidth": 4,
-    "printWidth": 120,
+    "printWidth": 60,
     "useTabs": false,
     "bracketSameLine": true,
     "bracketSpacing": false,

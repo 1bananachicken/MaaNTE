@@ -1,6 +1,6 @@
 [remote.github]
 owner = "MaaXYZ"
-repo = "MaaPracticeBoilerplate"
+repo  = "MaaPracticeBoilerplate"
 #自用时换成自己的仓库owner和repo
 #注意，本地git user需与github一致才能实现成功@
 [changelog]
@@ -66,29 +66,28 @@ footer = """
 
 [git]
 # 过滤提交
+commit_parsers = [
+    { group = "<!-- 00 -->🐛 Bug 修复", message = "(?i)^(?:bug)?fix" },
+    { group = "<!-- 01 -->✨ 新功能", message = "(?i)^feat(?:ure)?" },
+    { group = "<!-- 02 -->✔ 优化", message = "(?i)^(?:improvements?|impr?)" },
+    { group = "<!-- 03 -->🚀 性能优化", message = "(?i)^perf(?:ormance)?" },
+    { group = "<!-- 04 -->🔁 代码重构", message = "(?i)^ref(?:actor)?" },
+    { group = "<!-- 05 -->📚 文档更新", message = "(?i)^doc(?:ument)?s?" },
+    { group = "<!-- 06 -->🎨 样式调整", message = "(?i)^styles?" },
+    { group = "<!-- 07 -->🧪 修改测试代码", message = "(?i)^tests?" },
+    { group = "<!-- 08 -->⚙️ 修改 CI", message = "(?i)^ci" },
+    { group = "<!-- 09 -->🔧 杂项", message = "(?i)^chore" },
+    { group = "<!-- 10 -->🔒 安全", body = ".*security" },
+    { group = "<!-- 11 -->↩ 撤销更改", message = "(?i)^revert" },
+    { group = "<!-- 12 -->📦 依赖更新", message = "(?i)^chore\\(deps?\\)" },
+    # 跳过包含 [skip changelog] 的 commit
+    { skip = true, body = ".*\\[skip changelog\\].*" },
+    { skip = true, message = ".*\\[skip changelog\\].*" },
+]
 conventional_commits = true # 使用约定式提交格式
 filter_unconventional = false # 不过滤非约定式提交
-# 启用完整的 commit 信息
-split_commits = false
-# 保留完整的 commit body
-protect_breaking_commits = false
-commit_parsers = [
-    # 跳过包含 [skip changelog] 的 commit
-    { message = ".*\\[skip changelog\\].*", skip = true },
-    { body = ".*\\[skip changelog\\].*", skip = true },
-    { message = "^feat", group = "<!-- 0 -->✨ 新功能" },
-    { message = "^fix", group = "<!-- 1 -->🐛 Bug修复" },
-    { message = "^docs", group = "<!-- 4 -->📚 文档" },
-    { message = "^perf", group = "<!-- 3 -->🚀 性能优化" },
-    { message = "^refactor", group = "<!-- 2 -->🚜 代码重构" },
-    { message = "^style", group = "<!-- 5 -->🎨 样式" },
-    { message = "^test", group = "<!-- 6 -->🧪 测试" },
-    { message = "^chore\\(deps\\)", group = "📦 依赖更新" },
-    { message = "^chore", group = "<!-- 8 -->🔧 日常维护" },
-    { message = "^ci", group = "<!-- 7 -->⚙️ 持续集成" },
-    { body = ".*security", group = "<!-- 9 -->🔒 安全" },
-    { message = "^revert", group = "<!-- 10 -->◀️ 撤销" },
-]
+protect_breaking_commits = true # 保留完整的 commit body
+split_commits = true # 启用完整的 commit 信息
 
 # 忽略这些提交
 ignore_tags = "rc"

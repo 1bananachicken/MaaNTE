@@ -1,8 +1,9 @@
 """通过 MaaFramework pipeline focus 协议向 MXU 客户端发送用户可见消息。"""
 
 from maa.context import Context
-from utils.logger import logger
+
 from utils.i18n import T
+from utils.logger import logger
 
 _FOCUS_NODE = "_MAANTE_FOCUS_"
 

@@ -1,8 +1,9 @@
-import time
 import re
+import time
+
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
+from maa.custom_action import CustomAction
 
 
 def _screencap(controller):

@@ -1,0 +1,10 @@
+{
+    "FishFork2": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "fish_fork_2"
+            }
+        }
+    }
+}

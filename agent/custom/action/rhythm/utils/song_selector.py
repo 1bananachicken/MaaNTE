@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import logging
 import time
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +20,6 @@ _FIND_SONG_NODE = "RhythmSceneFindSong"
 
 
 class SongSelector:
-
     def __init__(self, cfg: dict[str, Any]) -> None:
         sc = cfg.get("song_select") or {}
         self._song_select_enabled = bool(sc.get("enabled", False))
@@ -40,7 +40,9 @@ class SongSelector:
         self._max_start_retries = max(1, int(sc.get("max_start_retries", 5)))
         self._scroll_settle_delay = float(sc.get("scroll_settle_delay_sec", 0.4))
         self._click_reverify_threshold = float(sc.get("click_reverify_threshold", 0.70))
-        self._max_click_reverify_retries = max(1, int(sc.get("max_click_reverify_retries", 2)))
+        self._max_click_reverify_retries = max(
+            1, int(sc.get("max_click_reverify_retries", 2))
+        )
 
         self._state: str = _SEL_IDLE
         self._scroll_attempts: int = 0
@@ -93,11 +95,10 @@ class SongSelector:
 
     def _find_start(self, context, frame, threshold) -> tuple[int, int] | None:
         result = context.run_recognition(
-            _START_BUTTON_NODE, frame,
+            _START_BUTTON_NODE,
+            frame,
             pipeline_override={
-                _START_BUTTON_NODE: {
-                    "recognition": {"param": {"threshold": threshold}}
-                }
+                _START_BUTTON_NODE: {"recognition": {"param": {"threshold": threshold}}}
             },
         )
         if result and result.hit and result.box:
@@ -120,8 +121,15 @@ class SongSelector:
             self._scroll_attempts = 0
 
         if self._state == _SEL_SEARCHING:
-            if self._scroll_attempts > 0 and now - self._post_scroll_time < self._scroll_settle_delay:
-                return {"state": self._state, "action": "settling", "scroll_attempts": self._scroll_attempts}
+            if (
+                self._scroll_attempts > 0
+                and now - self._post_scroll_time < self._scroll_settle_delay
+            ):
+                return {
+                    "state": self._state,
+                    "action": "settling",
+                    "scroll_attempts": self._scroll_attempts,
+                }
             match = self._find_song(context, frame, self._match_threshold)
             if match is not None:
                 self._match_loc = match
@@ -145,7 +153,11 @@ class SongSelector:
         if self._state == _SEL_SCROLLING:
             if now - self._last_action_time < self._click_delay:
                 return {"state": self._state, "action": "waiting"}
-            direction = self._one_time_ds if self._one_time_ds is not None else self._scroll_delta
+            direction = (
+                self._one_time_ds
+                if self._one_time_ds is not None
+                else self._scroll_delta
+            )
             if self._one_time_ds is not None:
                 self._one_time_ds = None
             else:
@@ -158,33 +170,39 @@ class SongSelector:
             self._last_action_time = now
             self._post_scroll_time = time.perf_counter()
             self._state = _SEL_SEARCHING
-            return {"state": self._state, "action": "scroll", "scroll_attempts": self._scroll_attempts}
+            return {
+                "state": self._state,
+                "action": "scroll",
+                "scroll_attempts": self._scroll_attempts,
+            }
 
         if self._state == _SEL_CLICKING_SONG:
             if now - self._last_action_time < self._click_delay:
                 return {"state": self._state, "action": "waiting"}
-            current_match = self._find_song(context, frame, self._click_reverify_threshold)
+            current_match = self._find_song(
+                context, frame, self._click_reverify_threshold
+            )
             if current_match is None:
                 self._click_reverify_retries += 1
                 if self._click_reverify_retries < self._max_click_reverify_retries:
                     logger.warning(
                         "点击前重验证失败 (%d/%d)，歌单可能已回滚，重新搜索",
-                        self._click_reverify_retries, self._max_click_reverify_retries,
-                    )
-                    self._last_action_time = now
-                    self._post_scroll_time = 0.0
-                    self._state = _SEL_SEARCHING
-                    return {"state": self._state, "action": "reverify_fail"}
-                else:
-                    logger.warning(
-                        "重验证 %d 次均失败，回退到滚动搜索",
                         self._click_reverify_retries,
+                        self._max_click_reverify_retries,
                     )
-                    self._click_reverify_retries = 0
                     self._last_action_time = now
                     self._post_scroll_time = 0.0
                     self._state = _SEL_SEARCHING
                     return {"state": self._state, "action": "reverify_fail"}
+                logger.warning(
+                    "重验证 %d 次均失败，回退到滚动搜索",
+                    self._click_reverify_retries,
+                )
+                self._click_reverify_retries = 0
+                self._last_action_time = now
+                self._post_scroll_time = 0.0
+                self._state = _SEL_SEARCHING
+                return {"state": self._state, "action": "reverify_fail"}
             self._match_loc = current_match
             mx, my = current_match
             controller.post_click(mx, my).wait()
@@ -207,7 +225,10 @@ class SongSelector:
                 if self._start_retry_count < self._max_start_retries:
                     self._last_action_time = now
                 else:
-                    logger.warning("未匹配到「开始演奏」按钮 (已重试 %d 次)，选歌失败", self._start_retry_count)
+                    logger.warning(
+                        "未匹配到「开始演奏」按钮 (已重试 %d 次)，选歌失败",
+                        self._start_retry_count,
+                    )
                     self._state = _SEL_FAILED
             return {"state": self._state, "action": "click_start"}
 

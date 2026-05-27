@@ -1,15 +1,14 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 下载Python依赖到deps目录的脚本
 自动检测当前平台并下载对应架构的wheel文件
 """
 
-import os
-import sys
-import subprocess
 import argparse
+import os
 import platform
+import subprocess
+import sys
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]

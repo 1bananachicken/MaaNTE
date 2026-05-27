@@ -1,18 +1,20 @@
 import json
 
-from .utils import click_rect
-
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
+from maa.custom_action import CustomAction
+
+from .utils import click_rect
 
 
 @AgentServer.custom_action("click_override")
 class ClickOverride(CustomAction):
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
         print("=== Click Action Started ===")
         controller = context.tasker.controller
-        
+
         if argv.custom_action_param is not None:
             try:
                 params = json.loads(argv.custom_action_param)
@@ -27,11 +29,10 @@ class ClickOverride(CustomAction):
             click_rect(controller, target, 0.005)
             print(f"Clicked at rect: {target}")
             return CustomAction.RunResult(success=True)
-        
-        elif argv.reco_detail is not None:
+
+        if argv.reco_detail is not None:
             click_rect(controller, argv.box, 0.005)
             return CustomAction.RunResult(success=True)
-        
-        else:
-            print("No valid parameters provided for click action.")
-            return CustomAction.RunResult(success=False)
+
+        print("No valid parameters provided for click action.")
+        return CustomAction.RunResult(success=False)

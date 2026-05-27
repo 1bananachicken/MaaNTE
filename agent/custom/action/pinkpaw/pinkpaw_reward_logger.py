@@ -8,8 +8,8 @@
 import re
 
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
+from maa.custom_action import CustomAction
 from maa.pipeline import JOCR, JRecognitionType
 
 # 每次撤离成功的固定收益（可根据实际调整）

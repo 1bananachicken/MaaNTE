@@ -7,7 +7,8 @@ if TYPE_CHECKING:
 
 
 class TetrisSceneDetector:
-    """Uses MaaFramework pipeline nodes for Tetris scene recognition.
+    """
+    Uses MaaFramework pipeline nodes for Tetris scene recognition.
 
     Scene nodes are defined in TetrisScene.json. This class calls them
     via context.run_recognition() for use in custom actions that need

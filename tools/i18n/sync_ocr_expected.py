@@ -2,8 +2,6 @@
 """
 将 pipeline 中 OCR 节点的 expected 统一替换为 CN/TC/EN/JP 四语文本。
 
-
-
 规则：
 1) 扫描目录：
    - assets/resource/base/pipeline
@@ -40,9 +38,9 @@ import re
 import sys
 import unicodedata
 from collections import defaultdict
+from collections.abc import Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Dict, List, Optional, Sequence, Set, Tuple, Union
 
 PIPELINE_DIRS = [
     Path("assets/resource/base/pipeline"),
@@ -115,7 +113,7 @@ class JsoncParser:
             break
         return i
 
-    def parse_string(self, i: int) -> Tuple[str, int]:
+    def parse_string(self, i: int) -> tuple[str, int]:
         if i >= self.n or self.text[i] != '"':
             raise ValueError(f"Expected string at index {i}")
         j = i + 1
@@ -178,10 +176,10 @@ class JsoncParser:
             return self.parse_array_end(i)
         return self.parse_primitive_end(i)
 
-    def parse_object_members(self, i: int) -> Tuple[List[Member], int]:
+    def parse_object_members(self, i: int) -> tuple[list[Member], int]:
         if i >= self.n or self.text[i] != "{":
             raise ValueError(f"Expected '{{' at index {i}")
-        members: List[Member] = []
+        members: list[Member] = []
         i += 1
         while True:
             i = self.skip_ws_comments(i)
@@ -215,10 +213,10 @@ class JsoncParser:
                 return members, i + 1
             raise ValueError(f"Expected ',' or '}}' at index {i}")
 
-    def parse_array_string_values(self, i: int) -> Tuple[List[str], int]:
+    def parse_array_string_values(self, i: int) -> tuple[list[str], int]:
         if i >= self.n or self.text[i] != "[":
             raise ValueError(f"Expected '[' at index {i}")
-        values: List[str] = []
+        values: list[str] = []
         i += 1
         while True:
             i = self.skip_ws_comments(i)
@@ -242,7 +240,7 @@ class JsoncParser:
             raise ValueError(f"Expected ',' or ']' at index {i}")
 
 
-def _find_game_json(culture_dir: Path) -> Optional[Path]:
+def _find_game_json(culture_dir: Path) -> Path | None:
     """Return path to game.json (or Game.json) in *culture_dir*, or None."""
     for name in (GAME_JSON_FILENAME, GAME_JSON_FILENAME_ALT):
         p = culture_dir / name
@@ -260,14 +258,15 @@ def _pick_culture(cultures: Sequence[str], game_dir: Path) -> str:
 
 
 def resolve_game_json_dir(
-    base_dir: Path, game_json_dir_override: Optional[Path] = None
+    base_dir: Path, game_json_dir_override: Path | None = None
 ) -> Path:
-    """Find the directory containing per-language game.json folders.
+    """
+    Find the directory containing per-language game.json folders.
 
     Accepts either the ExtractForNTE repo root (contains
     ``HT/Content/Localization/Game/``) or the ``Game`` directory directly.
     """
-    candidates: List[Path] = []
+    candidates: list[Path] = []
     if game_json_dir_override is not None:
         candidate = (
             game_json_dir_override
@@ -294,20 +293,22 @@ def resolve_game_json_dir(
 
 
 def load_i18n_tables(
-    base_dir: Path, game_json_dir_override: Optional[Path] = None
-) -> Tuple[Dict[str, Dict[str, str]], Path]:
+    base_dir: Path, game_json_dir_override: Path | None = None
+) -> tuple[dict[str, dict[str, str]], Path]:
     game_dir = resolve_game_json_dir(base_dir, game_json_dir_override)
-    tables: Dict[str, Dict[str, str]] = {}
+    tables: dict[str, dict[str, str]] = {}
     for lang, cultures in LANG_TO_CULTURE.items():
         culture = _pick_culture(cultures, game_dir)
         path = _find_game_json(game_dir / culture)
         if path is None:
-            raise FileNotFoundError(f"缺少语言表: {game_dir / culture / GAME_JSON_FILENAME}  (lang={lang})")
+            raise FileNotFoundError(
+                f"缺少语言表: {game_dir / culture / GAME_JSON_FILENAME}  (lang={lang})"
+            )
         with path.open("r", encoding="utf-8") as f:
             data = json.load(f)
         if not isinstance(data, dict):
             raise ValueError(f"{path} 不是 JSON object")
-        flat: Dict[str, str] = {}
+        flat: dict[str, str] = {}
         for entries in data.values():
             if isinstance(entries, dict):
                 for key, value in entries.items():
@@ -318,10 +319,10 @@ def load_i18n_tables(
 
 
 def build_reverse_index(
-    tables: Dict[str, Dict[str, str]],
-) -> Tuple[Dict[str, Set[str]], Dict[str, Set[str]]]:
-    reverse: Dict[str, Set[str]] = defaultdict(set)
-    english_reverse: Dict[str, Set[str]] = defaultdict(set)
+    tables: dict[str, dict[str, str]],
+) -> tuple[dict[str, set[str]], dict[str, set[str]]]:
+    reverse: dict[str, set[str]] = defaultdict(set)
+    english_reverse: dict[str, set[str]] = defaultdict(set)
     for lang, table in tables.items():
         for lang_id, text in table.items():
             if not text:
@@ -333,18 +334,18 @@ def build_reverse_index(
     return reverse, english_reverse
 
 
-def member_map(members: Sequence[Member]) -> Dict[str, Member]:
+def member_map(members: Sequence[Member]) -> dict[str, Member]:
     return {m.key: m for m in members}
 
 
-def get_string_value(parser: JsoncParser, member: Member) -> Optional[str]:
+def get_string_value(parser: JsoncParser, member: Member) -> str | None:
     if parser.text[member.value_start] != '"':
         return None
     value, _ = parser.parse_string(member.value_start)
     return value
 
 
-def get_object_members(parser: JsoncParser, member: Member) -> Optional[List[Member]]:
+def get_object_members(parser: JsoncParser, member: Member) -> list[Member] | None:
     if parser.text[member.value_start] != "{":
         return None
     members, _ = parser.parse_object_members(member.value_start)
@@ -352,8 +353,8 @@ def get_object_members(parser: JsoncParser, member: Member) -> Optional[List[Mem
 
 
 def get_array_member_if_exists(
-    parser: JsoncParser, members: Dict[str, Member], key: str
-) -> Optional[Member]:
+    parser: JsoncParser, members: dict[str, Member], key: str
+) -> Member | None:
     m = members.get(key)
     if not m:
         return None
@@ -362,7 +363,7 @@ def get_array_member_if_exists(
     return m
 
 
-def get_bool_value(parser: JsoncParser, member: Optional[Member]) -> Optional[bool]:
+def get_bool_value(parser: JsoncParser, member: Member | None) -> bool | None:
     if member is None:
         return None
     raw = parser.text[member.value_start : member.value_end].strip()
@@ -403,9 +404,9 @@ def build_expected_array_text(
 
 
 def build_numeric_array_text(
-    values: Sequence[Union[int, float]], key_indent: str, newline: str
+    values: Sequence[int | float], key_indent: str, newline: str
 ) -> str:
-    def format_number(value: Union[int, float]) -> str:
+    def format_number(value: float) -> str:
         if isinstance(value, float) and value.is_integer():
             value = int(value)
         return str(value)
@@ -420,11 +421,11 @@ def build_numeric_array_text(
 
 def parse_array_number_values(
     parser: JsoncParser, member: Member
-) -> Optional[List[Union[int, float]]]:
+) -> list[int | float] | None:
     if parser.text[member.value_start] != "[":
         return None
 
-    values: List[Union[int, float]] = []
+    values: list[int | float] = []
     i = member.value_start + 1
     while True:
         i = parser.skip_ws_comments(i)
@@ -455,7 +456,7 @@ def parse_array_number_values(
 
 def build_inserted_array_member_text(
     key: str,
-    values: Sequence[Union[int, float]],
+    values: Sequence[int | float],
     key_indent: str,
     closing_indent: str,
     newline: str,
@@ -465,9 +466,9 @@ def build_inserted_array_member_text(
 
 
 def apply_roi_offset(
-    roi_values: Sequence[Union[int, float]],
-    roi_offset_values: Sequence[Union[int, float]],
-) -> Optional[List[Union[int, float]]]:
+    roi_values: Sequence[int | float],
+    roi_offset_values: Sequence[int | float],
+) -> list[int | float] | None:
     if len(roi_values) != 4 or len(roi_offset_values) != 4:
         return None
 
@@ -482,7 +483,7 @@ def apply_roi_offset(
 
 def locate_node_roi_members(
     parser: JsoncParser, node_member: Member
-) -> Tuple[Optional[Member], Optional[Member]]:
+) -> tuple[Member | None, Member | None]:
     node_members, _ = parser.parse_object_members(node_member.value_start)
     node_map = member_map(node_members)
 
@@ -515,13 +516,13 @@ def locate_node_roi_members(
 def resolve_effective_roi(
     parser: JsoncParser,
     roi_member: Member,
-    roi_offset_member: Optional[Member],
-    root_member_map: Dict[str, Member],
-    roi_cache: Dict[str, Optional[List[Union[int, float]]]],
-    visiting: Set[str],
-) -> Optional[List[Union[int, float]]]:
+    roi_offset_member: Member | None,
+    root_member_map: dict[str, Member],
+    roi_cache: dict[str, list[int | float] | None],
+    visiting: set[str],
+) -> list[int | float] | None:
     ch = parser.text[roi_member.value_start]
-    base_roi: Optional[List[Union[int, float]]] = None
+    base_roi: list[int | float] | None = None
     if ch == "[":
         base_roi = parse_array_number_values(parser, roi_member)
     elif ch == '"':
@@ -562,11 +563,11 @@ def resolve_effective_roi(
 
 def resolve_lang_ids(
     expected_values: Sequence[str],
-    reverse_index: Dict[str, Set[str]],
-    english_reverse_index: Dict[str, Set[str]],
-    tables: Dict[str, Dict[str, str]],
-) -> Tuple[List[str], List[str]]:
-    candidates_by_text: List[Tuple[str, Set[str]]] = []
+    reverse_index: dict[str, set[str]],
+    english_reverse_index: dict[str, set[str]],
+    tables: dict[str, dict[str, str]],
+) -> tuple[list[str], list[str]]:
+    candidates_by_text: list[tuple[str, set[str]]] = []
     for text in expected_values:
         norm = normalize_text(text)
         candidates = set(reverse_index.get(norm, set()))
@@ -576,9 +577,9 @@ def resolve_lang_ids(
             )
         candidates_by_text.append((text, candidates))
 
-    resolved_in_order: List[str] = []
-    resolved_set: Set[str] = set()
-    unresolved_texts: List[str] = []
+    resolved_in_order: list[str] = []
+    resolved_set: set[str] = set()
+    unresolved_texts: list[str] = []
 
     # 第一轮：唯一命中
     for text, candidates in candidates_by_text:
@@ -619,10 +620,10 @@ def resolve_lang_ids(
 
 
 def expand_expected_from_ids(
-    lang_ids: Sequence[str], tables: Dict[str, Dict[str, str]]
-) -> List[str]:
-    expanded: List[str] = []
-    seen: Set[str] = set()
+    lang_ids: Sequence[str], tables: dict[str, dict[str, str]]
+) -> list[str]:
+    expanded: list[str] = []
+    seen: set[str] = set()
     for lang_id in lang_ids:
         row = [tables[lang].get(lang_id, "") for lang in LANG_ORDER]
         if any(row):
@@ -635,8 +636,8 @@ def expand_expected_from_ids(
 
 
 def append_unresolved_texts(
-    base_expected: List[str], unresolved_texts: Sequence[str]
-) -> List[str]:
+    base_expected: list[str], unresolved_texts: Sequence[str]
+) -> list[str]:
     """
     将未命中的原始 expected 追加到结果末尾，并避免重复追加。
     """
@@ -659,7 +660,7 @@ def escape_regex_literal(text: str) -> str:
     return re.sub(r"([\\.^$*+?{}\[\]|()])", r"\\\1", text)
 
 
-def split_english_text_tokens(text: str) -> List[str]:
+def split_english_text_tokens(text: str) -> list[str]:
     return re.findall(r"[A-Za-z0-9]+|[^A-Za-z0-9\s]+", text)
 
 
@@ -707,9 +708,9 @@ def estimate_text_display_width(text: str) -> float:
 def estimate_expected_max_width(
     expected_values: Sequence[str],
     lang_ids: Sequence[str],
-    tables: Dict[str, Dict[str, str]],
+    tables: dict[str, dict[str, str]],
 ) -> float:
-    widths: List[float] = []
+    widths: list[float] = []
     for expected_text in expected_values:
         for lang_id in lang_ids:
             matched = False
@@ -727,7 +728,7 @@ def estimate_expected_max_width(
 
 
 def estimate_translated_max_width(
-    lang_ids: Sequence[str], tables: Dict[str, Dict[str, str]]
+    lang_ids: Sequence[str], tables: dict[str, dict[str, str]]
 ) -> float:
     widths = [
         estimate_text_display_width(text)
@@ -743,7 +744,7 @@ def estimate_roi_base_width(
     old_expected: Sequence[str],
     new_expected: Sequence[str],
     lang_ids: Sequence[str],
-    tables: Dict[str, Dict[str, str]],
+    tables: dict[str, dict[str, str]],
 ) -> float:
     """
     ROI 宽度基准：
@@ -758,10 +759,10 @@ def estimate_roi_base_width(
 
 
 def compute_expanded_roi(
-    roi_values: Sequence[Union[int, float]],
+    roi_values: Sequence[int | float],
     old_max_width: float,
     new_max_width: float,
-) -> Optional[List[Union[int, float]]]:
+) -> list[int | float] | None:
     if len(roi_values) != 4 or old_max_width <= 0 or new_max_width <= old_max_width:
         return None
 
@@ -822,20 +823,20 @@ class Replacement:
 @dataclass
 class NodeChange:
     node_name: str
-    replacements: List[Replacement]
-    old_expected: List[str]
-    new_expected: List[str]
-    unresolved_texts: List[str]
-    old_roi: Optional[List[Union[int, float]]] = None
-    new_roi: Optional[List[Union[int, float]]] = None
+    replacements: list[Replacement]
+    old_expected: list[str]
+    new_expected: list[str]
+    unresolved_texts: list[str]
+    old_roi: list[int | float] | None = None
+    new_roi: list[int | float] | None = None
 
 
 def process_pipeline_file(
     path: Path,
-    tables: Dict[str, Dict[str, str]],
-    reverse_index: Dict[str, Set[str]],
-    english_reverse_index: Dict[str, Set[str]],
-) -> Tuple[str, List[NodeChange], List[Tuple[str, str, List[str]]], int, int]:
+    tables: dict[str, dict[str, str]],
+    reverse_index: dict[str, set[str]],
+    english_reverse_index: dict[str, set[str]],
+) -> tuple[str, list[NodeChange], list[tuple[str, str, list[str]]], int, int]:
     text = path.read_text(encoding="utf-8")
     parser = JsoncParser(text)
     newline = "\r\n" if "\r\n" in text else "\n"
@@ -843,10 +844,10 @@ def process_pipeline_file(
     root_start = parser.skip_ws_comments(0)
     root_members, _ = parser.parse_object_members(root_start)
     root_member_map = {member.key: member for member in root_members}
-    roi_cache: Dict[str, Optional[List[Union[int, float]]]] = {}
+    roi_cache: dict[str, list[int | float] | None] = {}
 
-    changes: List[NodeChange] = []
-    unresolved_nodes: List[Tuple[str, str, List[str]]] = []
+    changes: list[NodeChange] = []
+    unresolved_nodes: list[tuple[str, str, list[str]]] = []
     ocr_nodes_with_expected = 0
     skipped_by_marker = 0
 
@@ -861,9 +862,9 @@ def process_pipeline_file(
 
         recognition_member = node_map.get("recognition")
         is_ocr = False
-        expected_member: Optional[Member] = None
-        roi_member: Optional[Member] = None
-        roi_offset_member: Optional[Member] = None
+        expected_member: Member | None = None
+        roi_member: Member | None = None
+        roi_offset_member: Member | None = None
         roi_container_end = node_end
 
         if recognition_member:
@@ -943,7 +944,7 @@ def process_pipeline_file(
             )
             continue
         new_expected = append_unresolved_texts(new_expected, unresolved_texts)
-        replacements: List[Replacement] = []
+        replacements: list[Replacement] = []
 
         if new_expected != old_expected:
             key_indent = detect_line_indent(text, expected_member.key_start)
@@ -956,8 +957,8 @@ def process_pipeline_file(
                 )
             )
 
-        old_roi: Optional[List[Union[int, float]]] = None
-        new_roi: Optional[List[Union[int, float]]] = None
+        old_roi: list[int | float] | None = None
+        new_roi: list[int | float] | None = None
         if not only_rec and roi_member is not None:
             effective_roi = resolve_effective_roi(
                 parser,
@@ -1058,8 +1059,8 @@ def process_pipeline_file(
     )
 
 
-def iter_pipeline_files(base_dir: Path) -> List[Path]:
-    files: List[Path] = []
+def iter_pipeline_files(base_dir: Path) -> list[Path]:
+    files: list[Path] = []
     for rel_dir in PIPELINE_DIRS:
         abs_dir = base_dir / rel_dir
         if not abs_dir.exists():
@@ -1108,8 +1109,8 @@ def main() -> int:
     total_ocr_nodes = 0
     total_changed_nodes = 0
     total_skipped_nodes = 0
-    unresolved_all: List[Tuple[str, str, List[str]]] = []
-    failed_files: List[Tuple[str, str]] = []
+    unresolved_all: list[tuple[str, str, list[str]]] = []
+    failed_files: list[tuple[str, str]] = []
 
     for file_path in pipeline_files:
         try:

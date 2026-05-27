@@ -1,8 +1,6 @@
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-from maa.define import Status
-from datetime import datetime
+from maa.custom_action import CustomAction
 
 VK = {
     "W": 0x57,
@@ -527,7 +525,9 @@ class PinkPawHeistScheme1Action(CustomAction):
         timeout_ms = PinkPawHeistScheme1Action._adaptive_timeout_ms
         calibrated = PinkPawHeistScheme1Action._calibrated
 
-        print(f"[PinkPawHeist] 等待回到小吱... (超时: {timeout_ms/1000:.1f}s, 已校准: {calibrated})")
+        print(
+            f"[PinkPawHeist] 等待回到小吱... (超时: {timeout_ms / 1000:.1f}s, 已校准: {calibrated})"
+        )
 
         start = time.monotonic()
         found = False
@@ -546,35 +546,43 @@ class PinkPawHeistScheme1Action(CustomAction):
         elapsed_ms = (time.monotonic() - start) * 1000
 
         if found:
-            print(f"[PinkPawHeist] ✅ 找到小吱! 耗时: {elapsed_ms/1000:.1f}s")
+            print(f"[PinkPawHeist] ✅ 找到小吱! 耗时: {elapsed_ms / 1000:.1f}s")
             if not calibrated:
                 # 首轮校准：实际耗时 × 1.2 作为后续超时（至少20秒）
                 new_timeout = max(20000, elapsed_ms * 1.2)
                 PinkPawHeistScheme1Action._adaptive_timeout_ms = new_timeout
                 PinkPawHeistScheme1Action._calibrated = True
-                print(f"[PinkPawHeist] 📐 首轮校准完成!")
-                print(f"[PinkPawHeist]    实测等待时间: {elapsed_ms/1000:.1f}s")
-                print(f"[PinkPawHeist]    后续超时设为: {new_timeout/1000:.1f}s (实测×1.2)")
+                print("[PinkPawHeist] 📐 首轮校准完成!")
+                print(f"[PinkPawHeist]    实测等待时间: {elapsed_ms / 1000:.1f}s")
+                print(
+                    f"[PinkPawHeist]    后续超时设为: {new_timeout / 1000:.1f}s (实测×1.2)"
+                )
                 # 推送到前端
-                self._log_to_frontend(ah, f"📐 校准完成: 实测{elapsed_ms/1000:.1f}s, 后续超时{new_timeout/1000:.1f}s")
+                self._log_to_frontend(
+                    ah,
+                    f"📐 校准完成: 实测{elapsed_ms / 1000:.1f}s, 后续超时{new_timeout / 1000:.1f}s",
+                )
             else:
-                self._log_to_frontend(ah, f"✅ 找到小吱 ({elapsed_ms/1000:.1f}s)")
+                self._log_to_frontend(ah, f"✅ 找到小吱 ({elapsed_ms / 1000:.1f}s)")
         else:
-            print(f"[PinkPawHeist] ⚠️ 等待超时 ({timeout_ms/1000:.1f}s)，未找到小吱")
-            self._log_to_frontend(ah, f"⚠️ 等待小吱超时 ({timeout_ms/1000:.1f}s)")
+            print(f"[PinkPawHeist] ⚠️ 等待超时 ({timeout_ms / 1000:.1f}s)，未找到小吱")
+            self._log_to_frontend(ah, f"⚠️ 等待小吱超时 ({timeout_ms / 1000:.1f}s)")
 
     def _log_to_frontend(self, ah: ActionHelper, message: str):
         """通过 pipeline focus 向 MXU 前端推送消息"""
-        ah.ctx.run_task("PinkPawHeist_LogMessage", pipeline_override={
-            "PinkPawHeist_LogMessage": {
-                "focus": {
-                    "Node.Action.Starting": {
-                        "content": message,
-                        "display": ["log", "toast"]
+        ah.ctx.run_task(
+            "PinkPawHeist_LogMessage",
+            pipeline_override={
+                "PinkPawHeist_LogMessage": {
+                    "focus": {
+                        "Node.Action.Starting": {
+                            "content": message,
+                            "display": ["log", "toast"],
+                        }
                     }
                 }
-            }
-        })
+            },
+        )
 
     def _exit_to_main(self, ah: ActionHelper):
         for _ in range(3):

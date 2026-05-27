@@ -1,8 +1,6 @@
 from maa.agent.agent_server import AgentServer
-from maa.custom_action import CustomAction
 from maa.context import Context
-from maa.define import Status
-from datetime import datetime
+from maa.custom_action import CustomAction
 
 try:
     from agent.custom.action.pinkpaw.pinkpaw_reward_logger import notify_pinkpaw_reward

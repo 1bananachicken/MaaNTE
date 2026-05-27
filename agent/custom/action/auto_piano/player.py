@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from maa.context import Context
-
 from utils.maafocus import PrintT
+
 from .maa_keyboard import MaaKeyboardBridge
 from .midi_processor import MidiProcessor
 
