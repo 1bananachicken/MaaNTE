@@ -3,13 +3,13 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1779898544361,
+            "lastSyncTime": 1779898841350,
             "isModifiedExternally": false,
             "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\MaaNTE\\assets\\resource\\base\\pipeline\\AutoFight\\AutoFight.json",
             "savedViewport": {
-                "x": -813,
-                "y": -1937,
-                "zoom": 0.92
+                "x": -1753,
+                "y": -3156,
+                "zoom": 1.5
             },
             "filename": "AutoFight",
             "version": "v1.5.3"
