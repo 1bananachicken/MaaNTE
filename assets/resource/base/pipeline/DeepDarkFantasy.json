@@ -3,12 +3,12 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1779979519020,
+            "lastSyncTime": 1779979524577,
             "isModifiedExternally": false,
             "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\ddf\\assets\\resource\\base\\pipeline\\DeepDarkFantasy.json",
             "savedViewport": {
-                "x": -892,
-                "y": 66,
+                "x": -1102,
+                "y": -79,
                 "zoom": 0.75
             },
             "filename": "DeepDarkFantasy",
@@ -204,10 +204,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    519,
-                    453,
-                    260,
-                    184
+                    547,
+                    460,
+                    181,
+                    165
                 ],
                 "expected": [
                     "黑铁螺钉"
@@ -219,7 +219,8 @@
         },
         "timeout": 60000,
         "next": [
-            "DDF_GetIn"
+            "DDF_GetIn",
+            "[JumpBack]DDF_Wait_1_1_副本1"
         ],
         "$__mpe_code": {
             "position": {
@@ -255,6 +256,31 @@
             "position": {
                 "x": 1594,
                 "y": 167
+            }
+        }
+    },
+    "DDF_Wait_1_1_副本1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    984,
+                    646,
+                    217,
+                    56
+                ],
+                "expected": [
+                    "离开"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2656,
+                "y": 663
             }
         }
     }
