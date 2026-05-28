@@ -36,13 +36,22 @@ agent/
 │       ├── SoundTrigger/           # 音频触发业务
 │       ├── Movement/               # 移动控制
 │       ├── auto_piano/             # 自动钢琴
+│       ├── pinkpaw/                # 粉爪大劫案
+│       ├── DatasetCollection/      # 数据集采集
 │       ├── auto_make_coffee.py     # 单文件简单动作
 │       ├── auto_tetris.py          # 俄罗斯方块入口
+│       ├── auto_f_scroll.py        # 自动滚屏
 │       ├── furniture_claim.py      # 家具收取
-│       └── realtime_task.py        # 实时任务调度
+│       ├── realtime_task.py        # 实时任务调度
+│       ├── withdraw_money_choose_item.py  # 补货取钱物品选择
+│       └── __init__.py             # 所有 CustomAction 的导入与注册
 └── utils/
+    ├── __init__.py                 # 子模块聚合导出
     ├── logger.py                   # 日志系统（loguru/logging）
     ├── pienv.py                    # PI 环境变量
+    ├── maafocus.py                 # 用户可见消息（Pipeline focus 协议）
+    ├── i18n.py                     # 多语言/翻译
+    ├── screen.py                   # 屏幕缩放/分辨率
     ├── time.py                     # 时间工具
     └── win32_process.py            # Win32 窗口查找
 ```
