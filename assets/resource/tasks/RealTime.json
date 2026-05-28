@@ -7,6 +7,7 @@
             "description": "$task_realtime_desc",
             "option": [
                 "RealTimeCheckInterval",
+                "RealTimeAutoLoot",
                 "RealTimeAutoSkipStory",
                 "RealTimeAutoTeleport"
             ],
