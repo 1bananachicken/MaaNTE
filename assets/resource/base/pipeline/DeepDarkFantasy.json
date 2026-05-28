@@ -3,12 +3,12 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1779979524577,
+            "lastSyncTime": 1779981712246,
             "isModifiedExternally": false,
             "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\ddf\\assets\\resource\\base\\pipeline\\DeepDarkFantasy.json",
             "savedViewport": {
-                "x": -1102,
-                "y": -79,
+                "x": -949,
+                "y": 15,
                 "zoom": 0.75
             },
             "filename": "DeepDarkFantasy",
@@ -24,15 +24,6 @@
             "position": {
                 "x": -89,
                 "y": 255
-            }
-        }
-    },
-    "DDF_Finish": {
-        "focus": "完成",
-        "$__mpe_code": {
-            "position": {
-                "x": 2375,
-                "y": 311
             }
         }
     },
@@ -138,7 +129,7 @@
             }
         },
         "next": [
-            "DDF_Wait_副本5"
+            "DDF_Wait"
         ],
         "$__mpe_code": {
             "position": {
@@ -147,7 +138,7 @@
             }
         }
     },
-    "DDF_Wait_2_1": {
+    "DDF_Wait_1_2": {
         "recognition": {
             "type": "OCR",
             "param": {
@@ -189,8 +180,8 @@
             }
         },
         "next": [
-            "DDF_Wait_3_1",
-            "DDF_Finish"
+            "DDF_Wait_2_1",
+            "DDF_Wait_2_2"
         ],
         "$__mpe_code": {
             "position": {
@@ -199,7 +190,7 @@
             }
         }
     },
-    "DDF_Wait_3_1": {
+    "DDF_Wait_2_2": {
         "recognition": {
             "type": "OCR",
             "param": {
@@ -220,7 +211,7 @@
         "timeout": 60000,
         "next": [
             "DDF_GetIn",
-            "[JumpBack]DDF_Wait_1_1_副本1"
+            "[JumpBack]DDF_Wait_3_1"
         ],
         "$__mpe_code": {
             "position": {
@@ -229,7 +220,7 @@
             }
         }
     },
-    "DDF_Wait_副本5": {
+    "DDF_Wait": {
         "recognition": {
             "type": "OCR",
             "param": {
@@ -250,7 +241,7 @@
         "timeout": 200000,
         "next": [
             "DDF_Wait_1_1",
-            "[JumpBack]DDF_Wait_2_1"
+            "[JumpBack]DDF_Wait_1_2"
         ],
         "$__mpe_code": {
             "position": {
@@ -259,7 +250,7 @@
             }
         }
     },
-    "DDF_Wait_1_1_副本1": {
+    "DDF_Wait_3_1": {
         "recognition": {
             "type": "OCR",
             "param": {
@@ -279,8 +270,34 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 2656,
-                "y": 663
+                "x": 2701,
+                "y": 658
+            }
+        }
+    },
+    "DDF_Wait_2_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    547,
+                    460,
+                    181,
+                    165
+                ],
+                "expected": [
+                    "今日黑铁螺钉已达上限，无法继续获得"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "timeout": 60000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2330,
+                "y": 282
             }
         }
     }
