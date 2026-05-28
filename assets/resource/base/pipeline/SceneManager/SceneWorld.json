@@ -3,9 +3,57 @@
         "desc": "从任意界面返回大世界界面",
         "next": [
             "__ScenePrivateMenuListEnterWorld",
+            "__ScenePrivateMiniWorldEnterWorld",
             "__ScenePrivateAnyEnterWorldSuccess",
             "[JumpBack]__ScenePrivateLogin",
             "[JumpBack]__ScenePrivateAnyExit"
+        ]
+    },
+    "__ScenePrivateMiniWorldEnterWorld": {
+        "desc": "从小世界进入大世界",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InMiniWorld"
+                ]
+            }
+        },
+        "action": "Custom",
+        "custom_action": "alt_click",
+        "pre_wait_freezes": {
+            "target": [
+                75,
+                60,
+                60,
+                60
+            ],
+            "time": 800,
+            "timeout": 2000
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "__ScenePrivateAnyEnterWorldSuccess"
+        ]
+    },
+    "__ScenePrivateMiniWorldExitConfirm": {
+        "desc": "小世界退出确认",
+        "recognition": "OCR",
+        "roi": [
+            657,
+            437,
+            204,
+            57
+        ],
+        "expected": [
+            "确认"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "__ScenePrivateAnyEnterWorldSuccess",
+            "[JumpBack]SceneLoadingType2"
         ]
     },
     "__ScenePrivateAnyEnterWorldSuccess": {
