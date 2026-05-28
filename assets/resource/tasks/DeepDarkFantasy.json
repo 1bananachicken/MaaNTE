@@ -1,0 +1,12 @@
+{
+    "task": [
+        {
+            "name": "黑暗赛车界",
+            "label": "$黑暗赛车界",
+            "entry": "DDF_Action",
+            "option": [
+
+            ]
+        }
+    ]
+}
