@@ -37,6 +37,32 @@
                 }
             }
         },
+        "RealTimeAutoLoot": {
+            "type": "switch",
+            "label": "$task.RealTime.option.RealTimeAutoLoot.label",
+            "description": "$task.RealTime.option.RealTimeAutoLoot.desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "RealTimeLoot": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "RealTimeLoot": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
         "RealTimeAutoSkipStory": {
             "type": "switch",
             "label": "$task_realtime_option_auto_skip_story",

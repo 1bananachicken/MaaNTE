@@ -53,6 +53,8 @@
     "task_realtime_desc": "リアルタイム支援ツール，必要<span style='color:red'>“デスクトップ版 - フロントエンド”</span>控制器",
     "task_realtime_option_check_interval": "検知間隔 (ms)",
     "task_realtime_option_check_interval_desc": "2回の検知間隔（単位：ミリ秒）",
+    "task.RealTime.option.RealTimeAutoLoot.label": "自動拾得",
+    "task.RealTime.option.RealTimeAutoLoot.desc": "拾得可能なアイコンを検出したら自動的にクリックして拾得する（何であっても）",
     "task_realtime_option_auto_skip_story": "自動劇情",
     "task_realtime_option_auto_skip_story_desc": "自動で劇情ボタンをクリック",
     "task_realtime_option_skip_story_dialog": "自動で“今日不再提示”をチェック",

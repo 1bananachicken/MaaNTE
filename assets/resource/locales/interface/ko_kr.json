@@ -83,6 +83,8 @@
     "task_claim_rewards_option_battle_pass": "서클 바운티 패스 보상 수령",
     "task_realtime_option_check_interval": "감지 간격 (ms)",
     "task_realtime_option_check_interval_desc": "두 감지 사이의 간격 (밀리초)",
+    "task.RealTime.option.RealTimeAutoLoot.label": "자동 획득",
+    "task.RealTime.option.RealTimeAutoLoot.desc": "획득 가능한 표시가 감지되면 자동으로 클릭하여 획득합니다 (무엇이든)",
     "task_realtime_option_auto_skip_story": "자동 스토리 스킵",
     "task_realtime_option_auto_skip_story_desc": "스토리 스킵 버튼을 자동으로 클릭합니다",
     "task_realtime_option_skip_story_dialog": "\"오늘 다시 표시 안 함\" 자동 체크",
