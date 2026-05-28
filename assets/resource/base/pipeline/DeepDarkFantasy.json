@@ -3,11 +3,11 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1779981714527,
+            "lastSyncTime": 1779984028803,
             "isModifiedExternally": false,
             "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\ddf\\assets\\resource\\base\\pipeline\\DeepDarkFantasy.json",
             "savedViewport": {
-                "x": -1436,
+                "x": -1696,
                 "y": -146,
                 "zoom": 0.99
             },
@@ -179,6 +179,7 @@
                 ]
             }
         },
+        "post_delay": 1000,
         "next": [
             "DDF_Wait_2_1",
             "DDF_Wait_2_2"
@@ -280,13 +281,15 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    547,
-                    460,
-                    181,
-                    165
+                    484,
+                    506,
+                    317,
+                    95
                 ],
                 "expected": [
-                    "今日黑铁螺钉已达上限，无法继续获得"
+                    "黑铁螺钉已达上限，无法继续获得",
+                    "已达上限",
+                    "无法继续获得"
                 ]
             }
         },
