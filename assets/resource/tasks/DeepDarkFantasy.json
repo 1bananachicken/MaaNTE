@@ -1,0 +1,34 @@
+{
+    "task": [
+        {
+            "name": "DeepDarkFantasy",
+            "label": "$task_fish_label",
+            "entry": "DDF_Action",
+            "option": [
+            ]
+        }
+    ],
+    "option": {
+        "DeepDarkFantasyNumber": {
+            "type": "input",
+            "label": "$task_fish_option_count",
+            "description": "$task_fish_option_count_desc",
+            "inputs": [
+                {
+                    "name": "count",
+                    "label": "$task_fish_option_count_input",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "FishGameStart": {
+                    "custom_action_param": {
+                        "count": "{count}"
+                    }
+                }
+            }
+        }
+    }
+}
