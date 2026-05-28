@@ -231,10 +231,48 @@ jobs:
           rm -rf install-mxu/deps
           echo "Deps directory removed. Package size reduced by ~171MB."
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload unsigned executable for signing
+        id: upload-unsigned-artifact
+        uses: actions/upload-artifact@v7
+        with:
+          path: install-mxu/MaaNTE.exe
+          archive: false
+
+      - name: Submit signing request
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: 52da06e6-4590-473f-a3c3-ae7ea178db3e
+          project-slug: MaaNTE
+          signing-policy-slug: test-signing
+          github-artifact-id: ${{ steps.upload-unsigned-artifact.outputs.artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed-artifact
+          skip-decompress: true
+          parameters: |
+            version: ${{ toJSON(needs.meta.outputs.tag) }}
+
+      - name: Replace unsigned executable with signed executable
+        shell: bash
+        run: |
+          cp signed-artifact/MaaNTE.exe install-mxu/MaaNTE.exe
+
+      - name: Upload signed artifact
+        uses: actions/upload-artifact@v4
         with:
           name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
-          path: "install-mxu"
+          path: install-mxu
+
+      - name: Delete signing-only artifact
+        if: ${{ always() && steps.upload-unsigned-artifact.outputs.artifact-id != '' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.deleteArtifact({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              artifact_id: Number('${{ steps.upload-unsigned-artifact.outputs.artifact-id }}')
+            })
 
   changelog:
     name: Generate changelog
@@ -270,6 +308,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: assets
+          pattern: MaaNTE-*-MXU
 
       - name: Process and package artifacts
         run: |
@@ -313,7 +352,9 @@ jobs:
 
       - uses: softprops/action-gh-release@v2.2.2
         with:
-          files: assets/*
+          files: |
+            assets/*.zip
+            assets/*.tar.gz
           tag_name: ${{ needs.meta.outputs.tag }}
           body: ${{ needs.changelog.outputs.release_body }}
           draft: false
