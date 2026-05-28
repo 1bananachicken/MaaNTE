@@ -591,9 +591,9 @@ def main():
         # 3. MaaFramework
         step_download_maa_framework(os_arch)
 
-        # # 4. MFAAvalonia
-        # if not skip_mfa:
-        #     step_download_mfa(os_arch, platform_tag)
+        # 4. MFAAvalonia
+        if not skip_mfa:
+            step_download_mfa(os_arch, platform_tag)
 
         # 5. MXU
         if not skip_mxu:
@@ -640,12 +640,12 @@ def main():
     if not args.skip_icon:
         step_copy_icons()
 
-    # # 打包
-    # if not skip_package:
-    #     if not skip_mfa:
-    #         step_package(platform_tag, args.tag, args.output_dir)
-    #     if not skip_mxu:
-    #         step_package(platform_tag, args.tag, args.output_dir, mxu=True)
+    # 打包
+    if not skip_package:
+        if not skip_mfa:
+            step_package(platform_tag, args.tag, args.output_dir)
+        if not skip_mxu:
+            step_package(platform_tag, args.tag, args.output_dir, mxu=True)
 
     print("\n" + "=" * 60)
     print("构建完成!")
