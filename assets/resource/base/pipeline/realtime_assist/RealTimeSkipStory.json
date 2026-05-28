@@ -23,6 +23,7 @@
         "post_delay": 0,
         "next": [
             "RealTimeSkipStoryDialog",
+            "RealTimeSkipStorySummary",
             "RealTimeFakeTrue"
         ]
     },
@@ -107,8 +108,71 @@
                     250,
                     70
                 ],
+                "threshold": 0.8,
+                "roi_offset": [
+                    0,
+                    0,
+                    36,
+                    0
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 300,
+        "next": [
+            "RealTimeFakeTrue"
+        ]
+    },
+    "RealTimeSkipStorySummary": {
+        "desc": "跳过剧情概述",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "剧情概述"
+                ],
+                "roi": [
+                    560,
+                    240,
+                    160,
+                    50
+                ],
                 "threshold": 0.8
-            ,
+            }
+        },
+        "action": "DoNothing",
+        "post_delay": 0,
+        "next": [
+            "RealTimeSkipStorySummaryConfirm"
+        ]
+    },
+    "RealTimeSkipStorySummaryConfirm": {
+        "desc": "跳过剧情概述确认按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "确认记录",
+                    "確認記錄",
+                    "(?i)Confirm",
+                    "記録更新",
+                    "确认",
+                    "確認",
+                    "確定",
+                    "确定",
+                    "OK",
+                    "CONFIRN",
+                    "확인"
+                ],
+                "roi": [
+                    700,
+                    410,
+                    250,
+                    70
+                ],
+                "threshold": 0.8,
                 "roi_offset": [
                     0,
                     0,

@@ -87,6 +87,8 @@
     "task_realtime_option_auto_skip_story_desc": "스토리 스킵 버튼을 자동으로 클릭합니다",
     "task_realtime_option_skip_story_dialog": "\"오늘 다시 표시 안 함\" 자동 체크",
     "task_realtime_option_skip_story_dialog_desc": "스토리 스킵 팝업에서 \"오늘 다시 표시 안 함\"을 자동으로 체크하여 매번 확인 창이 뜨지 않도록 합니다",
+    "task.RealTime.option.RealTimeAutoSkipStorySummary.label": "스토리 개요 자동 스킵",
+    "task.RealTime.option.RealTimeAutoSkipStorySummary.desc": "스토리 개요 대화상자가 나타날 때 \"확인\"을 클릭하여 자동으로 건너뜁니다",
     "task_realtime_option_auto_teleport": "자동 순간이동",
     "task_realtime_option_auto_teleport_desc": "특정 순간이동 지점을 감지하면 자동으로 클릭하여 이동합니다",
     "task_realtime_option_teleport_witte": "베르트하이머 탑",

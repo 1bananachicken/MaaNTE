@@ -87,6 +87,8 @@
     "task_realtime_option_auto_skip_story_desc": "Automatically click the skip story button",
     "task_realtime_option_skip_story_dialog": "Automatically check “Don't ask me again today”.",
     "task_realtime_option_skip_story_dialog_desc": "In the skip story pop-up, automatically check ‘Don't ask me again today’ to avoid having to confirm every time.",
+    "task.RealTime.option.RealTimeAutoSkipStorySummary.label": "Auto Skip Story Summary",
+    "task.RealTime.option.RealTimeAutoSkipStorySummary.desc": "Automatically click \"Confirm\" to skip when the story summary dialog appears",
     "task_realtime_option_auto_teleport": "Automatic Transfer",
     "task_realtime_option_auto_teleport_desc": "Detect specific teleportation points and click to teleport automatically",
     "task_realtime_option_teleport_witte": "Wertheimer Tower",

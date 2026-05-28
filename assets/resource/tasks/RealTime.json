@@ -13,7 +13,9 @@
             "controller": [
                 "Win32-Front"
             ],
-            "group": ["RealTimeAssist"]
+            "group": [
+                "RealTimeAssist"
+            ]
         }
     ],
     "option": {
@@ -44,7 +46,8 @@
                     "name": "Yes",
                     "label": "$option_switch_case_yes",
                     "option": [
-                        "RealTimeAutoSkipStoryDialog"
+                        "RealTimeAutoSkipStoryDialog",
+                        "RealTimeAutoSkipStorySummary"
                     ],
                     "pipeline_override": {
                         "RealTimeSkipStory": {
@@ -95,6 +98,32 @@
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "RealTimeSkipStoryDialogCheckbox": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoSkipStorySummary": {
+            "type": "switch",
+            "label": "$task.RealTime.option.RealTimeAutoSkipStorySummary.label",
+            "description": "$task.RealTime.option.RealTimeAutoSkipStorySummary.desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "RealTimeSkipStorySummary": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "RealTimeSkipStorySummary": {
                             "enabled": false
                         }
                     }
