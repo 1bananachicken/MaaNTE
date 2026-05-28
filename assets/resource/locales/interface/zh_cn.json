@@ -145,5 +145,11 @@
     "task_auto_drive_dataset_input_duration_desc": "录制时长，默认为 60 秒。",
     "task_auto_drive_dataset_input_start_delay_label": "录制延迟",
     "task_touch_label": "抚摸",
-    "task_touch_desc": "检测"抚摸"按钮并自动执行：按F → 点击屏幕中央 → 按ESC，重复100次"
+    "task_touch_desc": "检测"抚摸"按钮并自动执行：按F → 点击屏幕中央 → 按ESC，重复100次",
+    "task_touch_option_loop_count": "循环次数",
+    "task_touch_option_loop_count_desc": "重复执行的次数",
+    "task_touch_option_delay_after_f": "按F后延迟 (ms)",
+    "task_touch_option_delay_after_f_desc": "按下F键后的延迟时间（毫秒）",
+    "task_touch_option_delay_after_click": "点击后延迟 (ms)",
+    "task_touch_option_delay_after_click_desc": "点击屏幕中央后的延迟时间（毫秒）"
 }

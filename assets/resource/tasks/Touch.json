@@ -4,7 +4,68 @@
             "name": "Touch",
             "label": "$task_touch_label",
             "entry": "TouchDetect",
-            "description": "$task_touch_desc"
+            "description": "$task_touch_desc",
+            "option": [
+                "TouchLoopCount",
+                "TouchDelayAfterF",
+                "TouchDelayAfterClick"
+            ]
         }
-    ]
+    ],
+    "option": {
+        "TouchLoopCount": {
+            "type": "input",
+            "label": "$task_touch_option_loop_count",
+            "description": "$task_touch_option_loop_count_desc",
+            "inputs": [
+                {
+                    "name": "count",
+                    "default": "100",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "TouchDetect": {
+                    "max_hit": "{count}"
+                }
+            }
+        },
+        "TouchDelayAfterF": {
+            "type": "input",
+            "label": "$task_touch_option_delay_after_f",
+            "description": "$task_touch_option_delay_after_f_desc",
+            "inputs": [
+                {
+                    "name": "delay",
+                    "default": "1000",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "TouchPressF": {
+                    "post_delay": "{delay}"
+                }
+            }
+        },
+        "TouchDelayAfterClick": {
+            "type": "input",
+            "label": "$task_touch_option_delay_after_click",
+            "description": "$task_touch_option_delay_after_click_desc",
+            "inputs": [
+                {
+                    "name": "delay",
+                    "default": "1000",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "TouchClickCenter": {
+                    "post_delay": "{delay}"
+                }
+            }
+        }
+    }
 }
