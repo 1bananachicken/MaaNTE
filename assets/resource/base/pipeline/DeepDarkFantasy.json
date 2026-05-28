@@ -3,13 +3,13 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1779981712246,
+            "lastSyncTime": 1779981714527,
             "isModifiedExternally": false,
             "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\ddf\\assets\\resource\\base\\pipeline\\DeepDarkFantasy.json",
             "savedViewport": {
-                "x": -949,
-                "y": 15,
-                "zoom": 0.75
+                "x": -1436,
+                "y": -146,
+                "zoom": 0.99
             },
             "filename": "DeepDarkFantasy",
             "version": "v1.5.3"
@@ -289,9 +289,6 @@
                     "今日黑铁螺钉已达上限，无法继续获得"
                 ]
             }
-        },
-        "action": {
-            "type": "Click"
         },
         "timeout": 60000,
         "$__mpe_code": {
