@@ -7,6 +7,14 @@
             "freq": 2
         }
     },
+    "MakeCoffeeScrollToTop": {
+        "action": "Scroll",
+        "target": [
+            120,
+            400
+        ],
+        "dy": 3600
+    },
     "MakeCoffeeStart": {
         "recognition": {
             "type": "OCR",
@@ -28,6 +36,27 @@
             }
         }
     },
+    "MakeCoffeeTargetCoffeeMaster": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    89,
+                    236,
+                    73,
+                    22
+                ],
+                "expected": [
+                    "新品",
+                    "新品",
+                    "(?i)New\\s*Product",
+                    "新作",
+                    "신제품"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
     "MakeCoffeeStar": {
         "recognition": {
             "type": "TemplateMatch",
@@ -38,7 +67,8 @@
                     29,
                     27
                 ],
-                "template": "auto_make_coffee/star.png"
+                "template": "auto_make_coffee/star.png",
+                "threshold": 0.9
             }
         }
     },
