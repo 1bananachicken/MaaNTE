@@ -74,7 +74,8 @@
                     "label": "$option_switch_case_yes",
                     "option": [
                         "RealTimeAutoSkipStoryDialog",
-                        "RealTimeAutoSkipStorySummary"
+                        "RealTimeAutoSkipStorySummary",
+                        "RealTimeAutoSkipImportantStory"
                     ],
                     "pipeline_override": {
                         "RealTimeSkipStory": {
@@ -151,6 +152,32 @@
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "RealTimeSkipStorySummary": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoSkipImportantStory": {
+            "type": "switch",
+            "label": "$task.RealTime.option.RealTimeAutoSkipImportantStory.label",
+            "description": "$task.RealTime.option.RealTimeAutoSkipImportantStory.desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "RealTimeSkipImportantStory": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "RealTimeSkipImportantStory": {
                             "enabled": false
                         }
                     }

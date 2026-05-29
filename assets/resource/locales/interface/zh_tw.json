@@ -61,6 +61,8 @@
     "task_realtime_option_skip_story_dialog_desc": "在跳過劇情彈窗中，自動勾選“今日不再提示”，避免每次彈出確認",
     "task.RealTime.option.RealTimeAutoSkipStorySummary.label": "自動跳過劇情概述",
     "task.RealTime.option.RealTimeAutoSkipStorySummary.desc": "在彈出劇情概述對話框時自動點擊「確認」跳過",
+    "task.RealTime.option.RealTimeAutoSkipImportantStory.label": "自動跳過重要劇情提示",
+    "task.RealTime.option.RealTimeAutoSkipImportantStory.desc": "在彈出重要劇情提示對話框時自動點擊「確認」跳過",
     "task_realtime_option_auto_teleport": "自動傳送",
     "task_realtime_option_auto_teleport_desc": "檢測到特定傳送點時自動點擊傳送",
     "task_realtime_option_teleport_witte": "維特海默塔",

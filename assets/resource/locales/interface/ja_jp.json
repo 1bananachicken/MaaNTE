@@ -61,6 +61,8 @@
     "task_realtime_option_skip_story_dialog_desc": "劇情をスキップするダイアログで、自動で“今日不再提示”をチェックし、毎回確認ダイアログが表示されるのを防ぐ",
     "task.RealTime.option.RealTimeAutoSkipStorySummary.label": "自動でストーリー概要をスキップ",
     "task.RealTime.option.RealTimeAutoSkipStorySummary.desc": "ストーリー概要ダイアログが表示されたときに「確認」をクリックして自動スキップ",
+    "task.RealTime.option.RealTimeAutoSkipImportantStory.label": "重要ストーリー通知を自動スキップ",
+    "task.RealTime.option.RealTimeAutoSkipImportantStory.desc": "重要ストーリー通知ダイアログが表示されたときに「確認」をクリックして自動スキップ",
     "task_realtime_option_auto_teleport": "自動伝送",
     "task_realtime_option_auto_teleport_desc": "特定の传送点を検知した場合に自動で传送ボタンをクリック",
     "task_realtime_option_teleport_witte": "ヴェルテハイモー塔",
