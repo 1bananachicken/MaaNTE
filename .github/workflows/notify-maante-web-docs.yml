@@ -1,0 +1,38 @@
+name: Notify MaaNTE-Web Docs Update
+
+on:
+  push:
+    branches:
+      - dev
+    paths:
+      - "docs/zh_cn/**"
+
+permissions:
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dispatch update event to MaaNTE-Web
+        env:
+          GH_TOKEN: ${{ secrets.MAANTE_BOT_TOKEN }}
+          TARGET_REPO: "Maa-NTE/MaaNTE-Web"
+          EVENT_TYPE: "md_changes"
+          SOURCE_REPO: ${{ github.repository }}
+          SOURCE_BRANCH: ${{ github.ref_name }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          if [ -z "$GH_TOKEN" ]; then
+            echo "MAANTE_BOT_TOKEN is not set"
+            exit 1
+          fi
+
+          curl --fail --silent --show-error \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            "https://api.github.com/repos/${TARGET_REPO}/dispatches" \
+            -d "{\"event_type\":\"${EVENT_TYPE}\",\"client_payload\":{\"source_repo\":\"${SOURCE_REPO}\",\"source_branch\":\"${SOURCE_BRANCH}\",\"source_sha\":\"${SOURCE_SHA}\"}}"
+
+          echo "Dispatched ${EVENT_TYPE} to ${TARGET_REPO}"
