@@ -47,6 +47,8 @@
     "task_fish_option_loop_time": "반복 횟수",
     "task_fish_option_loop_time_desc": "낚시 작업을 반복 실행할 횟수",
     "task_fish_option_count_input": "횟수",
+    "task_fish_fork_2_label": "자동 생선 판매 (브랜치 2)",
+    "task_fish_fork_2_desc": "자동 낚시 (포크 2 버전)",
     "task_realtime_label": "실시간 지원",
     "task_realtime_desc": "실시간 지원 도구",
     "task_make_coffee_label": "자동 커피 제조",

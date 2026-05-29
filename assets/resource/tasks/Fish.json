@@ -22,8 +22,8 @@
         },
         {
             "name": "FishFork2",
-            "label": "task_fish_fork_2_label",
-            "description": "钓鱼 - 分支 2",
+            "label": "$task_fish_fork_2_label",
+            "description": "$task_fish_fork_2_desc",
             "entry": "FishFork2",
             "option": [
                 "钓鱼通用设置",

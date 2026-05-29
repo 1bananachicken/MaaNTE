@@ -45,4 +45,5 @@ __all__ = [
     "RealTimeTaskAction",
     "SoundDodgeAction",
     "WithdrawMoneyChooseItem",
+    "auto_fish_fork_2",
 ]

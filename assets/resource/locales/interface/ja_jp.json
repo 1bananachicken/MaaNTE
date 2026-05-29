@@ -49,6 +49,8 @@
     "task_fish_option_loop_time": "ループ回数",
     "task_fish_option_loop_time_desc": "釣りタスクを実行する回数",
     "task_fish_option_count_input": "数量",
+    "task_fish_fork_2_label": "自動魚販売（fork 2）",
+    "task_fish_fork_2_desc": "自動釣り（fork 2 バージョン）",
     "task_realtime_label": "リアルタイム支援",
     "task_realtime_desc": "リアルタイム支援ツール，必要<span style='color:red'>“デスクトップ版 - フロントエンド”</span>控制器",
     "task_realtime_option_check_interval": "検知間隔 (ms)",

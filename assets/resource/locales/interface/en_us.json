@@ -47,6 +47,8 @@
     "task_fish_option_loop_time": "Loop count",
     "task_fish_option_loop_time_desc": "How many times to run the fishing task",
     "task_fish_option_count_input": "Count",
+    "task_fish_fork_2_label": "Fishing Quest mission (fork 2)",
+    "task_fish_fork_2_desc": "Auto fishing (fork 2 version)",
     "task_realtime_label": "Real-time assistance tools",
     "task_realtime_desc": "Real-time assistance tools, requires<span style='color:red'>“Win32 - Front Desk”</span>Controller",
     "task_make_coffee_label": "Auto Make Coffee",
