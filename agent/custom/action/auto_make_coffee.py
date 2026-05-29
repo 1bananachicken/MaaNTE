@@ -46,14 +46,8 @@ class AutoMakeCoffee(CustomAction):
 
         KEY_F = 70
 
-        # Coordinates mapped from auto_make_coffee.json [x, y, w, h]
-        scroll_to_top_action = "MakeCoffeeScrollToTop"
-        select_level_target = [18, 230, 188, 66]
         click_roi = [28, 272, 65, 56]
-        start_roi = [1057, 648, 178, 44]
-        star_roi = [1204, 109, 29, 27]
         exit_roi = [11, 12, 38, 37]
-        claim_roi = [681, 539, 187, 38]
 
         for count in range(make_count):
             if context.tasker.stopping:
@@ -61,11 +55,6 @@ class AutoMakeCoffee(CustomAction):
             PrintT(context, "coffee.making", count + 1, make_count)
 
             # Step 1: 选择关卡
-            PrintT(context, "coffee.step_select_level")
-            click_rect(controller, select_level_target)
-            time.sleep(1)
-
-            # Step 2: 开始营业
             PrintT(context, "coffee.step_wait_start")
             while True:
                 if context.tasker.stopping:
@@ -76,7 +65,7 @@ class AutoMakeCoffee(CustomAction):
                     while True:
                         if context.tasker.stopping:
                             return CustomAction.RunResult(success=False)
-                        context.run_action(scroll_to_top_action)
+                        context.run_action("MakeCoffeeScrollToTop")
                         time.sleep(1)
                         img = get_image(controller)
                         target_result = context.run_recognition(
@@ -110,11 +99,11 @@ class AutoMakeCoffee(CustomAction):
                             start_result.box.h,
                         ],
                     )
-                    time.sleep(3)  # Post delay from JSON: 3000ms
+                    time.sleep(3)
                     break
                 time.sleep(check_freq)
 
-            # Step 3: 达成营业额
+            # Step 2: 达成营业额
             PrintT(context, "coffee.step_wait_star")
             while True:
                 if context.tasker.stopping:
@@ -129,7 +118,7 @@ class AutoMakeCoffee(CustomAction):
                     break
                 time.sleep(2)
 
-            # Step 4: 点击领取
+            # Step 3: 点击领取
             PrintT(context, "coffee.step_wait_claim")
             while True:
                 if context.tasker.stopping:
