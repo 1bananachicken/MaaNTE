@@ -1,6 +1,7 @@
 name: Notify MaaNTE-Web Docs Update
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - dev
