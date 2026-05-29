@@ -1,27 +1,33 @@
 {
     "task": [
         {
-            "name": "领取一咖舍收益",
+            "name": "WithdrawMoney",
+            "label": "$task_withdraw_money_label",
             "entry": "WithdrawMoneyEntrance",
-            "description": "自动领取一咖舍收益<br><span style='color:red'>暂不支持根据风向标自动替换商品，若在意损失，建议关闭</span>",
+            "description": "$task_withdraw_money_desc",
             "option": [
-                "Restock"
+                "Restock",
+                "ChooseProduct"
             ],
             "controller": [
                 "Win32",
                 "Win32-Front"
+            ],
+            "group": [
+                "Daily",
+                "CityTycoon"
             ]
         }
     ],
     "option": {
         "Restock": {
             "type": "switch",
-            "label": "自动补货",
-            "description": "是否启用自动补货功能",
+            "label": "$task_withdraw_money_option_restock",
+            "description": "$task_withdraw_money_option_restock_desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "点击补货": {
                             "enabled": true
@@ -30,7 +36,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "禁用",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "点击补货": {
                             "enabled": false
@@ -39,6 +45,32 @@
                 }
             ],
             "default_case": "No"
+        },
+        "ChooseProduct": {
+            "type": "switch",
+            "label": "$task_withdraw_money_option_choose_product",
+            "description": "$task_withdraw_money_option_choose_product_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "WithdrawMoneyEnterItemList": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "WithdrawMoneyEnterItemList": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
         }
     }
 }

@@ -6,6 +6,7 @@ from pathlib import Path
 
 from maa.context import Context
 
+from utils.maafocus import PrintT
 from .maa_keyboard import MaaKeyboardBridge
 from .midi_processor import MidiProcessor
 
@@ -44,13 +45,16 @@ class AutoPianoPlayer:
         parsed = self.processor.parse(str(song_path))
         notes = parsed["notes"]
         if not notes:
-            print(f"No playable notes found: {song_path}", flush=True)
+            PrintT(context, "auto_piano.no_notes", str(song_path))
             return 0
 
-        print(
-            f"AutoPiano loaded {parsed['title']} "
-            f"({len(notes)} notes, speed {settings.speed}x, transpose {settings.transpose})",
-            flush=True,
+        PrintT(
+            context,
+            "auto_piano.loaded",
+            parsed["title"],
+            len(notes),
+            settings.speed,
+            settings.transpose,
         )
 
         self.sleep_interruptibly(context, DEFAULT_COUNTDOWN)
@@ -58,10 +62,7 @@ class AutoPianoPlayer:
         played = self.play_notes(
             context, notes, bridge, settings.speed, settings.transpose
         )
-        print(
-            f"AutoPiano finished. {played} notes sent through Maa controller.",
-            flush=True,
-        )
+        PrintT(context, "auto_piano.finished", played)
         return played
 
     def resolve_song_path(self, song: str) -> Path:

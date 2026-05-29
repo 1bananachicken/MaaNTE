@@ -48,7 +48,9 @@
 >
 > QQ Group 3: 1075143235 (満員)
 >
-> QQ Group 4: 713114598
+> QQ Group 4: 713114598 (満員)
+>
+> QQ Group 5: 1106448578
 
 # ⚠️免責事項とリスク警告
 
@@ -72,7 +74,7 @@
 
 ## ✨機能一覧
 
-- 🎣 自动钓鱼
+- 🎣 自動釣り
   - 🐟 自動釣り
   - 🪝 自動で餌を買う
 - 🥤 自動でコーヒーを作る
@@ -106,38 +108,11 @@
 
 ゲームは1280x720の解像度でウィンドウモードで実行する必要があり、釣りの新しいアルゴリズムは120フレームでの実行をサポートしています。
 
-## 💻开发指南
+## 💻開発ガイド
 
-<details><summary>点击展开</summary>
+開発に参加したい、またはプロジェクトを詳しく知りたい方はこちら 👉 [開発者ドキュメント](https://github.com/1bananachicken/MaaNTE/blob/dev/docs/zh_cn/develop/README.md)
 
-MaaNTE开发者群: 1092630280
-
-### 快速开始
-
-0. 配置环境
-
-- 安装 python>=3.11
-- 建议使用vscode作为IDE进行开发，并安装 [vscode插件“maa-support”](https://marketplace.visualstudio.com/items?itemName=nekosu.maa-support) 进行调试
-
-1. Fork项目
-
-- 点击 `Fork`，继续点击 `Create Fork`
-
-2. 克隆自己 fork 的项目到本地，并拉取子模块
-
-```bash
-git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
-```
-
-3. 下载MaaFramework的 [release包](https://github.com/MaaXYZ/MaaFramework/releases)，解压到 `deps` 文件夹中
-
-4. 提交PR
-
-- 新功能开发请提交到dev分支
-
-更多开发文档可以参考 [M9A文档站](https://1999.fan/zh_cn/develop/development.html)
-
-</details>
+コントリビューションをお待ちしています！一緒に MaaNTE をもっと強力にしましょう！💪
 
 ## ❤️謝辞
 
@@ -166,7 +141,7 @@ git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
 
 もしMaaNTEがあなたの時間を大いに節約してくれたなら、開発者にコーヒーを奢ってあげてはいかがでしょうか？
 
-あなたのサポートが私たちの継続的な更新の最大の原動力です🥰。
+あなたのサポートが私たちの継続な更新の最大の原動力です🥰。
 
 [<img width="200" alt="赞助我们" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.png">](https://afdian.com/a/MaaNTE)
 

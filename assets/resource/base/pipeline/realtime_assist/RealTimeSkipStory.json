@@ -8,7 +8,12 @@
                     "realtime_assist/skip_story_btn.png",
                     "realtime_assist/skip_story_btn_hover.png"
                 ],
-                "roi": [1210, 20, 50, 50],
+                "roi": [
+                    1210,
+                    20,
+                    50,
+                    50
+                ],
                 "threshold": 0.7
             }
         },
@@ -18,23 +23,39 @@
         "post_delay": 0,
         "next": [
             "RealTimeSkipStoryDialog",
+            "RealTimeSkipStorySummary",
             "RealTimeFakeTrue"
         ]
     },
     "RealTimeSkipStoryDialog": {
         "desc": "跳过剧情对话框",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": ["realtime_assist/skip_story_dialog.png"],
-                "roi": [420, 275, 450, 50],
+                "expected": [
+                    "是否跳过剧情",
+                    "是否跳過劇情",
+                    "Skip story",
+                    "ストーリーをスキップしますか",
+                    "스토리를 스킵하시겠습니까"
+                ],
+                "roi": [
+                    420,
+                    275,
+                    450,
+                    50
+                ],
                 "threshold": 0.8
             }
         },
         "action": "DoNothing",
         "post_delay": 0,
-        "next": ["RealTimeSkipStoryDialogCheckbox"],
-        "on_error": ["RealTimeFakeTrue"]
+        "next": [
+            "RealTimeSkipStoryDialogCheckbox"
+        ],
+        "on_error": [
+            "RealTimeFakeTrue"
+        ]
     },
     "RealTimeSkipStoryDialogCheckbox": {
         "desc": "跳过今日剧情复选框",
@@ -42,7 +63,12 @@
             "type": "TemplateMatch",
             "param": {
                 "template": "realtime_assist/skip_story_dialog_checkbox.png",
-                "roi": [550, 350, 50, 50],
+                "roi": [
+                    550,
+                    350,
+                    50,
+                    50
+                ],
                 "threshold": 0.8
             }
         },
@@ -54,22 +80,170 @@
         },
         "pre_delay": 500,
         "post_delay": 200,
-        "next": ["RealTimeSkipStoryDialogConfirm"]
+        "next": [
+            "RealTimeSkipStoryDialogConfirm"
+        ]
     },
     "RealTimeSkipStoryDialogConfirm": {
         "desc": "确认跳过剧情对话框确认按钮",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "realtime_assist/skip_story_dialog_confirm.png",
-                "roi": [700, 410, 250, 70],
-                "threshold": 0.8
+                "expected": [
+                    "确认", // @i18n-skip
+                    "確認", // @i18n-skip
+                    "Confirm", // @i18n-skip
+                    "確定", // @i18n-skip
+                    "확인" // @i18n-skip
+                ],
+                "roi": [
+                    700,
+                    410,
+                    250,
+                    70
+                ],
+                "threshold": 0.8,
+                "roi_offset": [
+                    0,
+                    0,
+                    36,
+                    0
+                ]
             }
         },
         "action": {
             "type": "Click"
         },
         "post_delay": 300,
-        "next": ["RealTimeFakeTrue"]
-    }
+        "next": [
+            "RealTimeFakeTrue"
+        ]
+    },
+    "RealTimeSkipStorySummary": {
+        "desc": "跳过剧情概述",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "剧情概述"
+                ],
+                "roi": [
+                    560,
+                    240,
+                    160,
+                    50
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": "DoNothing",
+        "post_delay": 0,
+        "next": [
+            "RealTimeSkipStorySummaryConfirm"
+        ]
+    },
+    "RealTimeSkipStorySummaryConfirm": {
+        "desc": "跳过剧情概述确认按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "确认", // @i18n-skip
+                    "確認", // @i18n-skip
+                    "Confirm", // @i18n-skip
+                    "確定", // @i18n-skip
+                    "확인" // @i18n-skip
+                ],
+                "roi": [
+                    700,
+                    410,
+                    250,
+                    70
+                ],
+                "threshold": 0.8,
+                "roi_offset": [
+                    0,
+                    0,
+                    36,
+                    0
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 300,
+        "next": [
+            "RealTimeFakeTrue"
+        ]
+    },
+    "RealTimeSkipImportantStory": {
+        "desc": "跳过重要剧情对话框",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "此?处?为?重要剧情内容.+", // @i18n-skip
+                    "此處為重要劇情內容.+", // @i18n-skip
+                    "This is the main story.+", // @i18n-skip
+                    "このシーンをスキップすると.+", // @i18n-skip
+                    "해당 스토리는 중요한 내용을 담고 있어.+", // @i18n-skip
+                    "Dies ist die Hauptgeschichte.+", // @i18n-skip
+                    "¡Esta es la historia principal.+", // @i18n-skip
+                    "Ceci est l’histoire principale.+", // @i18n-skip
+                    "Это главный сюжет.+" // @i18n-skip
+                ],
+                "roi": [
+                    385,
+                    290,
+                    505,
+                    35
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": "DoNothing",
+        "post_delay": 0,
+        "next": [
+            "RealTimeSkipImportantStoryConfirm"
+        ],
+        "on_error": [
+            "RealTimeFakeTrue"
+        ]
+    },
+    "RealTimeSkipImportantStoryConfirm": {
+        "desc": "跳过重要剧情确认按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "确认", // @i18n-skip
+                    "確認", // @i18n-skip
+                    "Confirm", // @i18n-skip
+                    "確定", // @i18n-skip
+                    "확인" // @i18n-skip
+                ],
+                "roi": [
+                    700,
+                    410,
+                    250,
+                    70
+                ],
+                "threshold": 0.8,
+                "roi_offset": [
+                    0,
+                    0,
+                    36,
+                    0
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 300,
+        "next": [
+            "RealTimeFakeTrue"
+        ]
+    },
 }

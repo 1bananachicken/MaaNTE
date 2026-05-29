@@ -9,7 +9,7 @@
     "FountainFindButton": {
         "desc": "识别喷泉打卡按钮",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
                     765,
@@ -17,10 +17,13 @@
                     210,
                     40
                 ],
-                "template": [
-                    "auto_fountain_checkin/find_fountain_button.png"
-                ],
-                "threshold": 0.7
+                "expected": [
+                    "纳库佩达之池",
+                    "納庫佩達之池",
+                    "(?i)Nacupeda\\s*'\\s*s\\s*Pool",
+                    "ナクペイダの池",
+                    "나쿠펜다의 연못"
+                ]
             }
         },
         "action": "ClickKey",
@@ -43,7 +46,7 @@
     "FountainMakeWish": {
         "desc": "识别许愿选项并按F",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
                     871,
@@ -51,10 +54,13 @@
                     239,
                     49
                 ],
-                "template": [
-                    "auto_fountain_checkin/fountain_make_wish.png"
-                ],
-                "threshold": 0.7
+                "expected": [
+                    "虔诚许愿",
+                    "虔誠許願",
+                    "(?i)Make\\s*a\\s*Sincere\\s*Wish",
+                    "敬虔な願い",
+                    "간절히 소원 빌기"
+                ]
             }
         },
         "action": "Click",
@@ -96,10 +102,14 @@
     "FountainSkipStoryDialog": {
         "desc": "跳过剧情对话框",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": [
-                    "realtime_assist/skip_story_dialog.png"
+                "expected": [
+                    "是否跳过剧情",
+                    "是否跳過劇情",
+                    "Skip Story",
+                    "ストーリーをスキップしますか",
+                    "스토리를 스킵하시겠습니까"
                 ],
                 "roi": [
                     420,
@@ -120,9 +130,21 @@
     "FountainSkipStoryDialogConfirm": {
         "desc": "确认跳过剧情对话框确认按钮",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
-                "template": "realtime_assist/skip_story_dialog_confirm.png",
+                "expected": [
+                    "确认记录",
+                    "確認記錄",
+                    "(?i)Confirm",
+                    "記録更新",
+                    "确认",
+                    "確認",
+                    "確定",
+                    "确定",
+                    "OK",
+                    "CONFIRN",
+                    "확인"
+                ],
                 "roi": [
                     700,
                     410,
@@ -130,6 +152,13 @@
                     70
                 ],
                 "threshold": 0.7
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    36,
+                    0
+                ]
             }
         },
         "action": {
@@ -167,7 +196,7 @@
     "FountainCheckinIfExit": {
         "desc": "识别喷泉打卡按钮，判断是否已退出",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
                     765,
@@ -175,8 +204,12 @@
                     210,
                     40
                 ],
-                "template": [
-                    "auto_fountain_checkin/find_fountain_button.png"
+                "expected": [
+                    "纳库佩达之池",
+                    "納庫佩達之池",
+                    "(?i)Nacupeda\\s*'\\s*s\\s*Pool",
+                    "ナクペイダの池",
+                    "나쿠펜다의 연못"
                 ],
                 "threshold": 0.7
             }

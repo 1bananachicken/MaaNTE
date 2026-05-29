@@ -59,7 +59,7 @@
         "key": [
             70 // F
         ],
-        "post_delay": 0,
+        "post_delay": 300, // 稍等一会，按下F后最上面的条都没出来，第一次会识别失败，引入不必要的延迟，孩子们，你们也不想让S级逃走罢（
         "next": [
             "FishNewGaming"
         ]
@@ -89,7 +89,7 @@
         },
         "next": [
             "[Anchor]FishNewRestart",
-            "[JumpBack]FishNewGameResult"
+            "[JumpBack]SceneClickBlankToExit"
         ]
     },
     "FishNewGameResult": {
@@ -102,7 +102,15 @@
             55
         ],
         "expected": [
-            "点击空白区域关闭"
+            "点击空白区域关闭",
+            "點擊空白區域關閉",
+            "(?i)Press\\s*empty\\s*area\\s*to\\s*close",
+            "空白を押して閉じる",
+            "关闭",
+            "關閉",
+            "(?i)Close",
+            "閉じる",
+            "빈 곳을 터치해 닫기"
         ],
         "action": "ClickKey",
         "key": [
@@ -129,10 +137,27 @@
                     240,
                     40
                 ],
-                "expected": "需要装备鱼饵",
-                "threshold": 0.8
+                "expected": [
+                    "需要装备鱼饵才可以钓鱼",
+                    "需要裝備魚餌才可以釣魚",
+                    "(?i)Equip\\s*bait\\s*before\\s*fishing\\s*\\.",
+                    "釣りをするには釣り餌を装着する必要があります",
+                    "需要装备鱼饵",
+                    "需要裝備魚餌",
+                    "釣り餌を装着する必要",
+                    "미끼를 장착해야 낚시할 수 있습니다"
+                ],
+                "threshold": 0.5
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    220,
+                    0
+                ]
             }
         },
+        "post_delay": 2000, // 等中间文字消失
         "focus": {
             "Node.Action.Succeeded": "未装备鱼饵，尝试前往装备"
         },
@@ -151,7 +176,13 @@
                     240,
                     40
                 ],
-                "expected": "渔获已满",
+                "expected": [
+                    "渔获已满",
+                    "漁獲已滿",
+                    "Your fish hold is full",
+                    "生け簀が一杯です", //生け簀が一杯です、魚を売却後に再度お試しください
+                    "저장고가 가득 찼습니다. 일부 어획물을 판매한 뒤 다시 시도해 주세요"
+                ],
                 "threshold": 0.8
             }
         },
@@ -187,7 +218,7 @@
                 463,
                 124
             ],
-            "time": 1000,
+            "time": 2000,
             "timeout": 6000
         },
         "next": [
@@ -226,7 +257,11 @@
             40
         ],
         "expected": [
-            "万能鱼饵"
+            "万能鱼饵",
+            "萬能魚餌",
+            "(?i)Universal\\s*Bait",
+            "万能釣り餌",
+            "만능 미끼"
         ],
         "pre_delay": 1000,
         "action": "ClickKey",
@@ -246,7 +281,11 @@
                     44
                 ],
                 "expected": [
-                    "购买"
+                    "购买",
+                    "購買",
+                    "(?i)Purchase",
+                    "購入",
+                    "구매"
                 ],
                 "threshold": 0.8
             }
@@ -275,7 +314,11 @@
                     59
                 ],
                 "expected": [
-                    "更换鱼饵"
+                    "更换鱼饵",
+                    "更換魚餌",
+                    "(?i)Switch\\s*Bait",
+                    "釣り餌交換",
+                    "미끼 교체"
                 ],
                 "threshold": 0.8
             }
@@ -302,7 +345,11 @@
                     44
                 ],
                 "expected": [
-                    "购买"
+                    "购买",
+                    "購買",
+                    "(?i)Purchase",
+                    "購入",
+                    "구매"
                 ],
                 "threshold": 0.8
             }
@@ -334,7 +381,11 @@
                     48
                 ],
                 "expected": [
-                    "渔具商店"
+                    "渔具商店",
+                    "漁具商店",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
+                    "釣具店",
+                    "낚시용품 상점"
                 ],
                 "threshold": 0.8
             }
@@ -356,9 +407,19 @@
                     44
                 ],
                 "expected": [
-                    "更换"
-                ],
-                "threshold": 0.8
+                    "更换",
+                    "更換",
+                    "(?i)Switch",
+                    "入れ替え",
+                    "替换",
+                    "替換",
+                    "(?i)Swap",
+                    "変更",
+                    "切换",
+                    "切換",
+                    "切り替え",
+                    "교체"
+                ]
             }
         },
         "action": "Click",
@@ -375,10 +436,15 @@
             418,
             585
         ],
+        // 考虑到刚开始鱼鳞币万能鱼饵可能不在那个位置，放宽ROI
+        // 通过置信度排序的方式滤除方斯鱼饵的选项
         "template": [
             "Fish/FishStoreGeneralBait.png"
         ],
-        "threshold": 0.8,
+        "green_mask": true,
+        "threshold": 0.5,
+        // "threshold": 0.8, // 0.8 有点高了
+        "order_by": "Score", // 默认似乎不是按置信度排的，需要显式声明
         "action": "Click",
         "next": [
             "FishNewStoreChooseMaxSuccess",
@@ -397,7 +463,11 @@
                     48
                 ],
                 "expected": [
-                    "渔具商店"
+                    "渔具商店",
+                    "漁具商店",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
+                    "釣具店",
+                    "낚시용품 상점"
                 ],
                 "threshold": 0.8
             }
@@ -426,11 +496,13 @@
                 "template": [
                     "Fish/FishStoreMax.png",
                     "Fish/FishStoreMaxGrey.png"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
-        "action": "Click"
+        "action": "LongPress",
+        "pre_delay": 500 // pre或post都行
+        // "post_delay": 200, // 实测必须加上这个，也不知道为什么有些电脑上快速点击没用
+        // "action": "Click"
     },
     "FishNewStoreChooseMaxSuccess": {
         "desc": "确认选中最大或鱼鳞币不足",
@@ -457,7 +529,11 @@
                     48
                 ],
                 "expected": [
-                    "万能鱼饵"
+                    "万能鱼饵",
+                    "萬能魚餌",
+                    "Universal Bait",
+                    "万能釣り餌",
+                    "만능 미끼"
                 ]
             }
         ],
@@ -477,7 +553,11 @@
                     45
                 ],
                 "expected": [
-                    "购买"
+                    "购买",
+                    "購買",
+                    "(?i)Purchase",
+                    "購入",
+                    "구매"
                 ],
                 "threshold": 0.8
             }
@@ -500,43 +580,32 @@
                     40
                 ],
                 "expected": [
-                    "确认"
+                    "确认记录",
+                    "確認記錄",
+                    "(?i)Confirm",
+                    "記録更新",
+                    "确认",
+                    "確認",
+                    "確定",
+                    "确定",
+                    "OK",
+                    "CONFIRN",
+                    "확인"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    22,
+                    0
+                ]
             }
         },
         "pre_delay": 500,
         "action": "Click",
         "next": [
-            "FishNewStoreContinue"
-        ]
-    },
-    "FishNewStoreContinue": {
-        "desc": "渔具商店点击空白区域关闭",
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    553,
-                    619,
-                    175,
-                    38
-                ],
-                "expected": [
-                    "点击空白区域关闭"
-                ],
-                "threshold": 0.8
-            }
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": [
-                    27 // Esc
-                ]
-            }
-        },
-        "next": [
+            "[JumpBack]SceneClickBlankToExit",
             "FishNewExitStore"
         ]
     },
@@ -552,7 +621,11 @@
                     57
                 ],
                 "expected": [
-                    "渔具商店"
+                    "渔具商店",
+                    "漁具商店",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
+                    "釣具店",
+                    "낚시용품 상점"
                 ],
                 "threshold": 0.8
             }
@@ -579,9 +652,16 @@
             38
         ],
         "expected": [
-            "货币不足无法购买"
+            "货币不足无法购买",
+            "貨幣不足無法購買",
+            "(?i)Insufficient\\s*currency\\s*\\.",
+            "通貨不足！購入できません",
+            "当前货币不足",
+            "當前貨幣不足",
+            "(?i)Insufficient\\s*Currency",
+            "通貨が足りません",
+            "화폐 부족, 구매 불가"
         ],
-        "threshold": 0.8,
         "focus": {
             "Node.Action.Succeeded": "鱼鳞币不足，尝试前往卖鱼"
         },
@@ -601,7 +681,11 @@
                     57
                 ],
                 "expected": [
-                    "渔具商店"
+                    "渔具商店",
+                    "漁具商店",
+                    "(?i)Fishing\\s*Tackle\\s*Shop",
+                    "釣具店",
+                    "낚시용품 상점"
                 ],
                 "threshold": 0.8
             }
@@ -654,7 +738,11 @@
             55
         ],
         "expected": [
-            "渔获市场"
+            "渔获市场",
+            "漁獲市場",
+            "(?i)Fish\\s*Market",
+            "鮮魚市場",
+            "어획물 시장"
         ],
         "next": [
             "FishNewFishingMasterPage1Sell1"
@@ -670,7 +758,11 @@
             33
         ],
         "expected": [
-            "收购"
+            "收购",
+            "收購",
+            "(?i)Sell",
+            "買取",
+            "매입"
         ],
         "action": "Click",
         "post_wait_freezes": 200,
@@ -688,11 +780,14 @@
             37
         ],
         "expected": [
-            "快捷提交"
+            "快捷提交",
+            "(?i)Quick\\s*Submit",
+            "クイック納品",
+            "빠른 제출"
         ],
         "action": "Click",
         "next": [
-            "[JumpBack]FishNewFishingMasterContinue",
+            "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell2"
         ]
     },
@@ -706,7 +801,11 @@
             33
         ],
         "expected": [
-            "收购"
+            "收购",
+            "收購",
+            "(?i)Sell",
+            "買取",
+            "매입"
         ],
         "action": "Click",
         "post_wait_freezes": 200,
@@ -724,11 +823,14 @@
             37
         ],
         "expected": [
-            "快捷提交"
+            "快捷提交",
+            "(?i)Quick\\s*Submit",
+            "クイック納品",
+            "빠른 제출"
         ],
         "action": "Click",
         "next": [
-            "[JumpBack]FishNewFishingMasterContinue",
+            "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell3"
         ]
     },
@@ -742,7 +844,11 @@
             33
         ],
         "expected": [
-            "收购"
+            "收购",
+            "收購",
+            "(?i)Sell",
+            "買取",
+            "매입"
         ],
         "action": "Click",
         "post_wait_freezes": 200,
@@ -760,30 +866,15 @@
             37
         ],
         "expected": [
-            "快捷提交"
+            "快捷提交",
+            "(?i)Quick\\s*Submit",
+            "クイック納品",
+            "빠른 제출"
         ],
         "action": "Click",
         "next": [
-            "[JumpBack]FishNewFishingMasterContinue",
+            "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterSwitchToPage2"
-        ]
-    },
-    "FishNewFishingMasterContinue": {
-        "desc": "海上钓客界面点击空白处关闭",
-        "pre_delay": 500,
-        "recognition": "OCR",
-        "roi": [
-            555,
-            617,
-            176,
-            43
-        ],
-        "expected": [
-            "点击空白区域关闭"
-        ],
-        "action": "ClickKey",
-        "key": [
-            27 //Esc
         ]
     },
     "FishNewFishingMasterSwitchToPage2": {
@@ -816,7 +907,10 @@
             39
         ],
         "expected": [
-            "出售"
+            "出售",
+            "(?i)Sell",
+            "売却",
+            "판매"
         ],
         "action": "Click",
         "post_wait_freezes": 1000,
@@ -836,14 +930,31 @@
                     40
                 ],
                 "expected": [
-                    "确认"
+                    "确认记录",
+                    "確認記錄",
+                    "(?i)Confirm",
+                    "記録更新",
+                    "确认",
+                    "確認",
+                    "確定",
+                    "确定",
+                    "OK",
+                    "CONFIRN",
+                    "확인"
                 ],
                 "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    22,
+                    0
+                ]
             }
         },
         "action": "Click",
         "next": [
-            "[JumpBack]FishNewFishingMasterContinue",
+            "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterExit"
         ]
     },
@@ -857,7 +968,11 @@
             36
         ],
         "expected": [
-            "暂未获得鱼"
+            "暂未获得鱼",
+            "暫未獲得魚",
+            "(?i)Fish\\s*not\\s*yet\\s*obtained",
+            "魚を獲得していません",
+            "어획물 없음"
         ],
         "focus": {
             "Node.Action.Succeeded": "无鱼可卖，结束卖鱼"
@@ -876,7 +991,11 @@
             48
         ],
         "expected": [
-            "海上钓客"
+            "海上钓客",
+            "海上釣客",
+            "(?i)Sea\\s*Angler",
+            "海釣り",
+            "바다 낚시꾼"
         ],
         "action": "ClickKey",
         "key": [

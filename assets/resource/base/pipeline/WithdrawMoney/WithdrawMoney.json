@@ -1,0 +1,386 @@
+{
+    "WithdrawMoneyEntrance": {
+        "desc": "领取收益入口",
+        "next": [
+            "WithdrawMoneyClickCafe",
+            "[JumpBack]SceneAnyEnterCityTycoonsMenu"
+        ]
+    },
+    "WithdrawMoneyClickCafe": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    490,
+                    457,
+                    93,
+                    46
+                ],
+                "expected": [
+                    "一咖舍",
+                    "(?i)The\\s*Cafe\\s*by\\s*Origen",
+                    "壱のコーヒー",
+                    "咖舍",
+                    "별미 카페"
+                ]
+            }
+        },
+        "action": "LongPress", //click默认模式失效
+        "duration": 100,
+        "next": [
+            "WithdrawMoneyWithdraw"
+        ]
+    },
+    "WithdrawMoneyWithdraw": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    151,
+                    608,
+                    174,
+                    43
+                ],
+                "expected": [
+                    "提取收益",
+                    "(?i)Withdraw\\s*Earnings",
+                    "収益受取",
+                    "수익 인출"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": "Click",
+        "next": [
+            "确认收益"
+        ]
+    },
+    "确认收益": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    540,
+                    589,
+                    198,
+                    44
+                ],
+                "expected": [
+                    "确认记录",
+                    "確認記錄",
+                    "(?i)Confirm",
+                    "記録更新",
+                    "确认",
+                    "確認",
+                    "確定",
+                    "确定",
+                    "OK",
+                    "CONFIRN",
+                    "확인"
+                ],
+                "threshold": 0.8,
+                "roi_offset": [
+                    0,
+                    0,
+                    29,
+                    0
+                ]
+            }
+        },
+        "action": "Click",
+        "next": [
+            "[JumpBack]SceneClickBlankToExit",
+            "WithdrawMoneyEnterItemList",
+            "点击补货"
+        ]
+    },
+    "WithdrawMoneyEnterItemList": {
+        "desc": "点击进入商品列表",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    56,
+                    434,
+                    364,
+                    45
+                ],
+                "expected": [
+                    "累计营业时间",
+                    "累計營業時間",
+                    "(?i)Total\\s*Operating\\s*Time",
+                    "累計営業時間"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    182,
+                    0
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    531,
+                    556,
+                    105,
+                    103
+                ]
+            }
+        },
+        "max_hit": 1,
+        "pre_delay": 500,
+        "post_delay": 500,
+        "next": [
+            "WithdrawMoneyItemsList"
+        ]
+    },
+    "WithdrawMoneyItemsList": {
+        "desc": "商品列表界面",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    154,
+                    87,
+                    140,
+                    56
+                ],
+                "expected": [
+                    "商品列表",
+                    "(?i)Item\\s*List",
+                    "商品リスト"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    35,
+                    0
+                ]
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "withdraw_money_choose_item"
+            }
+        },
+        "pre_delay": 500,
+        "post_delay": 1000,
+        "next": [
+            "WithdrawMoneyItemsListExit"
+        ]
+    },
+    "WithdrawMoneyItemsListExit": {
+        "desc": "点击商品列表退出按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    354,
+                    93,
+                    49,
+                    51
+                ],
+                "template": [
+                    "WithdrawMoney/WithdrawMoneyItemsListExit.png"
+                ]
+            }
+        },
+        "action": "Click",
+        "next": [
+            "点击补货",
+            "WithdrawMoneyExit"
+        ]
+    },
+    "点击补货": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    177,
+                    393,
+                    42,
+                    22
+                ],
+                "expected": [
+                    "补货",
+                    "補貨",
+                    "(?i)Restock",
+                    "補充"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": "Click",
+        "next": [
+            "选择24小时"
+        ]
+    },
+    "选择24小时": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    404,
+                    553,
+                    59,
+                    20
+                ],
+                "expected": [
+                    "24小时",
+                    "24小時",
+                    "(?i)24h",
+                    "24時間"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": "Click",
+        "next": [
+            "确认补货"
+        ]
+    },
+    "确认补货": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    813,
+                    544,
+                    201,
+                    44
+                ],
+                "expected": [
+                    "补货",
+                    "補貨",
+                    "(?i)Restock",
+                    "補充",
+                    "재고 보충"
+                ]
+            }
+        },
+        "action": "Click",
+        "next": [
+            "库存已满",
+            "送货上门"
+        ]
+    },
+    "库存已满": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    506,
+                    344,
+                    265,
+                    34
+                ],
+                "expected": [
+                    "库存已满无法存入更多材料",
+                    "庫存已滿無法存入更多材料",
+                    "(?i)Inventory\\s*full\\s*\\.\\s*Cannot\\s*store\\s*more\\s*materials\\s*\\.",
+                    "空きがありません",
+                    "库存已满",
+                    "庫存已滿",
+                    "Inventory full",
+                    "재고가 가득 차서"
+                ],
+                "roi_offset": [
+                    0,
+                    0,
+                    381,
+                    0
+                ]
+            }
+        },
+        "focus": {
+            "Node.Recognition.Succeeded": "库存已满"
+        },
+        "next": [
+            "WithdrawMoneyExit"
+        ]
+    },
+    "送货上门": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    657,
+                    534,
+                    203,
+                    45
+                ],
+                "expected": [
+                    "送货上门",
+                    "送貨上門",
+                    "(?i)Door\\s*-\\s*to\\s*-\\s*Door\\s*Delivery",
+                    "配達",
+                    "交付",
+                    "(?i)Delivery",
+                    "引き渡し",
+                    "宅配",
+                    "배송하기"
+                ],
+                "threshold": 0.8,
+                "roi_offset": [
+                    0,
+                    0,
+                    305,
+                    0
+                ]
+            }
+        },
+        "action": "Click",
+        "next": [
+            "确认送货"
+        ]
+    },
+    "确认送货": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    655,
+                    450,
+                    238,
+                    49
+                ],
+                "expected": [
+                    "确认记录",
+                    "確認記錄",
+                    "(?i)Confirm",
+                    "記録更新",
+                    "确认",
+                    "確認",
+                    "確定",
+                    "确定",
+                    "OK",
+                    "CONFIRN",
+                    "확인"
+                ],
+                "threshold": 0.8,
+                "roi_offset": [
+                    0,
+                    0,
+                    34,
+                    0
+                ]
+            }
+        },
+        "action": "Click",
+        "focus": {
+            "Node.Action.Succeeded": "补货成功"
+        }
+    },
+    "WithdrawMoneyExit": {
+        "desc": "提取收益任务出口",
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    }
+}

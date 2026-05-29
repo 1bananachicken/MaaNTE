@@ -1,24 +1,29 @@
 {
     "task": [
         {
-            "name": "实时辅助",
+            "name": "RealTime",
+            "label": "$task_realtime_label",
             "entry": "RealTimeTaskMain",
-            "description": "实时辅助小工具，需要[color:red]“桌面端-前台”[/color]控制器",
+            "description": "$task_realtime_desc",
             "option": [
                 "RealTimeCheckInterval",
+                "RealTimeAutoLoot",
                 "RealTimeAutoSkipStory",
                 "RealTimeAutoTeleport"
             ],
             "controller": [
                 "Win32-Front"
+            ],
+            "group": [
+                "RealTimeAssist"
             ]
         }
     ],
     "option": {
         "RealTimeCheckInterval": {
             "type": "input",
-            "label": "检测间隔 (ms)",
-            "description": "两次检测之间的间隔，单位毫秒",
+            "label": "$task_realtime_option_check_interval",
+            "description": "$task_realtime_option_check_interval_desc",
             "inputs": [
                 {
                     "name": "interval",
@@ -33,16 +38,44 @@
                 }
             }
         },
-        "RealTimeAutoSkipStory": {
+        "RealTimeAutoLoot": {
             "type": "switch",
-            "label": "自动剧情",
-            "description": "自动点击跳过剧情按钮",
+            "label": "$task.RealTime.option.RealTimeAutoLoot.label",
+            "description": "$task.RealTime.option.RealTimeAutoLoot.desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "开启",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "RealTimeLoot": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "RealTimeLoot": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoSkipStory": {
+            "type": "switch",
+            "label": "$task_realtime_option_auto_skip_story",
+            "description": "$task_realtime_option_auto_skip_story_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
                     "option": [
-                        "RealTimeAutoSkipStoryDialog"
+                        "RealTimeAutoSkipStoryDialog",
+                        "RealTimeAutoSkipStorySummary",
+                        "RealTimeAutoSkipImportantStory"
                     ],
                     "pipeline_override": {
                         "RealTimeSkipStory": {
@@ -55,7 +88,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "关闭",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "RealTimeSkipStory": {
                             "enabled": false
@@ -76,12 +109,12 @@
         },
         "RealTimeAutoSkipStoryDialog": {
             "type": "switch",
-            "label": "自动勾选“今日不再提示”",
-            "description": "在跳过剧情弹窗中，自动勾选“今日不再提示”，避免每次弹出确认",
+            "label": "$task_realtime_option_skip_story_dialog",
+            "description": "$task_realtime_option_skip_story_dialog_desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "启用",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "RealTimeSkipStoryDialogCheckbox": {
                             "enabled": true
@@ -90,7 +123,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "禁用",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "RealTimeSkipStoryDialogCheckbox": {
                             "enabled": false
@@ -100,14 +133,66 @@
             ],
             "default_case": "Yes"
         },
-        "RealTimeAutoTeleport": {
+        "RealTimeAutoSkipStorySummary": {
             "type": "switch",
-            "label": "自动传送",
-            "description": "检测到特定传送点时自动点击传送",
+            "label": "$task.RealTime.option.RealTimeAutoSkipStorySummary.label",
+            "description": "$task.RealTime.option.RealTimeAutoSkipStorySummary.desc",
             "cases": [
                 {
                     "name": "Yes",
-                    "label": "开启",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "RealTimeSkipStorySummary": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "RealTimeSkipStorySummary": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoSkipImportantStory": {
+            "type": "switch",
+            "label": "$task.RealTime.option.RealTimeAutoSkipImportantStory.label",
+            "description": "$task.RealTime.option.RealTimeAutoSkipImportantStory.desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "RealTimeSkipImportantStory": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "RealTimeSkipImportantStory": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoTeleport": {
+            "type": "switch",
+            "label": "$task_realtime_option_auto_teleport",
+            "description": "$task_realtime_option_auto_teleport_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
                     "option": [
                         "RealTimeAutoTeleportWitte",
                         "RealTimeAutoTeleportPhone"
@@ -115,7 +200,7 @@
                 },
                 {
                     "name": "No",
-                    "label": "关闭",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "RealTimeTeleportWitte": {
                             "enabled": false
@@ -130,11 +215,12 @@
         },
         "RealTimeAutoTeleportWitte": {
             "type": "switch",
-            "label": "维特海默塔",
-            "description": "是否检测维特海默塔的传送点",
+            "label": "$task_realtime_option_teleport_witte",
+            "description": "$task_realtime_option_teleport_witte_desc",
             "cases": [
                 {
                     "name": "Yes",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "RealTimeTeleportWitte": {
                             "enabled": true
@@ -146,6 +232,7 @@
                 },
                 {
                     "name": "No",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "RealTimeTeleportWitte": {
                             "enabled": false
@@ -160,11 +247,12 @@
         },
         "RealTimeAutoTeleportPhone": {
             "type": "switch",
-            "label": "ReroRero电话亭",
-            "description": "是否检测ReroRero电话亭的传送点",
+            "label": "$task_realtime_option_teleport_phone",
+            "description": "$task_realtime_option_teleport_phone_desc",
             "cases": [
                 {
                     "name": "Yes",
+                    "label": "$option_switch_case_yes",
                     "pipeline_override": {
                         "RealTimeTeleportPhone": {
                             "enabled": true
@@ -176,6 +264,7 @@
                 },
                 {
                     "name": "No",
+                    "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "RealTimeTeleportPhone": {
                             "enabled": false

@@ -24,7 +24,9 @@ print(f"set cwd: {os.getcwd()}")
 if current_script_dir not in sys.path:
     sys.path.insert(0, current_script_dir)
 
-from utils import logger
+from utils import setup_logger
+logger = setup_logger()
+import utils.screen as screen
 
 MAAHUB_ACCENT_NAME = "custom-9e8de7d9-ab2b-4784-a082-63110b986d90"
 MAAHUB_ACCENT = {
@@ -197,13 +199,6 @@ def _apply_maahub_ui_config(config: dict) -> bool:
         config["settings"] = settings
         changed = True
 
-    if settings.get("theme") != "dark":
-        settings["theme"] = "dark"
-        changed = True
-    if settings.get("accentColor") != MAAHUB_ACCENT_NAME:
-        settings["accentColor"] = MAAHUB_ACCENT_NAME
-        changed = True
-
     custom_accents = config.setdefault("customAccents", [])
     if not isinstance(custom_accents, list):
         custom_accents = []
@@ -223,6 +218,15 @@ def _apply_maahub_ui_config(config: dict) -> bool:
         None,
     )
 
+    is_first_maahub_startup = accent_index is None
+
+    if is_first_maahub_startup and settings.get("theme") != "dark":
+        settings["theme"] = "dark"
+        changed = True
+    if settings.get("accentColor") != MAAHUB_ACCENT_NAME:
+        settings["accentColor"] = MAAHUB_ACCENT_NAME
+        changed = True
+
     accent_config = json.loads(json.dumps(MAAHUB_ACCENT, ensure_ascii=False))
     if accent_index is None:
         custom_accents.append(accent_config)
@@ -239,10 +243,10 @@ def ensure_mxu_ui_config() -> None:
     config_dir = Path(project_root_dir) / "config"
     config_dir.mkdir(exist_ok=True)
     config_path = config_dir / "mxu-MaaNTE.json"
-    os.chmod(config_path, stat.S_IWRITE)
     config = {}
     if config_path.exists():
         try:
+            os.chmod(config_path, stat.S_IWRITE)
             with open(config_path, "r", encoding="utf-8") as f:
                 config = json.load(f)
         except Exception:
@@ -402,6 +406,8 @@ def _run_pip_command(cmd_args: list, operation_name: str) -> bool:
 def install_requirements(
     req_file="requirements.txt", pip_config: dict | None = None
 ) -> bool:
+    if not Path.exists(Path(project_root_dir) / "deps"):
+        return True
     req_path = Path(project_root_dir) / req_file  # 确保相对于项目根目录
     if not req_path.exists():
         logger.error(f"{req_file} 文件不存在于 {req_path.resolve()}")
@@ -535,11 +541,14 @@ def _check_game_resolution():
         return
 
     w, h = size
-    if (w, h) == (1280, 720):
-        logger.info(f"当前窗口分辨率: {w}x{h} [正常]")
+    screen.update_screen_size(w, h)
+    scale_x, scale_y = screen.scaling_factors()
+
+    if (w, h) == (screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT):
+        logger.info(f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})")
     else:
         logger.warning(
-            f"当前窗口分辨率: {w}x{h}，请使用 1280x720 分辨率。"
+            f"当前窗口分辨率: {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
             "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。"
         )
 
@@ -582,6 +591,8 @@ def agent(is_dev_mode=False):
         import custom
 
         Tasker.set_log_dir("./debug")
+
+        from utils.i18n import init as i18n_init; i18n_init()
 
         if len(sys.argv) < 2:
             logger.error("缺少必要的 socket_id 参数")

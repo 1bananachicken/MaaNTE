@@ -1,0 +1,24 @@
+{
+    "preset": [
+        {
+            "name": "RealTimeAssistance",
+            "label": "$preset.RealtimeAssist.label",
+            "description": "$preset.RealtimeAssist.description",
+            "task": [
+                {
+                    "name": "RealTime",
+                    "option": {
+                        "RealTimeCheckInterval": {
+                            "interval": 500
+                        },
+                        "RealTimeAutoSkipStory": "Yes",
+                        "RealTimeAutoSkipStoryDialog": "Yes",
+                        "RealTimeAutoTeleport": "Yes",
+                        "RealTimeAutoTeleportWitte": "Yes",
+                        "RealTimeAutoTeleportPhone": "Yes"
+                    }
+                }
+            ]
+        }
+    ]
+}
