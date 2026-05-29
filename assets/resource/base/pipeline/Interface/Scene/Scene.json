@@ -10,7 +10,7 @@
             "[JumpBack]__ScenePrivateLogin",
             "[JumpBack]SceneLoadingType1",
             "[JumpBack]SceneLoadingType2",
-            "[JumpBack]SceneClickCloseButton",
+            //"[JumpBack]SceneClickCloseButton",
             "[JumpBack]__ScenePrivateAnyExit"
         ]
     },
@@ -25,7 +25,6 @@
             }
         },
         "next": [
-            "[JumpBack]__SceneCheckOSD",
             "SceneLoadingType1",
             "__ScenePrivateNextTrue"
         ]
@@ -46,7 +45,6 @@
         "pre_delay": 0,
         "post_delay": 0,
         "next": [
-            "[JumpBack]__SceneCheckOSD",
             "SceneLoadingType2",
             "__ScenePrivateNextTrue"
         ]
