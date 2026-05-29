@@ -90,17 +90,11 @@
             "type": "OCR",
             "param": {
                 "expected": [
-                    "确认记录",
-                    "確認記錄",
-                    "(?i)Confirm",
-                    "記録更新",
-                    "确认",
-                    "確認",
-                    "確定",
-                    "确定",
-                    "OK",
-                    "CONFIRN",
-                    "확인"
+                    "确认", // @i18n-skip
+                    "確認", // @i18n-skip
+                    "Confirm", // @i18n-skip
+                    "確定", // @i18n-skip
+                    "확인" // @i18n-skip
                 ],
                 "roi": [
                     700,
@@ -154,17 +148,11 @@
             "type": "OCR",
             "param": {
                 "expected": [
-                    "确认记录",
-                    "確認記錄",
-                    "(?i)Confirm",
-                    "記録更新",
-                    "确认",
-                    "確認",
-                    "確定",
-                    "确定",
-                    "OK",
-                    "CONFIRN",
-                    "확인"
+                    "确认", // @i18n-skip
+                    "確認", // @i18n-skip
+                    "Confirm", // @i18n-skip
+                    "確定", // @i18n-skip
+                    "확인" // @i18n-skip
                 ],
                 "roi": [
                     700,
@@ -195,7 +183,15 @@
             "type": "OCR",
             "param": {
                 "expected": [
-                    "此?处?为?重要剧情内容.+"
+                    "此?处?为?重要剧情内容.+", // @i18n-skip
+                    "此處為重要劇情內容", // @i18n-skip
+                    "This is the main story", // @i18n-skip
+                    "このシーンをスキップすると", // @i18n-skip
+                    "해당 스토리는 중요한 내용을 담고 있어", // @i18n-skip
+                    "Dies ist die Hauptgeschichte.+", // @i18n-skip
+                    "¡Esta es la historia principal.+", // @i18n-skip
+                    "Ceci est l’histoire principale.+", // @i18n-skip
+                    "Это главный сюжет.+" // @i18n-skip
                 ],
                 "roi": [
                     385,
@@ -221,17 +217,11 @@
             "type": "OCR",
             "param": {
                 "expected": [
-                    "确认记录",
-                    "確認記錄",
-                    "(?i)Confirm",
-                    "記録更新",
-                    "确认",
-                    "確認",
-                    "確定",
-                    "确定",
-                    "OK",
-                    "CONFIRN",
-                    "확인"
+                    "确认", // @i18n-skip
+                    "確認", // @i18n-skip
+                    "Confirm", // @i18n-skip
+                    "確定", // @i18n-skip
+                    "확인" // @i18n-skip
                 ],
                 "roi": [
                     700,
