@@ -1,42 +1,8 @@
 # Custom 动作与识别
 
-`Custom` 用于在 Pipeline 中调用 Python Agent 注册的自定义逻辑，分为两类：
-
-- **Custom Action**：执行动作逻辑（点击、按键、复杂交互等）
-- **Custom Recognition**：执行识别逻辑，返回是否命中及识别结果
-
-## 注册
-
-Python 实现位于 `agent/custom/action/` 下，通过 `@AgentServer.custom_action("name")` 注册：
-
-```python
-@AgentServer.custom_action("my_action")
-class MyAction(CustomAction):
-    def run(self, context, argv) -> CustomAction.RunResult:
-        ...
-```
-
-必须同时在 `agent/custom/action/__init__.py` 中导入并加入 `__all__`。
-
-Pipeline JSON 中调用：
-
-```jsonc
-{
-    "action": {
-        "type": "Custom",
-        "param": {
-            "custom_action": "my_action",
-            "custom_action_param": { "key": "value" }
-        }
-    }
-}
-```
-
-## Common 公共组件
-
 以下 Custom Action 位于 `agent/custom/action/Common/`，可在 Pipeline 中直接使用。
 
-### click_override
+## click_override
 
 自定义点击。通过 `custom_action_param` 指定目标 rect，或使用当前识别结果的 box。
 
@@ -56,7 +22,7 @@ Pipeline JSON 中调用：
 }
 ```
 
-### alt_click
+## alt_click
 
 Alt + 点击。先按下 Alt 键，再点击识别结果 box 位置，最后松开 Alt。
 
@@ -91,15 +57,6 @@ hit, score, x, y = match_template_in_region(img, [0, 0, 1280, 720], template, 0.
 if hit:
     click_rect(controller, [x, y, 50, 50])
 ```
-
-## 流程控制节点
-
-以下节点定义在 `Interface/Scene/Status.json`：
-
-| 节点 | 说明 |
-|------|------|
-| `EmptyNode` | 空节点，无识别无动作，仅用于流程跳转 |
-| `StopNode` | 执行 `StopTask` 终止当前任务 |
 
 ## 编写新的 Custom Action
 

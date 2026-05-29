@@ -45,7 +45,7 @@
 | [场景管理器](./scene-manager.md) | 从任意界面自动导航到目标场景 | `Interface/Scene/` |
 | [InScene 场景识别](./in-scene.md) | 判断当前画面所在场景 | `Interface/Scene/Status.json` |
 | [通用按钮](./common-buttons.md) | 各场景入口按钮 | `Common/Button/` |
-| Custom 动作与识别 | 通用 Python 工具：alt_click等 | `agent/custom/action/Common/` |
+| [Custom 动作与识别](./custom-action.md) | 通用 Python 工具：alt_click等 | `agent/custom/action/Common/` |
 
 ## 高级组件参考
 

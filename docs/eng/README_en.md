@@ -124,36 +124,9 @@ The game must run in windowed mode at 1280×720 resolution. The new fishing algo
 
 ## 💻Development Guide
 
-<details><summary>Click to expand</summary>
+Want to contribute or dive deeper into the project? Start here 👉 [Developer Documentation Index](https://github.com/1bananachicken/MaaNTE/blob/dev/docs/zh_cn/develop/README.md)
 
-MaaNTE Developer QQ Group: 1092630280
-
-### Quick Start
-
-0. Set up environment
-
-- Install Python >= 3.11
-- It is recommended to use VS Code as your IDE and install the [vscode extension "maa-support"](https://marketplace.visualstudio.com/items?itemName=nekosu.maa-support) for debugging.
-
-1. Fork the project
-
-- Click `Fork`, then click `Create Fork`.
-
-2. Clone your forked repository and pull submodules
-
-```bash
-git clone --recursive https://github.com/<your-username>/MaaNTE.git
-```
-
-3. Download the [release package of MaaFramework](https://github.com/MaaXYZ/MaaFramework/releases) and extract it into the `deps` folder.
-
-4. Submit a PR
-
-- New feature development should be submitted to the `dev` branch.
-
-For more development documentation, refer to the [M9A documentation site](https://1999.fan/zh_cn/develop/development.html).
-
-</details>
+All contributions are welcome — let's make MaaNTE even better together! 💪
 
 ## ☕Acknowledgements
 
