@@ -59,7 +59,6 @@
         "key": [
             70 // F
         ],
-        "post_delay": 300, // 稍等一会，按下F后最上面的条都没出来，第一次会识别失败，引入不必要的延迟，孩子们，你们也不想让S级逃走罢（
         "next": [
             "FishNewGaming"
         ]
@@ -78,12 +77,6 @@
         },
         "pre_delay": 0,
         "post_wait_freezes": {
-            "target": [
-                0,
-                0,
-                0,
-                0
-            ],
             "time": 1000,
             "timeout": 6000
         },
@@ -499,6 +492,7 @@
             }
         },
         "action": "LongPress",
+        "duration": 20,
         "pre_delay": 500 // pre或post都行
         // "post_delay": 200, // 实测必须加上这个，也不知道为什么有些电脑上快速点击没用
         // "action": "Click"
