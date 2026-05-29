@@ -50,7 +50,7 @@
     "task_realtime_label": "Real-time assistance tools",
     "task_realtime_desc": "Real-time assistance tools, requires<span style='color:red'>“Win32 - Front Desk”</span>Controller",
     "task_make_coffee_label": "Auto Make Coffee",
-    "task_make_coffee_desc": "Auto make coffee. Currently needs to start on the World screen. Only supports Seize mouse input (must be foreground). Configure in Settings - Connection Settings.",
+    "task_make_coffee_desc": "Start the task on the stage selection page. Nanali must be in the party and her City Skill must be upgraded to level 3.",
     "task_make_coffee_option_loop_time": "Make Count",
     "task_rhythm_label": "Super Sound",
     "task_rhythm_option_auto_select": "Auto choose song",

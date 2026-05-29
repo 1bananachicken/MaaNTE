@@ -64,7 +64,7 @@
     "task_realtime_option_teleport_phone": "ReroRero電話亭",
     "task_realtime_option_teleport_phone_desc": "是否檢測ReroRero電話亭的傳送點",
     "task_make_coffee_label": "自動做咖啡",
-    "task_make_coffee_desc": "自動製作咖啡。暫時需要任務開始時在大世界介面，且僅支援Seize的滑鼠輸入方式（必須前台），使用時請前往左下角設定-連接設定自行配置。",
+    "task_make_coffee_desc": "在選擇關卡頁面開始任務，需要帶上娜娜莉並將都市技能點到3級。",
     "task_make_coffee_option_loop_time": "製作次數",
     "task_rhythm_label": "超強音",
     "task_rhythm_option_auto_select": "自動選曲",
