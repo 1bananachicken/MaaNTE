@@ -184,10 +184,10 @@
             "param": {
                 "expected": [
                     "此?处?为?重要剧情内容.+", // @i18n-skip
-                    "此處為重要劇情內容", // @i18n-skip
-                    "This is the main story", // @i18n-skip
-                    "このシーンをスキップすると", // @i18n-skip
-                    "해당 스토리는 중요한 내용을 담고 있어", // @i18n-skip
+                    "此處為重要劇情內容.+", // @i18n-skip
+                    "This is the main story.+", // @i18n-skip
+                    "このシーンをスキップすると.+", // @i18n-skip
+                    "해당 스토리는 중요한 내용을 담고 있어.+", // @i18n-skip
                     "Dies ist die Hauptgeschichte.+", // @i18n-skip
                     "¡Esta es la historia principal.+", // @i18n-skip
                     "Ceci est l’histoire principale.+", // @i18n-skip
