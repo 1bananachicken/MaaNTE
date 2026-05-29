@@ -22,7 +22,7 @@ def click_rect(controller, rect):
     cy = y + h // 2
     for _ in range(3):
         controller.post_touch_down(cx, cy).wait()
-        time.sleep(0.001)
+        time.sleep(0.05)
         controller.post_touch_up().wait()
 
 
@@ -47,6 +47,7 @@ class AutoMakeCoffee(CustomAction):
         KEY_F = 70
 
         # Coordinates mapped from auto_make_coffee.json [x, y, w, h]
+        scroll_to_top_action = "MakeCoffeeScrollToTop"
         select_level_target = [18, 230, 188, 66]
         click_roi = [28, 272, 65, 56]
         start_roi = [1057, 648, 178, 44]
@@ -72,6 +73,33 @@ class AutoMakeCoffee(CustomAction):
                 img = get_image(controller)
                 start_result = context.run_recognition("MakeCoffeeStart", img)
                 if start_result and start_result.hit:
+                    while True:
+                        if context.tasker.stopping:
+                            return CustomAction.RunResult(success=False)
+                        context.run_action(scroll_to_top_action)
+                        time.sleep(1)
+                        img = get_image(controller)
+                        target_result = context.run_recognition(
+                            "MakeCoffeeTargetCoffeeMaster", img
+                        )
+                        if target_result and target_result.hit:
+                            break
+
+                    click_rect(
+                        controller,
+                        [
+                            target_result.box.x,
+                            target_result.box.y,
+                            target_result.box.w,
+                            target_result.box.h,
+                        ],
+                    )
+                    img = get_image(controller)
+                    start_result = context.run_recognition("MakeCoffeeStart", img)
+                    if not (start_result and start_result.hit):
+                        time.sleep(check_freq)
+                        continue
+
                     PrintT(context, "coffee.step_start_click")
                     click_rect(
                         controller,
