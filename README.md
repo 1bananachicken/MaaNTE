@@ -120,36 +120,9 @@
 
 ## 💻开发指南
 
-<details><summary>点击展开</summary>
+想参与开发或深入了解项目？来这里吧 👉 [开发者文档索引](docs/zh_cn/develop/README.md)
 
-MaaNTE开发者群: 1092630280
-
-### 快速开始
-
-0. 配置环境
-
-- 安装 python>=3.11
-- 建议使用vscode作为IDE进行开发，并安装 [vscode插件“maa-support”](https://marketplace.visualstudio.com/items?itemName=nekosu.maa-support) 进行调试
-
-1. Fork项目
-
-- 点击 `Fork`，继续点击 `Create Fork`
-
-2. 克隆自己 fork 的项目到本地，并拉取子模块
-
-```bash
-git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
-```
-
-3. 下载MaaFramework的 [release包](https://github.com/MaaXYZ/MaaFramework/releases)，解压到 `deps` 文件夹中
-
-4. 提交PR
-
-- 新功能开发请提交到dev分支
-
-更多开发文档可以参考 [M9A文档站](https://1999.fan/zh_cn/develop/development.html)
-
-</details>
+欢迎各路大佬贡献代码，一起让 MaaNTE 变得更强！💪
 
 ## ❤️鸣谢
 
