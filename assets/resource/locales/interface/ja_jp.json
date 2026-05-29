@@ -1,5 +1,6 @@
 {
     "description": "異環アシスタント、MaaFrameworkにより駆動！",
+    "scene_check_osd_failed_focus": "<span style=\"color: red; font-weight: bold;\">画面が遮られています。フレームレート表示をオフにしてください</span>",
     "contact": "QQグループ: 1103323319",
     "welcome.file": "resource/locales/interface/WELCOME/WELCOME_ja_jp.md",
     "controller_default_label": "デスクトップ - デフォルト",

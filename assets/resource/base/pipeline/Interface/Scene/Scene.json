@@ -3,6 +3,7 @@
     "SceneAnyEnterWorld": {
         "desc": "从任意界面返回大世界界面",
         "next": [
+            "[JumpBack]__SceneCheckOSD",
             "__ScenePrivateMenuListEnterWorld",
             "__ScenePrivateMiniWorldEnterWorld",
             "__ScenePrivateAnyEnterWorldSuccess",
@@ -45,6 +46,7 @@
         "pre_delay": 0,
         "post_delay": 0,
         "next": [
+            "[JumpBack]__SceneCheckOSD",
             "SceneLoadingType2",
             "__ScenePrivateNextTrue"
         ]
