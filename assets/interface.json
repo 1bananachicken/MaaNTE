@@ -109,6 +109,7 @@
         // group:HethereauHobbies
         "resource/tasks/Fish.json",
         "resource/tasks/PinkPawHeist.json",
+        "resource/tasks/PinkPawHeistBG.json",
         "resource/tasks/MakeCoffee.json",
         "resource/tasks/Rhythm.json",
         "resource/tasks/Tetris.json",
