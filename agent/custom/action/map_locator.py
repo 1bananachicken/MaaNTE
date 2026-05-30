@@ -13,7 +13,6 @@ from maa.agent.agent_server import AgentServer
 from maa.context import Context
 from maa.custom_action import CustomAction
 
-
 logger = get_logger(__name__)
 
 
@@ -44,7 +43,9 @@ class MapLocator:
         debug_map_width: int = 900,
         max_processing_long_side: int = 6144,
     ):
-        self.big_map_path = Path(big_map_path) if big_map_path else self.default_big_map_path()
+        self.big_map_path = (
+            Path(big_map_path) if big_map_path else self.default_big_map_path()
+        )
         self.mini_map_roi = mini_map_roi or [24, 14, 159, 157]
         self.debug = debug
         self.ratio_thresh = ratio_thresh
@@ -98,8 +99,12 @@ class MapLocator:
                     good_matches.append(m)
 
             if len(good_matches) >= self.min_matches:
-                src_pts = np.float32([kp_mini[m.queryIdx].pt for m in good_matches]).reshape(-1, 1, 2)
-                dst_pts = np.float32([self.big_points[m.trainIdx] for m in good_matches]).reshape(-1, 1, 2)
+                src_pts = np.float32(
+                    [kp_mini[m.queryIdx].pt for m in good_matches]
+                ).reshape(-1, 1, 2)
+                dst_pts = np.float32(
+                    [self.big_points[m.trainIdx] for m in good_matches]
+                ).reshape(-1, 1, 2)
 
                 transform, mask = cv2.estimateAffinePartial2D(
                     src_pts,
@@ -115,7 +120,9 @@ class MapLocator:
                         ).reshape(-1, 1, 2)
                         polygon = cv2.transform(corners, transform)
 
-                        player_src = np.float32([[mw * 0.5, mh * 0.5]]).reshape(-1, 1, 2)
+                        player_src = np.float32([[mw * 0.5, mh * 0.5]]).reshape(
+                            -1, 1, 2
+                        )
                         player_dst = cv2.transform(player_src, transform)[0, 0]
                         player_point = (
                             int(player_dst[0] / self.big_map_scale),
@@ -123,7 +130,9 @@ class MapLocator:
                         )
                         raw_player_point = player_point
 
-        player_point, polygon = self._filter_point(player_point, polygon, inliers, len(good_matches))
+        player_point, polygon = self._filter_point(
+            player_point, polygon, inliers, len(good_matches)
+        )
         if player_point is None:
             player_point = self.last_center
 
@@ -183,7 +192,9 @@ class MapLocator:
                 interpolation=cv2.INTER_AREA,
             )
 
-        mini_view = cv2.resize(masked_minimap, (280, 280), interpolation=cv2.INTER_NEAREST)
+        mini_view = cv2.resize(
+            masked_minimap, (280, 280), interpolation=cv2.INTER_NEAREST
+        )
         cv2.putText(
             mini_view,
             "mini map",
@@ -198,12 +209,24 @@ class MapLocator:
         canvas_height = max(mini_view.shape[0], map_view.shape[0])
         if mini_view.shape[0] < canvas_height:
             mini_view = np.concatenate(
-                [mini_view, np.zeros((canvas_height - mini_view.shape[0], mini_view.shape[1], 3), dtype=np.uint8)],
+                [
+                    mini_view,
+                    np.zeros(
+                        (canvas_height - mini_view.shape[0], mini_view.shape[1], 3),
+                        dtype=np.uint8,
+                    ),
+                ],
                 axis=0,
             )
         if map_view.shape[0] < canvas_height:
             map_view = np.concatenate(
-                [map_view, np.zeros((canvas_height - map_view.shape[0], map_view.shape[1], 3), dtype=np.uint8)],
+                [
+                    map_view,
+                    np.zeros(
+                        (canvas_height - map_view.shape[0], map_view.shape[1], 3),
+                        dtype=np.uint8,
+                    ),
+                ],
                 axis=0,
             )
 
@@ -229,13 +252,18 @@ class MapLocator:
         if self.big_map_scale < 1.0:
             big_map = cv2.resize(
                 big_map,
-                (int(self.origin_w * self.big_map_scale), int(self.origin_h * self.big_map_scale)),
+                (
+                    int(self.origin_w * self.big_map_scale),
+                    int(self.origin_h * self.big_map_scale),
+                ),
                 interpolation=cv2.INTER_AREA,
             )
 
         self.big_map = cv2.convertScaleAbs(big_map, alpha=2.5, beta=-20)
         big_gray = cv2.cvtColor(self.big_map, cv2.COLOR_BGR2GRAY)
-        cache_path = self.big_map_path.with_name(f"{self.big_map_path.stem}.sift_cache.npz")
+        cache_path = self.big_map_path.with_name(
+            f"{self.big_map_path.stem}.sift_cache.npz"
+        )
         cache_meta = {
             "map_size": int(self.big_map_path.stat().st_size),
             "map_mtime_ns": self.big_map_path.stat().st_mtime_ns,
@@ -253,10 +281,14 @@ class MapLocator:
                 with np.load(cache_path, allow_pickle=False) as cache:
                     cache_meta_raw = cache["meta"]
                     saved_meta = json.loads(
-                        cache_meta_raw.item() if hasattr(cache_meta_raw, "item") else str(cache_meta_raw)
+                        cache_meta_raw.item()
+                        if hasattr(cache_meta_raw, "item")
+                        else str(cache_meta_raw)
                     )
                     if saved_meta == cache_meta:
-                        self.big_points = cache["keypoints"].astype(np.float32, copy=False)
+                        self.big_points = cache["keypoints"].astype(
+                            np.float32, copy=False
+                        )
                         self.des_big = cache["descriptors"]
             except Exception as exc:
                 logger.error(f"Failed to read feature cache: {exc}")
@@ -275,7 +307,11 @@ class MapLocator:
                 except Exception as exc:
                     logger.error(f"Failed to save feature cache: {exc}")
 
-        if self.des_big is None or self.big_points is None or len(self.big_points) < self.min_matches:
+        if (
+            self.des_big is None
+            or self.big_points is None
+            or len(self.big_points) < self.min_matches
+        ):
             raise ValueError("Big map does not have enough feature points")
 
         logger.debug(f"Big map keypoints: {len(self.big_points)}")
@@ -318,7 +354,10 @@ class MapLocator:
             accept_point = False
 
         if accept_point and self.last_center is not None:
-            jump = math.hypot(player_point[0] - self.last_center[0], player_point[1] - self.last_center[1])
+            jump = math.hypot(
+                player_point[0] - self.last_center[0],
+                player_point[1] - self.last_center[1],
+            )
             max_jump = 90 if inliers >= 8 or matches >= 14 else 60
 
             if jump > max_jump:
@@ -342,7 +381,9 @@ class MapLocator:
                     )
                     accept_point = False
                 else:
-                    logger.debug(f"Accept delayed jump raw={player_point} last={self.last_center} jump={jump:.1f}")
+                    logger.debug(
+                        f"Accept delayed jump raw={player_point} last={self.last_center} jump={jump:.1f}"
+                    )
                     self.pending_center = None
                     self.pending_count = 0
             else:
@@ -363,7 +404,9 @@ class MapLocator:
 
 @AgentServer.custom_action("map_locator")
 class MapLocatorTestAction(CustomAction):
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
         params = _load_params(argv.custom_action_param)
         debug = bool(params.get("debug", False))
         frame_interval = float(params.get("frame_interval", 0.1))
@@ -374,14 +417,16 @@ class MapLocatorTestAction(CustomAction):
                 mini_map_roi=params.get("mini_map_roi"),
                 debug=debug,
                 nfeatures=int(params.get("nfeatures", 0)),
-                ratio_thresh=float(params.get("ratio_thresh", 0.8)),
+                ratio_thresh=float(params.get("ratio_thresh", 0.85)),
                 min_matches=int(params.get("min_matches", 8)),
                 min_inliers=int(params.get("min_inliers", 4)),
-                ransac_thresh=float(params.get("ransac_thresh", 12.0)),
+                ransac_thresh=float(params.get("ransac_thresh", 14.0)),
                 circle_padding=int(params.get("circle_padding", 15)),
                 center_radius=int(params.get("center_radius", 11)),
                 debug_map_width=int(params.get("debug_map_width", 900)),
-                max_processing_long_side=int(params.get("max_processing_long_side", 6144)),
+                max_processing_long_side=int(
+                    params.get("max_processing_long_side", 6144)
+                ),
             )
         except Exception as exc:
             logger.error(f"Map locator init failed: {exc}")
