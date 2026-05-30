@@ -24,6 +24,11 @@ jobs:
             ];
 
             const issue = context.payload.issue;
+            if (issue.state === 'closed') {
+              core.info('Issue is already closed; skipping.');
+              return;
+            }
+
             const body = issue.body || '';
             const shouldClose = invalidPatterns.some((pattern) => pattern.test(body));
 
