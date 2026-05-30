@@ -9,7 +9,7 @@
     <br/>
     <a href="https://docs.maante.org/"><strong>官方網站</strong></a>
     ·
-    <a href="/docs/eng/README_en.md">English</a> | <a href="/README.md">简体中文</a> | <a href="/docs/jp/README_jp.md">日本語</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">报告 Bug</a>
+    <a href="../eng/README_en.md">English</a> | <a href="../README.md">简体中文</a> | <a href="../jp/README_jp.md">日本語</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">报告 Bug</a>
   </p>
 
   <p align="center">
@@ -43,7 +43,7 @@
 >
 > 其他渠道：[B 站 @MaaNTE-Official](https://space.bilibili.com/3546893080594665) · [Discord](https://discord.gg/e6mPMRYQpR)
 
-## ⚠️免責聲明與風險提示
+### ⚠️免責聲明與風險提示
 
 > [!Note]
 >
@@ -59,7 +59,7 @@
 >
 > **您應充分瞭解並自願承擔使用本工具可能帶來的所有風險。**
 
-## 🧾開源許可
+### 🧾開源許可
 
 本軟體使用 [GNU Affero General Public License v3.0 only](https://spdx.org/licenses/AGPL-3.0-only.html) 開源。
 
@@ -107,11 +107,11 @@
 
 - 一般使用者請下載 [Release 版本](https://github.com/1bananachicken/MaaNTE/releases)，有開發需求再 clone 倉庫
 
-## 💡注意事項
+### 💡注意事項
 
 遊戲需要在 1280×720 解析度下以視窗模式執行；釣魚新演算法支援 120 幀執行。
 
-## 💻開發指南
+### 💻開發指南
 
 想參與開發或深入了解專案？來這裡吧 👉 [開發者文件索引](zh_cn/develop/README.md)
 

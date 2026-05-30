@@ -7,9 +7,9 @@
   <p align="center">
     MAA Assistant for Neverness to Everness
     <br/>
-    <a href="https://docs.maante.org/en_us/"><strong>Official Website</strong></a>
+    <a href="https://docs.maante.org/"><strong>Official Website</strong></a>
     ·
-     <a href="/README.md">简体中文</a> | <a href="/docs/README_zh-tw.md">繁體中文</a> | <a href="/docs/jp/README_jp.md">日本語</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">Report Bug</a>
+     <a href="../README.md">简体中文</a> | <a href="../README_zh-tw.md">繁體中文</a> | <a href="../jp/README_jp.md">日本語</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">Report Bug</a>
   </p>
 
   <p align="center">
@@ -47,7 +47,7 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 >
 > Other channels: [Bilibili @MaaNTE-Official](https://space.bilibili.com/3546893080594665) · [Discord](https://discord.gg/e6mPMRYQpR)
 
-## ⚠️ Disclaimer and Risk Notice
+### ⚠️ Disclaimer and Risk Notice
 
 > [!Note]
 >
@@ -63,7 +63,7 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 >
 > **You should fully understand and voluntarily bear all risks that may arise from using this tool.**
 
-## 🧾 Open Source License
+### 🧾 Open Source License
 
 This software is open-sourced under [GNU Affero General Public License v3.0 only](https://spdx.org/licenses/AGPL-3.0-only.html).
 
@@ -111,11 +111,11 @@ Please refer to the [Troubleshooting Guide](../eng/trouble_shooting.md) (English
 
 - Regular users should download the [Release version](https://github.com/1bananachicken/MaaNTE/releases). Only clone the repository if you plan to develop.
 
-## 💡 Notes
+### 💡 Notes
 
 The game must run in windowed mode at 1280×720 resolution. The new fishing algorithm supports 120 FPS.
 
-## 💻 Development Guide
+### 💻 Development Guide
 
 Want to contribute or dive deeper into the project? Start here 👉 [Developer Documentation Index](../zh_cn/develop/README.md)
 
