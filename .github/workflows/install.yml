@@ -236,10 +236,12 @@ jobs:
           name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
           path: "install-mxu"
 
-  release:
-    if: ${{ needs.meta.outputs.is_release == 'true' }}
-    needs: [meta, windows]
+  changelog:
+    name: Generate changelog
+    needs: meta
     runs-on: ubuntu-latest
+    outputs:
+      release_body: ${{ steps.git-cliff.outputs.content }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -260,10 +262,13 @@ jobs:
           OUTPUT: CHANGES.md
           GITHUB_REPO: ${{ github.repository }}
 
+  release:
+    if: ${{ needs.meta.outputs.is_release == 'true' }}
+    needs: [meta, windows, changelog]
+    runs-on: ubuntu-latest
+    steps:
       - uses: actions/download-artifact@v4
         with:
-          pattern: MaaNTE-*
-          merge-multiple: false
           path: assets
 
       - name: Process and package artifacts
@@ -306,22 +311,13 @@ jobs:
             fi
           done
 
-      - name: Release
-        uses: softprops/action-gh-release@v3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: softprops/action-gh-release@v2.2.2
         with:
           files: assets/*
           tag_name: ${{ needs.meta.outputs.tag }}
-          body: |
-            ${{ steps.git-cliff.outputs.content }}
-
-            [已有 Mirror酱 CDK？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=MaaNTE)
-            [夸克网盘](https://pan.quark.cn/s/9eb393a6c95e?pwd=8nuf)
-            [百度网盘](https://pan.baidu.com/s/11QMC-aYfjfq52yco_UAwfg?pwd=tkmu)
+          body: ${{ needs.changelog.outputs.release_body }}
           draft: false
           prerelease: ${{ needs.meta.outputs.is_prerelease == 'true' }}
-          make_latest: ${{ needs.meta.outputs.is_prerelease == 'false' }}
 
       - name: Trigger MirrorChyanUploading
         shell: bash

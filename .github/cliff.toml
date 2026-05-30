@@ -1,6 +1,6 @@
 [remote.github]
-owner = "MaaXYZ"
-repo = "MaaPracticeBoilerplate"
+owner = "1bananachicken"
+repo = "MaaNTE"
 #自用时换成自己的仓库owner和repo
 #注意，本地git user需与github一致才能实现成功@
 [changelog]
@@ -62,6 +62,11 @@ body = """
 
 # 尾部
 footer = """
+## 国内下载源
+
+* [已有 Mirror酱 CDK？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=MaaNTE)
+* [夸克网盘](https://pan.quark.cn/s/9eb393a6c95e?pwd=8nuf)
+* [百度网盘](https://pan.baidu.com/s/11QMC-aYfjfq52yco_UAwfg?pwd=tkmu)
 """
 
 [git]
