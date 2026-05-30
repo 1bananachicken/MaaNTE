@@ -150,5 +150,13 @@
     "task_auto_drive_dataset_input_output_dir_label": "出力ディレクトリ",
     "task_auto_drive_dataset_input_duration_label": "録画時間",
     "task_auto_drive_dataset_input_duration_desc": "録画時間。デフォルトは 60 秒です。",
-    "task_auto_drive_dataset_input_start_delay_label": "開始遅延"
+    "task_auto_drive_dataset_input_start_delay_label": "開始遅延",
+    "task_touch_label": "撫でる",
+    "task_touch_desc": "「撫でる」ボタンを検出して自動実行：Fキー押下 → インタラクションエリアをクリック → ESCキー押下、100回繰り返し",
+    "task_touch_option_loop_count": "ループ回数",
+    "task_touch_option_loop_count_desc": "繰り返し実行する回数",
+    "task_touch_option_delay_after_f": "Fキー後の遅延 (ms)",
+    "task_touch_option_delay_after_f_desc": "Fキー押下後の遅延時間（ミリ秒）",
+    "task_touch_option_delay_after_click": "クリック後の遅延 (ms)",
+    "task_touch_option_delay_after_click_desc": "インタラクションエリアをクリックした後の遅延時間（ミリ秒）"
 }
