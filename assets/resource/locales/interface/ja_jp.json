@@ -44,7 +44,7 @@
     "task_fish_option_auto_sell": "自動魚販売",
     "task_fish_option_auto_sell_desc": "自動魚売却機能を有効にするか",
     "task_fish_option_auto_buy_bait": "餌を自動購入",
-    "task_fish_option_auto_buy_bait_desc": "1回周期で自動的に餌を購入します（上限99）",
+    "task_fish_option_auto_buy_bait_desc": "1回周期で自動的に餌を購入します（上限99）、フロントエンドのみ",
     "task_fish_option_bait_threshold": "餌の識別閾値",
     "task_fish_option_bait_threshold_desc": "餌の位置が認識できない場合は、この数値を下げてください",
     "task_fish_option_loop_time": "ループ回数",

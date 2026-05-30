@@ -44,7 +44,7 @@
     "task_fish_option_auto_sell": "自動賣魚",
     "task_fish_option_auto_sell_desc": "是否啟用自動賣魚功能",
     "task_fish_option_auto_buy_bait": "自動買魚餌",
-    "task_fish_option_auto_buy_bait_desc": "每次自動購買99（上限）魚餌",
+    "task_fish_option_auto_buy_bait_desc": "每次自動購買99（上限）魚餌，僅支援前台",
     "task_fish_option_bait_threshold": "魚餌識別閾值",
     "task_fish_option_bait_threshold_desc": "如果無法識別點擊魚餌位置，請調低該數值",
     "task_fish_option_loop_time": "循環次數",
