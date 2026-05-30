@@ -1,5 +1,6 @@
 {
     "description": "異環小助手，由MaaFramework強力驅動！",
+    "scene_check_osd_failed_focus": "<span style=\"color: red; font-weight: bold;\">螢幕存在遮擋，請嘗試關閉幀率顯示</span>",
     "contact": "QQ群: 1103323319",
     "welcome.file": "resource/locales/interface/WELCOME/WELCOME_zh_tw.md",
     "controller_default_label": "桌面端-默認",

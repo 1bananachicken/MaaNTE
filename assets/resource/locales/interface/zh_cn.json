@@ -1,5 +1,6 @@
 {
     "description": "异环小助手，由MAAFramework强力驱动！",
+    "scene_check_osd_failed_focus": "<span style=\"color: red; font-weight: bold;\">屏幕存在遮挡，请尝试关闭帧率显示</span>",
     "contact": "QQ群: 1103323319",
     "welcome.file": "resource/locales/interface/WELCOME/WELCOME_zh_cn.md",
     "controller_default_label": "桌面端-默认",

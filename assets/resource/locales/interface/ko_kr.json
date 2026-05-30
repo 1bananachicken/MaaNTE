@@ -1,5 +1,6 @@
 {
     "description": "NTE 어시스턴트, MaaFramework 기반 구동!",
+    "scene_check_osd_failed_focus": "<span style=\"color: red; font-weight: bold;\">화면이 가려져 있습니다. 프레임 레이트 표시를 비활성화하세요</span>",
     "contact": "QQ 그룹: 1103323319",
     "welcome.file": "resource/locales/interface/WELCOME/WELCOME_ko_kr.md",
     "controller_default_label": "데스크톱 - 기본",
