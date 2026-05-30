@@ -150,5 +150,13 @@
     "task_auto_drive_dataset_input_output_dir_label": "輸出目錄",
     "task_auto_drive_dataset_input_duration_label": "錄製時長",
     "task_auto_drive_dataset_input_duration_desc": "錄製時長，預設為 60 秒。",
-    "task_auto_drive_dataset_input_start_delay_label": "錄製延遲"
+    "task_auto_drive_dataset_input_start_delay_label": "錄製延遲",
+    "task_touch_label": "撫摸",
+    "task_touch_desc": "檢測「撫摸」按鈕並自動執行：按F → 點擊互動區域 → 按ESC，重複100次",
+    "task_touch_option_loop_count": "循環次數",
+    "task_touch_option_loop_count_desc": "重複執行的次數",
+    "task_touch_option_delay_after_f": "按F後延遲 (ms)",
+    "task_touch_option_delay_after_f_desc": "按下F鍵後的延遲時間（毫秒）",
+    "task_touch_option_delay_after_click": "點擊後延遲 (ms)",
+    "task_touch_option_delay_after_click_desc": "點擊互動區域後的延遲時間（毫秒）"
 }
