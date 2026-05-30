@@ -39,10 +39,12 @@
 > 本项目还处于早期开发阶段，欢迎提交 PR 和 Issue。
 >
 > 下载、文档与问题排查请访问 [官方网站](https://docs.maante.org/)。
->
 > 加入 QQ 交流群请前往 [官网 QQ 群页面](https://docs.maante.org/zh_cn/qq-group/)，会自动分配当前未满的群号。
 >
-> 其他渠道：[B 站 @MaaNTE-Official](https://space.bilibili.com/3546893080594665) · [Discord](https://discord.gg/e6mPMRYQpR)
+> 其他渠道：
+> 官方 B 站账号: [MaaNTE-Official](https://space.bilibili.com/3546893080594665)
+>
+> 官方Discord: [Discord](https://discord.gg/e6mPMRYQpR)
 
 ## ⚠️免责声明与风险提示
 
