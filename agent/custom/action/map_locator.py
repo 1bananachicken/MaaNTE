@@ -46,7 +46,7 @@ class MapLocator:
         self.big_map_path = (
             Path(big_map_path) if big_map_path else self.default_big_map_path()
         )
-        self.mini_map_roi = mini_map_roi or [24, 14, 159, 157]
+        self.mini_map_roi = mini_map_roi or [28, 20, 150, 150]
         self.debug = debug
         self.ratio_thresh = ratio_thresh
         self.min_matches = min_matches
@@ -417,10 +417,10 @@ class MapLocatorTestAction(CustomAction):
                 mini_map_roi=params.get("mini_map_roi"),
                 debug=debug,
                 nfeatures=int(params.get("nfeatures", 0)),
-                ratio_thresh=float(params.get("ratio_thresh", 0.85)),
+                ratio_thresh=float(params.get("ratio_thresh", 0.8)),
                 min_matches=int(params.get("min_matches", 8)),
                 min_inliers=int(params.get("min_inliers", 4)),
-                ransac_thresh=float(params.get("ransac_thresh", 14.0)),
+                ransac_thresh=float(params.get("ransac_thresh", 12.0)),
                 circle_padding=int(params.get("circle_padding", 15)),
                 center_radius=int(params.get("center_radius", 11)),
                 debug_map_width=int(params.get("debug_map_width", 900)),
