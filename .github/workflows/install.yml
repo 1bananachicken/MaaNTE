@@ -241,7 +241,7 @@ jobs:
     needs: meta
     runs-on: ubuntu-latest
     outputs:
-      release_body: ${{ steps.git-cliff.outputs.content }}
+      release_body: ${{ steps.append_release_footer.outputs.release_body }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -261,6 +261,45 @@ jobs:
         env:
           OUTPUT: CHANGES.md
           GITHUB_REPO: ${{ github.repository }}
+
+      - name: Append release download links
+        id: append_release_footer
+        shell: bash
+        env:
+          RELEASE_BODY: ${{ steps.git-cliff.outputs.content }}
+        run: |
+          {
+            echo 'release_body<<EOF'
+            printf '%s\n\n' "$RELEASE_BODY"
+            echo '[已有 Mirror酱 CDK？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=MaaNTE)'
+            echo '[夸克网盘](https://pan.quark.cn/s/9eb393a6c95e?pwd=8nuf)'
+            echo '[百度网盘](https://pan.baidu.com/s/11QMC-aYfjfq52yco_UAwfg?pwd=tkmu)'
+            echo 'EOF'
+          } >> "$GITHUB_OUTPUT"
+
+  preview_release_note:
+    name: Preview release note
+    if: ${{ needs.meta.outputs.is_release != 'true' }}
+    needs: [meta, changelog]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Show release note preview
+        shell: bash
+        env:
+          RELEASE_BODY: ${{ needs.changelog.outputs.release_body }}
+        run: |
+          {
+            echo '# Release note preview'
+            echo
+            printf '%s\n' "$RELEASE_BODY"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          printf '%s\n' "$RELEASE_BODY" > release-note-preview.md
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-note-preview-${{ needs.meta.outputs.tag }}
+          path: release-note-preview.md
 
   release:
     if: ${{ needs.meta.outputs.is_release == 'true' }}
