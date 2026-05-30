@@ -266,52 +266,55 @@ jobs:
           RELEASE_BODY: ${{ steps.git-cliff.outputs.content }}
         run: |
           printf '%s\n\n' "$RELEASE_BODY" > release-note.md
-          cat <<'EOF' >> release-note.md
-          [已有 Mirror酱 CDK？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=MaaNTE)
-          [夸克网盘](https://pan.quark.cn/s/9eb393a6c95e?pwd=8nuf)
-          [百度网盘](https://pan.baidu.com/s/11QMC-aYfjfq52yco_UAwfg?pwd=tkmu)
-          EOF
+          echo '[已有 Mirror酱 CDK？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=MaaNTE)' >> release-note.md
+          echo '[夸克网盘](https://pan.quark.cn/s/9eb393a6c95e?pwd=8nuf)' >> release-note.md
+          echo '[百度网盘](https://pan.baidu.com/s/11QMC-aYfjfq52yco_UAwfg?pwd=tkmu)' >> release-note.md
 
-      - uses: actions/upload-artifact@v4
-        with:
-          name: release-note-${{ needs.meta.outputs.tag }}
-          path: release-note.md
-
-  preview_release_note:
-    name: Preview release note
-    if: ${{ needs.meta.outputs.is_release != 'true' }}
-    needs: [meta, changelog]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: release-note-${{ needs.meta.outputs.tag }}
-          path: release-note
-
-      - name: Show release note preview
+      - name: Print release note preview
+        if: ${{ needs.meta.outputs.is_release != 'true' }}
         shell: bash
         run: |
-          {
-            echo '# Release note preview'
-            echo
-            cat release-note/release-note.md
-          } >> "$GITHUB_STEP_SUMMARY"
+          echo '===== Release note preview ====='
+          cat release-note.md
+          echo '===== End release note preview ====='
 
   release:
     if: ${{ needs.meta.outputs.is_release == 'true' }}
     needs: [meta, windows, changelog]
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate a changelog
+        uses: orhun/git-cliff-action@v4
+        id: git-cliff-release
+        with:
+          config: .github/cliff.toml
+          args: >-
+            -vv --latest --strip header
+            ${{ needs.meta.outputs.is_prerelease == 'false' && '--tag-pattern "^v[0-9]+\\.[0-9]+\\.[0-9]+$"' || '' }}
+        env:
+          OUTPUT: CHANGES.md
+          GITHUB_REPO: ${{ github.repository }}
+
+      - name: Build release note file
+        shell: bash
+        env:
+          RELEASE_BODY: ${{ steps.git-cliff-release.outputs.content }}
+        run: |
+          printf '%s\n\n' "$RELEASE_BODY" > release-note.md
+          echo '[已有 Mirror酱 CDK？前往 Mirror酱 高速下载](https://mirrorchyan.com/zh/projects?rid=MaaNTE)' >> release-note.md
+          echo '[夸克网盘](https://pan.quark.cn/s/9eb393a6c95e?pwd=8nuf)' >> release-note.md
+          echo '[百度网盘](https://pan.baidu.com/s/11QMC-aYfjfq52yco_UAwfg?pwd=tkmu)' >> release-note.md
+
       - uses: actions/download-artifact@v4
         with:
           pattern: MaaNTE-*
           merge-multiple: false
           path: assets
-
-      - uses: actions/download-artifact@v4
-        with:
-          name: release-note-${{ needs.meta.outputs.tag }}
-          path: release-note
 
       - name: Process and package artifacts
         run: |
@@ -357,7 +360,7 @@ jobs:
         with:
           files: assets/*
           tag_name: ${{ needs.meta.outputs.tag }}
-          body_path: release-note/release-note.md
+          body_path: release-note.md
           draft: false
           prerelease: ${{ needs.meta.outputs.is_prerelease == 'true' }}
 
