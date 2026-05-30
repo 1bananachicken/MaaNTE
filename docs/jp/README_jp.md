@@ -43,8 +43,8 @@
 >
 > 本プロジェクトはまだ初期開発段階にあり、PR や Issue の提出を歓迎します。
 >
-> ダウンロード、ドキュメント、トラブルシューティングは **[公式サイト docs.maante.org](https://docs.maante.org/)** をご利用ください。
-> QQ グループへの参加は [公式 QQ グループページ](https://docs.maante.org/zh_cn/qq-group/) から — 空きがあるグループが自動的に割り当てられます。
+> ダウンロード、ドキュメント、トラブルシューティングは **[公式サイト docs.maante.org](https://docs.maante.org/)** をご利用ください
+> QQ グループへの参加は [公式 QQ グループページ](https://docs.maante.org/zh_cn/qq-group/) から — 空きがあるグループが自動的に割り当てられます
 >
 > その他のチャンネル：
 > 公式 B 站アカウント: [MaaNTE-Official](https://space.bilibili.com/3546893080594665)

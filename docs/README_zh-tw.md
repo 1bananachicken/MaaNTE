@@ -37,11 +37,11 @@
 
 > [!Tip]
 >
-> 本專案仍處於早期開發階段，歡迎提交 PR 和 Issue。
+> 本專案仍處於早期開發階段，歡迎提交 PR 和 Issue
 >
-> 下載、文件與問題排查請造訪 **[官方網站 docs.maante.org](https://docs.maante.org/)**。
+> 下載、文件與問題排查請造訪 **[官方網站 docs.maante.org](https://docs.maante.org/)**
 >
-> 加入 QQ 交流群請前往 [官網 QQ 群頁面](https://docs.maante.org/zh_cn/qq-group/)，會自動分配目前未滿的群號。
+> 加入 QQ 交流群請前往 [官網 QQ 群頁面](https://docs.maante.org/zh_cn/qq-group/)，會自動分配目前未滿的群號
 >
 > 官方 B 站帳號： [MaaNTE-Official](https://space.bilibili.com/3546893080594665)
 >

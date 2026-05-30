@@ -43,9 +43,9 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 >
 > This project is still in early development. PRs and Issues are welcome.
 >
-> For downloads, docs, and troubleshooting, visit **[docs.maante.org](https://docs.maante.org/en_us/)**.
+> For downloads, docs, and troubleshooting, visit **[docs.maante.org](https://docs.maante.org/en_us/)**
 >
-> To join a QQ group, use the [official QQ group page](https://docs.maante.org/zh_cn/qq-group/) — it automatically assigns you to a group that still has space.
+> To join a QQ group, use the [official QQ group page](https://docs.maante.org/zh_cn/qq-group/) — it automatically assigns you to a group that still has space
 >
 > Official Bilibili account: [MaaNTE-Official](https://space.bilibili.com/3546893080594665)
 >
