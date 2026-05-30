@@ -207,8 +207,25 @@
                 "expected": [
                     "都市大亨",
                     "(?i)City\\s*Tycoon",
-                    "シティ名声",
-                    "도시 타이쿤"
+                    "シティ名声"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "InHethereauHobbiesMenu": {
+        "desc": "在都市闲趣菜单内",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    169,
+                    49,
+                    346,
+                    134
+                ],
+                "expected": [
+                    "都市闲趣"
                 ],
                 "threshold": 0.8
             }
