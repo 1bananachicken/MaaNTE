@@ -89,6 +89,7 @@
         "action": "DoNothing",
         "next": [
             "WitchDivinationMoveToWitchHouse",
+            "WitchDivinationPressEscTwice"
         ],
         "on_error": [
             "WitchDivinationEntrance"
@@ -217,4 +218,19 @@
             "WitchDivinationEntrance"
         ]
     },
+    "WitchDivinationPressEscTwice": {
+        "desc": "按两次ESC后结束任务",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "WitchDivinationActionEnd"
+        ]
+    }
 }
