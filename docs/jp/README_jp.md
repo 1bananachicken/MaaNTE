@@ -7,9 +7,9 @@
   <p align="center">
     MAA異環小助手
     <br/>
-    <a href="https://docs.maante.org/ja_jp/"><strong>公式サイト</strong></a>
+    <a href="https://docs.maante.org/"><strong>公式サイト</strong></a>
     ·
-    <a href="/docs/eng/README_en.md">English</a> | <a href="/README.md">简体中文</a> | <a href="/docs/README_zh-tw.md">繁體中文</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">バグ報告</a>
+    <a href="../eng/README_en.md">English</a> | <a href="../README.md">简体中文</a> | <a href="../README_zh-tw.md">繁體中文</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">バグ報告</a>
   </p>
 
   <p align="center">
@@ -47,7 +47,7 @@
 >
 > その他：[Bilibili @MaaNTE-Official](https://space.bilibili.com/3546893080594665) · [Discord](https://discord.gg/e6mPMRYQpR)
 
-## ⚠️免責事項とリスク警告
+### ⚠️免責事項とリスク警告
 
 > [!Note]
 >
@@ -63,7 +63,7 @@
 >
 > **本ツールの使用によって生じる可能性のあるすべてのリスクを十分に理解し、自発的に引き受けてください。**
 
-## 🧾オープンソースライセンス
+### 🧾オープンソースライセンス
 
 本ソフトウェアは [GNU Affero General Public License v3.0 only](https://spdx.org/licenses/AGPL-3.0-only.html) の下でオープンソース化されています。
 
@@ -111,11 +111,11 @@
 
 - 一般ユーザーは [Release 版](https://github.com/1bananachicken/MaaNTE/releases) をダウンロードしてください。開発する場合のみリポジトリをクローンしてください。
 
-## 💡注意事項
+### 💡注意事項
 
 ゲームは 1280×720 解像度のウィンドウモードで実行する必要があります。釣りの新アルゴリズムは 120 FPS に対応しています。
 
-## 💻開発ガイド
+### 💻開発ガイド
 
 開発に参加したい、またはプロジェクトを詳しく知りたい方はこちら 👉 [開発者ドキュメント](../zh_cn/develop/README.md)
 
