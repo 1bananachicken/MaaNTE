@@ -7,7 +7,9 @@
   <p align="center">
     MAA Assistant for Neverness to Everness
     <br/>
-     <a href="/README.md">简体中文</a> | <a href="/docs/README_zh-tw.md">繁體中文</a> | <a href="/docs/jp/README_jp.md">日本語</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">报告 Bug</a>
+    <a href="https://docs.maante.org/en_us/"><strong>Official Website</strong></a>
+    ·
+     <a href="/README.md">简体中文</a> | <a href="/docs/README_zh-tw.md">繁體中文</a> | <a href="/docs/jp/README_jp.md">日本語</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">Report Bug</a>
   </p>
 
   <p align="center">
@@ -15,6 +17,7 @@
     <img src="https://img.shields.io/badge/Language-Python%20%2F%20PipeLine-blue?style=flat-square&logo=Python" alt="Language" />
     <img alt="license" src="https://img.shields.io/github/license/1bananachicken/MaaNTE?style=flat-square">
     <br>
+    <a href="https://docs.maante.org/en_us/" target="_blank"><img alt="website" src="https://img.shields.io/badge/Website-docs.maante.org-00A98F?style=flat-square"></a>
     <a href="https://maafw.com/" target="_blank"><img alt="website" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/maafw.svg"></a>
     <a href="https://mirrorchyan.com/zh/projects?rid=MaaNTE" target="_blank"><img alt="mirrorc" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/mirrorc-en.svg"></a>
     <a href="https://space.bilibili.com/3546893080594665" target="_blank"><img alt="Bilibili" src="https://img.shields.io/badge/Bilibili-MaaNTE--Official-00A1D6?logo=bilibili"></a>
@@ -34,28 +37,17 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 
 > [!Caution]
 >
-> Recently, a large number of accounts have been redistributing this software, even impersonating official accounts. Software obtained through unofficial channels **may contain viruses** and is generally not the latest version. Please verify carefully.
->
-> We have recently discovered that some individuals are using this project to spread viruses. Please make sure to download only from the official channels.
+> Recently, many accounts have been redistributing this software or impersonating official accounts. Software obtained through unofficial channels **may contain viruses** and is often not the latest version. Please download only from [GitHub Releases](https://github.com/1bananachicken/MaaNTE/releases) or other official channels.
 
 > [!Tip]
 >
 > This project is still in early development. PRs and Issues are welcome.
+>
+> For downloads, docs, and troubleshooting, visit **[docs.maante.org](https://docs.maante.org/en_us/)**. To join a QQ group, use the [official QQ group page](https://docs.maante.org/zh_cn/qq-group/) — it automatically assigns you to a group that still has space.
+>
+> Other channels: [Bilibili @MaaNTE-Official](https://space.bilibili.com/3546893080594665) · [Discord](https://discord.gg/e6mPMRYQpR)
 
-> [!Tip]
->
-> Official Bilibili account: [MaaNTE-Official](https://space.bilibili.com/3546893080594665)
->
-> QQ Group 1: 1103323319 (Full)
->
-> QQ Group 2: 1101147419 (Full)
->
-> QQ Group 3: 1075143235 (Full)
->
-> QQ Group 4: 713114598 (Full)
->
-> QQ Group 5: 1106448578
-# Disclaimer and Risk Notice
+## ⚠️ Disclaimer and Risk Notice
 
 > [!Note]
 >
@@ -71,11 +63,11 @@ Powered by [MaaFramework](https://github.com/MaaXYZ/MaaFramework) !
 >
 > **You should fully understand and voluntarily bear all risks that may arise from using this tool.**
 
-## 📄Open Source License
+## 🧾 Open Source License
 
 This software is open-sourced under [GNU Affero General Public License v3.0 only](https://spdx.org/licenses/AGPL-3.0-only.html).
 
-## ✨Features
+## ✨ Features
 
 - 🎣 Auto Fishing
   - 🐟 Auto Sell Fish
@@ -99,6 +91,7 @@ This software is open-sourced under [GNU Affero General Public License v3.0 only
 - 🕛 Real-time Assistance
   - 🗼 Auto Teleport
   - ⏩ Auto Skip Story
+  - 🎁 Auto Loot
 - ⚔️ Auto Dodge
   - 🛡️ Audio-based auto dodge/counter
 - 🎵 Auto Rhythm Game
@@ -106,29 +99,29 @@ This software is open-sourced under [GNU Affero General Public License v3.0 only
 - 🎹 Auto Piano
   - 📂 Supports custom MIDI import
 - 📋 Task Presets
-  - ⚡ Quick Daily / 📆 Full Daily / 💤 AFK / 🗺️ Real-time Assist
+  - 💤 AFK / 🗺️ Real-time Assist
 
-## ❓FAQ
+## ❓ FAQ
 
-### 📄Troubleshooting
+### 📄 Troubleshooting
 
-Please refer to the [Trouble shooting Guide](../eng/trouble_shooting.md) (English).
+Please refer to the [Troubleshooting Guide](../eng/trouble_shooting.md) (English).
 
-### 🤔Can't find how to start?
+### 🤔 Can't find how to start?
 
-- Regular users please download the release version. Only clone the repository if you plan to develop.
+- Regular users should download the [Release version](https://github.com/1bananachicken/MaaNTE/releases). Only clone the repository if you plan to develop.
 
-## 💡Notes
+## 💡 Notes
 
 The game must run in windowed mode at 1280×720 resolution. The new fishing algorithm supports 120 FPS.
 
-## 💻Development Guide
+## 💻 Development Guide
 
-Want to contribute or dive deeper into the project? Start here 👉 [Developer Documentation Index](https://github.com/1bananachicken/MaaNTE/blob/dev/docs/zh_cn/develop/README.md)
+Want to contribute or dive deeper into the project? Start here 👉 [Developer Documentation Index](../zh_cn/develop/README.md)
 
 All contributions are welcome — let's make MaaNTE even better together! 💪
 
-## ☕Acknowledgements
+## ❤️ Acknowledgements
 
 ### Open Source Projects
 
@@ -151,7 +144,7 @@ Thanks to all the developers who participated in testing and development (´▽`
 
 [![Contributors](https://contributors-img.web.app/image?repo=1bananachicken/MaaNTE&max=1000)](https://github.com/1bananachicken/MaaNTE/graphs/contributors)
 
-## ☕Buy Us a Coffee
+## ☕ Buy Us a Coffee
 
 If MaaNTE has saved you a lot of time, how about buying the developers a coffee?
 
@@ -159,7 +152,7 @@ Your support is our biggest motivation to keep updating! 🥰
 
 [<img width="200" alt="Sponsor Us" src="https://pic1.afdiancdn.com/static/img/welcome/button-sponsorme.png">](https://afdian.com/a/MaaNTE)
 
-## ⭐Star History
+## ⭐ Star History
 
 If you find this software helpful, please give us a Star! (the little star at the top right of the page) – that's the greatest support for us!
 

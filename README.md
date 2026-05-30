@@ -7,6 +7,8 @@
   <p align="center">
     MAA异环小助手
     <br/>
+    <a href="https://docs.maante.org/"><strong>官方网站</strong></a>
+    ·
     <a href="./docs/eng/README_en.md">English</a> | <a href="./docs/README_zh-tw.md">繁體中文</a> | <a href="./docs/jp/README_jp.md">日本語</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">报告 Bug</a>
   </p>
   <p align="center">
@@ -14,6 +16,7 @@
     <img src="https://img.shields.io/badge/Language-Python%20%2F%20PipeLine-blue?style=flat-square&logo=Python" alt="Language" />
     <img alt="license" src="https://img.shields.io/github/license/1bananachicken/MaaNTE?style=flat-square">
     <br>
+    <a href="https://docs.maante.org/" target="_blank"><img alt="website" src="https://img.shields.io/badge/Website-docs.maante.org-00A98F?style=flat-square"></a>
     <a href="https://maafw.com/" target="_blank"><img alt="website" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/maafw.svg"></a>
     <a href="https://mirrorchyan.com/zh/projects?rid=MaaNTE" target="_blank"><img alt="mirrorc" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/mirrorc-zh.svg"></a>
     <a href="https://space.bilibili.com/3546893080594665" target="_blank"><img alt="Bilibili" src="https://img.shields.io/badge/Bilibili-MaaNTE--Official-00A1D6?logo=bilibili"></a>
@@ -29,31 +32,17 @@
 
 > [!Caution]
 >
-> 近期出现大量账号二次分发本软件，甚至冒充官方账号。通过非官方途径获取的软件可能**含有病毒**，并且一般不是最新的版本，请注意甄别。
->
->近日，我们发现存在借本项目之名传播病毒的行为，请在下载时认准官方渠道。
+> 近期出现大量账号二次分发本软件，甚至冒充官方账号。通过非官方途径获取的软件可能**含有病毒**，并且一般不是最新版本。请务必从 [GitHub Releases](https://github.com/1bananachicken/MaaNTE/releases) 等官方渠道下载。
 
 > [!Tip]
 >
-> 本项目还处于早期开发阶段，欢迎提交PR和Issue
+> 本项目还处于早期开发阶段，欢迎提交 PR 和 Issue。
+>
+> 下载、文档与问题排查请访问 **[官方网站 docs.maante.org](https://docs.maante.org/)**；加入 QQ 交流群请前往 [官网 QQ 群页面](https://docs.maante.org/zh_cn/qq-group/)，会自动分配当前未满的群号。
+>
+> 其他渠道：[B 站 @MaaNTE-Official](https://space.bilibili.com/3546893080594665) · [Discord](https://discord.gg/e6mPMRYQpR)
 
-> [!Tip]
->
-> 官方 B 站账号: [MaaNTE-Official](https://space.bilibili.com/3546893080594665)
->
-> 官方网站: [MaaNTE文档站](https://docs.maante.org/)
->
-> QQ交流1群: 1103323319
->
-> QQ交流2群: 1101147419
->
-> QQ交流3群: 1075143235
->
-> QQ交流4群: 713114598
->
-> QQ交流5群: 1106448578
-
-# ⚠️免责声明与风险提示
+## ⚠️免责声明与风险提示
 
 > [!Note]
 >
@@ -97,14 +86,15 @@
 - 🕛 实时辅助
   - 🗼 自动传送
   - ⏩ 自动跳剧情
+  - 🎁 自动拾取
 - ⚔️ 自动闪避
   - 🛡️ 基于音频识别的自动闪避/反击
 - 🎵 自动超强音
   - 🥁 循环演奏迷星叫
 - 🎹 自动弹钢琴
-  - 📂 支持任意midi导入
+  - 📂 支持任意 MIDI 导入
 - 📋 预设任务组
-  - ⚡ 快速日常 / 📆 全套日常 / 💤 挂机任务 / 🗺️ 实时辅助
+  - 💤 挂机任务 / 🗺️ 实时辅助
 
 ## ❓常见问题
 
@@ -114,11 +104,11 @@
 
 ### 🤔找不到怎么启动？
 
-- 普通用户请下载release版本，有开发需求再clone仓库
+- 普通用户请下载 [Release 版本](https://github.com/1bananachicken/MaaNTE/releases)，有开发需求再 clone 仓库
 
 ## 💡注意事项
 
-游戏需要运行在1280x720分辨率，窗口化，钓鱼新算法支持120帧运行
+游戏需要运行在 1280×720 分辨率、窗口化模式下；钓鱼新算法支持 120 帧运行。
 
 ## 💻开发指南
 
