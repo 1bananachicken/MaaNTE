@@ -1,0 +1,58 @@
+{
+    "ShuffleStepCheck": {
+        "desc": "检测「黑羽」文本，存在则结束小碎步",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    672,
+                    235,
+                    410,
+                    259
+                ],
+                "expected": [
+                    "黑羽"
+                ]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70 // 'F' 键与魔女交互
+            }
+        },
+        "next": [
+            "ShuffleStepTalkToWitch"
+        ],
+        "on_error": [
+            "ShuffleStepWalk"
+        ]
+    },
+    "ShuffleStepWalk": {
+        "desc": "按住W键向前走0.5秒",
+        "action": {
+            "type": "KeyDown",
+            "param": {
+                "key": 87
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "ShuffleStepPause"
+        ]
+    },
+    "ShuffleStepPause": {
+        "desc": "松开W键停顿1.3秒",
+        "action": {
+            "type": "KeyUp",
+            "param": {
+                "key": 87
+            }
+        },
+        "post_delay": 1300,
+        "next": [
+            "ShuffleStepCheck",
+            "ShuffleStepWalk"
+        ]
+    }
+}

@@ -119,6 +119,7 @@
         // group:others
         "resource/tasks/FountainCheckin.json",
         "resource/tasks/AutoPiano.json",
+        "resource/tasks/WitchDivination.json",
         // group:DatasetCollection
         "resource/tasks/AutonomousDrivingDataset.json",
         // preset

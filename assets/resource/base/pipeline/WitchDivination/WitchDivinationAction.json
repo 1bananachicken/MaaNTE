@@ -1,0 +1,298 @@
+{
+    "WitchDivinationCheckWitchHouseInterface": {
+        "desc": "检测是否在魔女之家界面，进入占卜流程",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    216,
+                    75
+                ],
+                "expected": [
+                    "魔女之家"
+                ]
+            }
+        },
+        "action": "DoNothing",
+        "next": [
+            "WitchDivinationSelectYiWen"
+        ],
+        "on_error": [
+            "WitchDivinationEntrance"
+        ]
+    },
+    "WitchDivinationSelectYiWen": {
+        "desc": "选择占卜类型 — 佚闻",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    236,
+                    507,
+                    803,
+                    143
+                ],
+                "expected": [
+                    "佚闻"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": true
+            }
+        },
+        "next": [
+            "WitchDivinationDivineYiWen"
+        ],
+        "on_error": [
+            "WitchDivinationSelectCiFu"
+        ]
+    },
+    "WitchDivinationDivineYiWen": {
+        "desc": "执行佚闻占卜 — 点击占卜按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1037,
+                    637,
+                    230,
+                    63
+                ],
+                "expected": [
+                    "占卜"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": true
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "[JumpBack]WitchDivinationCheckNoChancesYiWen",
+            "[JumpBack]WitchDivinationActionEnd",
+            "WitchDivinationSelectYiWen"
+        ],
+        "on_error": [
+            "WitchDivinationSelectCiFu"
+        ]
+    },
+    "WitchDivinationCheckNoChancesYiWen": {
+        "desc": "确认佚闻是否已无占卜次数",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    394,
+                    315,
+                    506,
+                    84
+                ],
+                "expected": [
+                    "次数不足"
+                ]
+            }
+        },
+        "action": "DoNothing",
+        "next": [
+            "WitchDivinationSelectCiFu"
+        ],
+        "on_error": [
+            "WitchDivinationEntrance"
+        ]
+    },
+    "WitchDivinationSelectCiFu": {
+        "desc": "选择占卜类型 — 赐福",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    236,
+                    507,
+                    803,
+                    143
+                ],
+                "expected": [
+                    "赐福"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": true
+            }
+        },
+        "next": [
+            "WitchDivinationDivineCiFu"
+        ],
+        "on_error": [
+            "WitchDivinationSelectXunBao"
+        ]
+    },
+    "WitchDivinationDivineCiFu": {
+        "desc": "执行赐福占卜 — 点击占卜按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1037,
+                    637,
+                    230,
+                    63
+                ],
+                "expected": [
+                    "占卜"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": true
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "[JumpBack]WitchDivinationCheckNoChancesCiFu",
+            "[JumpBack]WitchDivinationActionEnd",
+            "WitchDivinationSelectCiFu"
+        ],
+        "on_error": [
+            "WitchDivinationSelectXunBao"
+        ]
+    },
+    "WitchDivinationCheckNoChancesCiFu": {
+        "desc": "确认赐福是否已无占卜次数",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    394,
+                    315,
+                    506,
+                    84
+                ],
+                "expected": [
+                    "次数不足"
+                ]
+            }
+        },
+        "action": "DoNothing",
+        "next": [
+            "WitchDivinationSelectXunBao"
+        ],
+        "on_error": [
+            "WitchDivinationEntrance"
+        ]
+    },
+    "WitchDivinationSelectXunBao": {
+        "desc": "选择占卜类型 — 寻宝",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    236,
+                    507,
+                    803,
+                    143
+                ],
+                "expected": [
+                    "寻宝"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": true
+            }
+        },
+        "next": [
+            "WitchDivinationDivineXunBao"
+        ],
+        "on_error": [
+            "WitchDivinationActionEnd"
+        ]
+    },
+    "WitchDivinationDivineXunBao": {
+        "desc": "执行寻宝占卜 — 点击占卜按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1037,
+                    637,
+                    230,
+                    63
+                ],
+                "expected": [
+                    "占卜"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": true
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "[JumpBack]WitchDivinationCheckNoChancesXunBao",
+            "WitchDivinationActionEnd"
+        ]
+    },
+    "WitchDivinationCheckNoChancesXunBao": {
+        "desc": "确认寻宝是否已无占卜次数",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    394,
+                    315,
+                    506,
+                    84
+                ],
+                "expected": [
+                    "次数不足"
+                ]
+            }
+        },
+        "action": "DoNothing",
+        "next": [
+            "WitchDivinationActionEnd"
+        ],
+        "on_error": [
+            "WitchDivinationEntrance"
+        ]
+    },
+    "WitchDivinationActionEnd": {
+        "desc": "占卜流程结束 — 等待画面静止后按ESC退出",
+        "pre_wait_freezes": {
+            "time": 500,
+            "target": [
+                0,
+                0,
+                0,
+                0
+            ],
+            "timeout": 3000
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        }
+    }
+}

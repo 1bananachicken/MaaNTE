@@ -1,0 +1,79 @@
+{
+    "ShuffleStepTalkToWitch": {
+        "desc": "等待对话面板静止后检测「卜运」并点击",
+        "pre_wait_freezes": {
+            "time": 500,
+            "target": [
+                828,
+                333,
+                417,
+                282
+            ],
+            "timeout": 3000
+        },
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    828,
+                    333,
+                    417,
+                    282
+                ],
+                "expected": [
+                    "卜运"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": true
+            }
+        },
+        "next": [
+            "ShuffleStepSkipDialogue1"
+        ],
+        "on_error": [
+            "WitchDivinationEntrance"
+        ]
+    },
+    "ShuffleStepSkipDialogue1": {
+        "desc": "跳过女巫对话 — 第1次点击", // 这个会比 maxhit 稳一点，万一中途失败重新进来的时候，还可以连续点
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": "ShuffleStepTalkToWitch"
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "ShuffleStepSkipDialogue2"
+        ]
+    },
+    "ShuffleStepSkipDialogue2": {
+        "desc": "跳过女巫对话 — 第2次点击",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": "ShuffleStepTalkToWitch"
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "ShuffleStepSkipDialogue3"
+        ]
+    },
+    "ShuffleStepSkipDialogue3": {
+        "desc": "跳过女巫对话 — 第3次点击",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": "ShuffleStepTalkToWitch"
+            }
+        },
+        "next": [
+            "WitchDivinationCheckWitchHouseInterface"
+        ]
+    }
+}
