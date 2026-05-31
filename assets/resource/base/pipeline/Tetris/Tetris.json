@@ -64,7 +64,7 @@
         "desc": "泯除方块 - 检测到游戏空闲（等待方块出现）",
         "recognition": "And",
         "all_of": [
-            "TetrisSceneGameIdle"
+            "TetrisGamingNext"
         ],
         "pre_delay": 500,
         "next": [

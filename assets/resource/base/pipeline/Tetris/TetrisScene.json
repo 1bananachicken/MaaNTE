@@ -101,26 +101,6 @@
         "post_delay": 0,
         "next": []
     },
-    "TetrisScenePrepareOneMarker": {
-        "desc": "泯除方块 - 检测准备界面一标记",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    779,
-                    151,
-                    245,
-                    366
-                ],
-                "template": [
-                    "Tetris/prepare_one_marker.png"
-                ]
-            }
-        },
-        "pre_delay": 0,
-        "post_delay": 0,
-        "next": []
-    },
     "TetrisScenePrepareOneSingle": {
         "desc": "泯除方块 - 检测单人模式入口",
         "recognition": {
@@ -175,7 +155,6 @@
             "type": "Or",
             "param": {
                 "any_of": [
-                    "TetrisScenePrepareOneMarker",
                     "TetrisScenePrepareOneSingle",
                     "TetrisScenePrepareOneMulti"
                 ]
@@ -286,24 +265,45 @@
         "pre_delay": 0,
         "post_delay": 0
     },
-    "TetrisSceneDrop": {
-        "desc": "泯除方块 - 检测下落按钮（游戏中标志）",
+    "TetrisGamingNext": {
+        "desc": "泯除方块 - 识别游戏中Next队列文字",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
-                    270,
-                    425,
-                    92,
-                    97
+                    792,
+                    52,
+                    45,
+                    25
                 ],
-                "template": [
-                    "Tetris/drop.png"
+                "expected": [
+                    "Next",
+                    "次の",
+                    "다음"
                 ]
             }
-        },
-        "pre_delay": 0,
-        "post_delay": 0
+        }
+    },
+    "TetrisGamingExisting": {
+        "desc": "泯除方块 - 识别游戏中当前存活文字",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    783,
+                    489,
+                    65,
+                    23
+                ],
+                "expected": [
+                    "当前存活",
+                    "當前存活",
+                    "(?i)Existing",
+                    "現在の生存",
+                    "현재 생존"
+                ]
+            }
+        }
     },
     "TetrisSceneMatchend": {
         "desc": "泯除方块 - 检测对局结束界面",
@@ -326,12 +326,14 @@
         "post_delay": 0
     },
     "TetrisSceneGameActive": {
-        "desc": "泯除方块 - 检测游戏中（下落按钮可见）",
+        "desc": "泯除方块 - 检测游戏中（下落按钮或游戏标记可见）",
         "recognition": {
-            "type": "And",
+            "type": "Or",
             "param": {
-                "all_of": [
-                    "TetrisSceneDrop"
+                "any_of": [
+                    "TetrisSceneGameIdle",
+                    "TetrisGamingNext",
+                    "TetrisGamingExisting"
                 ]
             }
         },
