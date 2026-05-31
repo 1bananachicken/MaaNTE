@@ -19,7 +19,7 @@
     <a href="https://space.bilibili.com/3546893080594665" target="_blank"><img alt="Bilibili" src="https://img.shields.io/badge/Bilibili-MaaNTE--Official-00A1D6?logo=bilibili"></a>
     <a href="https://discord.gg/e6mPMRYQpR" target="_blank"><img alt="Discord" src="https://img.shields.io/badge/Discord-MaaNTE--Official-5865F2?logo=discord"></a>
     <br/>
-    <img alt="commit" src="https://img.shields.io/github/commit-activity/m/1bananachicken/MaaNTE?&style=flat-square&logo=github&color=darkgreen">
+    <img alt="commit" src="https://img.shields.io/github/commit-activity/m/1bananachicken/MaaNTE?&color=darkgreen">
     <img src="https://img.shields.io/github/stars/1bananachicken/MaaNTE?style=flat-square&logo=github&color=darkgreen" alt="Stars" />
   </p>
 
@@ -78,11 +78,20 @@
   - 🪝 自动买鱼饵
 - 🥤 自动做咖啡
   - 🔨 驱赶所有顾客
-- 💰 自动提取一咖舍收益
+- 💰 自动领取一咖舍收益
   - 📦 自动补货
+  - 🏷️ 根据风向标自动替换商品
+- 🪑 自动收家具
+  - 🏠 支持维纳/伊登/天景/金都/峰林五处公寓
 - 💎 自动领取奖励
   - 🎁 活跃度
   - 📅 环期赏令
+- 🐾 粉爪大劫案
+  - 🔄 支持无限循环挂机
+  - 📊 收益统计与日志记录
+- 🧩 自动俄罗斯方块
+  - 🤖 内置 AI 自动决策
+  - 🔁 自动连打直到活力耗尽
 - 🕛 实时辅助
   - 🗼 自动传送
   - ⏩ 自动跳剧情
@@ -92,6 +101,8 @@
   - 🥁 循环演奏迷星叫
 - 🎹 自动弹钢琴
   - 📂 支持任意midi导入
+- 📋 预设任务组
+  - ⚡ 快速日常 / 📆 全套日常 / 💤 挂机任务 / 🗺️ 实时辅助
 
 ## ❓常见问题
 
@@ -109,36 +120,9 @@
 
 ## 💻开发指南
 
-<details><summary>点击展开</summary>
+想参与开发或深入了解项目？来这里吧 👉 [开发者文档索引](docs/zh_cn/develop/README.md)
 
-MaaNTE开发者群: 1092630280
-
-### 快速开始
-
-0. 配置环境
-
-- 安装 python>=3.11
-- 建议使用vscode作为IDE进行开发，并安装 [vscode插件“maa-support”](https://marketplace.visualstudio.com/items?itemName=nekosu.maa-support) 进行调试
-
-1. Fork项目
-
-- 点击 `Fork`，继续点击 `Create Fork`
-
-2. 克隆自己 fork 的项目到本地，并拉取子模块
-
-```bash
-git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
-```
-
-3. 下载MaaFramework的 [release包](https://github.com/MaaXYZ/MaaFramework/releases)，解压到 `deps` 文件夹中
-
-4. 提交PR
-
-- 新功能开发请提交到dev分支
-
-更多开发文档可以参考 [M9A文档站](https://1999.fan/zh_cn/develop/development.html)
-
-</details>
+欢迎各路大佬贡献代码，一起让 MaaNTE 变得更强！💪
 
 ## ❤️鸣谢
 

@@ -22,7 +22,7 @@ def click_rect(controller, rect):
     cy = y + h // 2
     for _ in range(3):
         controller.post_touch_down(cx, cy).wait()
-        time.sleep(0.001)
+        time.sleep(0.05)
         controller.post_touch_up().wait()
 
 
@@ -46,13 +46,8 @@ class AutoMakeCoffee(CustomAction):
 
         KEY_F = 70
 
-        # Coordinates mapped from auto_make_coffee.json [x, y, w, h]
-        select_level_target = [18, 230, 188, 66]
         click_roi = [28, 272, 65, 56]
-        start_roi = [1057, 648, 178, 44]
-        star_roi = [1204, 109, 29, 27]
         exit_roi = [11, 12, 38, 37]
-        claim_roi = [681, 539, 187, 38]
 
         for count in range(make_count):
             if context.tasker.stopping:
@@ -60,11 +55,6 @@ class AutoMakeCoffee(CustomAction):
             PrintT(context, "coffee.making", count + 1, make_count)
 
             # Step 1: 选择关卡
-            PrintT(context, "coffee.step_select_level")
-            click_rect(controller, select_level_target)
-            time.sleep(1)
-
-            # Step 2: 开始营业
             PrintT(context, "coffee.step_wait_start")
             while True:
                 if context.tasker.stopping:
@@ -72,6 +62,33 @@ class AutoMakeCoffee(CustomAction):
                 img = get_image(controller)
                 start_result = context.run_recognition("MakeCoffeeStart", img)
                 if start_result and start_result.hit:
+                    while True:
+                        if context.tasker.stopping:
+                            return CustomAction.RunResult(success=False)
+                        context.run_action("MakeCoffeeScrollToTop")
+                        time.sleep(1)
+                        img = get_image(controller)
+                        target_result = context.run_recognition(
+                            "MakeCoffeeTargetCoffeeMaster", img
+                        )
+                        if target_result and target_result.hit:
+                            break
+
+                    click_rect(
+                        controller,
+                        [
+                            target_result.box.x,
+                            target_result.box.y,
+                            target_result.box.w,
+                            target_result.box.h,
+                        ],
+                    )
+                    img = get_image(controller)
+                    start_result = context.run_recognition("MakeCoffeeStart", img)
+                    if not (start_result and start_result.hit):
+                        time.sleep(check_freq)
+                        continue
+
                     PrintT(context, "coffee.step_start_click")
                     click_rect(
                         controller,
@@ -82,11 +99,11 @@ class AutoMakeCoffee(CustomAction):
                             start_result.box.h,
                         ],
                     )
-                    time.sleep(3)  # Post delay from JSON: 3000ms
+                    time.sleep(3)
                     break
                 time.sleep(check_freq)
 
-            # Step 3: 达成营业额
+            # Step 2: 达成营业额
             PrintT(context, "coffee.step_wait_star")
             while True:
                 if context.tasker.stopping:
@@ -101,7 +118,7 @@ class AutoMakeCoffee(CustomAction):
                     break
                 time.sleep(2)
 
-            # Step 4: 点击领取
+            # Step 3: 点击领取
             PrintT(context, "coffee.step_wait_claim")
             while True:
                 if context.tasker.stopping:
