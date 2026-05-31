@@ -14,6 +14,20 @@
         "post_delay": 0,
         "rate_limit": 0
     },
+    "InMiniWorld": {
+        "desc": "在特殊的小世界中(如粉爪、主线故事、异象委托等)",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "ExitButton"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
     "InEscMenu": {
         "desc": "在Esc菜单内",
         "recognition": {
@@ -169,8 +183,7 @@
                     "メッセージ",
                     "정보"
                 ],
-                "threshold": 0.8
-            ,
+                "threshold": 0.8,
                 "roi_offset": [
                     0,
                     0,
@@ -194,10 +207,37 @@
                 "expected": [
                     "都市大亨",
                     "(?i)City\\s*Tycoon",
-                    "シティ名声",
-                    "도시 타이쿤"
+                    "シティ名声"
                 ],
                 "threshold": 0.8
+            }
+        }
+    },
+    "InHethereauHobbiesMenu": {
+        "desc": "在都市闲趣菜单内",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    169,
+                    49,
+                    346,
+                    134
+                ],
+                "expected": [
+                    "都市闲趣",
+                    "都市閒趣",
+                    "(?i)Hethereau\\s*Hobbies",
+                    "シティライフ"
+                ],
+                "threshold": 0.8
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    346,
+                    0
+                ]
             }
         }
     },
