@@ -4,7 +4,19 @@
             "type": "OCR",
             "param": {
                 "roi": [731, 326, 182, 136],
-                "expected": ["抚摸"]
+                "expected": [
+                    "抚摸",
+                    "撫摸",
+                    "(?i)Pet",
+                    "なでる"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    91,
+                    0
+                ]
             }
         },
         "action": {

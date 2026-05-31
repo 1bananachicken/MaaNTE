@@ -47,13 +47,23 @@
             57
         ],
         "expected": [
-            "确认"
+            "确认",
+            "確認",
+            "(?i)Confirm",
+            "確定"
         ],
         "pre_delay": 0,
         "post_delay": 0,
         "next": [
             "__ScenePrivateAnyEnterWorldSuccess",
             "[JumpBack]SceneLoadingType2"
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            153,
+            0
         ]
     },
     "__ScenePrivateAnyEnterWorldSuccess": {

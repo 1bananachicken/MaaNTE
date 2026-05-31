@@ -274,11 +274,21 @@
             62
         ],
         "expected": [
-            "海上钓客"
+            "海上钓客",
+            "海上釣客",
+            "(?i)Sea\\s*Angler",
+            "海釣り"
         ],
         "action": "Click",
         "next": [
             "FishNewSeaAnglerToFishMarket"
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            35,
+            0
         ]
     },
     "FishNewSeaAnglerToFishMarket": {
@@ -291,11 +301,21 @@
             47
         ],
         "expected": [
-            "渔获市场"
+            "渔获市场",
+            "漁獲市場",
+            "(?i)Fish\\s*Market",
+            "鮮魚市場"
         ],
         "action": "Click",
         "next": [
             "FishNewSellFishStart"
+        ]
+    ,
+        "roi_offset": [
+            0,
+            0,
+            13,
+            0
         ]
     }
 }
