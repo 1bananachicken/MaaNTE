@@ -147,7 +147,6 @@
                     "釣り餌を装着する必要",
                     "미끼를 장착해야 낚시할 수 있습니다"
                 ],
-                "threshold": 0.5,
                 "roi_offset": [
                     0,
                     0,
@@ -182,8 +181,7 @@
                     "Your fish hold is full",
                     "生け簀が一杯です", //生け簀が一杯です、魚を売却後に再度お試しください
                     "저장고가 가득 찼습니다. 일부 어획물을 판매한 뒤 다시 시도해 주세요"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
         "focus": {
@@ -286,8 +284,7 @@
                     "(?i)Purchase",
                     "購入",
                     "구매"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
         "action": "ClickKey",
@@ -319,8 +316,7 @@
                     "(?i)Switch\\s*Bait",
                     "釣り餌交換",
                     "미끼 교체"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
         "pre_delay": 500,
@@ -350,8 +346,7 @@
                     "(?i)Purchase",
                     "購入",
                     "구매"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
         "action": "Click",
@@ -370,22 +365,18 @@
         ]
     },
     "FishNewOnStore": {
-        "desc": "到达商店界面商店界面",
+        "desc": "到达商店界面",
         "recognition": {
-            "type": "OCR",
+            "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    60,
-                    16,
-                    120,
-                    48
+                    0,
+                    0,
+                    80,
+                    80
                 ],
-                "expected": [
-                    "渔具商店",
-                    "漁具商店",
-                    "(?i)Fishing\\s*Tackle\\s*Shop",
-                    "釣具店",
-                    "낚시용품 상점"
+                "template": [
+                    "Fish/FishFishingTackleShop.png"
                 ],
                 "threshold": 0.8
             }
@@ -442,7 +433,6 @@
             "Fish/FishStoreGeneralBait.png"
         ],
         "green_mask": true,
-        "threshold": 0.5,
         // "threshold": 0.8, // 0.8 有点高了
         "order_by": "Score", // 默认似乎不是按置信度排的，需要显式声明
         "action": "Click",
@@ -454,22 +444,11 @@
     "FishNewStoreScrollMouse": {
         "desc": "滚动商店界面",
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "roi": [
-                    60,
-                    16,
-                    120,
-                    48
-                ],
-                "expected": [
-                    "渔具商店",
-                    "漁具商店",
-                    "(?i)Fishing\\s*Tackle\\s*Shop",
-                    "釣具店",
-                    "낚시용품 상점"
-                ],
-                "threshold": 0.8
+                "all_of": [
+                    "FishNewOnStore"
+                ]
             }
         },
         "pre_delay": 500,
@@ -558,8 +537,7 @@
                     "(?i)Purchase",
                     "購入",
                     "구매"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
         "action": "Click",
@@ -592,7 +570,6 @@
                     "CONFIRN",
                     "확인"
                 ],
-                "threshold": 0.8,
                 "roi_offset": [
                     0,
                     0,
@@ -611,22 +588,11 @@
     "FishNewExitStore": {
         "desc": "退出渔具商店重新开始钓鱼",
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "roi": [
-                    10,
-                    13,
-                    198,
-                    57
-                ],
-                "expected": [
-                    "渔具商店",
-                    "漁具商店",
-                    "(?i)Fishing\\s*Tackle\\s*Shop",
-                    "釣具店",
-                    "낚시용품 상점"
-                ],
-                "threshold": 0.8
+                "all_of": [
+                    "FishNewOnStore"
+                ]
             }
         },
         "action": {
@@ -671,22 +637,11 @@
     "FishNewExitStoreSellFish": {
         "desc": "退出渔具商店前往卖鱼",
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "roi": [
-                    10,
-                    13,
-                    198,
-                    57
-                ],
-                "expected": [
-                    "渔具商店",
-                    "漁具商店",
-                    "(?i)Fishing\\s*Tackle\\s*Shop",
-                    "釣具店",
-                    "낚시용품 상점"
-                ],
-                "threshold": 0.8
+                "all_of": [
+                    "FishNewOnStore"
+                ]
             }
         },
         "action": {
@@ -979,19 +934,15 @@
     },
     "FishNewFishingMasterExit": {
         "desc": "从海上钓客退回钓鱼游戏界面",
-        "recognition": "OCR",
+        "recognition": "TemplateMatch",
         "roi": [
-            61,
-            16,
-            120,
-            48
+            0,
+            0,
+            80,
+            80
         ],
-        "expected": [
-            "海上钓客",
-            "海上釣客",
-            "(?i)Sea\\s*Angler",
-            "海釣り",
-            "바다 낚시꾼"
+        "template": [
+            "Fish/FishSeaAngler.png"
         ],
         "action": "ClickKey",
         "key": [
