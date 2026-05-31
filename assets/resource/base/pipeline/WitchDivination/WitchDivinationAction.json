@@ -75,6 +75,7 @@
             }
         },
         "post_delay": 1000,
+        "post_wait_freezes": 800,
         "next": [
             "[JumpBack]WitchDivinationCheckNoChancesYiWen",
             "[JumpBack]WitchDivinationActionEnd",
@@ -160,6 +161,7 @@
             }
         },
         "post_delay": 1000,
+        "post_wait_freezes": 800,
         "next": [
             "[JumpBack]WitchDivinationCheckNoChancesCiFu",
             "[JumpBack]WitchDivinationActionEnd",
@@ -245,9 +247,11 @@
             }
         },
         "post_delay": 1000,
+        "post_wait_freezes": 800,
         "next": [
             "[JumpBack]WitchDivinationCheckNoChancesXunBao",
-            "WitchDivinationActionEnd"
+            "[JumpBack]WitchDivinationActionEnd",
+            "WitchDivinationSelectXunBao"
         ]
     },
     "WitchDivinationCheckNoChancesXunBao": {
@@ -283,8 +287,7 @@
                 0,
                 0,
                 0
-            ],
-            "timeout": 3000
+            ]
         },
         "action": {
             "type": "ClickKey",

@@ -22,16 +22,7 @@
                 ] // 'M' 键打开地图
             }
         },
-        "post_wait_freezes": {
-            "time": 500,
-            "target": [
-                0,
-                0,
-                0,
-                0
-            ], // 全屏等待地图界面稳定
-            "timeout": 3000
-        },
+        "post_wait_freezes": 500, // 全屏等待地图界面稳定
         "next": [
             "WitchDivinationFindMapTask"
         ]
@@ -60,11 +51,12 @@
                 46,
                 390,
                 623
-            ], // 等待右侧面板稳定
-            "timeout": 3000
+            ] // 等待右侧面板稳定
         },
         "next": [
-            "WitchDivinationCheckTodayGuide"
+            "WitchDivinationCheckTodayGuide",
+            "WitchDivinationFindMapTask",
+            "WitchDivinationActionEnd"
         ],
         "on_error": [
             "WitchDivinationEntrance"
@@ -146,18 +138,10 @@
                 "target": true // 鼠标已在目标位置，直接点击
             }
         },
-        "post_wait_freezes": {
-            "time": 500,
-            "target": [
-                0,
-                0,
-                0,
-                0
-            ], // 点击后等待全屏稳定
-            "timeout": 3000
-        },
+        "post_wait_freezes": 500, // 点击后等待全屏稳定 
         "next": [
-            "WitchDivinationVerifyWitchHouse"
+            "WitchDivinationVerifyWitchHouse",
+            "WitchDivinationPressEscTwice"
         ],
         "on_error": [
             "WitchDivinationEntrance"
