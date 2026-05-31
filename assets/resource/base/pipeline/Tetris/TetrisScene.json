@@ -82,9 +82,7 @@
                     "테트로미노"
                 ]
             }
-        },
-        "pre_delay": 0,
-        "post_delay": 0
+        }
     },
     "TetrisSceneWorldWithPrompt": {
         "desc": "泯除方块 - 大世界场景且有方块入口提示",
