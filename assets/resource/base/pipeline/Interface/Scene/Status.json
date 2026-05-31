@@ -42,65 +42,45 @@
     "InExplorationGuideMenu": {
         "desc": "在探索指南菜单内",
         "recognition": {
-            "type": "OCR",
+            "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    60,
-                    20,
-                    110,
-                    40
+                    0,
+                    0,
+                    80,
+                    80
                 ],
-                "expected": [
-                    "探索指南",
-                    "(?i)Exploration\\s*Guide",
-                    "探検ガイド",
-                    "탐색 안내서"
-                ],
-                "threshold": 0.8
+                "template": "Common/Scene/SceneExplorationGuide.png"
             }
         }
     },
     "InBattlePassMenu": {
         "desc": "在环期赏令菜单内（第一页）",
         "recognition": {
-            "type": "OCR",
+            "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    60,
-                    20,
-                    110,
-                    40
+                    0,
+                    0,
+                    80,
+                    80
                 ],
-                "expected": [
-                    "历练奖赏",
-                    "歷練獎賞",
-                    "(?i)Experience\\s*Rewards",
-                    "鍛錬の証",
-                    "수련 보상"
-                ],
-                "threshold": 0.8
+                "template": "Common/Scene/SceneBattlePass.png"
             }
         }
     },
     "InScarboroughFairMenu": {
         "desc": "在斯卡布罗集市内",
         "recognition": {
-            "type": "OCR",
+            "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    41,
-                    660,
-                    87,
-                    34
+                    0,
+                    0,
+                    80,
+                    80
                 ],
-                "expected": [
-                    "弧盘研募",
-                    "弧盤研募",
-                    "(?i)Arc\\s*Research",
-                    "弧盤研究プロジェクト",
-                    "아크 연구 모집"
-                ],
-                "threshold": 0.8
+                "template": "Common/Scene/SceneScarboroughFair.png"
             }
         }
     },
@@ -169,8 +149,7 @@
                     "メッセージ",
                     "정보"
                 ],
-                "threshold": 0.8
-            ,
+                "threshold": 0.8,
                 "roi_offset": [
                     0,
                     0,
@@ -183,21 +162,15 @@
     "InCityTycoonMenu": {
         "desc": "在都市大亨菜单内",
         "recognition": {
-            "type": "OCR",
+            "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    60,
-                    20,
-                    110,
-                    40
+                    0,
+                    0,
+                    80,
+                    80
                 ],
-                "expected": [
-                    "都市大亨",
-                    "(?i)City\\s*Tycoon",
-                    "シティ名声",
-                    "도시 타이쿤"
-                ],
-                "threshold": 0.8
+                "template": "Common/Scene/SceneCityTycoon.png"
             }
         }
     },
