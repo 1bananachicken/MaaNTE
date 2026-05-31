@@ -1,0 +1,49 @@
+{
+    // 列表按钮，见于：角色、羁遇界面右下角
+    "ListButton": {
+        "desc": "通用关闭按钮类型1：右下角 三黑一白四叶草？",
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "__ListButtonType1"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": {
+            "time": 80,
+            "target": [
+                0,
+                0,
+                0,
+                0
+            ]
+        },
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "__ListButtonType1": {
+        "desc": "通用列表按钮常用变体1：三黑一白四叶草？ 适配 Hover",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1184,
+                    621,
+                    70,
+                    70
+                ],
+                "template": [
+                    "Common/Button/ListButtonType1.png"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    }
+}

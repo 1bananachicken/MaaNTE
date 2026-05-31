@@ -271,7 +271,7 @@
         ],
         "action": "Click",
         "next": [
-            "[JumpBack]SceneLoading",
+            "[JumpBack]SceneLoadingType1",
             "FurnitureClickFurniture"
         ]
     },

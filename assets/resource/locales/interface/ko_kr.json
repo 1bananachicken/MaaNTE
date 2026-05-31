@@ -1,5 +1,6 @@
 {
     "description": "NTE 어시스턴트, MaaFramework 기반 구동!",
+    "scene_check_osd_failed_focus": "<span style=\"color: red; font-weight: bold;\">화면이 가려져 있습니다. 프레임 레이트 표시를 비활성화하세요</span>",
     "contact": "QQ 그룹: 1103323319",
     "welcome.file": "resource/locales/interface/WELCOME/WELCOME_ko_kr.md",
     "controller_default_label": "데스크톱 - 기본",
@@ -41,7 +42,7 @@
     "task_fish_option_auto_sell": "자동 생선 판매",
     "task_fish_option_auto_sell_desc": "자동 생선 판매 기능 사용 여부",
     "task_fish_option_auto_buy_bait": "자동 미끼 구매",
-    "task_fish_option_auto_buy_bait_desc": "매번 최대 99개까지 자동 구매",
+    "task_fish_option_auto_buy_bait_desc": "매번 최대 99개까지 자동 구매, 포그라운드만",
     "task_fish_option_bait_threshold": "미끼 인식 임계값",
     "task_fish_option_bait_threshold_desc": "미끼 위치를 인식할 수 없는 경우 이 값을 낮추세요",
     "task_fish_option_loop_time": "반복 횟수",
@@ -151,5 +152,13 @@
     "task_auto_drive_dataset_input_output_dir_label": "출력 디렉터리",
     "task_auto_drive_dataset_input_duration_label": "녹화 시간",
     "task_auto_drive_dataset_input_duration_desc": "녹화 시간이며 기본값은 60초입니다.",
-    "task_auto_drive_dataset_input_start_delay_label": "시작 지연"
+    "task_auto_drive_dataset_input_start_delay_label": "시작 지연",
+    "task_touch_label": "쓰다듬기",
+    "task_touch_desc": "\"쓰다듬기\" 버튼 감지 후 자동 실행: F 키 누르기 → 상호작용 영역 클릭 → ESC 키 누르기, 100회 반복",
+    "task_touch_option_loop_count": "반복 횟수",
+    "task_touch_option_loop_count_desc": "반복 실행할 횟수",
+    "task_touch_option_delay_after_f": "F 키 후 지연 (ms)",
+    "task_touch_option_delay_after_f_desc": "F 키 누른 후 지연 시간 (밀리초)",
+    "task_touch_option_delay_after_click": "클릭 후 지연 (ms)",
+    "task_touch_option_delay_after_click_desc": "상호작용 영역 클릭 후 지연 시간 (밀리초)"
 }

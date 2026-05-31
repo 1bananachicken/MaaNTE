@@ -122,6 +122,8 @@
         "resource/tasks/WitchDivination.json",
         // group:DatasetCollection
         "resource/tasks/AutonomousDrivingDataset.json",
+        // group:others
+        "resource/tasks/Touch.json",
         // preset
         "resource/tasks/preset/AFK.json",
         // "resource/tasks/preset/FullDaily.json",

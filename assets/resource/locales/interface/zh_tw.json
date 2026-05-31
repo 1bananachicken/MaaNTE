@@ -1,5 +1,6 @@
 {
     "description": "異環小助手，由MaaFramework強力驅動！",
+    "scene_check_osd_failed_focus": "<span style=\"color: red; font-weight: bold;\">螢幕存在遮擋，請嘗試關閉幀率顯示</span>",
     "contact": "QQ群: 1103323319",
     "welcome.file": "resource/locales/interface/WELCOME/WELCOME_zh_tw.md",
     "controller_default_label": "桌面端-默認",
@@ -43,7 +44,7 @@
     "task_fish_option_auto_sell": "自動賣魚",
     "task_fish_option_auto_sell_desc": "是否啟用自動賣魚功能",
     "task_fish_option_auto_buy_bait": "自動買魚餌",
-    "task_fish_option_auto_buy_bait_desc": "每次自動購買99（上限）魚餌",
+    "task_fish_option_auto_buy_bait_desc": "每次自動購買99（上限）魚餌，僅支援前台",
     "task_fish_option_bait_threshold": "魚餌識別閾值",
     "task_fish_option_bait_threshold_desc": "如果無法識別點擊魚餌位置，請調低該數值",
     "task_fish_option_loop_time": "循環次數",
@@ -151,5 +152,13 @@
     "task_auto_drive_dataset_input_output_dir_label": "輸出目錄",
     "task_auto_drive_dataset_input_duration_label": "錄製時長",
     "task_auto_drive_dataset_input_duration_desc": "錄製時長，預設為 60 秒。",
-    "task_auto_drive_dataset_input_start_delay_label": "錄製延遲"
+    "task_auto_drive_dataset_input_start_delay_label": "錄製延遲",
+    "task_touch_label": "撫摸",
+    "task_touch_desc": "檢測「撫摸」按鈕並自動執行：按F → 點擊互動區域 → 按ESC，重複100次",
+    "task_touch_option_loop_count": "循環次數",
+    "task_touch_option_loop_count_desc": "重複執行的次數",
+    "task_touch_option_delay_after_f": "按F後延遲 (ms)",
+    "task_touch_option_delay_after_f_desc": "按下F鍵後的延遲時間（毫秒）",
+    "task_touch_option_delay_after_click": "點擊後延遲 (ms)",
+    "task_touch_option_delay_after_click_desc": "點擊互動區域後的延遲時間（毫秒）"
 }

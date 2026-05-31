@@ -9,8 +9,8 @@
             60
         ],
         "template": [
-            "Common/Button/Bag.png",
-            "Common/Button/BagWithRedDot.png"
+            "Common/Button/InWorld/Bag.png",
+            "Common/Button/InWorld/BagWithRedDot.png"
         ],
         "green_mask": true,
         "pre_delay": 0,

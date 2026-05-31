@@ -9,8 +9,8 @@
             60
         ],
         "template": [
-            "Common/Button/CityTycoon.png",
-            "Common/Button/CityTycoonWithRedDot.png"
+            "Common/Button/InWorld/CityTycoon.png",
+            "Common/Button/InWorld/CityTycoonWithRedDot.png"
         ],
         "green_mask": true,
         "pre_delay": 0,
