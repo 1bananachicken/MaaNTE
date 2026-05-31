@@ -105,6 +105,15 @@
             "entry": "MapLocatorNcc"
         },
         {
+            "name": "MapWebViewLocator",
+            "label": "在线地图实时定位",
+            "description": "打开在线地图，将实时位置和方向指针直接显示在原始网页地图图层中。",
+            "entry": "MapWebViewLocator",
+            "group": [
+                "RealTimeAssist"
+            ]
+        },
+        {
             "name": "AnglePredictor",
             "entry": "AnglePredictor"
         }

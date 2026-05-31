@@ -11,6 +11,7 @@ from .predict_angle import *
 from .predict_depth import *
 from .map_locator import *
 from .map_locator_ncc import *
+from .map_webview_locator import *
 from .combined_auto_navigate import *
 from .pinkpaw.pinkpaw_core1 import *
 from .pinkpaw.pinkpaw_core2 import *
@@ -48,6 +49,8 @@ __all__ = [
     "MapLocatorNcc",
     "MapLocationNccResult",
     "MapLocatorNccTestAction",
+    "MapCoordinateTransform",
+    "MapWebViewLocatorAction",
     "CombinedAutoNavigate",
     "PinkPawHeistScheme1Action",
     "PinkPawHeistScheme2Action",

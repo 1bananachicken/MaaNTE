@@ -12,5 +12,16 @@
         "custom_action_param": {
             "debug": true
         }
+    },
+    "MapWebViewLocator": {
+        "action": "Custom",
+        "custom_action": "map_webview_locator",
+        "custom_action_param": {
+            "map_url": "https://www.ghzs666.com/yh-map#/",
+            "update_interval": 0.1,
+            "angle_backend": "auto",
+            "angle_threshold": 0.0,
+            "crop_size": 1800
+        }
     }
 }
