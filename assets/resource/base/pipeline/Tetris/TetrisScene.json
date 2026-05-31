@@ -206,7 +206,7 @@
         "next": []
     },
     "TetrisSceneStartMatch": {
-        "desc": "泯除方块 - 检测开始匹配按钮",
+        "desc": "泯除方块 - 检测开始游戏按钮",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -217,11 +217,11 @@
                     36
                 ],
                 "expected": [
-                    "开始匹配",
-                    "開始匹配",
-                    "(?i)Start\\s*Matchmaking",
-                    "マッチング開始",
-                    "매칭 시작"
+                    "开始游戏",
+                    "開始遊戲",
+                    "(?i)Start\\s*Game",
+                    "ゲーム開始",
+                    "게임 시작"
                 ]
             }
         },
