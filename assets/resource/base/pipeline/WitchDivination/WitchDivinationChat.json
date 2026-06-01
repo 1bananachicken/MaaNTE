@@ -72,6 +72,7 @@
                 "target": "ShuffleStepTalkToWitch"
             }
         },
+        "post_wait_freezes": 1000, // 等待画面静止
         "next": [
             "WitchDivinationCheckWitchHouseInterface"
         ]

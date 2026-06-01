@@ -15,11 +15,11 @@
             "InWorld"
         ],
         "action": {
-            "type": "ClickKey",
+            "type": "ClickKey", // 'M' 键打开地图
             "param": {
                 "key": [
                     77
-                ] // 'M' 键打开地图
+                ]
             }
         },
         "post_wait_freezes": 500, // 全屏等待地图界面稳定
@@ -44,14 +44,14 @@
         "action": {
             "type": "Click"
         },
-        "post_wait_freezes": {
+        "post_wait_freezes": { // 等待右侧面板稳定
             "time": 500,
             "target": [
                 884,
                 46,
                 390,
                 623
-            ] // 等待右侧面板稳定
+            ]
         },
         "next": [
             "WitchDivinationCheckTodayGuide",
@@ -109,6 +109,7 @@
                 "target": true // 先移动鼠标到匹配位置，避免直接点击触发滑动
             }
         },
+        "post_delay": 500,
         "next": [
             "WitchDivinationClickWitchHouse"
         ],
@@ -141,9 +142,6 @@
         "post_wait_freezes": 500, // 点击后等待全屏稳定 
         "next": [
             "WitchDivinationVerifyWitchHouse",
-            "WitchDivinationPressEscTwice"
-        ],
-        "on_error": [
             "WitchDivinationEntrance"
         ]
     },
@@ -195,7 +193,7 @@
         },
         "timeout": 1000,
         "next": [
-            "[JumpBack]__ScenePrivateLoading",
+            "[JumpBack]SceneLoadingType1",
             "ShuffleStepWalk"
         ],
         "on_error": [
@@ -203,7 +201,7 @@
         ]
     },
     "WitchDivinationPressEscTwice": {
-        "desc": "按两次ESC后结束任务",
+        "desc": "按两次 ESC 后结束任务",
         "action": {
             "type": "ClickKey",
             "param": {
@@ -216,5 +214,17 @@
         "next": [
             "WitchDivinationActionEnd"
         ]
+    },
+    "WitchDivinationActionEnd": {
+        "desc": "占卜流程结束 — 等待画面静止后按ESC退出",
+        "pre_wait_freezes": 2000,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        }
     }
 }

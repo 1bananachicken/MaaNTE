@@ -25,6 +25,7 @@
     },
     "WitchDivinationSelectYiWen": {
         "desc": "选择占卜类型 — 佚闻",
+        "anchor": "WDSelectPoint",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -49,7 +50,7 @@
             "WitchDivinationDivineYiWen"
         ],
         "on_error": [
-            "WitchDivinationSelectCiFu"
+            "WitchDivinationEntrance"
         ]
     },
     "WitchDivinationDivineYiWen": {
@@ -74,15 +75,15 @@
                 "target": true
             }
         },
+        "post_wait_freezes": 1000,
         "post_delay": 1000,
-        "post_wait_freezes": 800,
         "next": [
-            "[JumpBack]WitchDivinationCheckNoChancesYiWen",
-            "[JumpBack]WitchDivinationActionEnd",
+            "WitchDivinationCheckNoChancesYiWen",
+            "[JumpBack]WitchDivinationEscThenBackToAnchor",
             "WitchDivinationSelectYiWen"
         ],
         "on_error": [
-            "WitchDivinationSelectCiFu"
+            "WitchDivinationEntrance"
         ]
     },
     "WitchDivinationCheckNoChancesYiWen": {
@@ -102,6 +103,7 @@
             }
         },
         "action": "DoNothing",
+        "post_wait_freezes": 1000,
         "next": [
             "WitchDivinationSelectCiFu"
         ],
@@ -111,6 +113,7 @@
     },
     "WitchDivinationSelectCiFu": {
         "desc": "选择占卜类型 — 赐福",
+        "anchor": "WDSelectPoint",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -135,7 +138,7 @@
             "WitchDivinationDivineCiFu"
         ],
         "on_error": [
-            "WitchDivinationSelectXunBao"
+            "WitchDivinationEntrance"
         ]
     },
     "WitchDivinationDivineCiFu": {
@@ -161,14 +164,14 @@
             }
         },
         "post_delay": 1000,
-        "post_wait_freezes": 800,
+        "post_wait_freezes": 1000,
         "next": [
-            "[JumpBack]WitchDivinationCheckNoChancesCiFu",
-            "[JumpBack]WitchDivinationActionEnd",
+            "WitchDivinationCheckNoChancesCiFu",
+            "[JumpBack]WitchDivinationEscThenBackToAnchor",
             "WitchDivinationSelectCiFu"
         ],
         "on_error": [
-            "WitchDivinationSelectXunBao"
+            "WitchDivinationEntrance"
         ]
     },
     "WitchDivinationCheckNoChancesCiFu": {
@@ -188,6 +191,7 @@
             }
         },
         "action": "DoNothing",
+        "post_wait_freezes": 1000,
         "next": [
             "WitchDivinationSelectXunBao"
         ],
@@ -197,6 +201,7 @@
     },
     "WitchDivinationSelectXunBao": {
         "desc": "选择占卜类型 — 寻宝",
+        "anchor": "WDSelectPoint",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -221,7 +226,7 @@
             "WitchDivinationDivineXunBao"
         ],
         "on_error": [
-            "WitchDivinationActionEnd"
+            "WitchDivinationEntrance"
         ]
     },
     "WitchDivinationDivineXunBao": {
@@ -249,8 +254,8 @@
         "post_delay": 1000,
         "post_wait_freezes": 800,
         "next": [
-            "[JumpBack]WitchDivinationCheckNoChancesXunBao",
-            "[JumpBack]WitchDivinationActionEnd",
+            "WitchDivinationCheckNoChancesXunBao",
+            "[JumpBack]WitchDivinationEscThenBackToAnchor",
             "WitchDivinationSelectXunBao"
         ]
     },
@@ -271,24 +276,32 @@
             }
         },
         "action": "DoNothing",
+        "post_wait_freezes": 800,
         "next": [
-            "WitchDivinationActionEnd"
+            "WitchDivinationActionEnd1S"
         ],
         "on_error": [
             "WitchDivinationEntrance"
         ]
     },
-    "WitchDivinationActionEnd": {
-        "desc": "占卜流程结束 — 等待画面静止后按ESC退出",
-        "pre_wait_freezes": {
-            "time": 500,
-            "target": [
-                0,
-                0,
-                0,
-                0
-            ]
+    "WitchDivinationEscThenBackToAnchor": {
+        "desc": "等待画面静止后按ESC退出,然后进入锚点",
+        "pre_wait_freezes": 2000,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
         },
+        "next": [
+            "[Anchor]WDSelectPoint"
+        ]
+    },
+    "WitchDivinationActionEnd1S": {
+        "desc": "占卜流程结束 — 等待1秒后按ESC退出",
+        "pre_delay": 1000,
         "action": {
             "type": "ClickKey",
             "param": {

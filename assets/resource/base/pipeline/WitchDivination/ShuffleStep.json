@@ -29,27 +29,27 @@
         ]
     },
     "ShuffleStepWalk": {
-        "desc": "按住W键向前走0.5秒",
+        "desc": "按住W键向前走0.4秒",
         "action": {
             "type": "KeyDown",
             "param": {
                 "key": 87
             }
         },
-        "post_delay": 500,
+        "post_delay": 400,
         "next": [
             "ShuffleStepPause"
         ]
     },
     "ShuffleStepPause": {
-        "desc": "松开W键停顿1.3秒",
+        "desc": "松开W键停顿1.4秒",
         "action": {
             "type": "KeyUp",
             "param": {
                 "key": 87
             }
         },
-        "post_delay": 1300,
+        "post_delay": 1400,
         "next": [
             "ShuffleStepCheck",
             "ShuffleStepWalk"
