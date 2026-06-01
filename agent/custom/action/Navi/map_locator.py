@@ -7,7 +7,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from .Common.logger import get_logger
+from ..Common.logger import get_logger
+from .resources import resource_base_path
 
 from maa.agent.agent_server import AgentServer
 from maa.context import Context
@@ -68,10 +69,7 @@ class MapLocator:
 
     @staticmethod
     def default_big_map_path() -> Path:
-        abs_path = Path(__file__).parents[3]
-        if (abs_path / "assets").exists():
-            return abs_path / "assets/resource/base/image/map/map.jpg"
-        return abs_path / "resource/base/image/map/map.jpg"
+        return resource_base_path() / "image/map/map.jpg"
 
     def locate(self, frame: np.ndarray) -> MapLocationResult:
         if frame.shape[2] == 4:

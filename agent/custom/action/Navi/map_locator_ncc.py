@@ -7,7 +7,8 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from .Common.logger import get_logger
+from ..Common.logger import get_logger
+from .resources import resource_base_path
 
 from maa.agent.agent_server import AgentServer
 from maa.context import Context
@@ -43,10 +44,8 @@ class MapLocatorNcc:
     DEBUG_MAP_WIDTH = 900
 
     def __init__(self, big_map_path: Path | None = None, debug: bool = False):
-        root = Path(__file__).parents[3]
-        resource_root = root / "assets" if (root / "assets").exists() else root
         self.big_map_path = Path(big_map_path) if big_map_path else (
-            resource_root / "resource/base/image/map/map.jpg"
+            resource_base_path() / "image/map/map.jpg"
         )
         self.debug = debug
         self.last_center: tuple[int, int] | None = None

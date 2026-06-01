@@ -114,6 +114,15 @@
             ]
         },
         {
+            "name": "MapWebViewCalibration",
+            "label": "在线地图标定",
+            "description": "打开专用标定地图，按住 Shift 点击游戏位置对应的网页地图地标。",
+            "entry": "MapWebViewCalibration",
+            "group": [
+                "RealTimeAssist"
+            ]
+        },
+        {
             "name": "AnglePredictor",
             "entry": "AnglePredictor"
         }

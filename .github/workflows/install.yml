@@ -7,6 +7,7 @@ on:
     paths:
       - ".github/workflows/install.yml"
       - "assets/**"
+      - "**.js"
       - "**.py"
   pull_request:
     branches:
@@ -14,6 +15,7 @@ on:
     paths:
       - ".github/workflows/install.yml"
       - "assets/**"
+      - "**.js"
       - "**.py"
   workflow_dispatch:
 

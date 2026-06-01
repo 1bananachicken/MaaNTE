@@ -9,7 +9,8 @@ import cv2
 import numpy as np
 import onnxruntime
 
-from .Common.logger import get_logger
+from ..Common.logger import get_logger
+from .resources import resource_base_path
 
 from maa.agent.agent_server import AgentServer
 from maa.context import Context
@@ -39,12 +40,8 @@ class AnglePredictor:
         threshold: float = 0.0,
         debug: bool = False,
     ):
-        abs_path = Path(__file__).parents[3]
         if model_path is None:
-            if (abs_path / "assets").exists():
-                model_path = abs_path / "assets/resource/base/model/navi/pointer_model.onnx"
-            else:
-                model_path = abs_path / "resource/base/model/navi/pointer_model.onnx"
+            model_path = resource_base_path() / "model/navi/pointer_model.onnx"
 
         self.model_path = Path(model_path)
         self.backend = self._resolve_backend(backend)

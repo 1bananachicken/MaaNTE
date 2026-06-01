@@ -7,11 +7,9 @@ from .rhythm.feats.repeat_decision import *
 from .rhythm.feats.select_song import *
 from .Common.click import *
 from .realtime_task import *
-from .predict_angle import *
+from .Navi import *
 from .predict_depth import *
-from .map_locator import *
-from .map_locator_ncc import *
-from .map_webview_locator import *
+from .map_webview import *
 from .combined_auto_navigate import *
 from .pinkpaw.pinkpaw_core1 import *
 from .pinkpaw.pinkpaw_core2 import *
@@ -50,6 +48,7 @@ __all__ = [
     "MapLocationNccResult",
     "MapLocatorNccTestAction",
     "MapCoordinateTransform",
+    "MapWebViewCalibrationAction",
     "MapWebViewLocatorAction",
     "CombinedAutoNavigate",
     "PinkPawHeistScheme1Action",

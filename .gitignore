@@ -464,6 +464,7 @@ assets/resource/base/model/detect/sos_nodes.onnx
 .nicegui/
 assets/resource/base/model/navi/pointer_model.onnx
 assets/resource/base/image/map/*
+!assets/resource/base/image/map/map_webview_pointer.png
 assets/resource/base/model/depth/*
 
 # local gui test

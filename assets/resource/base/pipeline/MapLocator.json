@@ -18,10 +18,17 @@
         "custom_action": "map_webview_locator",
         "custom_action_param": {
             "map_url": "https://www.ghzs666.com/yh-map#/",
+            "viewer_mode": "webview",
             "update_interval": 0.1,
             "angle_backend": "auto",
-            "angle_threshold": 0.0,
-            "crop_size": 1800
+            "angle_threshold": 0.0
+        }
+    },
+    "MapWebViewCalibration": {
+        "action": "Custom",
+        "custom_action": "map_webview_calibration",
+        "custom_action_param": {
+            "calibration_path": "config/map_webview_calibration.json"
         }
     }
 }

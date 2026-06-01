@@ -80,7 +80,37 @@ def download_dependencies(deps_dir, platform_tag):
         print("错误: requirements.txt 文件不存在")
         return False
 
+    # 部分纯Python包在PyPI上只有sdist，需要先用pip wheel本地构建成wheel
+    # 例如: proxy_tools (pywebview的依赖) 只有 .tar.gz
+    # 构建前先确保 setuptools 可用（嵌入式Python默认不含 setuptools）
+    SDIST_ONLY_PACKAGES = ["proxy_tools"]
+    print("预构建纯Python sdist包为wheel...")
+    subprocess.run(
+        [sys.executable, "-m", "pip", "install", "setuptools", "--quiet"],
+        check=False,
+        capture_output=True,
+    )
+    for pkg in SDIST_ONLY_PACKAGES:
+        try:
+            cmd_wheel = [
+                sys.executable,
+                "-m",
+                "pip",
+                "wheel",
+                pkg,
+                "--no-deps",
+                "-w",
+                str(deps_path),
+            ]
+            result = subprocess.run(
+                cmd_wheel, check=True, capture_output=True, text=True
+            )
+            print(result.stdout)
+        except subprocess.CalledProcessError as e:
+            print(f"预构建 {pkg} 失败 (可能不是必需的): {e.stderr}")
+
     # 首先尝试下载平台特定的wheel文件
+    # 使用 --find-links 优先使用本地已构建的wheel（如 proxy_tools），避免与 --only-binary 冲突
     try:
         cmd = [
             sys.executable,
@@ -94,6 +124,8 @@ def download_dependencies(deps_dir, platform_tag):
             "--platform",
             platform_tag,
             "--only-binary=:all:",
+            "--find-links",
+            str(deps_path),
         ]
 
         print(f"执行命令: {' '.join(cmd)}")
@@ -133,6 +165,8 @@ def download_dependencies(deps_dir, platform_tag):
                     "-d",
                     str(deps_path),
                     "--only-binary=:all:",
+                    "--find-links",
+                    str(deps_path),
                 ]
 
                 print(f"执行回退命令: {' '.join(cmd_fallback)}")
