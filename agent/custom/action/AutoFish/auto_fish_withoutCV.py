@@ -71,7 +71,7 @@ class AutoFishWithoutCV(CustomAction):
                 fish_on_gaming = context.run_recognition("FishSceneOnFishGame", image)
                 if fish_on_gaming and fish_on_gaming.hit:
                     Print(
-                        "钓鱼异常结束（可能是鱼溜走），继续钓鱼"
+                        context, "钓鱼异常结束（可能是鱼溜走），继续钓鱼"
                     )  # 通常不会执行这一步
                     return CustomAction.RunResult(success=True)
                 continue
