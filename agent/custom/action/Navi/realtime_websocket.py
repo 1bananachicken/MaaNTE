@@ -29,7 +29,7 @@ class NavigationWebSocketPublisher:
         self._loop: asyncio.AbstractEventLoop | None = None
         self._clients: set[Any] = set()
         self._state = {
-            "type": "maan-nav-state",
+            "type": "navi-state",
             "version": 1,
             "position": None,
             "angle": None,
