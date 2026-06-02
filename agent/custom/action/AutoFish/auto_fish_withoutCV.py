@@ -56,7 +56,9 @@ class AutoFishWithoutCV(CustomAction):
                 and cursor.box
                 is not None  # 这个是为了消除pylance的warning，实际运行时不应该有None的情况
             ):
-                # 绿条/光标未命中时检查是否已弹出结算画面
+                time.sleep(0.5)
+                image = context.tasker.controller.post_screencap().wait().get()
+
                 click_blank = context.run_recognition("SceneClickBlankToExit", image)
                 if click_blank and click_blank.hit:
                     PrintT(context, "autofish.fish_caught")
