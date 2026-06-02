@@ -57,6 +57,14 @@ LangString DESC_SecDesktop ${LANG_SIMPCHINESE} "在桌面上创建 MaaNTE 的快
 Section "核心文件" SecCore
     SectionIn RO
     SetOutPath "$INSTDIR"
+
+    ; 安装/更新前清理旧文件夹，避免残留文件干扰
+    RMDir /r "$INSTDIR\agent"
+    RMDir /r "$INSTDIR\cache"
+    RMDir /r "$INSTDIR\resource"
+    RMDir /r "$INSTDIR\maafw"
+    RMDir /r "$INSTDIR\python"
+
     ; 使用动态源文件目录
     File /r "${SOURCE_DIR}\*.*"
 
