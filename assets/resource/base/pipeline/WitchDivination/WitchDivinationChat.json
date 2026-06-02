@@ -1,4 +1,5 @@
 {
+    // 自动魔女之家占卜 - 魔女对话流程
     "ShuffleStepTalkToWitch": {
         "desc": "等待对话面板静止后检测「卜运」并点击",
         "pre_wait_freezes": {

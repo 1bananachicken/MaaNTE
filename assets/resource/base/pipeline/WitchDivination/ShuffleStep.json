@@ -1,4 +1,6 @@
 {
+    // 自动魔女之家占卜 - 小碎步
+    // 用于从传送点直走到魔女之家
     "ShuffleStepCheck": {
         "desc": "检测「黑羽」文本，存在则结束小碎步",
         "recognition": {
@@ -49,10 +51,35 @@
                 "key": 87
             }
         },
-        "post_delay": 1400,
+        "post_delay": 1500,
         "next": [
             "ShuffleStepCheck",
+            "ShuffleStepCheck2",
             "ShuffleStepWalk"
         ]
+    },
+    "ShuffleStepCheck2": {
+        "desc": "检测「轻叩」文本，存在则结束任务",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    672,
+                    235,
+                    410,
+                    259
+                ],
+                "expected": [
+                    "轻叩"
+                ]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70 // 'F' 键与门交互
+            }
+        },
+        "next": []
     }
 }

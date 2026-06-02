@@ -1,4 +1,4 @@
-{
+{ // 自动魔女之家占卜 - 占卜页面流程
     "WitchDivinationCheckWitchHouseInterface": {
         "desc": "检测是否在魔女之家界面，进入占卜流程",
         "recognition": {
@@ -276,7 +276,7 @@
             }
         },
         "action": "DoNothing",
-        "post_wait_freezes": 800,
+        "post_wait_freezes": 1000,
         "next": [
             "WitchDivinationActionEnd1S"
         ],
@@ -309,6 +309,7 @@
                     27
                 ]
             }
-        }
+        },
+        "next": []
     }
 }
