@@ -114,7 +114,8 @@
                             "recognition": {
                                 "param": {
                                     "expected": [
-                                        "迷星叫"
+                                        "迷星叫",
+                                        "(?i)Mayoiuta"
                                     ]
                                 }
                             }

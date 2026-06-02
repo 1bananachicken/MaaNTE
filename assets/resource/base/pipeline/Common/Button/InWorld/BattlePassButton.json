@@ -9,8 +9,8 @@
             60
         ],
         "template": [
-            "Common/Button/BattlePass.png",
-            "Common/Button/BattlePassWithRedDot.png"
+            "Common/Button/InWorld/BattlePass.png",
+            "Common/Button/InWorld/BattlePassWithRedDot.png"
         ],
         "green_mask": true,
         "pre_delay": 0,

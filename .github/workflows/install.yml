@@ -168,6 +168,15 @@ jobs:
             cp -rpvn install/deps/. install-mxu/deps/
           fi
       
+      - name: Pre-install all dependencies
+        shell: bash
+        run: |
+          echo "Pre-installing all dependencies into embedded Python..."
+          ./install-mxu/python/python.exe -m pip install \
+            --no-index \
+            --find-links install-mxu/deps \
+            -r requirements.txt
+
       - name: Install and patch soundcard
         shell: bash
         run: |
@@ -216,6 +225,13 @@ jobs:
           if [ -f "maante.ico" ]; then
             cp maante.ico install-mxu/logo.ico
           fi
+
+      - name: Remove deps directory to reduce package size
+        shell: bash
+        run: |
+          echo "Removing deps directory to reduce package size..."
+          rm -rf install-mxu/deps
+          echo "Deps directory removed. Package size reduced by ~171MB."
 
       - uses: actions/upload-artifact@v4
         with:

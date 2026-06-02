@@ -21,6 +21,7 @@ from .Movement.character_move import *
 from .Common.alt_click import *
 from .furniture_claim import *
 from .auto_piano.action import *
+from .withdraw_money_choose_item import *
 from .DatasetCollection.autonomous_driving_dataset_recorder import *
 
 __all__ = [
@@ -51,5 +52,6 @@ __all__ = [
     "AltClick",
     "FurnitureClaim",
     "AutoPlayPiano",
+    "WithdrawMoneyChooseItem",
     "AutonomousDrivingDatasetRecorder",
 ]

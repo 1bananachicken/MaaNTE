@@ -13,15 +13,15 @@
             "[JumpBack]TetrisHandleLoading",
             "[JumpBack]TetrisDismissResult",
             "[JumpBack]TetrisCheckVitality",
-            "[JumpBack]TetrisHandleGameActive",
-            "[JumpBack]TetrisHandleGameIdle",
-            "[JumpBack]TetrisHandleMatching",
-            "[JumpBack]TetrisHandlePrepareTwo",
-            "[JumpBack]TetrisHandlePrepareTwoReturn",
-            "[JumpBack]TetrisHandlePrepareOne",
             "[JumpBack]TetrisHandleWorldWithPrompt",
             "[JumpBack]TetrisHandleExit",
             "[JumpBack]TetrisHandleWorldNoPrompt",
+            "[JumpBack]TetrisHandlePrepareOne",
+            "[JumpBack]TetrisHandlePrepareTwo",
+            "[JumpBack]TetrisHandlePrepareTwoReturn",
+            "[JumpBack]TetrisHandleMatching",
+            "[JumpBack]TetrisHandleGameActive",
+            "[JumpBack]TetrisHandleGameIdle",
             "TetrisExitWithError"
         ]
     },
@@ -64,7 +64,7 @@
         "desc": "泯除方块 - 检测到游戏空闲（等待方块出现）",
         "recognition": "And",
         "all_of": [
-            "TetrisSceneGameIdle"
+            "TetrisGamingNext"
         ],
         "pre_delay": 500,
         "next": [

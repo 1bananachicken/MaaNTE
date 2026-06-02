@@ -13,7 +13,7 @@
   - `Furniture.json:9` → `Win32-Front`
   - `FountainCheckin.json:9` → `Win32-Front`
   - `ClaimRewards.json:9-10` → `Win32` 或 `Win32-Front`
-  - `WithdrawMoney.json:12-13` → `Win32` 或 `Win32-Front`
+  - `WithdrawMoney.json:13-14` → `Win32` 或 `Win32-Front`
 - 用户报告"功能比别人少"或"找不到某个任务"时，先检查控制器是否匹配。
 - 主页控制器切换按钮已知有 bug，用户必须在"设置 > 连接设置"中更改。
 - 前台控制器（`Seize`）抢占鼠标是 by design，不是 bug。

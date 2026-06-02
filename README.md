@@ -7,6 +7,8 @@
   <p align="center">
     MAA异环小助手
     <br/>
+    <a href="https://docs.maante.org/"><strong>官方网站</strong></a>
+    ·
     <a href="./docs/eng/README_en.md">English</a> | <a href="./docs/README_zh-tw.md">繁體中文</a> | <a href="./docs/jp/README_jp.md">日本語</a> | <a href="https://github.com/1bananachicken/MaaNTE/issues">报告 Bug</a>
   </p>
   <p align="center">
@@ -14,12 +16,13 @@
     <img src="https://img.shields.io/badge/Language-Python%20%2F%20PipeLine-blue?style=flat-square&logo=Python" alt="Language" />
     <img alt="license" src="https://img.shields.io/github/license/1bananachicken/MaaNTE?style=flat-square">
     <br>
+    <a href="https://docs.maante.org/" target="_blank"><img alt="website" src="https://img.shields.io/badge/Website-docs.maante.org-00A98F?style=flat-square"></a>
     <a href="https://maafw.com/" target="_blank"><img alt="website" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/maafw.svg"></a>
     <a href="https://mirrorchyan.com/zh/projects?rid=MaaNTE" target="_blank"><img alt="mirrorc" src="https://raw.githubusercontent.com/MaaXYZ/MaaFramework/refs/heads/main/docs/static/mirrorc-zh.svg"></a>
     <a href="https://space.bilibili.com/3546893080594665" target="_blank"><img alt="Bilibili" src="https://img.shields.io/badge/Bilibili-MaaNTE--Official-00A1D6?logo=bilibili"></a>
     <a href="https://discord.gg/e6mPMRYQpR" target="_blank"><img alt="Discord" src="https://img.shields.io/badge/Discord-MaaNTE--Official-5865F2?logo=discord"></a>
     <br/>
-    <img alt="commit" src="https://img.shields.io/github/commit-activity/m/1bananachicken/MaaNTE?&style=flat-square&logo=github&color=darkgreen">
+    <img alt="commit" src="https://img.shields.io/github/commit-activity/m/1bananachicken/MaaNTE?&color=darkgreen">
     <img src="https://img.shields.io/github/stars/1bananachicken/MaaNTE?style=flat-square&logo=github&color=darkgreen" alt="Stars" />
   </p>
 
@@ -29,29 +32,21 @@
 
 > [!Caution]
 >
-> 近期出现大量账号二次分发本软件，甚至冒充官方账号。通过非官方途径获取的软件可能**含有病毒**，并且一般不是最新的版本，请注意甄别。
->
->近日，我们发现存在借本项目之名传播病毒的行为，请在下载时认准官方渠道。
+> 近期出现大量账号二次分发本软件，甚至冒充官方账号。通过非官方途径获取的软件可能**含有病毒**，并且一般不是最新版本。请务必从 [GitHub Releases](https://github.com/1bananachicken/MaaNTE/releases) 等官方渠道下载。
 
 > [!Tip]
 >
-> 本项目还处于早期开发阶段，欢迎提交PR和Issue
-
-> [!Tip]
+> 本项目还处于早期开发阶段，欢迎提交 PR 和 Issue。
+>
+> 下载、文档与问题排查请访问 [官方网站](https://docs.maante.org/)
+>
+> 加入 QQ 交流群请前往 [官网 QQ 群页面](https://docs.maante.org/zh_cn/qq-group/)，会自动分配当前未满的群号
 >
 > 官方 B 站账号: [MaaNTE-Official](https://space.bilibili.com/3546893080594665)
 >
-> QQ交流1群: 1103323319 (已满)
->
-> QQ交流2群: 1101147419 (已满)
->
-> QQ交流3群: 1075143235 (已满)
->
-> QQ交流4群: 713114598 (已满)
->
-> QQ交流5群: 1106448578
+> 官方Discord: [Discord](https://discord.gg/e6mPMRYQpR)
 
-# ⚠️免责声明与风险提示
+## ⚠️免责声明与风险提示
 
 > [!Note]
 >
@@ -78,20 +73,32 @@
   - 🪝 自动买鱼饵
 - 🥤 自动做咖啡
   - 🔨 驱赶所有顾客
-- 💰 自动提取一咖舍收益
+- 💰 自动领取一咖舍收益
   - 📦 自动补货
+  - 🏷️ 根据风向标自动替换商品
+- 🪑 自动收家具
+  - 🏠 支持维纳/伊登/天景/金都/峰林五处公寓
 - 💎 自动领取奖励
   - 🎁 活跃度
   - 📅 环期赏令
+- 🐾 粉爪大劫案
+  - 🔄 支持无限循环挂机
+  - 📊 收益统计与日志记录
+- 🧩 自动俄罗斯方块
+  - 🤖 内置 AI 自动决策
+  - 🔁 自动连打直到活力耗尽
 - 🕛 实时辅助
   - 🗼 自动传送
   - ⏩ 自动跳剧情
+  - 🎁 自动拾取
 - ⚔️ 自动闪避
   - 🛡️ 基于音频识别的自动闪避/反击
 - 🎵 自动超强音
   - 🥁 循环演奏迷星叫
 - 🎹 自动弹钢琴
-  - 📂 支持任意midi导入
+  - 📂 支持任意 MIDI 导入
+- 📋 预设任务组
+  - 💤 挂机任务 / 🗺️ 实时辅助
 
 ## ❓常见问题
 
@@ -101,44 +108,17 @@
 
 ### 🤔找不到怎么启动？
 
-- 普通用户请下载release版本，有开发需求再clone仓库
+- 普通用户请下载 [Release 版本](https://github.com/1bananachicken/MaaNTE/releases)，有开发需求再 clone 仓库
 
 ## 💡注意事项
 
-游戏需要运行在1280x720分辨率，窗口化，钓鱼新算法支持120帧运行
+游戏需要运行在 1280×720 分辨率、窗口化模式下；钓鱼新算法支持 120 帧运行。
 
 ## 💻开发指南
 
-<details><summary>点击展开</summary>
+想参与开发或深入了解项目？来这里吧 👉 [开发者文档索引](docs/zh_cn/develop/README.md)
 
-MaaNTE开发者群: 1092630280
-
-### 快速开始
-
-0. 配置环境
-
-- 安装 python>=3.11
-- 建议使用vscode作为IDE进行开发，并安装 [vscode插件“maa-support”](https://marketplace.visualstudio.com/items?itemName=nekosu.maa-support) 进行调试
-
-1. Fork项目
-
-- 点击 `Fork`，继续点击 `Create Fork`
-
-2. 克隆自己 fork 的项目到本地，并拉取子模块
-
-```bash
-git clone --recursive https://github.com/<你的用户名>/MaaNTE.git
-```
-
-3. 下载MaaFramework的 [release包](https://github.com/MaaXYZ/MaaFramework/releases)，解压到 `deps` 文件夹中
-
-4. 提交PR
-
-- 新功能开发请提交到dev分支
-
-更多开发文档可以参考 [M9A文档站](https://1999.fan/zh_cn/develop/development.html)
-
-</details>
+欢迎各路大佬贡献代码，一起让 MaaNTE 变得更强！💪
 
 ## ❤️鸣谢
 
