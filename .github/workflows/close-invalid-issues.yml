@@ -1,0 +1,72 @@
+name: Close Invalid Issues
+
+on:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  close-invalid-issue:
+    if: ${{ !github.event.issue.pull_request }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close issues with invalid confirmation checked
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- maa-auto-close-invalid-checkbox -->';
+            const invalidPatterns = [
+              /(?:^|\n)\s*-\s*\[[xX]\]\s*我未确认下列内容，仅仅是点了确认\s*(?:\n|$)/,
+              /(?:^|\n)\s*-\s*\[[xX]\]\s*I did not confirm the following content;\s*I simply clicked ["“]confirm\.[”"]\s*(?:\n|$)/i,
+            ];
+
+            const issue = context.payload.issue;
+            if (issue.state === 'closed') {
+              core.info('Issue is already closed; skipping.');
+              return;
+            }
+
+            const body = issue.body || '';
+            const shouldClose = invalidPatterns.some((pattern) => pattern.test(body));
+
+            if (!shouldClose) {
+              core.info('No invalid confirmation checkbox was checked.');
+              return;
+            }
+
+            const { owner, repo } = context.repo;
+            const issue_number = issue.number;
+            const commentBody = [
+              marker,
+              '该 Issue 勾选了“未确认下列内容，仅仅是点了确认”确认项，按模板规则自动关闭。',
+              '',
+              'This issue checked the invalid confirmation option ("I did not confirm the following content; I simply clicked confirm.") and has been closed automatically.',
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner,
+              repo,
+              issue_number,
+              per_page: 100,
+            });
+
+            const alreadyCommented = comments.some((comment) => comment.body?.includes(marker));
+            if (!alreadyCommented) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number,
+                body: commentBody,
+              });
+            }
+
+            await github.rest.issues.update({
+              owner,
+              repo,
+              issue_number,
+              state: 'closed',
+              state_reason: 'not_planned',
+            });

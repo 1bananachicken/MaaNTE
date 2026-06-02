@@ -1,6 +1,6 @@
 {
-    "__ScenePrivateWorldEnterCityTycoon":{
-        "desc":"从大世界界面进入都市大亨",
+    "__ScenePrivateWorldEnterCityTycoon": {
+        "desc": "从大世界界面进入都市大亨",
         "pre_delay": 0,
         "recognition": "And",
         "all_of": [
@@ -45,5 +45,61 @@
         },
         "pre_delay": 0,
         "post_delay": 0
-    }
+    },
+    "__ScenePrivateCityTycoonEnterHethereauHobbies": {
+        "desc": "从都市大亨界面进入都市闲趣",
+        "pre_delay": 0,
+        "recognition": "And",
+        "all_of": [
+            {
+                "recognition": "OCR",
+                "roi": [
+                    567,
+                    251,
+                    196,
+                    113
+                ],
+                "expected": [
+                    "都市闲趣"
+                ]
+            },
+            "InCityTycoonMenu"
+        ],
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": {
+            "target": [
+                0,
+                0,
+                100,
+                100
+            ],
+            "time": 600
+        },
+        "post_delay": 0
+    },
+    "__ScenePrivateAnyEnterHethereauHobbiesSuccess": {
+        "desc": "从任意界面进入都市闲趣成功",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InHethereauHobbiesMenu"
+                ]
+            }
+        },
+        "pre_wait_freezes": {
+            "target": [
+                20,
+                20,
+                40,
+                40
+            ],
+            "time": 800,
+            "timeout": 2000
+        },
+        "pre_delay": 0,
+        "post_delay": 0
+    },
 }

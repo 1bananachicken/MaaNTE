@@ -59,7 +59,7 @@
         "next": [
             "__ScenePrivateAnyEnterWorldSuccess",
             "[JumpBack]__ScenePrivateLoginMonthlyPassConfirm",
-            "[JumpBack]__ScenePrivateLoginLoading",
+            "[JumpBack]SceneLoadingType2",
             "[JumpBack]__ScenePrivateAnyExit"
         ]
     },
@@ -149,26 +149,6 @@
         "pre_delay": 1000,
         "key": [
             27
-        ]
-    },
-    "__ScenePrivateLoginLoading": {
-        "desc": "判断正在登录加载界面",
-        "recognition": "OCR",
-        "roi": [
-            1158,
-            644,
-            101,
-            49
-        ],
-        "expected": [
-            // @i18n-skip 
-            "%"
-        ],
-        "pre_delay": 0,
-        "post_delay": 0,
-        "next": [
-            "__ScenePrivateLoginLoading",
-            "__ScenePrivateNextTrue"
         ]
     }
 }
