@@ -16,7 +16,6 @@ from maa.agent.agent_server import AgentServer
 from maa.context import Context
 from maa.custom_action import CustomAction
 
-
 logger = get_logger(__name__)
 
 
@@ -166,7 +165,9 @@ class AnglePredictor:
         return provider_name
 
     def _resolve_backend(self, backend: str | None) -> str:
-        backend = str(backend or os.environ.get("MAA_ONNX_BACKEND", "cpu")).strip().lower()
+        backend = (
+            str(backend or os.environ.get("MAA_ONNX_BACKEND", "cpu")).strip().lower()
+        )
         if backend == "auto":
             available = onnxruntime.get_available_providers()
             if "DmlExecutionProvider" in available:
@@ -201,7 +202,9 @@ class AnglePredictor:
             self.backend = backend
             provider_name = self._provider_name_map[backend]
 
-        provider_options = [{"device_id": 0}] if provider_name == "DmlExecutionProvider" else None
+        provider_options = (
+            [{"device_id": 0}] if provider_name == "DmlExecutionProvider" else None
+        )
         session = onnxruntime.InferenceSession(
             str(self.model_path),
             sess_options=onnxruntime.SessionOptions(),
@@ -213,8 +216,10 @@ class AnglePredictor:
 
 
 @AgentServer.custom_action("predict_angle")
-class PredictAngleTestAction(CustomAction):
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+class AnglePredictorTestAction(CustomAction):
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
         params = _load_params(argv.custom_action_param)
         debug = bool(params.get("debug", False))
         frame_interval = float(params.get("frame_interval", 0.016))
@@ -234,7 +239,9 @@ class PredictAngleTestAction(CustomAction):
             logger.error(f"Angle predictor init failed: {exc}")
             return CustomAction.RunResult(success=False)
 
-        logger.info(f"Angle predictor started: backend={predictor.backend}, provider={provider_name}, debug={debug}")
+        logger.info(
+            f"Angle predictor started: backend={predictor.backend}, provider={provider_name}, debug={debug}"
+        )
         controller = context.tasker.controller
         last_result = AnglePredictionResult(found=False, angle=None, confidence=0.0)
 
@@ -246,12 +253,6 @@ class PredictAngleTestAction(CustomAction):
                     continue
 
                 last_result = predictor.predict(frame)
-                if last_result.found:
-                    logger.info(
-                        f"Angle result: angle={last_result.angle:.1f}, confidence={last_result.confidence:.3f}"
-                    )
-                else:
-                    logger.info(f"Angle result: not found, confidence={last_result.confidence:.3f}")
 
                 if debug and (cv2.waitKey(1) & 0xFF == ord("q")):
                     break
@@ -280,6 +281,3 @@ def _load_params(custom_action_param) -> dict:
     except Exception as exc:
         logger.warning(f"Parse custom_action_param failed, use defaults: {exc}")
         return {}
-
-
-PredictAngle = PredictAngleTestAction

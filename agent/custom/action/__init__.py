@@ -8,8 +8,6 @@ from .rhythm.feats.select_song import *
 from .Common.click import *
 from .realtime_task import *
 from .Navi import *
-from .predict_depth import *
-from .map_webview import *
 from .combined_auto_navigate import *
 from .pinkpaw.pinkpaw_core1 import *
 from .pinkpaw.pinkpaw_core2 import *
@@ -38,18 +36,11 @@ __all__ = [
     "RealTimeTaskAction",
     "AnglePredictor",
     "AnglePredictionResult",
-    "PredictAngle",
-    "PredictAngleTestAction",
-    "PredictDepth",
+    "AnglePredictorTestAction",
     "MapLocator",
     "MapLocationResult",
     "MapLocatorTestAction",
-    "MapLocatorNcc",
-    "MapLocationNccResult",
-    "MapLocatorNccTestAction",
-    "MapCoordinateTransform",
-    "MapWebViewCalibrationAction",
-    "MapWebViewLocatorAction",
+    "NaviWebSocketAction",
     "CombinedAutoNavigate",
     "PinkPawHeistScheme1Action",
     "PinkPawHeistScheme2Action",

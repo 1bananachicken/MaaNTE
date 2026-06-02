@@ -90,27 +90,8 @@ def download_dependencies(deps_dir, platform_tag):
         check=False,
         capture_output=True,
     )
-    for pkg in SDIST_ONLY_PACKAGES:
-        try:
-            cmd_wheel = [
-                sys.executable,
-                "-m",
-                "pip",
-                "wheel",
-                pkg,
-                "--no-deps",
-                "-w",
-                str(deps_path),
-            ]
-            result = subprocess.run(
-                cmd_wheel, check=True, capture_output=True, text=True
-            )
-            print(result.stdout)
-        except subprocess.CalledProcessError as e:
-            print(f"预构建 {pkg} 失败 (可能不是必需的): {e.stderr}")
 
     # 首先尝试下载平台特定的wheel文件
-    # 使用 --find-links 优先使用本地已构建的wheel（如 proxy_tools），避免与 --only-binary 冲突
     try:
         cmd = [
             sys.executable,
@@ -124,8 +105,6 @@ def download_dependencies(deps_dir, platform_tag):
             "--platform",
             platform_tag,
             "--only-binary=:all:",
-            "--find-links",
-            str(deps_path),
         ]
 
         print(f"执行命令: {' '.join(cmd)}")

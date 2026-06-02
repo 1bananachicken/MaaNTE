@@ -11,4 +11,4 @@ scipy
 scikit-learn
 soundcard
 mido
-pywebview>=5.0,<7.0
+websockets>=14.0,<17.0
