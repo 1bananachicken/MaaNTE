@@ -24,7 +24,7 @@ OutFile "${OUTFILE}"
 InstallDir "D:\MaaNTE"
 InstallDirRegKey HKLM "Software\MaaNTE" "InstallDir"
 RequestExecutionLevel admin
-SetCompressor /SOLID zstd
+SetCompressor /SOLID zlib
 
 ; ---------- 图标（使用动态变量） ----------
 !define MUI_ICON "${ICON_FILE}"

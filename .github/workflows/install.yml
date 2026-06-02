@@ -235,8 +235,7 @@ jobs:
         if: matrix.arch == 'x86_64'
         shell: pwsh
         run: |
-          winget install NSIS.NSIS --version 3.12 --silent --accept-package-agreements --accept-source-agreements
-          echo "NSIS_DIR=C:\Program Files (x86)\NSIS" >> $env:GITHUB_ENV
+          choco install nsis --version=3.12.0 -y
 
       - name: Build NSIS installer
         if: matrix.arch == 'x86_64'
@@ -244,7 +243,7 @@ jobs:
         run: |
           $tag = "${{ needs.meta.outputs.tag }}"
           $arch = "${{ steps.platform.outputs.tag }}"
-          $env:Path = "$env:NSIS_DIR;$env:Path"
+          $env:Path = "C:\Program Files (x86)\NSIS;$env:Path"
           makensis `
             -DVERSION="$tag" `
             -DARCH="$arch" `
