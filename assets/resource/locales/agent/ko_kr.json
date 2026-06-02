@@ -1,5 +1,6 @@
 {
     "autofish.fish_caught": "물고기가 걸렸습니다!",
+    "autofish.fish_escape": "물고기가 도망갔습니다!",
     "autofish.task_end": "낚시 작업 종료",
     "autofish.started": "=== 자동 낚시 시작 ===",
     "autofish.progress": "=== 낚시 %d/%d ===",

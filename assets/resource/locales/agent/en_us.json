@@ -1,5 +1,6 @@
 {
     "autofish.fish_caught": "Fish hooked!",
+    "autofish.fish_escape": "Fish escaped!",
     "autofish.task_end": "Fishing task ended",
     "autofish.started": "=== Auto Fishing Started ===",
     "autofish.progress": "=== Fishing %d/%d ===",

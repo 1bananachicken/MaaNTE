@@ -76,10 +76,6 @@
             "factor": 1.4
         },
         "pre_delay": 0,
-        "post_wait_freezes": {
-            "time": 1000,
-            "timeout": 6000
-        },
         "next": [
             "[Anchor]FishNewRestart",
             "[JumpBack]SceneClickBlankToExit"
