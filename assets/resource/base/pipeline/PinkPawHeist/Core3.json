@@ -6,8 +6,86 @@
         "action": "Custom",
         "custom_action": "PinkPawHeistScheme3Action",
         "custom_action_param": {
-            "avoid_method": "dash"
+            "avoid_method": "dash",
+            "timing_scale": 1.0
         }
+    },
+    "PinkPawHeist_Core3_CheckInteractPinkOnce": {
+        "desc": "Core3 single pink interaction prompt color check",
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    650,
+                    240,
+                    520,
+                    460
+                ],
+                "method": 4,
+                "lower": [
+                    197,
+                    71,
+                    119
+                ],
+                "upper": [
+                    221,
+                    78,
+                    133
+                ],
+                "connected": true,
+                "count": 80
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 80,
+        "next": []
+    },
+    "PinkPawHeist_Core3_CheckInteractTemplateOnce": {
+        "desc": "Core3 single interaction icon template check",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    680,
+                    250,
+                    430,
+                    430
+                ],
+                "template": [
+                    "PinkPawHeist/interactable.png",
+                    "PinkPawHeist/heist_interac_lock_pick.png"
+                ],
+                "threshold": 0.68
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 100,
+        "next": []
+    },
+    "PinkPawHeist_Core3_CheckLockPickActiveOnce": {
+        "desc": "Core3 single lock-pick UI template check",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    680,
+                    300,
+                    260,
+                    180
+                ],
+                "template": "PinkPawHeist/heist_lock_pick.png",
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 100,
+        "next": []
     },
     "PinkPawHeist_Core3_CheckInteractOnce": {
         "desc": "Core3 single interaction prompt check",

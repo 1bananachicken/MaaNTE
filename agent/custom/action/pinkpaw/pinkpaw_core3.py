@@ -41,6 +41,12 @@ REWARD_OCR_DELAY_MS = 3000
 POST_REWARD_DELAY_MS = 7000
 DEFAULT_WIDTH = 1280
 DEFAULT_HEIGHT = 720
+DEFAULT_ROUTE_TIMING_SCALE = 1.0
+MIN_ROUTE_TIMING_SCALE = 0.25
+MAX_ROUTE_TIMING_SCALE = 1.2
+MAX_ROUTE_SLEEP_ADJUST = 0.25
+ROUTE_SLEEP_ADJUST_RATIO_CAP = 0.08
+TIMING_SENSITIVE_KEYS = {"w", "a", "s", "d", "lshift", "space", "e"}
 
 
 class AbortException(Exception):
@@ -97,6 +103,14 @@ def _parse_custom_action_param(argv: CustomAction.RunArg) -> dict:
     return parsed if isinstance(parsed, dict) else {}
 
 
+def _parse_timing_scale(value) -> float:
+    try:
+        scale = float(value)
+    except (TypeError, ValueError):
+        scale = DEFAULT_ROUTE_TIMING_SCALE
+    return max(MIN_ROUTE_TIMING_SCALE, min(MAX_ROUTE_TIMING_SCALE, scale))
+
+
 class Core3ActionHelper:
     def __init__(self, ctx: Context):
         self.ctx = ctx
@@ -134,6 +148,22 @@ class Core3ActionHelper:
         vk = VK.get(_norm_key(key_str))
         if vk is None:
             return False
+        controller = self.controller
+        if controller is not None:
+            if node_type == "KeyDown":
+                controller.post_key_down(vk)
+            elif node_type == "KeyUp":
+                controller.post_key_up(vk)
+            elif node_type == "ClickKey":
+                if hasattr(controller, "post_click_key"):
+                    controller.post_click_key(vk)
+                else:
+                    controller.post_key_down(vk)
+                    time.sleep(0.02)
+                    controller.post_key_up(vk)
+            if node_type != "KeyUp":
+                self.raise_if_stopped()
+            return True
         param = {"key": vk}
         if extra:
             param.update(extra)
@@ -183,6 +213,12 @@ class Core3ActionHelper:
 
     def click(self, x, y):
         self.raise_if_stopped()
+        controller = self.controller
+        if controller is not None and hasattr(controller, "post_click"):
+            controller.post_click(int(x), int(y))
+            self.raise_if_stopped()
+            self.mx, self.my = int(x), int(y)
+            return True
         self.move_to(x, y)
         override = {
             "PinkPawHeist_Click": {
@@ -197,13 +233,13 @@ class Core3ActionHelper:
         vk = MOUSE_VK.get(key, MOUSE_VK["left"])
         controller = self.controller
         if controller is not None:
-            controller.post_key_down(vk).wait()
+            controller.post_key_down(vk)
 
     def mouse_up(self, key="left"):
         vk = MOUSE_VK.get(key, MOUSE_VK["left"])
         controller = self.controller
         if controller is not None:
-            controller.post_key_up(vk).wait()
+            controller.post_key_up(vk)
 
     def release_controls(self):
         for key in ("w", "a", "s", "d", "e", "f", "space", "lshift"):
@@ -244,6 +280,9 @@ class PinkPawHeistCore3Path:
         if avoid_method not in self.avoid_methods:
             self.log_warning(f"unknown avoid_method {avoid_method!r}, fallback to dash")
             avoid_method = self.AVOID_METHOD_DASH
+        self.route_timing_scale = _parse_timing_scale(
+            (params or {}).get("timing_scale", DEFAULT_ROUTE_TIMING_SCALE)
+        )
         self.config = {
             self.CONF_FIGHTER: ["4", "1"],
             self.CONF_RUNNER: ["3"],
@@ -261,7 +300,7 @@ class PinkPawHeistCore3Path:
         self._interaction_watch_active = False
         self._interaction_watch_found = False
         self._checking_interaction = False
-        self.last_check_reward_time = 0.0
+        self.last_check_reward_time = time.monotonic()
         self.check_reward_fail_count = 0
         self._round_label = "Core3"
 
@@ -315,6 +354,9 @@ class PinkPawHeistCore3Path:
         self.ah.click_key("f")
         self._next_quick_pick_at = now + self.QUICK_PICK_INTERVAL
 
+    def _has_timing_sensitive_key_held(self) -> bool:
+        return bool(self._held_keys & TIMING_SENSITIVE_KEYS)
+
     def _check_still_in_heist(self):
         now = time.monotonic()
         if now - self.last_check_reward_time <= 2.0:
@@ -335,17 +377,36 @@ class PinkPawHeistCore3Path:
         else:
             self.check_reward_fail_count = 0
 
-    def sleep(self, timeout, check_reward=True):
-        target = time.monotonic() + max(float(timeout), 0.0)
+    def _scale_route_duration(self, duration: float) -> float:
+        if duration <= 0 or self.route_timing_scale == 1.0:
+            return max(duration, 0.0)
+
+        wanted_adjust = duration * abs(1.0 - self.route_timing_scale)
+        adaptive_cap = min(
+            MAX_ROUTE_SLEEP_ADJUST,
+            max(0.02, duration * ROUTE_SLEEP_ADJUST_RATIO_CAP),
+        )
+        adjust = min(wanted_adjust, adaptive_cap)
+        if self.route_timing_scale < 1.0:
+            return max(0.0, duration - adjust)
+        return duration + adjust
+
+    def sleep(self, timeout, check_reward=True, scaled=True):
+        duration = max(float(timeout), 0.0)
+        if scaled:
+            duration = self._scale_route_duration(duration)
+        target = time.monotonic() + duration
         while time.monotonic() < target:
             self.ah.raise_if_stopped()
             self._poll_quick_pick()
-            if check_reward:
+            timing_sensitive = self._has_timing_sensitive_key_held()
+            if check_reward and not timing_sensitive:
                 self._check_still_in_heist()
             if (
                 self._interaction_watch_active
                 and not self._interaction_watch_found
                 and not self._checking_interaction
+                and not timing_sensitive
             ):
                 self._interaction_watch_found = self.find_interac()
             remaining = target - time.monotonic()
@@ -491,9 +552,10 @@ class PinkPawHeistCore3Path:
 
     def _run_check_node(self, node_name, timeout=1.5):
         deadline = time.monotonic() + timeout
+        override = {node_name: {"timeout": max(20, int(timeout * 1000))}}
         while time.monotonic() < deadline:
             self.ah.raise_if_stopped()
-            if _is_hit(self.ah.run_task(node_name)):
+            if _is_hit(self.ah.run_task(node_name, pipeline_override=override)):
                 return True
             time.sleep(0.05)
         return False
@@ -501,10 +563,15 @@ class PinkPawHeistCore3Path:
     def find_interac(self):
         self._checking_interaction = True
         try:
+            if self._run_check_node("PinkPawHeist_Core3_CheckInteractPinkOnce", timeout=0.08):
+                return True
+            if self._run_check_node("PinkPawHeist_Core3_CheckInteractTemplateOnce", timeout=0.08):
+                return True
+            if self._run_check_node("PinkPawHeist_Core3_CheckInteractOnce", timeout=0.08):
+                return True
             return any(
-                self._run_check_node(node, timeout=0.15)
+                self._run_check_node(node, timeout=0.04)
                 for node in (
-                    "PinkPawHeist_Core3_CheckInteractOnce",
                     "PinkPawHeist_CheckDoorOnce",
                     "PinkPawHeist_CheckGateOnce",
                     "PinkPawHeist_CheckGate2Once",
@@ -539,6 +606,10 @@ class PinkPawHeistCore3Path:
         timeout = 1.5 if not time_out or time_out <= 0 else float(time_out)
         matched = self._run_check_node("PinkPawHeist_CheckDoorOnce", timeout=timeout)
         if not matched:
+            matched = self._run_check_node("PinkPawHeist_Core3_CheckInteractPinkOnce", timeout=0.2)
+        if not matched:
+            matched = self._run_check_node("PinkPawHeist_Core3_CheckInteractTemplateOnce", timeout=0.2)
+        if not matched:
             matched = self._run_check_node("PinkPawHeist_Core3_CheckInteractOnce", timeout=0.2)
         if matched:
             if post_action:
@@ -559,7 +630,7 @@ class PinkPawHeistCore3Path:
         return True
 
     def is_lock_pick_active(self):
-        return self._quick_pick_active
+        return self._run_check_node("PinkPawHeist_Core3_CheckLockPickActiveOnce", timeout=0.08) or self._quick_pick_active
 
     def wait_and_interact(
         self, direction=None, interact=True, key_up_sleep=0.7, is_lock=False, time_out=10
@@ -572,9 +643,21 @@ class PinkPawHeistCore3Path:
             raise AbortException("timeout for wait_and_interact")
         if not interact:
             return True
-        self.send_key("f", interval=1)
+        self.send_key("f", interval=-1)
+        self.wait_until(
+            lambda: not self.find_interac(),
+            pre_action=lambda: self.send_key("f", interval=0.6, action_name="wait_and_interact_f"),
+            time_out=2.0,
+        )
         if is_lock:
-            self.sleep(2.0)
+            if self.wait_until(self.is_lock_pick_active, time_out=2.0):
+                self.wait_until(
+                    lambda: not self.is_lock_pick_active(),
+                    time_out=max(float(time_out), 5.0),
+                    settle_time=0.5,
+                )
+            else:
+                self.sleep(max(float(time_out), 5.0), scaled=False)
         return True
 
     def loot_safes_while_walking(
@@ -733,12 +816,12 @@ class PinkPawHeistCore3Path:
 
     def exit_heist(self):
         self.log_round_info("Confirm extract")
-        self.sleep(1.0, check_reward=False)
+        self.sleep(1.0, check_reward=False, scaled=False)
         result = self.ah.run_task("PinkPawHeist_EvacuateOnce")
         if _is_hit(result):
-            self.sleep(REWARD_OCR_DELAY_MS / 1000.0, check_reward=False)
+            self.sleep(REWARD_OCR_DELAY_MS / 1000.0, check_reward=False, scaled=False)
             notify_pinkpaw_reward(self.ctx, success=True)
-            self.sleep(POST_REWARD_DELAY_MS / 1000.0, check_reward=False)
+            self.sleep(POST_REWARD_DELAY_MS / 1000.0, check_reward=False, scaled=False)
             return True
         notify_pinkpaw_reward(self.ctx, success=False)
         return False
@@ -748,9 +831,9 @@ class PinkPawHeistCore3Path:
         self.ah.release_controls()
         for _ in range(4):
             self.send_key("esc")
-            self.sleep(1.0, check_reward=False)
+            self.sleep(1.0, check_reward=False, scaled=False)
         self.ah.run_task("PinkPawHeist_Once")
-        self.sleep(5.0, check_reward=False)
+        self.sleep(5.0, check_reward=False, scaled=False)
         notify_pinkpaw_reward(self.ctx, success=False)
 
     def _release_held_keys(self):
@@ -2587,7 +2670,9 @@ class PinkPawHeistScheme3Action(CustomAction):
         params = _parse_custom_action_param(argv)
         path = PinkPawHeistCore3Path(context, params=params)
         try:
-            path.log_round_info("Start copied OK-NTE route B")
+            path.log_round_info(
+                f"Start copied OK-NTE route B, timing x{path.route_timing_scale:.2f}"
+            )
             path.run_path()
             path._release_held_keys()
             path.ah.release_controls()

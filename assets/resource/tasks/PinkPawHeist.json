@@ -101,6 +101,7 @@
                     },
                     "option": [
                         "PinkPawHeist_Scheme_Core3_AvoidMethod",
+                        "PinkPawHeist_Scheme_Core3_TimingScale",
                         "PinkPawHeist_Scheme_Core3_desc"
                     ]
                 }
@@ -153,6 +154,27 @@
                     }
                 }
             ]
+        },
+        "PinkPawHeist_Scheme_Core3_TimingScale": {
+            "type": "input",
+            "label": "路线时间微调",
+            "description": "默认 1.00。低延迟发键已启用，只有实测路线仍有固定偏差时再微调：走过头调小，没走到调大。锁门等待不会被这个倍率缩短。",
+            "inputs": [
+                {
+                    "name": "timing_scale",
+                    "label": "倍率",
+                    "default": "1.00",
+                    "pipeline_type": "string",
+                    "verify": "^0\\.(2[5-9]|[3-9]\\d?)$|^1(\\.0{1,2}|\\.1\\d?|\\.2)?$"
+                }
+            ],
+            "pipeline_override": {
+                "PinkPawHeist_Scheme3": {
+                    "custom_action_param": {
+                        "timing_scale": "{timing_scale}"
+                    }
+                }
+            }
         }
     }
 }
