@@ -235,13 +235,8 @@ jobs:
         if: matrix.arch == 'x86_64'
         shell: pwsh
         run: |
-          $nsisVersion = "3.10"
-          $nsisZip = "nsis-$nsisVersion.zip"
-          $nsisDir = "${{ runner.temp }}\nsis"
-          $url = "https://sourceforge.net/projects/nsis/files/NSIS%203/$nsisVersion/$nsisZip/download"
-          Invoke-WebRequest -Uri $url -OutFile "${{ runner.temp }}\$nsisZip"
-          Expand-Archive -Path "${{ runner.temp }}\$nsisZip" -DestinationPath $nsisDir
-          echo "NSIS_DIR=$nsisDir" >> $env:GITHUB_ENV
+          winget install NSIS.NSIS --version 3.12 --silent --accept-package-agreements
+          echo "NSIS_DIR=C:\Program Files (x86)\NSIS" >> $env:GITHUB_ENV
 
       - name: Build NSIS installer
         if: matrix.arch == 'x86_64'
