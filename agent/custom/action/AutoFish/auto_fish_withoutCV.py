@@ -116,5 +116,5 @@ class AutoFishWithoutCV(CustomAction):
                     },
                 )
 
-        logger.debug("任务结束（success=True）")
+        logger.debug("任务中止")
         return CustomAction.RunResult(success=True)
