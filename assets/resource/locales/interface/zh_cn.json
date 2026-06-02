@@ -1,5 +1,6 @@
 {
     "description": "异环小助手，由MAAFramework强力驱动！",
+    "scene_check_osd_failed_focus": "<span style=\"color: red; font-weight: bold;\">屏幕存在遮挡，请尝试关闭帧率显示</span>",
     "contact": "QQ群: 1103323319",
     "welcome.file": "resource/locales/interface/WELCOME/WELCOME_zh_cn.md",
     "controller_default_label": "桌面端-默认",
@@ -41,7 +42,7 @@
     "task_fish_option_auto_sell": "自动卖鱼",
     "task_fish_option_auto_sell_desc": "是否启用自动卖鱼功能",
     "task_fish_option_auto_buy_bait": "自动买鱼饵",
-    "task_fish_option_auto_buy_bait_desc": "每次自动购买99（上限）鱼饵",
+    "task_fish_option_auto_buy_bait_desc": "每次自动购买99（上限）鱼饵，仅支持前台",
     "task_fish_option_bait_threshold": "鱼饵识别阈值",
     "task_fish_option_bait_threshold_desc": "如果无法识别点击鱼饵位置，请调低该数值",
     "task_fish_option_loop_time": "循环次数",
@@ -50,7 +51,7 @@
     "task_realtime_label": "实时辅助",
     "task_realtime_desc": "实时辅助小工具",
     "task_make_coffee_label": "自动做咖啡",
-    "task_make_coffee_desc": "自动制作咖啡。暂时需要任务开始时在大世界界面，且仅支持Seize的鼠标输入方式（必须前台），使用时请前往左下角设置-连接设置自行配置。",
+    "task_make_coffee_desc": "在选择关卡页面开始任务，需要带上娜娜莉并将都市技能点到3级。",
     "task_make_coffee_option_loop_time": "制作次数",
     "task_rhythm_label": "超强音",
     "task_rhythm_option_auto_select": "自动选曲",
@@ -149,5 +150,13 @@
     "task_auto_drive_dataset_input_output_dir_label": "输出目录",
     "task_auto_drive_dataset_input_duration_label": "录制时长",
     "task_auto_drive_dataset_input_duration_desc": "录制时长，默认为 60 秒。",
-    "task_auto_drive_dataset_input_start_delay_label": "录制延迟"
+    "task_auto_drive_dataset_input_start_delay_label": "录制延迟",
+    "task_touch_label": "抚摸",
+    "task_touch_desc": "检测“抚摸”按钮并自动执行：按F → 点击互动区域 → 按ESC，重复100次",
+    "task_touch_option_loop_count": "循环次数",
+    "task_touch_option_loop_count_desc": "重复执行的次数",
+    "task_touch_option_delay_after_f": "按F后延迟 (ms)",
+    "task_touch_option_delay_after_f_desc": "按下F键后的延迟时间（毫秒）",
+    "task_touch_option_delay_after_click": "点击后延迟 (ms)",
+    "task_touch_option_delay_after_click_desc": "点击互动区域后的延迟时间（毫秒）"
 }
