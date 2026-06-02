@@ -1,0 +1,44 @@
+{
+    "PinkPawHeist_Scheme3": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": "Custom",
+        "custom_action": "PinkPawHeistScheme3Action",
+        "custom_action_param": {
+            "avoid_method": "dash"
+        }
+    },
+    "PinkPawHeist_Core3_CheckInteractOnce": {
+        "desc": "Core3 single interaction prompt check",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "F",
+                    "撬锁",
+                    "开门",
+                    "强制开启",
+                    "安全撤离",
+                    "撤离",
+                    "(?i)Open",
+                    "(?i)Force\\s*Open",
+                    "(?i)Retreat",
+                    "(?i)Extract"
+                ],
+                "roi": [
+                    720,
+                    300,
+                    360,
+                    260
+                ],
+                "threshold": 0.75
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 300,
+        "next": []
+    }
+}

@@ -9,6 +9,7 @@ from .Common.click import *
 from .realtime_task import *
 from .pinkpaw.pinkpaw_core1 import *
 from .pinkpaw.pinkpaw_core2 import *
+from .pinkpaw.pinkpaw_core3 import *
 from .pinkpaw.pinkpaw_reward_logger import *
 from .auto_tetris import *
 from .AutoFish.auto_fish_withoutCV import *
@@ -35,6 +36,7 @@ __all__ = [
     "RealTimeTaskAction",
     "PinkPawHeistScheme1Action",
     "PinkPawHeistScheme2Action",
+    "PinkPawHeistScheme3Action",
     "PinkPawRewardSummary",
     "AutoFishWithoutCV",
     "SoundDodgeAction",
