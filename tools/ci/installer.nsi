@@ -24,7 +24,7 @@ OutFile "${OUTFILE}"
 InstallDir "D:\MaaNTE"
 InstallDirRegKey HKLM "Software\MaaNTE" "InstallDir"
 RequestExecutionLevel admin
-SetCompressor lzma
+SetCompressor /SOLID zstd
 
 ; ---------- 图标（使用动态变量） ----------
 !define MUI_ICON "${ICON_FILE}"
@@ -59,6 +59,7 @@ Section "核心文件" SecCore
     SetOutPath "$INSTDIR"
 
     ; 安装/更新前清理旧文件夹，避免残留文件干扰
+    ClearErrors
     RMDir /r "$INSTDIR\agent"
     RMDir /r "$INSTDIR\cache"
     RMDir /r "$INSTDIR\resource"
