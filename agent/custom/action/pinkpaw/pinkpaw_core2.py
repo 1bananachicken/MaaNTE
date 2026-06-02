@@ -743,8 +743,12 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_up("W")
             ah.delay(100)
             # 准备穿激光
+            ah.key_down("A")
+            ah.delay(1000)
+            ah.key_up("A")
+            ah.delay(200)
             ah.key_down("D")
-            ah.delay(2700)
+            ah.delay(3100)
             ah.key_up("D")
             ah.delay(100)
 
