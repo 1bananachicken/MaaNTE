@@ -90,8 +90,9 @@
         "action": "Click",
         "next": [
             "[JumpBack]SceneClickBlankToExit",
-            "WithdrawMoneyEnterItemList",
-            "点击补货"
+            "[JumpBack]WithdrawMoneyEnterItemList",
+            "点击补货",
+            "WithdrawMoneyExit"
         ]
     },
     "WithdrawMoneyEnterItemList": {
@@ -110,8 +111,7 @@
                     "累計營業時間",
                     "(?i)Total\\s*Operating\\s*Time",
                     "累計営業時間"
-                ]
-            ,
+                ],
                 "roi_offset": [
                     0,
                     0,
@@ -153,8 +153,7 @@
                     "商品列表",
                     "(?i)Item\\s*List",
                     "商品リスト"
-                ]
-            ,
+                ],
                 "roi_offset": [
                     0,
                     0,
@@ -191,11 +190,7 @@
                 ]
             }
         },
-        "action": "Click",
-        "next": [
-            "点击补货",
-            "WithdrawMoneyExit"
-        ]
+        "action": "Click"
     },
     "点击补货": {
         "recognition": {
@@ -360,7 +355,6 @@
                     "確定",
                     "确定",
                     "OK",
-                    "CONFIRN",
                     "확인"
                 ],
                 "threshold": 0.8,
