@@ -136,9 +136,9 @@
                     "label": "1早雾 2翳 3薄荷 4任意",
                     "pipeline_override": {
                         "PinkPawHeist_Scheme3": {
-                            "custom_action_param": {
-                                "avoid_method": "dash"
-                            }
+                            "next": [
+                                "PinkPawHeist_Scheme3_Dash"
+                            ]
                         }
                     }
                 },
@@ -147,9 +147,9 @@
                     "label": "1战斗 2浔 3薄荷 4任意",
                     "pipeline_override": {
                         "PinkPawHeist_Scheme3": {
-                            "custom_action_param": {
-                                "avoid_method": "attack"
-                            }
+                            "next": [
+                                "PinkPawHeist_Scheme3_Attack"
+                            ]
                         }
                     }
                 }
@@ -169,8 +169,17 @@
                 }
             ],
             "pipeline_override": {
-                "PinkPawHeist_Scheme3": {
+                "PinkPawHeist_Scheme3_Dash": {
                     "custom_action_param": {
+                        "avoid_method": "dash",
+                        "interaction_pause": 0.2,
+                        "timing_scale": "{timing_scale}"
+                    }
+                },
+                "PinkPawHeist_Scheme3_Attack": {
+                    "custom_action_param": {
+                        "avoid_method": "attack",
+                        "interaction_pause": 0.2,
                         "timing_scale": "{timing_scale}"
                     }
                 }

@@ -106,7 +106,7 @@ FAST_RECO_CONFIG = {
     },
     "PinkPawHeist_Core3_CheckLockPickActiveOnce": {
         "type": "template",
-        "roi": [640, 260, 360, 260],
+        "roi": [720, 260, 360, 260],
         "templates": ["heist_lock_pick.png"],
         "threshold": 0.48,
         "cv_threshold": 0.86,
@@ -1898,7 +1898,7 @@ class PinkPawHeistCore3Path:
         self.wait_and_interact(is_lock=True)
         self.sleep(0.11)
         self.send_key_down("a")
-        self.sleep(0.15)
+        self.sleep(0.20)
         self.send_key_up("a")
         self.sleep(0.10)
         self.send_key_down("w")
@@ -2661,7 +2661,6 @@ class PinkPawHeistCore3Path:
         self.sleep(0.60)
         self.switch_to_avoider(check_switched=True)  # 切到狗哥潜行避免碰到怪改变路径
         self.wait_and_interact(direction="w", is_lock=True, time_out=5.2)
-        self.sleep(0.10)
         self.send_key_down("w")
         self.sleep(0.15)
         self.send_key_down("lshift")
@@ -2794,7 +2793,6 @@ class PinkPawHeistCore3Path:
         self.send_key("lshift", down_time=0.24)
         self.sleep(0.60)
         self.wait_and_interact(direction="w", is_lock=True, time_out=5.2)
-        self.sleep(0.10)
         self.click(down_time=0.64)
         self.sleep(0.10)
         self.send_key_down("d")
@@ -2828,8 +2826,12 @@ class PinkPawHeistCore3Path:
         self.click(down_time=0.64)
         self.send_key_down("w")
         self.wait_and_interact(direction="w", is_lock=True, time_out=6.4)
+        if self.find_interac():
+            self.wait_and_interact(direction="w", is_lock=True, time_out=6.4)
         self.sleep(0.10)
         self.send_key_down("w")
+        self.sleep(0.32)
+        self.send_key("d", down_time=0.32)
         self.sleep(0.32)
         self.send_key("a", down_time=0.32)
         self.sleep(0.32)
@@ -3247,10 +3249,20 @@ class PinkPawHeistScheme3Action(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         params = _parse_custom_action_param(argv)
+        if PinkPawHeistCore3Path.CONF_AVOID_MTH not in params:
+            node_name = getattr(argv, "node_name", "")
+            if node_name.endswith("_Attack"):
+                params[PinkPawHeistCore3Path.CONF_AVOID_MTH] = (
+                    PinkPawHeistCore3Path.AVOID_METHOD_ATTACK
+                )
+            elif node_name.endswith("_Dash"):
+                params[PinkPawHeistCore3Path.CONF_AVOID_MTH] = (
+                    PinkPawHeistCore3Path.AVOID_METHOD_DASH
+                )
         path = PinkPawHeistCore3Path(context, params=params)
         try:
             path.log_round_info(
-                f"Start copied OK-NTE route B, timing x{path.route_timing_scale:.2f}"
+                f"Start copied OK-NTE route B, method {path.config[path.CONF_AVOID_MTH]}, timing x{path.route_timing_scale:.2f}"
             )
             path.run_path()
             path._release_held_keys()

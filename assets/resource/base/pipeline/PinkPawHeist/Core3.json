@@ -3,10 +3,33 @@
         "recognition": {
             "type": "DirectHit"
         },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "PinkPawHeist_Scheme3_Dash"
+        ]
+    },
+    "PinkPawHeist_Scheme3_Dash": {
+        "recognition": {
+            "type": "DirectHit"
+        },
         "action": "Custom",
         "custom_action": "PinkPawHeistScheme3Action",
         "custom_action_param": {
             "avoid_method": "dash",
+            "timing_scale": 1.0,
+            "interaction_pause": 0.2
+        }
+    },
+    "PinkPawHeist_Scheme3_Attack": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": "Custom",
+        "custom_action": "PinkPawHeistScheme3Action",
+        "custom_action_param": {
+            "avoid_method": "attack",
             "timing_scale": 1.0,
             "interaction_pause": 0.2
         }
@@ -58,7 +81,7 @@
                     "PinkPawHeist/interactable.png",
                     "PinkPawHeist/heist_interac_lock_pick.png"
                 ],
-                "threshold": 0.68
+                "threshold": 0.62
             }
         },
         "action": {
@@ -94,13 +117,13 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    640,
+                    720,
                     260,
                     360,
                     260
                 ],
                 "template": "PinkPawHeist/heist_lock_pick.png",
-                "threshold": 0.4
+                "threshold": 0.41
             }
         },
         "action": {
