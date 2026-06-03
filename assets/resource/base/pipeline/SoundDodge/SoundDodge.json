@@ -7,7 +7,8 @@
             "enable_sound_trigger": true,
             "dodge_all_attacks": true,
             "threshold": 0.13,
-            "counter_attack_threshold": 0.12
+            "counter_attack_threshold": 0.12,
+            "monitor_process_audio_only": true
         }
     }
 }
