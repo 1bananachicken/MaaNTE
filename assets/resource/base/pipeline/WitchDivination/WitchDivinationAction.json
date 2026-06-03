@@ -256,7 +256,7 @@
         "next": [
             "WitchDivinationCheckNoChancesXunBao",
             "[JumpBack]WitchDivinationEscThenBackToAnchor",
-            "WitchDivinationSelectXunBao"
+            "WitchDivinationActionEnd1S"
         ]
     },
     "WitchDivinationCheckNoChancesXunBao": {
@@ -300,7 +300,7 @@
         ]
     },
     "WitchDivinationActionEnd1S": {
-        "desc": "占卜流程结束 — 等待1秒后按ESC退出",
+        "desc": "占卜流程结束 — 等待1秒后按ESC退出并停止任务",
         "pre_delay": 1000,
         "action": {
             "type": "ClickKey",
@@ -310,6 +310,9 @@
                 ]
             }
         },
-        "next": []
+        "post_delay": 500,
+        "next": [
+            "StopNode"
+        ]
     }
 }

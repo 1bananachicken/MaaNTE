@@ -117,7 +117,7 @@
                 "target": true // 先移动鼠标到匹配位置，避免直接点击触发滑动
             }
         },
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": [
             "WitchDivinationClickWitchHouse"
         ],
@@ -144,7 +144,7 @@
         "action": {
             "type": "Click",
             "param": {
-                "target": true // 鼠标已在目标位置，直接点击
+                "target": "WitchDivinationMoveToWitchHouse" // 鼠标已在目标位置，直接点击
             }
         },
         "post_wait_freezes": 500, // 点击后等待全屏稳定 
