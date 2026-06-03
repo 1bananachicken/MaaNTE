@@ -57,5 +57,11 @@ class AutoPlayPiano(CustomAction):
             song=str(param.get("song", "")).strip(),
             speed=float(param.get("speed", 1.0)),
             transpose=int(param.get("transpose", 0)),
+            key_mode=str(param.get("key_mode", "36")).strip(),
+            tracks=str(param.get("tracks", "all")).strip(),
+            out_of_range_mode=str(param.get("out_of_range_mode", "fold")).strip(),
+            sustain=str(param.get("sustain", "true")).strip().lower() in ("true", "1", "on", "yes"),
+            sustain_mode=str(param.get("sustain_mode", "repeat")).strip().lower(),
+            sustain_repeat_rate=str(param.get("sustain_repeat_rate", "fast")).strip().lower(),
         )
         AutoPianoPlayer(PROJECT_ROOT).play(context, settings)
