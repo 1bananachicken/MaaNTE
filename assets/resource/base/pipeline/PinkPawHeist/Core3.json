@@ -7,7 +7,8 @@
         "custom_action": "PinkPawHeistScheme3Action",
         "custom_action_param": {
             "avoid_method": "dash",
-            "timing_scale": 1.0
+            "timing_scale": 1.0,
+            "interaction_pause": 0.2
         }
     },
     "PinkPawHeist_Core3_CheckInteractPinkOnce": {
@@ -66,25 +67,72 @@
         "timeout": 100,
         "next": []
     },
-    "PinkPawHeist_Core3_CheckLockPickActiveOnce": {
-        "desc": "Core3 single lock-pick UI template check",
+    "PinkPawHeist_Core3_CheckSafeLockPromptOnce": {
+        "desc": "Core3 single safe lock-pick prompt check",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "roi": [
                     680,
-                    300,
-                    260,
-                    180
+                    250,
+                    430,
+                    430
                 ],
-                "template": "PinkPawHeist/heist_lock_pick.png",
-                "threshold": 0.7
+                "template": "PinkPawHeist/heist_interac_lock_pick.png",
+                "threshold": 0.56
             }
         },
         "action": {
             "type": "DoNothing"
         },
         "timeout": 100,
+        "next": []
+    },
+    "PinkPawHeist_Core3_CheckLockPickActiveOnce": {
+        "desc": "Core3 single lock-pick UI template check",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    640,
+                    260,
+                    360,
+                    260
+                ],
+                "template": "PinkPawHeist/heist_lock_pick.png",
+                "threshold": 0.4
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 100,
+        "next": []
+    },
+    "PinkPawHeist_Core3_CheckLockPickTextOnce": {
+        "desc": "Core3 single lock-pick active text check",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "奋力撬锁中",
+                    "撬锁中",
+                    "撬锁",
+                    "(?i)lock"
+                ],
+                "roi": [
+                    700,
+                    390,
+                    160,
+                    80
+                ],
+                "threshold": 0.65
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 120,
         "next": []
     },
     "PinkPawHeist_Core3_CheckInteractOnce": {
@@ -94,7 +142,7 @@
             "param": {
                 "expected": [
                     "F",
-                    "撬锁",
+                    "^撬锁$",
                     "开门",
                     "强制开启",
                     "安全撤离",

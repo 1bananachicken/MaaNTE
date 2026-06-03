@@ -4,10 +4,24 @@ import json
 import re
 import time
 from dataclasses import dataclass
+from pathlib import Path
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+from maa.pipeline import JOCR, JRecognitionType
+
+try:
+    import numpy as np
+    from PIL import Image
+except ImportError:
+    np = None
+    Image = None
+
+try:
+    import cv2
+except ImportError:
+    cv2 = None
 
 try:
     from agent.custom.action.pinkpaw.pinkpaw_reward_logger import notify_pinkpaw_reward
@@ -42,11 +56,65 @@ POST_REWARD_DELAY_MS = 7000
 DEFAULT_WIDTH = 1280
 DEFAULT_HEIGHT = 720
 DEFAULT_ROUTE_TIMING_SCALE = 1.0
+DEFAULT_INTERACTION_PAUSE = 0.7
 MIN_ROUTE_TIMING_SCALE = 0.25
 MAX_ROUTE_TIMING_SCALE = 1.2
+MIN_INTERACTION_PAUSE = 0.0
+MAX_INTERACTION_PAUSE = 1.0
 MAX_ROUTE_SLEEP_ADJUST = 0.25
 ROUTE_SLEEP_ADJUST_RATIO_CAP = 0.08
+ROUTE_SLEEP_BUSY_WAIT = 0.02
+ROUTE_SLEEP_POLL_INTERVAL = 0.001
+ROUTE_REWARD_CHECK_MIN_SLEEP = 0.5
+WAIT_UNTIL_POLL_INTERVAL = 0.02
+INTERAC_OCR_FALLBACK_INTERVAL = 1.0
+FOCUS_LOG_NODE = "_PINKPAW_CORE3_FOCUS_"
+DEFAULT_OCR_THRESHOLD = 0.2
 TIMING_SENSITIVE_KEYS = {"w", "a", "s", "d", "lshift", "space", "e"}
+FAST_TEMPLATE_SAMPLE_LIMIT = 64
+FAST_TEMPLATE_CANDIDATE_LIMIT = 5000
+FAST_TEMPLATE_ANCHOR_TOLERANCE = 45
+ENABLE_FAST_COLOR_RECO = True
+FAST_TEMPLATE_RECO_NODES = {
+    "PinkPawHeist_Core3_CheckInteractTemplateOnce",
+    "PinkPawHeist_Core3_CheckSafeLockPromptOnce",
+    "PinkPawHeist_Core3_CheckLockPickActiveOnce",
+}
+
+FAST_RECO_CONFIG = {
+    "PinkPawHeist_Core3_CheckInteractPinkOnce": {
+        "type": "color",
+        "roi": [650, 240, 520, 460],
+        "lower_bgr": [119, 71, 197],
+        "upper_bgr": [133, 78, 221],
+        "count": 80,
+        "stride": 4,
+    },
+    "PinkPawHeist_Core3_CheckInteractTemplateOnce": {
+        "type": "template",
+        "roi": [680, 250, 430, 430],
+        "templates": ["interactable.png", "heist_interac_lock_pick.png"],
+        "threshold": 0.62,
+        "cv_threshold": 0.88,
+    },
+    "PinkPawHeist_Core3_CheckSafeLockPromptOnce": {
+        "type": "template",
+        "roi": [680, 250, 430, 430],
+        "templates": ["heist_interac_lock_pick.png"],
+        "threshold": 0.56,
+        "cv_threshold": 0.90,
+    },
+    "PinkPawHeist_Core3_CheckLockPickActiveOnce": {
+        "type": "template",
+        "roi": [640, 260, 360, 260],
+        "templates": ["heist_lock_pick.png"],
+        "threshold": 0.48,
+        "cv_threshold": 0.86,
+    },
+}
+
+_FAST_TEMPLATE_CACHE = {}
+_FAST_IMAGE_DIR = None
 
 
 class AbortException(Exception):
@@ -71,6 +139,15 @@ class CharacterSwitchState:
     def advance(self):
         self.index += 1
         return self.index < len(self.keys)
+
+
+@dataclass
+class OCRText:
+    name: str
+    text: str
+    box: object = None
+    confidence: float = 1.0
+    score: float = 1.0
 
 
 def _is_hit(result) -> bool:
@@ -98,7 +175,9 @@ def _parse_custom_action_param(argv: CustomAction.RunArg) -> dict:
     try:
         parsed = json.loads(value)
     except Exception as exc:
-        print(f"[PinkPawHeist/Core3] invalid custom_action_param: {value!r}, error: {exc}")
+        print(
+            f"[PinkPawHeist/Core3] invalid custom_action_param: {value!r}, error: {exc}"
+        )
         return {}
     return parsed if isinstance(parsed, dict) else {}
 
@@ -109,6 +188,280 @@ def _parse_timing_scale(value) -> float:
     except (TypeError, ValueError):
         scale = DEFAULT_ROUTE_TIMING_SCALE
     return max(MIN_ROUTE_TIMING_SCALE, min(MAX_ROUTE_TIMING_SCALE, scale))
+
+
+def _parse_interaction_pause(value) -> float:
+    try:
+        pause = float(value)
+    except (TypeError, ValueError):
+        pause = DEFAULT_INTERACTION_PAUSE
+    return max(MIN_INTERACTION_PAUSE, min(MAX_INTERACTION_PAUSE, pause))
+
+
+def _get_fast_image_dir():
+    global _FAST_IMAGE_DIR
+    if _FAST_IMAGE_DIR is not None:
+        return _FAST_IMAGE_DIR
+    candidates = [
+        Path.cwd() / "assets" / "resource" / "base" / "image" / "PinkPawHeist",
+        Path(__file__).resolve().parents[4]
+        / "assets"
+        / "resource"
+        / "base"
+        / "image"
+        / "PinkPawHeist",
+    ]
+    for candidate in candidates:
+        if candidate.exists():
+            _FAST_IMAGE_DIR = candidate
+            return candidate
+    _FAST_IMAGE_DIR = candidates[0]
+    return _FAST_IMAGE_DIR
+
+
+def _load_fast_template(name):
+    if np is None or Image is None:
+        return None
+    if name in _FAST_TEMPLATE_CACHE:
+        return _FAST_TEMPLATE_CACHE[name]
+    path = _get_fast_image_dir() / name
+    if not path.exists():
+        _FAST_TEMPLATE_CACHE[name] = None
+        return None
+    rgba = np.asarray(Image.open(path).convert("RGBA"), dtype=np.uint8)
+    alpha = rgba[:, :, 3]
+    rgb = rgba[:, :, :3]
+    brightness = rgb.max(axis=2)
+    saturation = brightness - rgb.min(axis=2)
+    mask = (alpha >= 128) & ((brightness >= 80) | (saturation >= 40))
+    if int(mask.sum()) == 0:
+        mask = alpha >= 128
+    coords = np.argwhere(mask)
+    if coords.size == 0:
+        _FAST_TEMPLATE_CACHE[name] = None
+        return None
+    if len(coords) > FAST_TEMPLATE_SAMPLE_LIMIT:
+        scores = (
+            brightness[coords[:, 0], coords[:, 1]].astype(np.int32)
+            + saturation[coords[:, 0], coords[:, 1]].astype(np.int32) * 2
+        )
+        indices = np.argsort(scores)[-FAST_TEMPLATE_SAMPLE_LIMIT:]
+        coords = coords[indices]
+    gray = (
+        rgb[:, :, 0].astype(np.float32) * 0.299
+        + rgb[:, :, 1].astype(np.float32) * 0.587
+        + rgb[:, :, 2].astype(np.float32) * 0.114
+    )
+    bgr = rgb[:, :, ::-1].astype(np.float32)
+    cv_bgr = np.ascontiguousarray(rgb[:, :, ::-1])
+    cv_mask = np.ascontiguousarray((alpha >= 128).astype(np.uint8) * 255)
+    values = gray[coords[:, 0], coords[:, 1]].astype(np.float32)
+    bgr_values = bgr[coords[:, 0], coords[:, 1]].astype(np.float32)
+    template = {
+        "name": name,
+        "cv_bgr": cv_bgr,
+        "cv_mask": cv_mask,
+        "coords": coords.astype(np.int32),
+        "bgr_values": bgr_values,
+        "height": gray.shape[0],
+        "width": gray.shape[1],
+    }
+    anchor_index = int(np.argmax(values))
+    anchor_bgr = bgr_values[anchor_index]
+    template["anchor_y"] = int(template["coords"][anchor_index, 0])
+    template["anchor_x"] = int(template["coords"][anchor_index, 1])
+    template["anchor_channel"] = int(np.argmax(anchor_bgr))
+    template["anchor_value"] = int(anchor_bgr[template["anchor_channel"]])
+    _FAST_TEMPLATE_CACHE[name] = template
+    return template
+
+
+def _as_bgr_image(image):
+    if np is None or not isinstance(image, np.ndarray):
+        return None
+    if image.ndim != 3 or image.shape[2] < 3 or image.size == 0:
+        return None
+    return image[:, :, :3]
+
+
+def _crop_roi(image, roi):
+    bgr = _as_bgr_image(image)
+    if bgr is None:
+        return None
+    x, y, w, h = [int(v) for v in roi]
+    ih, iw = bgr.shape[:2]
+    x1 = max(0, min(iw, x))
+    y1 = max(0, min(ih, y))
+    x2 = max(x1, min(iw, x + w))
+    y2 = max(y1, min(ih, y + h))
+    if x2 <= x1 or y2 <= y1:
+        return None
+    return bgr[y1:y2, x1:x2]
+
+
+def _fast_color_match(image, cfg):
+    roi = _crop_roi(image, cfg["roi"])
+    if roi is None:
+        return False
+    stride = max(1, int(cfg.get("stride", 1)))
+    if stride > 1:
+        roi = roi[::stride, ::stride]
+    lower = np.asarray(cfg["lower_bgr"], dtype=np.uint8)
+    upper = np.asarray(cfg["upper_bgr"], dtype=np.uint8)
+    mask = np.all((roi >= lower) & (roi <= upper), axis=2)
+    count = max(1, int(cfg.get("count", 1)) // (stride * stride))
+    return int(mask.sum()) >= count
+
+
+def _fast_template_match(image, cfg):
+    if cv2 is None:
+        return None
+    roi = _crop_roi(image, cfg["roi"])
+    if roi is None:
+        return None
+    threshold = float(cfg.get("cv_threshold", cfg["threshold"]))
+    roi = np.ascontiguousarray(roi)
+    for name in cfg["templates"]:
+        template = _load_fast_template(name)
+        if template is None:
+            continue
+        templ = template["cv_bgr"]
+        mask = template["cv_mask"]
+        if roi.shape[0] < templ.shape[0] or roi.shape[1] < templ.shape[1]:
+            continue
+        scores = cv2.matchTemplate(roi, templ, cv2.TM_CCORR_NORMED, mask=mask)
+        finite_scores = scores[np.isfinite(scores)]
+        if finite_scores.size == 0:
+            continue
+        best = float(np.max(finite_scores))
+        if best >= threshold:
+            return True
+    return None
+
+
+def _fast_recognize_node(node_name, image):
+    cfg = FAST_RECO_CONFIG.get(node_name)
+    if cfg is None or np is None:
+        return None
+    if cfg["type"] == "color":
+        if not ENABLE_FAST_COLOR_RECO:
+            return None
+        return _fast_color_match(image, cfg)
+    if cfg["type"] == "template":
+        if node_name not in FAST_TEMPLATE_RECO_NODES:
+            return None
+        if Image is None:
+            return None
+        return _fast_template_match(image, cfg)
+    return None
+
+
+def _value_to_pixel(value, total, default=0):
+    try:
+        value = float(value)
+    except (TypeError, ValueError):
+        return int(default)
+    if 0 <= value <= 1:
+        return int(round(value * total))
+    return int(round(value))
+
+
+def _calc_ocr_roi(image, x, y, to_x, to_y, width, height, box=None):
+    if image is not None and hasattr(image, "shape") and len(image.shape) >= 2:
+        frame_height, frame_width = image.shape[:2]
+    else:
+        frame_width, frame_height = DEFAULT_WIDTH, DEFAULT_HEIGHT
+
+    if box is not None:
+        if isinstance(box, (list, tuple)) and len(box) >= 4:
+            bx, by, bw, bh = box[:4]
+            return [int(bx), int(by), max(1, int(bw)), max(1, int(bh))]
+        bx = getattr(box, "x", None)
+        by = getattr(box, "y", None)
+        bw = getattr(box, "width", getattr(box, "w", None))
+        bh = getattr(box, "height", getattr(box, "h", None))
+        if None not in (bx, by, bw, bh):
+            return [int(bx), int(by), max(1, int(bw)), max(1, int(bh))]
+
+    roi_x = _value_to_pixel(x, frame_width)
+    roi_y = _value_to_pixel(y, frame_height)
+    if not width:
+        width = float(to_x) - float(x)
+    if not height:
+        height = float(to_y) - float(y)
+    roi_w = max(1, _value_to_pixel(width, frame_width, default=frame_width - roi_x))
+    roi_h = max(1, _value_to_pixel(height, frame_height, default=frame_height - roi_y))
+
+    roi_x = max(0, min(frame_width - 1, roi_x))
+    roi_y = max(0, min(frame_height - 1, roi_y))
+    roi_w = max(1, min(frame_width - roi_x, roi_w))
+    roi_h = max(1, min(frame_height - roi_y, roi_h))
+    return [roi_x, roi_y, roi_w, roi_h]
+
+
+def _normalize_ocr_text(text: str) -> str:
+    return str(text or "").strip()
+
+
+def _ocr_text_matches(text: str, match) -> bool:
+    text = _normalize_ocr_text(text)
+    compact_text = re.sub(r"\s+", "", text)
+    if match is None:
+        return bool(text)
+    matches = match if isinstance(match, list) else [match]
+    for item in matches:
+        if isinstance(item, str) and (item == text or item == compact_text):
+            return True
+        if isinstance(item, re.Pattern) and (
+            re.search(item, text) or re.search(item, compact_text)
+        ):
+            return True
+    return False
+
+
+def _ocr_match_requests_text(match, text: str) -> bool:
+    if match is None:
+        return False
+    matches = match if isinstance(match, list) else [match]
+    for item in matches:
+        if isinstance(item, str) and text in item:
+            return True
+        if isinstance(item, re.Pattern) and text in item.pattern:
+            return True
+    return False
+
+
+def _ocr_result_items(result, match=None):
+    items = []
+    seen = set()
+    for item in getattr(result, "all_results", None) or []:
+        text = _normalize_ocr_text(getattr(item, "text", ""))
+        if not text or text in seen:
+            continue
+        seen.add(text)
+        if not _ocr_text_matches(text, match):
+            continue
+        score = float(getattr(item, "score", 1.0) or 0.0)
+        items.append(
+            OCRText(
+                name=text,
+                text=text,
+                box=getattr(item, "box", None),
+                confidence=score,
+                score=score,
+            )
+        )
+    return items
+
+
+def _normalize_ocr_frame(image):
+    if image is None:
+        return None
+    if not hasattr(image, "shape") or len(image.shape) != 3:
+        return image
+    if image.shape[2] <= 3:
+        return image
+    return np.ascontiguousarray(image[:, :, :3]) if np is not None else image[:, :, :3]
 
 
 class Core3ActionHelper:
@@ -131,7 +484,9 @@ class Core3ActionHelper:
 
     def raise_if_stopped(self):
         if self.is_stopping():
-            raise TaskerStoppedException("PinkPawHeistScheme3Action stopped by Maa tasker.")
+            raise TaskerStoppedException(
+                "PinkPawHeistScheme3Action stopped by Maa tasker."
+            )
 
     def run_task(self, task_name, pipeline_override=None):
         self.raise_if_stopped()
@@ -225,7 +580,10 @@ class Core3ActionHelper:
                 "action": {"type": "Click", "param": {"target": [int(x), int(y)]}}
             }
         }
-        ret = self.ctx.run_task("PinkPawHeist_Click", pipeline_override=override) is not None
+        ret = (
+            self.ctx.run_task("PinkPawHeist_Click", pipeline_override=override)
+            is not None
+        )
         self.raise_if_stopped()
         return ret
 
@@ -283,6 +641,9 @@ class PinkPawHeistCore3Path:
         self.route_timing_scale = _parse_timing_scale(
             (params or {}).get("timing_scale", DEFAULT_ROUTE_TIMING_SCALE)
         )
+        self.interaction_pause = _parse_interaction_pause(
+            (params or {}).get("interaction_pause", DEFAULT_INTERACTION_PAUSE)
+        )
         self.config = {
             self.CONF_FIGHTER: ["4", "1"],
             self.CONF_RUNNER: ["3"],
@@ -319,16 +680,19 @@ class PinkPawHeistCore3Path:
 
     def _log_to_frontend(self, message: str):
         try:
-            self.ctx.run_task(
-                "PinkPawHeist_LogMessage",
+            self.ctx.run_action(
+                FOCUS_LOG_NODE,
                 pipeline_override={
-                    "PinkPawHeist_LogMessage": {
+                    FOCUS_LOG_NODE: {
                         "focus": {
                             "Node.Action.Starting": {
                                 "content": f"[Core3] {message}",
                                 "display": ["log", "toast"],
                             }
-                        }
+                        },
+                        "action": "DoNothing",
+                        "pre_delay": 0,
+                        "post_delay": 0,
                     }
                 },
             )
@@ -395,12 +759,14 @@ class PinkPawHeistCore3Path:
         duration = max(float(timeout), 0.0)
         if scaled:
             duration = self._scale_route_duration(duration)
-        target = time.monotonic() + duration
-        while time.monotonic() < target:
+        target = time.perf_counter() + duration
+        busy_from = target - ROUTE_SLEEP_BUSY_WAIT
+        allow_reward_check = check_reward and duration >= ROUTE_REWARD_CHECK_MIN_SLEEP
+        while time.perf_counter() < busy_from:
             self.ah.raise_if_stopped()
             self._poll_quick_pick()
             timing_sensitive = self._has_timing_sensitive_key_held()
-            if check_reward and not timing_sensitive:
+            if allow_reward_check and not timing_sensitive:
                 self._check_still_in_heist()
             if (
                 self._interaction_watch_active
@@ -409,8 +775,11 @@ class PinkPawHeistCore3Path:
                 and not timing_sensitive
             ):
                 self._interaction_watch_found = self.find_interac()
-            remaining = target - time.monotonic()
-            time.sleep(max(0.0, min(0.05, remaining)))
+            remaining = busy_from - time.perf_counter()
+            time.sleep(max(0.0, min(ROUTE_SLEEP_POLL_INTERVAL, remaining)))
+        while time.perf_counter() < target:
+            if self.ah.is_stopping():
+                self.ah.raise_if_stopped()
         self._poll_quick_pick()
         return True
 
@@ -418,7 +787,9 @@ class PinkPawHeistCore3Path:
         self.sleep(0.05)
         return True
 
-    def send_key(self, key, down_time=0.02, interval=-1, after_sleep=0, action_name=None):
+    def send_key(
+        self, key, down_time=0.02, interval=-1, after_sleep=0, action_name=None
+    ):
         key = _norm_key(key)
         name = action_name or f"key:{key}"
         if not self._check_interval(name, interval):
@@ -444,7 +815,9 @@ class PinkPawHeistCore3Path:
         key = _norm_key(key)
         if key == "f":
             if not self._quick_pick_active:
-                self._quick_pick_ready_at = time.monotonic() + self.QUICK_PICK_START_DELAY
+                self._quick_pick_ready_at = (
+                    time.monotonic() + self.QUICK_PICK_START_DELAY
+                )
                 self._next_quick_pick_at = self._quick_pick_ready_at
             self._quick_pick_active = True
             return True
@@ -541,45 +914,114 @@ class PinkPawHeistCore3Path:
                     return True
             else:
                 settled_at = None
-            self.sleep(0.1)
+            self.sleep(WAIT_UNTIL_POLL_INTERVAL, check_reward=False, scaled=False)
         if raise_if_not_found:
             raise AbortException("timeout for wait_until")
         return False
 
     def wait_team_ui_settle(self):
-        self.sleep(0.5)
+        self.sleep(0.5, check_reward=False)
         return True
 
     def _run_check_node(self, node_name, timeout=1.5):
         deadline = time.monotonic() + timeout
-        override = {node_name: {"timeout": max(20, int(timeout * 1000))}}
         while time.monotonic() < deadline:
             self.ah.raise_if_stopped()
-            if _is_hit(self.ah.run_task(node_name, pipeline_override=override)):
+            if self._recognize_once(node_name):
                 return True
-            time.sleep(0.05)
+            time.sleep(0.01)
         return False
 
-    def find_interac(self):
+    def _screencap(self):
+        controller = getattr(getattr(self.ctx, "tasker", None), "controller", None)
+        if controller is None:
+            return None
+        return controller.post_screencap().wait().get()
+
+    def _recognize_once(self, node_name, image=None):
+        self.ah.raise_if_stopped()
+        if image is None:
+            image = self._screencap()
+        if image is None:
+            return _is_hit(self.ah.run_task(node_name))
+        fast_result = _fast_recognize_node(node_name, image)
+        if fast_result is not None:
+            return fast_result
+        result = self.ctx.run_recognition(node_name, image)
+        self.ah.raise_if_stopped()
+        return _is_hit(result)
+
+    def _find_interac_in_image(self, image, include_ocr=False):
+        if self._recognize_once("PinkPawHeist_Core3_CheckInteractPinkOnce", image):
+            return True
+        if self._recognize_once("PinkPawHeist_Core3_CheckInteractTemplateOnce", image):
+            return True
+        if not include_ocr:
+            return False
+        return any(
+            self._recognize_once(node, image)
+            for node in (
+                "PinkPawHeist_Core3_CheckInteractOnce",
+                "PinkPawHeist_CheckDoorOnce",
+                "PinkPawHeist_CheckGateOnce",
+                "PinkPawHeist_CheckGate2Once",
+                "PinkPawHeist_CheckEvacuateOnce",
+            )
+        )
+
+    def find_interac(self, include_ocr=False):
         self._checking_interaction = True
         try:
-            if self._run_check_node("PinkPawHeist_Core3_CheckInteractPinkOnce", timeout=0.08):
-                return True
-            if self._run_check_node("PinkPawHeist_Core3_CheckInteractTemplateOnce", timeout=0.08):
-                return True
-            if self._run_check_node("PinkPawHeist_Core3_CheckInteractOnce", timeout=0.08):
-                return True
-            return any(
-                self._run_check_node(node, timeout=0.04)
-                for node in (
-                    "PinkPawHeist_CheckDoorOnce",
-                    "PinkPawHeist_CheckGateOnce",
-                    "PinkPawHeist_CheckGate2Once",
-                    "PinkPawHeist_CheckEvacuateOnce",
-                )
-            )
+            image = self._screencap()
+            return self._find_interac_in_image(image, include_ocr=include_ocr)
         finally:
             self._checking_interaction = False
+
+    def ocr_once(
+        self,
+        x=0,
+        y=0,
+        to_x=1,
+        to_y=1,
+        width=0,
+        height=0,
+        name=None,
+        box=None,
+        match=None,
+        threshold=0,
+        frame=None,
+        target_height=0,
+        time_out=0,
+        post_action=None,
+        raise_if_not_found=False,
+        log=False,
+        screenshot=False,
+        lib="default",
+    ):
+        image = frame if frame is not None else self._screencap()
+        image = _normalize_ocr_frame(image)
+        if image is None:
+            return None
+        roi = _calc_ocr_roi(image, x, y, to_x, to_y, width, height, box=box)
+        ocr_threshold = DEFAULT_OCR_THRESHOLD if not threshold else float(threshold)
+        try:
+            result = self.ctx.run_recognition_direct(
+                JRecognitionType.OCR,
+                JOCR(roi=roi, threshold=ocr_threshold),
+                image,
+            )
+        except Exception as exc:
+            self.log_warning(f"OCR failed roi={roi} match={match}: {exc}")
+            return None
+
+        items = _ocr_result_items(result, match=match)
+        if log:
+            all_texts = [
+                _normalize_ocr_text(getattr(item, "text", ""))
+                for item in getattr(result, "all_results", None) or []
+            ]
+            self.log_info(f"OCR roi={roi} match={match} hit={items} all={all_texts}")
+        return items or None
 
     def wait_ocr(
         self,
@@ -604,17 +1046,52 @@ class PinkPawHeistCore3Path:
         lib="default",
     ):
         timeout = 1.5 if not time_out or time_out <= 0 else float(time_out)
-        matched = self._run_check_node("PinkPawHeist_CheckDoorOnce", timeout=timeout)
-        if not matched:
-            matched = self._run_check_node("PinkPawHeist_Core3_CheckInteractPinkOnce", timeout=0.2)
-        if not matched:
-            matched = self._run_check_node("PinkPawHeist_Core3_CheckInteractTemplateOnce", timeout=0.2)
-        if not matched:
-            matched = self._run_check_node("PinkPawHeist_Core3_CheckInteractOnce", timeout=0.2)
-        if matched:
-            if post_action:
-                post_action()
-            return [type("OCRText", (), {"name": getattr(match, "pattern", "")})()]
+        deadline = time.monotonic() + timeout
+        settled_at = None
+        last_items = None
+        while time.monotonic() < deadline:
+            self.ah.raise_if_stopped()
+            items = self.ocr_once(
+                x=x,
+                y=y,
+                to_x=to_x,
+                to_y=to_y,
+                width=width,
+                height=height,
+                name=name,
+                box=box,
+                match=match,
+                threshold=threshold,
+                frame=frame,
+                target_height=target_height,
+                log=log,
+                screenshot=screenshot,
+                lib=lib,
+            )
+            if items:
+                last_items = items
+                if settle_time is not None and settle_time >= 0:
+                    if settled_at is None:
+                        settled_at = time.monotonic()
+                    if time.monotonic() - settled_at >= settle_time:
+                        if post_action:
+                            post_action()
+                        return last_items
+                else:
+                    if post_action:
+                        post_action()
+                    return items
+            else:
+                settled_at = None
+            if frame is not None:
+                break
+            self.sleep(WAIT_UNTIL_POLL_INTERVAL, check_reward=False, scaled=False)
+        if frame is None and _ocr_match_requests_text(match, "开门"):
+            if self._run_check_node("PinkPawHeist_CheckDoorOnce", timeout=0.25):
+                items = [OCRText(name="开门", text="开门")]
+                if post_action:
+                    post_action()
+                return items
         if raise_if_not_found:
             raise AbortException("timeout for wait_ocr")
         return None
@@ -629,35 +1106,66 @@ class PinkPawHeistCore3Path:
         self._interaction_watch_found = False
         return True
 
+    def is_lock_pick_active_fast(self):
+        image = self._screencap()
+        return self._is_lock_pick_active_fast_in_image(image)
+
+    def _is_lock_pick_active_fast_in_image(self, image):
+        return self._recognize_once("PinkPawHeist_Core3_CheckLockPickActiveOnce", image)
+
     def is_lock_pick_active(self):
-        return self._run_check_node("PinkPawHeist_Core3_CheckLockPickActiveOnce", timeout=0.08) or self._quick_pick_active
+        if self.is_lock_pick_active_fast():
+            return True
+        return self._recognize_once("PinkPawHeist_Core3_CheckLockPickTextOnce")
+
+    def wait_lock_pick_active(self, time_out=2, settle_time=-1):
+        if self.wait_until(
+            self.is_lock_pick_active_fast,
+            time_out=time_out,
+            settle_time=settle_time,
+        ):
+            return True
+        return self.is_lock_pick_active()
+
+    def has_safe_lock_prompt(self):
+        image = self._screencap()
+        return self._recognize_once("PinkPawHeist_Core3_CheckSafeLockPromptOnce", image)
+
+    def wait_for_interac(self, time_out=10, include_ocr_fallback=True):
+        if self.wait_until(self.find_interac, time_out=time_out):
+            return True
+        if include_ocr_fallback:
+            return self.find_interac(include_ocr=True)
+        return False
 
     def wait_and_interact(
-        self, direction=None, interact=True, key_up_sleep=0.7, is_lock=False, time_out=10
+        self,
+        direction=None,
+        interact=True,
+        key_up_sleep=None,
+        is_lock=False,
+        time_out=10,
     ):
-        ret = self.wait_until(self.find_interac, time_out=time_out)
+        ret = self.wait_for_interac(time_out=time_out)
         if interact and direction is not None:
             self.send_key_up(direction)
-            self.sleep(key_up_sleep)
+            if key_up_sleep is None:
+                key_up_sleep = self.interaction_pause
+            self.sleep(key_up_sleep, check_reward=False, scaled=False)
         if not ret:
             raise AbortException("timeout for wait_and_interact")
         if not interact:
             return True
-        self.send_key("f", interval=-1)
         self.wait_until(
             lambda: not self.find_interac(),
-            pre_action=lambda: self.send_key("f", interval=0.6, action_name="wait_and_interact_f"),
-            time_out=2.0,
+            pre_action=lambda: self.send_key("f", interval=0.5),
         )
         if is_lock:
-            if self.wait_until(self.is_lock_pick_active, time_out=2.0):
-                self.wait_until(
-                    lambda: not self.is_lock_pick_active(),
-                    time_out=max(float(time_out), 5.0),
-                    settle_time=0.5,
-                )
-            else:
-                self.sleep(max(float(time_out), 5.0), scaled=False)
+            self.wait_until(self.is_lock_pick_active_fast, time_out=2)
+            self.wait_until(
+                lambda: not self.is_lock_pick_active_fast(), settle_time=0.15
+            )
+            return not self.find_interac()
         return True
 
     def loot_safes_while_walking(
@@ -665,42 +1173,85 @@ class PinkPawHeistCore3Path:
     ):
         start_time = time.monotonic()
         deadline = start_time + time_out
+        earliest_lock_pick_time = start_time + min_walk_time
         if direction is not None:
             self.send_key_down(direction)
         pick_started = False
-        while time.monotonic() < deadline:
-            if send_pick and not pick_started and time.monotonic() - start_time >= min_walk_time:
+
+        def wait_until_pick_time():
+            nonlocal pick_started
+            remaining = earliest_lock_pick_time - time.monotonic()
+            if remaining > 0:
+                self.sleep(remaining)
+            if send_pick and not pick_started:
                 self.send_key_down("f")
                 pick_started = True
-            self._poll_quick_pick()
-            self.sleep(0.05)
-        if direction is not None and not hold:
-            self.send_key_up(direction)
-        if send_pick and pick_started:
-            self.send_key_up("f")
+
+        try:
+            while time.monotonic() < deadline:
+                now = time.monotonic()
+                if send_pick and not pick_started and now >= earliest_lock_pick_time:
+                    self.send_key_down("f")
+                    pick_started = True
+                if self.has_safe_lock_prompt():
+                    if now < earliest_lock_pick_time:
+                        wait_until_pick_time()
+                    lock_pick_start = time.monotonic()
+                    if direction is not None:
+                        self.send_key_up(direction)
+                    if self.wait_lock_pick_active(time_out=2, settle_time=0.25):
+                        self.wait_until(
+                            lambda: not self.is_lock_pick_active_fast(),
+                            time_out=10,
+                            settle_time=0.5,
+                        )
+                        self.sleep(0.5, check_reward=False, scaled=False)
+                    deadline += time.monotonic() - lock_pick_start
+                    if direction is not None:
+                        self.send_key_down(direction)
+                self.next_frame()
+        finally:
+            if direction is not None and not hold:
+                self.send_key_up(direction)
+            if send_pick and pick_started:
+                self.send_key_up("f")
 
     def wait_for_safe_loot(self, time_out=10, raise_timeout=False):
-        self.sleep(min(float(time_out), 1.2))
-        return True
+        deadline = time.monotonic() + time_out
+        while time.monotonic() < deadline:
+            if self.has_safe_lock_prompt():
+                self.wait_lock_pick_active(time_out=2)
+            if self.is_lock_pick_active_fast():
+                self.wait_until(
+                    lambda: not self.is_lock_pick_active_fast(),
+                    time_out=10,
+                    settle_time=0.5,
+                )
+                self.sleep(0.5, check_reward=False, scaled=False)
+                return True
+            self.next_frame()
+        if raise_timeout:
+            raise AbortException("timeout for wait_for_safe_loot")
+        return False
 
     def has_extract_panel(self):
-        return self._run_check_node("PinkPawHeist_CheckEvacuateOnce", timeout=0.2)
+        return self._recognize_once("PinkPawHeist_CheckEvacuateOnce")
 
     def try_open_exit(self, direction=None):
-        if not self.wait_until(self.find_interac, time_out=4):
+        if not self.wait_for_interac(time_out=4):
             raise AbortException("not found exit interaction")
         if direction is not None:
             self.send_key_up(direction)
-            self.sleep(0.3)
+            self.sleep(0.3, check_reward=False)
         ret = self.wait_until(
             self.has_extract_panel,
             pre_action=lambda: self.send_key("f", interval=1),
             time_out=1.75,
         )
         if ret:
-            self.sleep(0.3)
+            self.sleep(0.3, check_reward=False)
             self.send_key("esc", interval=0.5)
-            self.sleep(0.5)
+            self.sleep(0.5, check_reward=False)
         return ret
 
     def walk_until_extract_panel(self, direction=None, time_out=10):
@@ -717,8 +1268,8 @@ class PinkPawHeistCore3Path:
             if direction is not None:
                 self.send_key_up(direction)
 
-    def clear_current_combat(self):
-        self.switch_to_fighter(check_switched=True)
+    def clear_current_combat(self, fighter_mode="all_desc"):
+        self.switch_to_fighter(check_switched=True, mode=fighter_mode)
         self.fight_until_no_monster(timeout_no_monster=10000, wait_for_monster=True)
         self.switch_to_runner(check_switched=True)
 
@@ -783,7 +1334,9 @@ class PinkPawHeistCore3Path:
         return self.switch_to_key(key)
 
     def switch_to_runner(self, check_switched=False):
-        return self._begin_character_switch(self.ROLE_RUNNER, self.config.get(self.CONF_RUNNER, []), check_switched)
+        return self._begin_character_switch(
+            self.ROLE_RUNNER, self.config.get(self.CONF_RUNNER, []), check_switched
+        )
 
     def switch_to_avoider(self, check_switched=False):
         keys = self.config.get(self.CONF_AVOIDER, [])
@@ -902,10 +1455,10 @@ class PinkPawHeistCore3Path:
                 break
             self.next_frame()
 
-        self.wait_until(self.is_lock_pick_active, settle_time=0.5)
+        self.wait_lock_pick_active(settle_time=0.5)
         self.send_key_up("f")
         self.send_key_up("w")
-        self.wait_until(lambda: not self.is_lock_pick_active(), settle_time=0.5)
+        self.wait_until(lambda: not self.is_lock_pick_active_fast(), settle_time=0.5)
         if self.find_interac():
             self.goto_lg1_interrupted()
         self.sleep(0.01)
@@ -1339,8 +1892,15 @@ class PinkPawHeistCore3Path:
         self.sleep(3.2)
         self.switch_to_runner(check_switched=True)
         self.sleep(0.5)
+        self.send_key_down("d")
+        self.sleep(0.20)
+        self.send_key_up("d")
         self.wait_and_interact(is_lock=True)
         self.sleep(0.11)
+        self.send_key_down("a")
+        self.sleep(0.15)
+        self.send_key_up("a")
+        self.sleep(0.10)
         self.send_key_down("w")
         self.sleep(1.00)
         self.wait_and_interact(direction="w")
@@ -1385,7 +1945,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("s")
         self.sleep(0.11)
         self.send_key_down("d")
-        self.sleep(0.89)
+        self.sleep(0.94)
         self.send_key_up("d")
         self.sleep(0.41)
         self.send_key_up("f")  # end pick
@@ -1459,6 +2019,7 @@ class PinkPawHeistCore3Path:
         self.loot_safes_while_walking(
             direction="w", min_walk_time=0.8, time_out=1.3, hold=True, send_pick=True
         )
+        self.send_key_down("f")  # start pick
         self.sleep(0.10)
         self.send_key_down("space")
         self.sleep(0.13)
@@ -1467,7 +2028,11 @@ class PinkPawHeistCore3Path:
         self.send_key_down("space")
         self.sleep(0.13)
         self.send_key_up("space")
-        self.sleep(7.46)
+        self.sleep(3.46)
+        self.send_key_down("a")
+        self.sleep(0.13)
+        self.send_key_up("a")
+        self.sleep(6.54)
         self.send_key_down("d")
         self.sleep(1.31)
         self.send_key_up("d")
@@ -1501,7 +2066,7 @@ class PinkPawHeistCore3Path:
         self.switch_to_runner()
         self.sleep(0.30)
         self.send_key_down("a")
-        self.sleep(0.60)
+        self.sleep(0.68)
         self.send_key_up("a")
         self.sleep(0.11)
         self.send_key_down("s")
@@ -1692,7 +2257,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.11)
         self.send_key_down("f")  # start pick
         self.sleep(0.11)
-        self.wait_for_safe_loot(time_out=0.8)
+        self.wait_for_safe_loot(time_out=1.5)
         self.sleep(0.11)
         self.send_key_down("a")
         self.sleep(0.46)
@@ -1715,7 +2280,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("d")
         self.sleep(0.30)
         self.send_key_down("s")
-        self.sleep(0.30)
+        self.sleep(0.35)
         self.send_key_up("s")
 
         self.sleep(0.11)
@@ -2054,7 +2619,7 @@ class PinkPawHeistCore3Path:
         self.wait_team_ui_settle()
         # if not self.check_current_floor_str("藏品"):
         #     self.check_current_floor(2)
-        self.lg2_wp1_to_exit1() # self.lg2_wp1_to_exit1_safer(False)
+        self.lg2_wp1_to_exit1()  # self.lg2_wp1_to_exit1_safer(False)
         self.lg2_wp1_remains()
         self.lg2_wp2_to_exit2_safer()
         self.lg2_wp3_to_layzer_room()
@@ -2094,9 +2659,8 @@ class PinkPawHeistCore3Path:
         self.sleep(0.40)
         self.send_key("lshift", down_time=0.25)
         self.sleep(0.60)
-        self.wait_and_interact(direction="w", is_lock=True, time_out=5.2)
-        self.sleep(0.10)
         self.switch_to_avoider(check_switched=True)  # 切到狗哥潜行避免碰到怪改变路径
+        self.wait_and_interact(direction="w", is_lock=True, time_out=5.2)
         self.sleep(0.10)
         self.send_key_down("w")
         self.sleep(0.15)
@@ -2187,27 +2751,17 @@ class PinkPawHeistCore3Path:
         self.wait_and_interact(direction="d", is_lock=True, time_out=7.64)
         self.sleep(0.10)
         self.send_key_up("w")
-        if self.wait_ocr(x=0.60, y=0.52, to_x=0.70, to_y=0.57, match=re.compile("开门"), time_out=1.14):
+        if self.wait_ocr(
+            x=0.60,
+            y=0.52,
+            to_x=0.70,
+            to_y=0.57,
+            match=re.compile("开门"),
+            time_out=1.14,
+        ):
             self.sleep(0.10)
             self.send_key("f", down_time=0.10)
             self.sleep(0.10)
-        elif self.find_interac():
-            self.sleep(0.20)
-            self.clear_current_combat()
-            self.sleep(0.10)
-            self.send_key("w", down_time=0.32)
-            self.sleep(0.10)
-            self.send_key_down('d')
-            self.sleep(0.05)
-            self.wait_and_interact(direction="d", is_lock=False, time_out=3.65)
-            if self.find_interac():
-                is_open_door = self.lobby_open_door_check()
-                if not is_open_door:
-                    raise AbortException("timeout for wait_and_interact") # 考虑之后加复位或其他
-                else:
-                    self.sleep(0.10)
-                    self.send_key("f", down_time=0.10)
-                    self.sleep(0.10)
         self.send_key_down("w")
         self.sleep(0.24)
         self.send_key("a", down_time=0.36)
@@ -2219,23 +2773,23 @@ class PinkPawHeistCore3Path:
         self.sleep(0.30)
         self.switch_to_avoider(check_switched=True)
         self.sleep(0.10)
-        self.send_key_down('w')
+        self.send_key_down("w")
         self.sleep(0.64)
-        self.send_key('lshift', down_time=0.24)
+        self.send_key("lshift", down_time=0.24)
         self.sleep(0.64)
-        self.send_key('lshift', down_time=0.24)
+        self.send_key("lshift", down_time=0.24)
         self.sleep(0.64)
-        self.send_key('lshift', down_time=0.24)
+        self.send_key("lshift", down_time=0.24)
         self.sleep(0.64)
-        self.send_key_up('w')
+        self.send_key_up("w")
         self.sleep(0.10)
-        self.send_key_down('d')
+        self.send_key_down("d")
         self.sleep(0.64)
-        self.send_key('lshift', down_time=0.24)
+        self.send_key("lshift", down_time=0.24)
         self.sleep(0.64)
-        self.send_key_up('d')
+        self.send_key_up("d")
         self.sleep(0.10)
-        self.send_key_down('w')
+        self.send_key_down("w")
         self.sleep(0.24)
         self.send_key("lshift", down_time=0.24)
         self.sleep(0.60)
@@ -2249,25 +2803,25 @@ class PinkPawHeistCore3Path:
         self.sleep(0.24)
         self.send_key_up("d")
         self.sleep(0.24)
-        self.send_key('space', down_time=0.24)
+        self.send_key("space", down_time=0.24)
         self.sleep(0.64)
-        self.send_key('space', down_time=0.24)
+        self.send_key("space", down_time=0.24)
         self.sleep(0.64)
-        self.send_key('space', down_time=0.24)
+        self.send_key("space", down_time=0.24)
         self.sleep(0.64)
-        self.send_key('space', down_time=0.24)
+        self.send_key("space", down_time=0.24)
         self.sleep(0.64)
-        self.send_key('space', down_time=0.24)
+        self.send_key("space", down_time=0.24)
         self.sleep(0.64)
-        self.send_key('space', down_time=0.24)
+        self.send_key("space", down_time=0.24)
         self.sleep(0.64)
-        self.send_key('space', down_time=0.24)
+        self.send_key("space", down_time=0.24)
         self.sleep(0.64)
-        self.send_key('space', down_time=0.24)
+        self.send_key("space", down_time=0.24)
         self.sleep(0.64)
-        self.send_key('space', down_time=0.24)
+        self.send_key("space", down_time=0.24)
         self.sleep(0.84)
-        self.send_key('lshift', down_time=0.24)
+        self.send_key("lshift", down_time=0.24)
         self.sleep(0.84)
         self.send_key_up("w")
         self.sleep(0.10)
@@ -2285,11 +2839,11 @@ class PinkPawHeistCore3Path:
         self.sleep(0.10)
         self.send_key_down("a")
         self.sleep(0.20)
-        self.send_key('lshift', down_time=0.20)
+        self.send_key("lshift", down_time=0.20)
         self.sleep(0.20)
-        self.send_key('lshift', down_time=0.20)
+        self.send_key("lshift", down_time=0.20)
         self.sleep(0.20)
-        self.send_key('lshift', down_time=0.20)
+        self.send_key("lshift", down_time=0.20)
         self.sleep(1.20)
         self.send_key_up("a")
         self.sleep(0.10)
@@ -2319,25 +2873,25 @@ class PinkPawHeistCore3Path:
         self.sleep(0.10)
         self.click(down_time=0.64)
         self.sleep(0.10)
-        self.send_key_down('w')
+        self.send_key_down("w")
         self.sleep(1.14)
-        self.send_key('lshift', down_time=0.24)
+        self.send_key("lshift", down_time=0.24)
         self.sleep(0.42)
-        self.send_key('lshift', down_time=0.24)
+        self.send_key("lshift", down_time=0.24)
         self.sleep(0.42)
-        self.send_key('lshift', down_time=0.24)
+        self.send_key("lshift", down_time=0.24)
         self.sleep(0.42)
         self.send_key_down("d")
         self.sleep(0.42)
-        self.send_key_up('d')
+        self.send_key_up("d")
         self.sleep(0.42)
-        self.send_key('lshift', down_time=0.24)
+        self.send_key("lshift", down_time=0.24)
         self.sleep(0.76)
-        self.send_key_up('w')
+        self.send_key_up("w")
         self.sleep(0.10)
         self.click(down_time=0.64)
         self.sleep(0.10)
-        self.send_key_down('w')
+        self.send_key_down("w")
         self.wait_and_interact(direction="w", is_lock=True, time_out=7.64)
         self.sleep(0.10)
         self.send_key_down("w")
@@ -2346,11 +2900,18 @@ class PinkPawHeistCore3Path:
         self.wait_and_interact(direction="w", is_lock=False, time_out=3.65)
         self.sleep(0.30)
 
-    def lobby_open_door_check(self, check_time = 3):
+    def lobby_open_door_check(self, check_time=3):
         open_door = False
-        open_loop =0
+        open_loop = 0
         while not open_door and open_loop < check_time:
-            if self.wait_ocr(x=0.60, y=0.52, to_x=0.70, to_y=0.57, match=re.compile("开门"), time_out=1.14):
+            if self.wait_ocr(
+                x=0.60,
+                y=0.52,
+                to_x=0.70,
+                to_y=0.57,
+                match=re.compile("开门"),
+                time_out=1.14,
+            ):
                 open_door = True
             else:
                 self.sleep(0.10)
@@ -2361,17 +2922,19 @@ class PinkPawHeistCore3Path:
 
     def lg1_wp1_safer(self):
         self.log_round_info("LG1 WP1 Safer")
-        self.switch_to_runner(check_switched=True) # 确认切到薄荷跑图
+        self.switch_to_runner(check_switched=True)  # 确认切到薄荷跑图
         self.sleep(0.20)
-        self.send_key('w', down_time=9.08)
+        self.send_key("w", down_time=9.08)
         self.sleep(0.10)
-        self.send_key('d', down_time=1.72)
+        self.send_key("d", down_time=1.72)
         self.sleep(0.10)
-        self.send_key('s', down_time=1.00)
+        self.send_key("s", down_time=1.00)
         self.sleep(0.10)
-        self.send_key('f', down_time=0.10) # 这里没必要上检测，门口不安全，停太久可能会被蚊子扫
+        self.send_key(
+            "f", down_time=0.10
+        )  # 这里没必要上检测，门口不安全，停太久可能会被蚊子扫
         self.sleep(0.10)
-        self.send_key('f', down_time=0.10)
+        self.send_key("f", down_time=0.10)
         self.sleep(0.20)
         self.send_key_down("f")  # start pick
         self.sleep(0.11)
@@ -2527,7 +3090,14 @@ class PinkPawHeistCore3Path:
         self.send_key_up("w")
         self.switch_to_runner(check_switched=True)
         self.sleep(0.32)
+        self.send_key_down("d")
+        self.sleep(0.20)
+        self.send_key_up("d")
         self.wait_and_interact(is_lock=True)
+        self.sleep(0.10)
+        self.send_key_down("a")
+        self.sleep(0.15)
+        self.send_key_up("a")
         self.sleep(0.10)
         self.send_key_down("w")
         self.sleep(0.10)
@@ -2546,15 +3116,15 @@ class PinkPawHeistCore3Path:
         self.send_key_up("d")
         self.sleep(0.20)
         self.send_key_up("f")  # end pick
-        self.send_key_down('w')
+        self.send_key_down("w")
         self.sleep(1.70)
-        self.send_key_up('w')
+        self.send_key_up("w")
         self.sleep(0.11)
-        self.send_key_down('d')
+        self.send_key_down("d")
         self.sleep(0.80)
         self.send_key("lshift", down_time=0.10)
         self.sleep(2.00)
-        self.send_key_up('d')
+        self.send_key_up("d")
         self.sleep(0.11)
         self.send_key_down("s")
         self.sleep(0.31)
@@ -2625,12 +3195,14 @@ class PinkPawHeistCore3Path:
         self.sleep(0.40)
 
     def check_current_floor_str(self, floor_str):
-        ret = self.wait_ocr(0.04, 0.23, 0.17, 0.28, match=re.compile(floor_str), time_out=5)
+        ret = self.wait_ocr(
+            0.04, 0.23, 0.17, 0.28, match=re.compile(floor_str), time_out=5
+        )
         if ret:
             return True
 
     def switch_to_fighter(self, check_switched=False, mode="all_desc"):
-        """切换到可用战斗角色。   
+        """切换到可用战斗角色。
         `mode` 调度策略（配置重新从小到大排序后）：
         - "all_desc": [默认]按键位从大到小完整尝试（如 ["4", "1"]）
         - "all_asc" : 按键位从小到大完整尝试（如 ["1", "4"]）
@@ -2642,13 +3214,15 @@ class PinkPawHeistCore3Path:
         if not config_keys:
             dead_keys = set(self._dead_fighter_keys)
             config_keys = [item for item in config_keys if item not in dead_keys]
-            return self._begin_character_switch(self.ROLE_FIGHTER, config_keys, check_switched)
+            return self._begin_character_switch(
+                self.ROLE_FIGHTER, config_keys, check_switched
+            )
         sorted_keys = sorted(config_keys, key=int)
         if mode == "all_asc":
             keys = sorted_keys
         elif mode == "all_desc":
             keys = sorted_keys[::-1]
-        elif isinstance(mode, int):   
+        elif isinstance(mode, int):
             if mode == -1:
                 keys = [sorted_keys[-1]]
             else:
@@ -2656,7 +3230,9 @@ class PinkPawHeistCore3Path:
                 if 0 <= idx < len(sorted_keys):
                     keys = [sorted_keys[idx]]
                 else:
-                    self.log_error(f"切人位置越界！配置排序后只有 {len(sorted_keys)} 个人，你请求切第 {mode} 个，自动切最后一个。")
+                    self.log_error(
+                        f"切人位置越界！配置排序后只有 {len(sorted_keys)} 个人，你请求切第 {mode} 个，自动切最后一个。"
+                    )
                     keys = [sorted_keys[-1]]
         else:
             keys = sorted_keys[::-1]
@@ -2664,9 +3240,12 @@ class PinkPawHeistCore3Path:
         keys = [item for item in keys if item not in dead_keys]
         return self._begin_character_switch(self.ROLE_FIGHTER, keys, check_switched)
 
+
 @AgentServer.custom_action("PinkPawHeistScheme3Action")
 class PinkPawHeistScheme3Action(CustomAction):
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
         params = _parse_custom_action_param(argv)
         path = PinkPawHeistCore3Path(context, params=params)
         try:
