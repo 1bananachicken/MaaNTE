@@ -1,5 +1,7 @@
 # Pull Request
 
+提交前请阅读 [PR 规范](docs/zh_cn/develop/pull-request-guidelines.md)。
+
 ## 关联 Issue
 
 <!-- Closes #123 / Fixes #123 / Related #123；没有 Issue 时请说明需求来源。 -->
@@ -12,9 +14,7 @@
 
 <!-- 请写清楚测试入口、设备/控制器、结果。不要只写“已测试”。 -->
 
-- [ ] 我已同步最新 `dev` 分支
-- [ ] 我已确认 PR 目标分支是 `dev`
-- [ ] 我已阅读并遵守 [PR 规范](https://github.com/1bananachicken/MaaNTE/blob/dev/docs/zh_cn/develop/pull-request-guidelines.md)
+- [ ] 我已阅读并遵守 [PR 规范](docs/zh_cn/develop/pull-request-guidelines.md)
 
 ## 截图 / 日志 / 说明
 
