@@ -1,5 +1,6 @@
 {
     "autofish.fish_caught": "钓上鱼了！",
+    "autofish.fish_escape": "鱼逃走了！",
     "autofish.task_end": "钓鱼任务结束",
     "autofish.started": "=== 自动钓鱼已启动 ===",
     "autofish.progress": "=== 钓鱼 %d/%d ===",

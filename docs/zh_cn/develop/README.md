@@ -27,6 +27,7 @@
 |------|------|
 | [自定义动作开发](./custom-action.md) | Python CustomAction 编写、Controller API、Pipeline 集成 |
 | [节点测试](./node-testing.md) | 如何编写和运行节点测试，验证识别是否稳定命中 |
+| [DMCA / Abuse 提报模板](./dmca-abuse-template.md) | 仿冒/搬运/带毒仓库的一键复用提报文案（AGPL-3.0） |
 | [DeepWiki — MaaNTE](https://deepwiki.com/1bananachicken/MaaNTE) | 带 AI 的在线项目文档速览 |
 | [Pipeline 协议](https://maafw.com/docs/3.1-PipelineProtocol/) | MaaFramework 官方 Pipeline 协议全文 |
 
