@@ -1,0 +1,335 @@
+{
+    "task": [
+        {
+            "name": "自动日常本",
+            "label": "自动日常本",
+            "description": "刷取日常本",
+            "entry": "DF_Action",
+            "option": [
+                "DF_TargetNumber_clean",
+                "DF_Action"
+            ]
+        }
+    ],
+    "option": {
+        "DF_TargetNumber_clean": {
+            "type": "input",
+            "label": "$刷取次数",
+            "description": "$指定日常本的刷取次数",
+            "inputs": [
+                {
+                    "name": "DF_TargetNumber_clean_Value",
+                    "label": "$输入次数",
+                    "description": "$执行刷取次数后结束",
+                    "pipeline_type": "int",
+                    "verify": "^(([1-9])|([1-9][0-9]))$",
+                    "default": "1"
+                }
+            ],
+            "pipeline_override": {
+                "DF_TargetNumber_clean": {
+                    "recognition": {
+                        "param": {
+                            "custom_recognition_param": {
+                                "clean_node_name": "DF_TargetNumber",
+                                "target_number": "{DF_TargetNumber_clean_Value}"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "DF_Action": {
+            "type": "select",
+            "label": "$选取日常本",
+            "description": "$刷取目标为合订本",
+            "cases": [
+                {
+                    "name": "合订本",
+                    "label": "合订本",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "合订本"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "万花筒",
+                    "label": "万花筒",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "万花筒"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "硬币记",
+                    "label": "硬币记",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "硬币记"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "小心鸽子",
+                    "label": "小心鸽子",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "小心鸽子"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "扑克茶会",
+                    "label": "扑克茶会",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "扑克茶会"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "惊喜派对",
+                    "label": "惊喜派对",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "惊喜派对"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "心电感应",
+                    "label": "心电感应",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "心电感应"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "越狱艺术",
+                    "label": "越狱艺术",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "越狱艺术"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "苹果核",
+                    "label": "苹果核",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "苹果核"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "螺旋乐",
+                    "label": "螺旋乐",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "螺旋乐"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "液态梦",
+                    "label": "液态梦",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "液态梦"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "冷甜点",
+                    "label": "冷甜点",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "冷甜点"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "戏剧芯",
+                    "label": "戏剧芯",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "戏剧芯"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "钟表把戏",
+                    "label": "钟表把戏",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "钟表把戏"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "雕塑展馆",
+                    "label": "雕塑展馆",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "雕塑展馆"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "纬线织机",
+                    "label": "纬线织机",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "纬线织机"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "守卫萝卜",
+                    "label": "守卫萝卜",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "守卫萝卜"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "精神图谱",
+                    "label": "精神图谱",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "精神图谱"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "轨道之夜",
+                    "label": "轨道之夜",
+                    "pipeline_override": {
+                        "AF_ChooseNormalInstance": {
+                            "recognition": {
+                                "param": {
+                                    "custom_recognition_param": {
+                                        "target_instance": "轨道之夜"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
