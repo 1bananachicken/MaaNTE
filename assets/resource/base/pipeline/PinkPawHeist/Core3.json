@@ -112,7 +112,33 @@
         "next": []
     },
     "PinkPawHeist_Core3_CheckLockPickActiveOnce": {
-        "desc": "Core3 single lock-pick UI template check",
+        "desc": "Core3 single lock-pick active OCR check",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "奋力撬锁中",
+                    "撬锁中",
+                    "奋力撬",
+                    "锁中"
+                ],
+                "roi": [
+                    700,
+                    390,
+                    160,
+                    80
+                ],
+                "threshold": 0.65
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 100,
+        "next": []
+    },
+    "PinkPawHeist_Core3_CheckLockPickActiveTemplateOnce": {
+        "desc": "Core3 single lock-pick active template fallback check",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -123,7 +149,7 @@
                     260
                 ],
                 "template": "PinkPawHeist/heist_lock_pick.png",
-                "threshold": 0.41
+                "threshold": 0.40
             }
         },
         "action": {
@@ -140,8 +166,8 @@
                 "expected": [
                     "奋力撬锁中",
                     "撬锁中",
-                    "撬锁",
-                    "(?i)lock"
+                    "奋力撬",
+                    "锁中"
                 ],
                 "roi": [
                     700,

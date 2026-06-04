@@ -78,7 +78,7 @@ ENABLE_FAST_COLOR_RECO = True
 FAST_TEMPLATE_RECO_NODES = {
     "PinkPawHeist_Core3_CheckInteractTemplateOnce",
     "PinkPawHeist_Core3_CheckSafeLockPromptOnce",
-    "PinkPawHeist_Core3_CheckLockPickActiveOnce",
+    "PinkPawHeist_Core3_CheckLockPickActiveTemplateOnce",
 }
 
 FAST_RECO_CONFIG = {
@@ -104,11 +104,11 @@ FAST_RECO_CONFIG = {
         "threshold": 0.56,
         "cv_threshold": 0.90,
     },
-    "PinkPawHeist_Core3_CheckLockPickActiveOnce": {
+    "PinkPawHeist_Core3_CheckLockPickActiveTemplateOnce": {
         "type": "template",
         "roi": [720, 260, 360, 260],
         "templates": ["heist_lock_pick.png"],
-        "threshold": 0.48,
+        "threshold": 0.40,
         "cv_threshold": 0.86,
     },
 }
@@ -1114,9 +1114,7 @@ class PinkPawHeistCore3Path:
         return self._recognize_once("PinkPawHeist_Core3_CheckLockPickActiveOnce", image)
 
     def is_lock_pick_active(self):
-        if self.is_lock_pick_active_fast():
-            return True
-        return self._recognize_once("PinkPawHeist_Core3_CheckLockPickTextOnce")
+        return self.is_lock_pick_active_fast()
 
     def wait_lock_pick_active(self, time_out=2, settle_time=-1):
         if self.wait_until(
@@ -1126,6 +1124,21 @@ class PinkPawHeistCore3Path:
         ):
             return True
         return self.is_lock_pick_active()
+
+    def is_safe_lock_pick_active(self):
+        image = self._screencap()
+        if self._is_lock_pick_active_fast_in_image(image):
+            return True
+        return self._recognize_once(
+            "PinkPawHeist_Core3_CheckLockPickActiveTemplateOnce", image
+        )
+
+    def wait_safe_lock_pick_active(self, time_out=2, settle_time=-1):
+        return self.wait_until(
+            self.is_safe_lock_pick_active,
+            time_out=time_out,
+            settle_time=settle_time,
+        )
 
     def has_safe_lock_prompt(self):
         image = self._screencap()
@@ -1146,7 +1159,29 @@ class PinkPawHeistCore3Path:
         is_lock=False,
         time_out=10,
     ):
-        ret = self.wait_for_interac(time_out=time_out)
+        timeout = 10.0 if not time_out or time_out <= 0 else float(time_out)
+        lock_min_done_at = 0.0
+
+        def start_lock_min_timer():
+            nonlocal lock_min_done_at
+            if is_lock and lock_min_done_at <= 0:
+                lock_min_done_at = time.monotonic() + timeout
+
+        def remaining_min_time():
+            if not is_lock or lock_min_done_at <= 0:
+                return 0.0
+            return max(0.0, lock_min_done_at - time.monotonic())
+
+        def wait_until_min_time():
+            remaining = remaining_min_time()
+            if remaining > 0:
+                self.sleep(remaining, check_reward=False, scaled=False)
+
+        def press_interact():
+            start_lock_min_timer()
+            self.send_key("f", interval=0.5)
+
+        ret = self.wait_for_interac(time_out=timeout)
         if interact and direction is not None:
             self.send_key_up(direction)
             if key_up_sleep is None:
@@ -1155,17 +1190,34 @@ class PinkPawHeistCore3Path:
         if not ret:
             raise AbortException("timeout for wait_and_interact")
         if not interact:
+            wait_until_min_time()
             return True
-        self.wait_until(
+        interaction_closed = self.wait_until(
             lambda: not self.find_interac(),
-            pre_action=lambda: self.send_key("f", interval=0.5),
+            pre_action=press_interact,
+            time_out=max(2.0, timeout if is_lock else 0.001),
         )
         if is_lock:
-            self.wait_until(self.is_lock_pick_active_fast, time_out=2)
-            self.wait_until(
-                lambda: not self.is_lock_pick_active_fast(), settle_time=0.15
+            lock_started = self.wait_until(
+                self.is_lock_pick_active_fast,
+                time_out=max(2.0, remaining_min_time(), 0.001),
             )
-            return not self.find_interac()
+            if lock_started:
+                lock_finished = self.wait_until(
+                    lambda: not self.is_lock_pick_active_fast(),
+                    time_out=max(10.0, remaining_min_time(), 0.001),
+                    settle_time=0.15,
+                )
+                if not lock_finished:
+                    wait_until_min_time()
+                    self.log_warning("未确认撬锁结束，按保底时间等待后继续")
+            else:
+                self.log_warning("未确认撬锁开始，按保底时间等待后继续确认")
+            wait_until_min_time()
+            if not interaction_closed and self.find_interac(include_ocr=True):
+                self.log_warning("锁交互提示仍可见，继续路线")
+            return True
+        wait_until_min_time()
         return True
 
     def loot_safes_while_walking(
@@ -1199,9 +1251,9 @@ class PinkPawHeistCore3Path:
                     lock_pick_start = time.monotonic()
                     if direction is not None:
                         self.send_key_up(direction)
-                    if self.wait_lock_pick_active(time_out=2, settle_time=0.25):
+                    if self.wait_safe_lock_pick_active(time_out=2, settle_time=0.25):
                         self.wait_until(
-                            lambda: not self.is_lock_pick_active_fast(),
+                            lambda: not self.is_safe_lock_pick_active(),
                             time_out=10,
                             settle_time=0.5,
                         )
@@ -1220,10 +1272,10 @@ class PinkPawHeistCore3Path:
         deadline = time.monotonic() + time_out
         while time.monotonic() < deadline:
             if self.has_safe_lock_prompt():
-                self.wait_lock_pick_active(time_out=2)
-            if self.is_lock_pick_active_fast():
+                self.wait_safe_lock_pick_active(time_out=2)
+            if self.is_safe_lock_pick_active():
                 self.wait_until(
-                    lambda: not self.is_lock_pick_active_fast(),
+                    lambda: not self.is_safe_lock_pick_active(),
                     time_out=10,
                     settle_time=0.5,
                 )
@@ -1909,7 +1961,7 @@ class PinkPawHeistCore3Path:
         self.log_round_info("LG2 WP1尝试出口1")
         self.sleep(2.65)  # 2.65
         self.send_key_down("w")
-        self.sleep(5.04)
+        self.sleep(4.92)
         self.send_key_up("w")
         self.sleep(0.13)
         self.send_key_down("f")  # start pick
@@ -1945,7 +1997,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("s")
         self.sleep(0.11)
         self.send_key_down("d")
-        self.sleep(0.94)
+        self.sleep(0.90)
         self.send_key_up("d")
         self.sleep(0.41)
         self.send_key_up("f")  # end pick
@@ -2265,7 +2317,7 @@ class PinkPawHeistCore3Path:
 
         self.sleep(0.20)
         self.send_key_down("w")
-        self.sleep(0.40)
+        self.sleep(0.38)
         self.send_key_up("w")
         self.sleep(0.36)
         self.send_key_down("a")
@@ -2378,7 +2430,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("a")
         self.sleep(0.11)
         self.send_key_down("s")
-        self.sleep(0.63)
+        self.sleep(0.62)
         self.send_key_up("s")
         self.sleep(0.11)
         self.send_key_down("a")
@@ -2573,7 +2625,7 @@ class PinkPawHeistCore3Path:
         self.send_key_down("a")
         self.sleep(1.98)
         self.send_key_up("a")
-        self.wait_and_interact(direction="w", is_lock=True, time_out=6)
+        self.wait_and_interact(direction="w", is_lock=True, time_out=9)
         self.sleep(0.20)
         self.send_key_down("w")
         self.sleep(0.05)
