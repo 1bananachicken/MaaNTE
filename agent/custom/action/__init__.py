@@ -7,6 +7,7 @@ from .rhythm.feats.repeat_decision import *
 from .rhythm.feats.select_song import *
 from .Common.click import *
 from .realtime_task import *
+from .Navi import *
 from .pinkpaw.pinkpaw_core1 import *
 from .pinkpaw.pinkpaw_core2 import *
 from .pinkpaw.pinkpaw_reward_logger import *
@@ -33,6 +34,7 @@ __all__ = [
     "AutoRhythmRepeatDecision",
     "AutoRhythmSelectSong",
     "RealTimeTaskAction",
+    "NaviWebSocketAction",
     "PinkPawHeistScheme1Action",
     "PinkPawHeistScheme2Action",
     "PinkPawRewardSummary",
