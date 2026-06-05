@@ -132,7 +132,7 @@
                     "name": "Yes",
                     "label": "$option_switch_case_yes",
                     "pipeline_override": {
-                        "FurnitureChooseGoldenCapital": {
+                        "FurnitureChooseTianJun": {
                             "enabled": true
                         }
                     }
@@ -141,7 +141,7 @@
                     "name": "No",
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
-                        "FurnitureChooseGoldenCapital": {
+                        "FurnitureChooseTianJun": {
                             "enabled": false
                         }
                     }
