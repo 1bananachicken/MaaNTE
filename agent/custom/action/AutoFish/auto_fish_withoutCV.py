@@ -58,7 +58,6 @@ class AutoFishWithoutCV(CustomAction):
             ):
                 time.sleep(0.5)
                 image = context.tasker.controller.post_screencap().wait().get()
-
                 click_blank = context.run_recognition("SceneClickBlankToExit", image)
                 if click_blank and click_blank.hit:
                     PrintT(context, "autofish.fish_caught")
@@ -76,7 +75,8 @@ class AutoFishWithoutCV(CustomAction):
                         context, "钓鱼异常结束（可能是鱼溜走），继续钓鱼"
                     )  # 通常不会执行这一步
                     return CustomAction.RunResult(success=True)
-                continue
+                green_bar = context.run_recognition("FishGreenBar", image)
+                cursor = context.run_recognition("FishCursor", image)
 
             green_bar_x, green_bar_y, green_bar_w, green_bar_h = green_bar.box
             cursor_x, cursor_y, cursor_w, cursor_h = cursor.box
