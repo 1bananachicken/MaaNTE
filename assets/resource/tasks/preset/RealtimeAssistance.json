@@ -6,6 +6,19 @@
             "description": "$preset.RealtimeAssist.description",
             "task": [
                 {
+                    "name": "NaviWebSocket",
+                    "option": {
+                        "NaviWebSocketSettings": {
+                            "host": "0.0.0.0",
+                            "port": "14514",
+                            "frame_interval": "0.1"
+                        },
+                        "NaviWebSocketAngleBackend": "auto",
+                        "NaviWebSocketDebug": "No"
+                    },
+                    "enabled": true
+                },
+                {
                     "name": "RealTime",
                     "option": {
                         "RealTimeCheckInterval": {

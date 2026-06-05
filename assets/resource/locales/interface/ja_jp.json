@@ -158,5 +158,17 @@
     "task_touch_option_delay_after_f": "Fキー後の遅延 (ms)",
     "task_touch_option_delay_after_f_desc": "Fキー押下後の遅延時間（ミリ秒）",
     "task_touch_option_delay_after_click": "クリック後の遅延 (ms)",
-    "task_touch_option_delay_after_click_desc": "インタラクションエリアをクリックした後の遅延時間（ミリ秒）"
+    "task_touch_option_delay_after_click_desc": "インタラクションエリアをクリックした後の遅延時間（ミリ秒）",
+    "task_navi_websocket_label": "オンラインマップリアルタイム測位",
+    "task_navi_websocket_desc": "Navi WebSocket サービスを起動し、リアルタイムの位置と方向をローカルマップフロントエンドへ配信します。",
+    "task_navi_websocket_option_settings": "WebSocket 設定",
+    "task_navi_websocket_option_settings_desc": "リアルタイム測位サービスの待ち受けアドレスとサンプリング間隔を設定します。",
+    "task_navi_websocket_option_angle_backend": "方向推論バックエンド",
+    "task_navi_websocket_option_angle_backend_desc": "方向モデルで使用する推論バックエンドを選択します。既定では自動選択します。",
+    "task_navi_websocket_option_debug": "デバッグモード",
+    "task_navi_websocket_option_debug_desc": "有効にすると、測位と方向予測のデバッグウィンドウを表示します。",
+    "task_navi_websocket_input_host": "待ち受けアドレス",
+    "task_navi_websocket_input_port": "待ち受けポート",
+    "task_navi_websocket_input_frame_interval": "サンプリング間隔 (秒)",
+    "task_navi_websocket_input_frame_interval_desc": "スクリーンショット測位の最小間隔です。処理側で最低 0.05 秒に制限されます。"
 }

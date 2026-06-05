@@ -158,5 +158,17 @@
     "task_touch_option_delay_after_f": "按F後延遲 (ms)",
     "task_touch_option_delay_after_f_desc": "按下F鍵後的延遲時間（毫秒）",
     "task_touch_option_delay_after_click": "點擊後延遲 (ms)",
-    "task_touch_option_delay_after_click_desc": "點擊互動區域後的延遲時間（毫秒）"
+    "task_touch_option_delay_after_click_desc": "點擊互動區域後的延遲時間（毫秒）",
+    "task_navi_websocket_label": "線上地圖即時定位",
+    "task_navi_websocket_desc": "啟動 Navi WebSocket 服務，將即時位置和方向廣播給本機地圖前端。",
+    "task_navi_websocket_option_settings": "WebSocket 設定",
+    "task_navi_websocket_option_settings_desc": "設定即時定位服務的監聽位址和取樣間隔。",
+    "task_navi_websocket_option_angle_backend": "方向推理後端",
+    "task_navi_websocket_option_angle_backend_desc": "選擇方向模型使用的推理後端，預設自動選擇。",
+    "task_navi_websocket_option_debug": "除錯模式",
+    "task_navi_websocket_option_debug_desc": "啟用後顯示定位和方向預測除錯視窗。",
+    "task_navi_websocket_input_host": "監聽位址",
+    "task_navi_websocket_input_port": "監聽連接埠",
+    "task_navi_websocket_input_frame_interval": "取樣間隔 (秒)",
+    "task_navi_websocket_input_frame_interval_desc": "每次截圖定位之間的最小間隔，最低會限制為 0.05 秒。"
 }

@@ -10,7 +10,7 @@ from maa.custom_action import CustomAction
 from ..Common.logger import get_logger
 from .map_locator import MapLocationResult, MapLocator
 from .angle_predictor import AnglePredictionResult, AnglePredictor
-from .realtime_websocket import navigation_websocket
+from .websocket_backend import NavigationWebSocketPublisher
 
 logger = get_logger(__name__)
 
@@ -20,22 +20,23 @@ class NaviWebSocketAction(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        params = json.loads(argv.custom_action_param)
+        params = self.load_params(argv.custom_action_param)
+        host = params.get("host", "0.0.0.0")
+        port = params.get("port", 14514)
         debug = bool(params.get("debug", False))
-        frame_interval = max(0.01, float(params.get("frame_interval", 0.1)))
+        frame_interval = max(0.05, float(params.get("frame_interval", 0.1)))
 
         try:
             locator = MapLocator(
-                big_map_path=params.get("big_map_path") or params.get("map_path"),
                 debug=debug,
             )
             predictor = AnglePredictor(
-                backend=params.get("angle_backend") or params.get("backend"),
-                pointer_roi=params.get("pointer_roi") or None,
-                threshold=float(params.get("angle_threshold", 0.0)),
+                backend=params.get("angle_backend", "auto"),
+                threshold=0.0,
                 debug=debug,
             )
             angle_provider = predictor.provider_name()
+            navigation_websocket = NavigationWebSocketPublisher(host, port)
             navigation_websocket.start()
         except Exception as exc:
             logger.error(f"Navi WebSocket init failed: {exc}")
@@ -81,3 +82,16 @@ class NaviWebSocketAction(CustomAction):
                 cv2.destroyAllWindows()
 
         return CustomAction.RunResult(success=last_location.found)
+
+    @staticmethod
+    def load_params(custom_action_param) -> dict:
+        if not custom_action_param:
+            return {}
+        if isinstance(custom_action_param, dict):
+            return custom_action_param
+        try:
+            params = json.loads(custom_action_param)
+            return params if isinstance(params, dict) else {}
+        except Exception as exc:
+            logger.warning(f"Parse custom_action_param failed, use defaults: {exc}")
+            return {}

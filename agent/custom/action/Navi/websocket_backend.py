@@ -1,6 +1,5 @@
 import asyncio
 import json
-import os
 import threading
 import time
 import logging
@@ -15,14 +14,11 @@ get_logger("websockets.server").setLevel(logging.WARNING)
 get_logger("websockets.client").setLevel(logging.WARNING)
 get_logger("websockets.protocol").setLevel(logging.WARNING)
 
-DEFAULT_HOST = "127.0.0.1"
-DEFAULT_PORT = 8765
-
 
 class NavigationWebSocketPublisher:
-    def __init__(self) -> None:
-        self._host = os.environ.get("MAA_NAVI_WEBSOCKET_HOST", DEFAULT_HOST)
-        self._port = self._read_port()
+    def __init__(self, host="0.0.0.0", port="14514") -> None:
+        self._host = host
+        self._port = port
         self._state_lock = threading.Lock()
         self._start_lock = threading.Lock()
         self._started = False
@@ -36,16 +32,6 @@ class NavigationWebSocketPublisher:
             "angleConfidence": 0.0,
             "timestamp": 0.0,
         }
-
-    @staticmethod
-    def _read_port() -> int:
-        try:
-            return int(os.environ.get("MAA_NAVI_WEBSOCKET_PORT", DEFAULT_PORT))
-        except ValueError:
-            logger.warning(
-                f"Invalid MAA_NAVI_WEBSOCKET_PORT, use default {DEFAULT_PORT}"
-            )
-            return DEFAULT_PORT
 
     def start(self) -> None:
         with self._start_lock:
@@ -146,6 +132,3 @@ class NavigationWebSocketPublisher:
         finally:
             self._loop = None
             loop.close()
-
-
-navigation_websocket = NavigationWebSocketPublisher()

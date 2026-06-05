@@ -8,28 +8,25 @@
     "action": "Custom",
     "custom_action": "navi_websocket",
     "custom_action_param": {
-      "frame_interval": 0.1,
-      "angle_backend": "auto",
-      "angle_threshold": 0.0
+      "host": "0.0.0.0",
+      "port": 14514,
+      "debug": false,
+      "frame_interval": "0.1",
+      "angle_backend": "auto"
     }
   }
 }
 ```
 
-该入口已加入 `assets/resource/base/pipeline/MapLocator.json`。
+该入口位于 `assets/resource/base/pipeline/NaviWebSocket.json`，任务设置位于 `assets/resource/tasks/NaviWebSocket.json`。
 
 默认监听地址：
 
 ```text
-ws://127.0.0.1:8765
+ws://127.0.0.1:14514
 ```
 
-可通过环境变量调整监听地址：
-
-```text
-MAA_NAVI_WEBSOCKET_HOST
-MAA_NAVI_WEBSOCKET_PORT
-```
+可在任务设置中覆盖监听地址、端口、采样间隔、调试模式，并在 `auto`、`cpu` 和 `directml` 三个方向推理后端之间选择。
 
 消息格式：
 

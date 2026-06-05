@@ -1,18 +1,11 @@
-import json
 import math
-import time
 from dataclasses import dataclass
-from pathlib import Path
 
 import cv2
 import numpy as np
 
 from ..Common.logger import get_logger
 from .resources import resource_base_path
-
-from maa.agent.agent_server import AgentServer
-from maa.context import Context
-from maa.custom_action import CustomAction
 
 logger = get_logger(__name__)
 
@@ -28,46 +21,44 @@ class MapLocationResult:
 
 
 class MapLocator:
-    MAP_SIZE = (11264, 11264)  # (16896, 18176)
-    MINI_MAP_ROI = (28, 15, 150, 150)
-    MAP_CROP_SIZES = (268, 530, 660)
-    MAP_CROP_SIZE = MAP_CROP_SIZES[0]
-    SCALE_PROBE_INTERVAL = 10
-    MINI_GRAY_RANGE = (24, 58)
-    BIG_GRAY_RANGE = (18, 77)
-    SEARCH_RADIUS = 256
-    GLOBAL_MIN_SCORE = 0.75
-    LOCAL_MIN_SCORE = 0.65
-    SMOOTHING_ALPHA = 0.3
-    MIN_FILTER_PIXELS = 120
-    CIRCLE_PADDING = 11
-    CENTER_RADIUS = 11
-    DEBUG_MAP_WIDTH = 900
-    DEBUG_ZOOM_MAP_WIDTH = (
-        4000  # resolution of the separate high-res map used for zoom crops
+    MAP_SIZE = (11264, 11264)  # 大地图模板尺寸
+    MINI_MAP_ROI = (28, 15, 150, 150)  # 小地图ROI
+    MAP_CROP_SIZES = (
+        268,
+        530,
+        660,
+    )  # 大地图匹配模板尺寸（对应不同缩放级别下的小地图尺寸）
+    SEARCH_RADIUS = 256  # 邻域搜索半径
+    GLOBAL_MIN_SCORE = 0.75  # 全局搜索的最低置信度
+    LOCAL_MIN_SCORE = 0.65  # 邻域搜索的最低置信度
+    SMOOTHING_ALPHA = 0.7  # 越小越平滑，但是响应越慢
+    MIN_FILTER_PIXELS = (
+        120  # 模板中至少要有这么多有效像素才进行匹配，否则直接放弃，避免误匹配
     )
-    DEBUG_ZOOM_SIZE = 300  # pixel side length of the zoomed map inset
-    DEBUG_ZOOM_RADIUS_DEFAULT = 400  # default half-side of the original-coord zoom area
-    DEBUG_ZOOM_RADIUS_MAX = 2000
-    DEBUG_WIN = "Map Locator NCC"
-    # Each entry: (y_start, y_end, x_start, x_end) in original-image coordinates.
-    # They are scaled for the candidate match map before indexing its cache.
+    CIRCLE_PADDING = 11  # 小地图圆形掩码的内边距，单位像素
+
+    # 由于地图上存在大量纯黑区域，因此限定搜索范围，降低计算量
+    # 这些坐标在原图（11264x11264）上定义，代码中会根据当前缩放自动调整
+    # 坐标格式 [y_start, y_end, x_start, x_end]
     GLOBAL_SEARCH_REGIONS: list[tuple[int, int, int, int]] = [
         (8976, 9700, 1506, 2644),
         (2561, 8703, 2312, 7719),
     ]
 
-    def __init__(self, big_map_path: Path | None = None, debug: bool = False):
-        self.big_map_path = (
-            Path(big_map_path)
-            if big_map_path
-            else (resource_base_path() / "image/map/bigworldmapSecond.png")
-        )
+    # debug visualization parameters
+    DEBUG_MAP_WIDTH = 900
+    DEBUG_ZOOM_MAP_WIDTH = 4000
+    DEBUG_ZOOM_SIZE = 300
+    DEBUG_ZOOM_RADIUS_DEFAULT = 400
+    DEBUG_ZOOM_RADIUS_MAX = 2000
+    DEBUG_WIN = "Map Locator"
+
+    def __init__(self, debug: bool = False):
+        self.big_map_path = resource_base_path() / "image/map/bigworldmapSecond.png"
         self.debug = debug
         self.last_center: tuple[int, int] | None = None
         self.smoothed_center: tuple[float, float] | None = None
         self._active_map_crop_index = 0
-        self._frame_count = 0
 
         big_gray = cv2.imread(str(self.big_map_path), cv2.IMREAD_GRAYSCALE)
         if big_gray is None:
@@ -80,6 +71,8 @@ class MapLocator:
                 f"expected {self.MAP_SIZE[0]}x{self.MAP_SIZE[1]}"
             )
 
+        # 由于模板匹配对缩放敏感，需要预生成多尺度匹配模板，适配不同速度下的小地图尺寸
+        # Fucking Neverness to Everness
         self._match_maps: list[tuple[float, np.ndarray]] = []
         for map_crop_size in self.MAP_CROP_SIZES:
             scale = self.MINI_MAP_ROI[2] / map_crop_size
@@ -90,10 +83,8 @@ class MapLocator:
             resized_gray = cv2.resize(
                 big_gray, match_size, interpolation=cv2.INTER_AREA
             )
-            self._match_maps.append(
-                (scale, cv2.inRange(resized_gray, *self.BIG_GRAY_RANGE))
-            )
-        self._activate_map_crop_size(0)
+            self._match_maps.append((scale, resized_gray))
+        self.activate_map_crop_size(0)
 
         if self.debug:
             self.debug_scale = min(1.0, self.DEBUG_MAP_WIDTH / self.origin_w)
@@ -103,7 +94,7 @@ class MapLocator:
             )
             debug_gray = cv2.resize(big_gray, debug_size, interpolation=cv2.INTER_AREA)
             self.debug_map = cv2.cvtColor(debug_gray, cv2.COLOR_GRAY2BGR)
-            # high-res map kept solely for sharp zoom crops
+
             self.zoom_map_scale = min(1.0, self.DEBUG_ZOOM_MAP_WIDTH / self.origin_w)
             zoom_map_size = (
                 int(round(self.origin_w * self.zoom_map_scale)),
@@ -113,9 +104,9 @@ class MapLocator:
                 big_gray, zoom_map_size, interpolation=cv2.INTER_AREA
             )
             self.zoom_map = cv2.cvtColor(zoom_map_gray, cv2.COLOR_GRAY2BGR)
-            # zoom / pan state
+
             self._zoom_radius: int = self.DEBUG_ZOOM_RADIUS_DEFAULT
-            self._zoom_pan: list[float] = [0.0, 0.0]  # pan offset in original coords
+            self._zoom_pan: list[float] = [0.0, 0.0]
             self._drag_state: dict = {
                 "active": False,
                 "sx": 0,
@@ -129,12 +120,16 @@ class MapLocator:
             f"crop_sizes={self.MAP_CROP_SIZES}"
         )
 
-    def _activate_map_crop_size(self, index: int) -> None:
+    def activate_map_crop_size(self, index: int) -> None:
         previous_size = getattr(self, "map_crop_size", None)
         self._active_map_crop_index = index
         self.map_crop_size = self.MAP_CROP_SIZES[index]
         self.scale, self.big_match = self._match_maps[index]
-        if previous_size is not None and previous_size != self.map_crop_size:
+        if (
+            previous_size is not None
+            and previous_size != self.map_crop_size
+            and self.debug
+        ):
             logger.info(
                 f"NCC map crop size switched: {previous_size} -> {self.map_crop_size}"
             )
@@ -147,52 +142,50 @@ class MapLocator:
             )
 
         minimap = frame[y : y + h, x : x + w]
-        if minimap.ndim == 2:
-            mini_gray = minimap
-        elif minimap.shape[2] == 4:
-            mini_gray = cv2.cvtColor(minimap, cv2.COLOR_BGRA2GRAY)
-        else:
-            mini_gray = cv2.cvtColor(minimap, cv2.COLOR_BGR2GRAY)
-
-        template = cv2.inRange(mini_gray, *self.MINI_GRAY_RANGE)
+        # 小地图预处理
+        # 1. 初始化 Mask
         template_mask = np.zeros((h, w), dtype=np.uint8)
         center = (w // 2, h // 2)
         cv2.circle(template_mask, center, min(w, h) // 2 - self.CIRCLE_PADDING, 255, -1)
-        cv2.circle(template_mask, center, self.CENTER_RADIUS, 0, -1)
-        template = cv2.bitwise_and(template, template_mask)
 
-        if self._frame_count % self.SCALE_PROBE_INTERVAL == 0:
-            matches = [
-                self._match_template(template, template_mask, w, h, index)
-                for index in range(len(self.MAP_CROP_SIZES))
-            ]
-            valid_matches = [
-                (index, match) for index, match in enumerate(matches) if match.found
-            ]
-            if valid_matches:
-                selected_index, result = max(
-                    valid_matches,
-                    key=lambda item: (
-                        item[1].score,
-                        item[0] == self._active_map_crop_index,
-                    ),
-                )
-                self._activate_map_crop_size(selected_index)
-            else:
-                result = matches[self._active_map_crop_index]
-        else:
-            result = self._match_template(
-                template, template_mask, w, h, self._active_map_crop_index
+        # 2. HSV颜色过滤，去除小图标干扰
+        hsv_img = cv2.cvtColor(minimap, cv2.COLOR_BGR2HSV)
+        color_mask = cv2.inRange(hsv_img, np.array([0, 0, 0]), np.array([179, 66, 80]))
+
+        # 3. 结合颜色掩码和圆形掩码
+        combined_mask = cv2.bitwise_and(color_mask, template_mask)
+
+        # 4. 直接取 V 通道作为灰度，并应用掩码
+        v_channel = hsv_img[:, :, 2]
+        mini_gray = cv2.bitwise_and(v_channel, combined_mask)
+
+        # 5. 大地图灰度 = 小地图灰度 - 3，在这里做严格对齐
+        template = cv2.subtract(mini_gray, 3)
+
+        # 多尺度匹配
+        matches = [
+            self.match_template(template, template_mask, w, h, index)
+            for index in range(len(self.MAP_CROP_SIZES))
+        ]
+        valid_matches = [
+            (index, match) for index, match in enumerate(matches) if match.found
+        ]
+        if valid_matches:
+            selected_index, result = max(
+                valid_matches,
+                key=lambda item: (
+                    item[1].score,
+                    item[0] == self._active_map_crop_index,
+                ),
             )
-        self._frame_count += 1
+            self.activate_map_crop_size(selected_index)
+        else:
+            result = matches[self._active_map_crop_index]
 
-        if self._frame_count == 10000:
-            self._frame_count = 0  # prevent overflow in long runs
-
-        raw_point = result.raw_point
-        polygon = result.polygon
-        score = result.score
-        mode = result.mode
+        raw_point = result.raw_point  # 原始坐标
+        polygon = result.polygon  # 匹配区域的四边形顶点坐标
+        score = result.score  # 置信度
+        mode = result.mode  # 匹配模式（local/global/rejected）
 
         if raw_point is None:
             self.last_center = None
@@ -202,6 +195,7 @@ class MapLocator:
             self.smoothed_center = tuple(float(value) for value in raw_point)
             point = raw_point
         else:
+            # EMA平滑坐标，减少抖动
             alpha = self.SMOOTHING_ALPHA
             self.smoothed_center = (
                 self.smoothed_center[0] * (1.0 - alpha) + raw_point[0] * alpha,
@@ -223,7 +217,7 @@ class MapLocator:
 
         return result
 
-    def _match_template(
+    def match_template(
         self,
         template: np.ndarray,
         template_mask: np.ndarray,
@@ -242,7 +236,7 @@ class MapLocator:
             mode = "global"
 
             if self.last_center is not None:
-                # ---- local search ----
+                # 邻域搜索
                 center_x = self.last_center[0] * scale
                 center_y = self.last_center[1] * scale
                 radius = self.SEARCH_RADIUS * scale
@@ -268,30 +262,33 @@ class MapLocator:
                 best_offset_x, best_offset_y = offset_x, offset_y
                 best_loc = max_loc
             else:
-                # ---- global search across all valid regions ----
+                # 全局搜索
                 best_score_g = -1.0
                 best_loc = None
                 best_offset_x, best_offset_y = 0, 0
                 for ry0, ry1, rx0, rx1 in self.GLOBAL_SEARCH_REGIONS:
-                    # regions are defined in original-image coords; scale to match-image coords
+                    # 将全局搜索区域坐标根据当前缩放调整到匹配图尺寸
                     mry0 = int(round(ry0 * scale))
                     mry1 = int(round(ry1 * scale))
                     mrx0 = int(round(rx0 * scale))
                     mrx1 = int(round(rx1 * scale))
                     region = big_match[mry0:mry1, mrx0:mrx1]
                     if region.shape[0] < h or region.shape[1] < w:
-                        logger.debug(
+                        logger.warning(
                             f"Global search region ({rx0},{ry0})-({rx1},{ry1}) skipped: "
                             f"region too small ({region.shape[1]}x{region.shape[0]}) for template ({w}x{h})"
                         )
                         continue
-                    resp = cv2.matchTemplate(
+                    # 核心匹配计算
+                    response = cv2.matchTemplate(
                         region, template, cv2.TM_CCORR_NORMED, mask=template_mask
                     )
-                    resp = np.nan_to_num(resp, nan=-1.0, posinf=-1.0, neginf=-1.0)
-                    resp[(resp < -1e-6) | (resp > 1.0 + 1e-6)] = -1.0
-                    np.clip(resp, 0.0, 1.0, out=resp)
-                    _, s, _, loc = cv2.minMaxLoc(resp)
+                    response = np.nan_to_num(
+                        response, nan=-1.0, posinf=-1.0, neginf=-1.0
+                    )
+                    response[(response < -1e-6) | (response > 1.0 + 1e-6)] = -1.0
+                    np.clip(response, 0.0, 1.0, out=response)
+                    _, s, _, loc = cv2.minMaxLoc(response)
 
                     if s > best_score_g:
                         best_score_g = s
@@ -300,6 +297,7 @@ class MapLocator:
                 score = best_score_g
 
             if best_loc is not None and score >= min_score:
+                # 坐标映射
                 match_x = best_offset_x + best_loc[0]
                 match_y = best_offset_y + best_loc[1]
                 raw_point = (
@@ -327,7 +325,7 @@ class MapLocator:
             polygon=polygon,
         )
 
-    def _setup_debug_window(self) -> None:
+    def setup_debug_window(self) -> None:
         """Create the OpenCV window with trackbar and mouse callback (once)."""
         cv2.namedWindow(self.DEBUG_WIN, cv2.WINDOW_AUTOSIZE)
 
@@ -367,7 +365,7 @@ class MapLocator:
 
     def show_debug(self, template: np.ndarray, result: MapLocationResult) -> None:
         if not self._debug_win_ready:
-            self._setup_debug_window()
+            self.setup_debug_window()
 
         # ---- full-map overview panel ----
         map_view = self.debug_map.copy()
@@ -394,7 +392,6 @@ class MapLocator:
             cv2.LINE_AA,
         )
 
-        # ---- mini template panel ----
         mini_view = cv2.cvtColor(template, cv2.COLOR_GRAY2BGR)
         mini_view = cv2.resize(mini_view, (280, 280), interpolation=cv2.INTER_NEAREST)
         if mini_view.shape[0] < map_view.shape[0]:
@@ -407,11 +404,9 @@ class MapLocator:
                 cv2.BORDER_CONSTANT,
             )
 
-        # ---- zoomed inset panel (pannable + zoomable) ----
         zoom_side = self.DEBUG_ZOOM_SIZE
         r = self._zoom_radius
         if result.point is not None:
-            # zoom center = match point + user pan offset
             cx = result.point[0] + self._zoom_pan[0]
             cy = result.point[1] + self._zoom_pan[1]
         else:
@@ -424,7 +419,7 @@ class MapLocator:
         z_y0 = cy - r
         z_x1 = cx + r
         z_y1 = cy + r
-        # crop from the high-res zoom_map for sharpness
+
         zs = self.zoom_map_scale
         cx0 = int(max(0, z_x0 * zs))
         cy0 = int(max(0, z_y0 * zs))
@@ -433,11 +428,10 @@ class MapLocator:
 
         if cx1 > cx0 and cy1 > cy0:
             zoom_crop = self.zoom_map[cy0:cy1, cx0:cx1].copy()
-            # draw polygon
             if result.polygon is not None:
                 poly_shifted = (result.polygon - np.float32([[[z_x0, z_y0]]])) * zs
                 cv2.polylines(zoom_crop, [np.int32(poly_shifted)], True, (0, 255, 0), 2)
-            # draw match point
+
             if result.point is not None:
                 dot_x = int((result.point[0] - z_x0) * zs)
                 dot_y = int((result.point[1] - z_y0) * zs)
@@ -460,7 +454,6 @@ class MapLocator:
                 cv2.LINE_AA,
             )
 
-        # ---- assemble panels ----
         target_h = map_view.shape[0]
         panels = [mini_view, map_view]
         if zoom_view.shape[0] < target_h:
@@ -471,61 +464,3 @@ class MapLocator:
             zoom_view = zoom_view[:target_h]
         panels.append(zoom_view)
         cv2.imshow(self.DEBUG_WIN, np.concatenate(panels, axis=1))
-
-
-@AgentServer.custom_action("map_locator")
-class MapLocatorTestAction(CustomAction):
-    def run(
-        self, context: Context, argv: CustomAction.RunArg
-    ) -> CustomAction.RunResult:
-        params = argv.custom_action_param or {}
-        if not isinstance(params, dict):
-            try:
-                params = json.loads(params)
-            except Exception as exc:
-                logger.warning(f"Parse custom_action_param failed, use defaults: {exc}")
-                params = {}
-        if not isinstance(params, dict):
-            params = {}
-
-        debug = bool(params.get("debug", False))
-        try:
-            locator = MapLocator(
-                big_map_path=params.get("big_map_path") or params.get("map_path"),
-                debug=debug,
-            )
-        except Exception as exc:
-            logger.error(f"Map locator NCC init failed: {exc}")
-            return CustomAction.RunResult(success=False)
-
-        logger.info(
-            f"Map locator NCC started: map={locator.big_map_path}, debug={debug}"
-        )
-        controller = context.tasker.controller
-        last_result = MapLocationResult(False, None, None, 0.0, "init")
-
-        try:
-            while not context.tasker.stopping:
-                started = time.perf_counter()
-                frame = controller.post_screencap().wait().get()
-                if frame is None:
-                    continue
-
-                last_result = locator.locate(frame)
-
-                if debug and (cv2.waitKey(1) & 0xFF == ord("q")):
-                    break
-
-                if debug:
-                    logger.debug(f"time={time.perf_counter() - started:.3f}s")
-                sleep_time = 0.1 - (time.perf_counter() - started)
-                if sleep_time > 0:
-                    time.sleep(sleep_time)
-        except Exception as exc:
-            logger.error(f"Map locator NCC failed: {exc}")
-            return CustomAction.RunResult(success=False)
-        finally:
-            if debug:
-                cv2.destroyAllWindows()
-
-        return CustomAction.RunResult(success=last_result.found)

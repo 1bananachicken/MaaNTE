@@ -33,18 +33,14 @@ class AnglePredictionResult:
 class AnglePredictor:
     def __init__(
         self,
-        model_path: Path | None = None,
         backend: str | None = None,
-        pointer_roi: list[int] | None = None,
         threshold: float = 0.0,
         debug: bool = False,
     ):
-        if model_path is None:
-            model_path = resource_base_path() / "model/navi/pointer_model.onnx"
-
+        model_path = resource_base_path() / "model/navi/pointer_model.onnx"
         self.model_path = Path(model_path)
-        self.backend = self._resolve_backend(backend)
-        self.pointer_roi = pointer_roi or [73, 60, 64, 64]
+        self.backend = self.resolve_backend(backend)
+        self.pointer_roi = [73, 60, 64, 64]
         self.threshold = threshold
         self.debug = debug
         self._session_cache = {}
@@ -55,7 +51,7 @@ class AnglePredictor:
         }
 
     def predict(self, frame: np.ndarray) -> AnglePredictionResult:
-        session, _provider_name = self._get_session()
+        session, _ = self.get_session()
         input_name = session.get_inputs()[0].name
 
         if frame.shape[2] == 4:
@@ -161,10 +157,10 @@ class AnglePredictor:
             cv2.destroyWindow("Angle Predictor")
 
     def provider_name(self) -> str:
-        _session, provider_name = self._get_session()
+        _, provider_name = self.get_session()
         return provider_name
 
-    def _resolve_backend(self, backend: str | None) -> str:
+    def resolve_backend(self, backend: str | None) -> str:
         backend = (
             str(backend or os.environ.get("MAA_ONNX_BACKEND", "cpu")).strip().lower()
         )
@@ -184,7 +180,7 @@ class AnglePredictor:
             return "cpu"
         return backend
 
-    def _get_session(self):
+    def get_session(self):
         backend = self.backend
         if backend in self._session_cache:
             return self._session_cache[backend]
@@ -213,71 +209,3 @@ class AnglePredictor:
         )
         self._session_cache[backend] = (session, provider_name)
         return self._session_cache[backend]
-
-
-@AgentServer.custom_action("predict_angle")
-class AnglePredictorTestAction(CustomAction):
-    def run(
-        self, context: Context, argv: CustomAction.RunArg
-    ) -> CustomAction.RunResult:
-        params = _load_params(argv.custom_action_param)
-        debug = bool(params.get("debug", False))
-        frame_interval = float(params.get("frame_interval", 0.016))
-        threshold = float(params.get("threshold", 0.0))
-        pointer_roi = params.get("pointer_roi") or None
-        backend = params.get("backend")
-
-        try:
-            predictor = AnglePredictor(
-                backend=backend,
-                pointer_roi=pointer_roi,
-                threshold=threshold,
-                debug=debug,
-            )
-            provider_name = predictor.provider_name()
-        except Exception as exc:
-            logger.error(f"Angle predictor init failed: {exc}")
-            return CustomAction.RunResult(success=False)
-
-        logger.info(
-            f"Angle predictor started: backend={predictor.backend}, provider={provider_name}, debug={debug}"
-        )
-        controller = context.tasker.controller
-        last_result = AnglePredictionResult(found=False, angle=None, confidence=0.0)
-
-        try:
-            while not context.tasker.stopping:
-                started = time.perf_counter()
-                frame = controller.post_screencap().wait().get()
-                if frame is None:
-                    continue
-
-                last_result = predictor.predict(frame)
-
-                if debug and (cv2.waitKey(1) & 0xFF == ord("q")):
-                    break
-
-                sleep_time = frame_interval - (time.perf_counter() - started)
-                if sleep_time > 0:
-                    time.sleep(sleep_time)
-        except Exception as exc:
-            logger.error(f"Angle predictor failed: {exc}")
-            return CustomAction.RunResult(success=False)
-        finally:
-            if debug:
-                cv2.destroyAllWindows()
-
-        return CustomAction.RunResult(success=last_result.found)
-
-
-def _load_params(custom_action_param) -> dict:
-    if not custom_action_param:
-        return {}
-    if isinstance(custom_action_param, dict):
-        return custom_action_param
-    try:
-        params = json.loads(custom_action_param)
-        return params if isinstance(params, dict) else {}
-    except Exception as exc:
-        logger.warning(f"Parse custom_action_param failed, use defaults: {exc}")
-        return {}

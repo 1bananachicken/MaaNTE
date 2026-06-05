@@ -158,5 +158,17 @@
     "task_touch_option_delay_after_f": "Delay After F (ms)",
     "task_touch_option_delay_after_f_desc": "Delay time after pressing F key (milliseconds)",
     "task_touch_option_delay_after_click": "Delay After Click (ms)",
-    "task_touch_option_delay_after_click_desc": "Delay time after clicking interaction area (milliseconds)"
+    "task_touch_option_delay_after_click_desc": "Delay time after clicking interaction area (milliseconds)",
+    "task_navi_websocket_label": "Online Map Real-time Positioning",
+    "task_navi_websocket_desc": "Start the Navi WebSocket service and broadcast live position and direction to the local map frontend.",
+    "task_navi_websocket_option_settings": "WebSocket Settings",
+    "task_navi_websocket_option_settings_desc": "Configure the real-time positioning service listen address and sampling interval.",
+    "task_navi_websocket_option_angle_backend": "Angle Backend",
+    "task_navi_websocket_option_angle_backend_desc": "Choose the inference backend used by the angle model. Auto is the default.",
+    "task_navi_websocket_option_debug": "Debug Mode",
+    "task_navi_websocket_option_debug_desc": "Show positioning and angle prediction debug windows when enabled.",
+    "task_navi_websocket_input_host": "Listen Host",
+    "task_navi_websocket_input_port": "Listen Port",
+    "task_navi_websocket_input_frame_interval": "Sampling Interval (s)",
+    "task_navi_websocket_input_frame_interval_desc": "Minimum interval between screenshot localization runs. The action clamps it to at least 0.05 seconds."
 }

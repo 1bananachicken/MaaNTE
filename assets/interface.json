@@ -99,25 +99,7 @@
             "default_expand": true
         }
     ],
-    "task": [
-        {
-            "name": "MapLocator",
-            "entry": "MapLocator"
-        },
-        {
-            "name": "NaviWebSocket",
-            "label": "在线地图实时定位",
-            "description": "打开在线地图，将实时位置和方向指针直接显示在原始网页地图图层中。",
-            "entry": "NaviWebSocket",
-            "group": [
-                "RealTimeAssist"
-            ]
-        },
-        {
-            "name": "AnglePredictor",
-            "entry": "AnglePredictor"
-        }
-    ],
+    "task": [],
     "import": [
         // group:Daily
         "resource/tasks/ClaimRewards.json",
@@ -132,6 +114,7 @@
         "resource/tasks/Tetris.json",
         // group:RealTimeAssist
         "resource/tasks/RealTime.json",
+        "resource/tasks/NaviWebSocket.json",
         "resource/tasks/SoundDodge.json",
         "resource/tasks/AutoFScroll.json",
         // group:others

@@ -12,4 +12,3 @@ def resource_base_path() -> Path:
             return resource_base
 
     raise FileNotFoundError("Unable to locate resource/base directory")
-
