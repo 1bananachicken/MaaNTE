@@ -49,6 +49,22 @@
         "post_delay": 0,
         "rate_limit": 0
     },
+    "FurnitureIntactCrate": {
+        "desc": "识别完整的木箱",
+        "recognition": "OCR",
+        "roi": [
+            948,
+            170,
+            308,
+            517
+        ],
+        "expected": [
+            "完整的木箱"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
     "FurnitureClaim": {
         "desc": " 识别按钮黄底",
         "recognition": "ColorMatch",

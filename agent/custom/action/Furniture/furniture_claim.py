@@ -9,6 +9,7 @@ FURNITURE_RECOG_NODES = [
     ("FurnitureHamsterBall", "仓鼠球", "hamster_ball"),
     ("FurnitureFluff", "棉棉", "fluff"),
     ("FurnitureDamagedCrate", "破损的木箱", "damaged_crate"),
+    ("FurnitureIntactCrate", "完整的木箱", "intact_crate"),
 ]
 
 
