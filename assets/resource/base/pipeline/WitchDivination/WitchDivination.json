@@ -127,27 +127,13 @@
     },
     "WitchDivinationClickWitchHouse": {
         "desc": "在「魔女之家」位置执行点击",
-        // "recognition": {
-        //     "type": "OCR",
-        //     "param": {
-        //         "roi": [
-        //             893,
-        //             120,
-        //             367,
-        //             533
-        //         ],
-        //         "expected": [
-        //             "魔女之家"
-        //         ]
-        //     }
-        // },
         "action": {
             "type": "TouchDown",
             "param": {
                 "target": "WitchDivinationMoveToWitchHouse" // 鼠标已在目标位置，直接点击
             }
         },
-        "post_wait_freezes": 500, // 点击后等待全屏稳定 
+        "post_wait_freezes": 50, // 点击后等待全屏稳定 
         "next": [
             "WitchDivinationClickWitchHouse2",
             "WitchDivinationCheckTodayGuide"
@@ -161,7 +147,7 @@
                 "target": "WitchDivinationMoveToWitchHouse" // 鼠标已在目标位置，直接点击
             }
         },
-        "post_wait_freezes": 500, // 点击后等待全屏稳定 
+        "post_wait_freezes": 50, // 点击后等待全屏稳定 
         "next": [
             "WitchDivinationVerifyWitchHouse",
             "WitchDivinationEntrance"
