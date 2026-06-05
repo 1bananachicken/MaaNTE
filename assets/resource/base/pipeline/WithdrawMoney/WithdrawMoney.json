@@ -81,8 +81,9 @@
         "action": "Click",
         "next": [
             "[JumpBack]SceneClickBlankToExit",
-            "WithdrawMoneyEnterItemList",
-            "点击补货"
+            "[JumpBack]WithdrawMoneyEnterItemList",
+            "点击补货",
+            "WithdrawMoneyExit"
         ]
     },
     "WithdrawMoneyEnterItemList": {
@@ -101,6 +102,12 @@
                     "累計營業時間",
                     "(?i)Total\\s*Operating\\s*Time",
                     "累計営業時間"
+                ],
+                "roi_offset": [
+                    0,
+                    0,
+                    182,
+                    0
                 ]
             }
         },
@@ -174,11 +181,7 @@
                 ]
             }
         },
-        "action": "Click",
-        "next": [
-            "点击补货",
-            "WithdrawMoneyExit"
-        ]
+        "action": "Click"
     },
     "点击补货": {
         "recognition": {

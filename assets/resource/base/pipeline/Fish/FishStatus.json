@@ -62,7 +62,9 @@
         "recognition": "OCR",
         "expected": [
             "鱼儿溜走了",
-            "The fish got away!"
+            "魚兒溜走了",
+            "(?i)The\\s*fish\\s*got\\s*away\\s*!",
+            "魚に逃げられた"
         ],
         "pre_delay": 0,
         "post_delay": 0,
