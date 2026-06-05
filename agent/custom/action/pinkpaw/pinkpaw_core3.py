@@ -1297,8 +1297,8 @@ class PinkPawHeistCore3Path:
             self.sleep(0.3, check_reward=False)
         ret = self.wait_until(
             self.has_extract_panel,
-            pre_action=lambda: self.send_key("f", interval=1),
-            time_out=1.75,
+            pre_action=lambda: self.send_key("f", interval=0.7),
+            time_out=2.5,
         )
         if ret:
             self.sleep(0.3, check_reward=False)
@@ -1371,7 +1371,7 @@ class PinkPawHeistCore3Path:
         return True
 
     def switch_to_key(self, key):
-        for _ in range(3):
+        for _ in range(4):
             self.send_key(str(key))
             self.sleep(0.2)
         return str(key)
@@ -1997,29 +1997,29 @@ class PinkPawHeistCore3Path:
         self.send_key_up("s")
         self.sleep(0.11)
         self.send_key_down("d")
-        self.sleep(0.90)
+        self.sleep(0.93)
         self.send_key_up("d")
         self.sleep(0.41)
         self.send_key_up("f")  # end pick
         self.sleep(0.11)
         self.send_key_down("w")
-        self.sleep(2.81)
+        self.sleep(2.71)
         self.exit_state[1] = self.try_open_exit(direction="w")
 
     def lg2_wp1_remains(self):
         self.log_round_info("LG2 WP1剩余路线")
         self.send_key_down("w")
-        self.sleep(2.10)
+        self.sleep(2.05)
         self.send_key_up("w")
         self.sleep(0.11)
         self.send_key_down("f")  # start pick
-        self.sleep(0.11)
+        self.sleep(0.01)
         self.send_key_down("a")
         self.sleep(0.90)
         self.send_key_up("a")
         self.sleep(0.30)
         self.send_key_down("w")
-        self.sleep(0.80)
+        self.sleep(3.00)
         self.send_key_up("w")
         self.sleep(0.11)
         self.send_key_down("d")
@@ -2033,13 +2033,13 @@ class PinkPawHeistCore3Path:
         self.switch_to_runner()
         self.sleep(0.11)
         self.send_key_down("a")
-        self.sleep(0.81)
+        self.sleep(5.41)
         self.send_key_up("a")
         self.sleep(0.30)
         self.send_key_down("d")
         self.sleep(0.2)
         self.send_key("lshift")
-        self.sleep(1.43)
+        self.sleep(1.35)
         self.send_key_up("d")
         self.switch_to_runner()
         self.sleep(0.11)
@@ -2062,18 +2062,15 @@ class PinkPawHeistCore3Path:
         self.switch_to_runner()
         self.sleep(0.11)
         self.send_key_down("d")
-        self.sleep(5.05)
+        self.sleep(5.07)
         self.send_key_up("d")
-        self.sleep(0.23)
-        self.switch_to_runner()
-        self.sleep(0.01)
+        self.sleep(0.21)
         self.send_key_up("f")  # end pick
-        self.loot_safes_while_walking(
-            direction="w", min_walk_time=0.8, time_out=1.3, hold=True, send_pick=True
-        )
-        self.send_key_down("f")  # start pick
-        self.sleep(0.10)
+        self.send_key_down("w")
+        self.sleep(1.81)
+
         self.send_key_down("space")
+        self.send_key_down("f")  # start pick
         self.sleep(0.13)
         self.send_key_up("space")
         self.sleep(0.17)
@@ -2084,7 +2081,7 @@ class PinkPawHeistCore3Path:
         self.send_key_down("a")
         self.sleep(0.13)
         self.send_key_up("a")
-        self.sleep(6.54)
+        self.sleep(5.54)
         self.send_key_down("d")
         self.sleep(1.31)
         self.send_key_up("d")
@@ -2328,7 +2325,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("w")
 
         self.send_key_down("d")
-        self.sleep(0.60)
+        self.sleep(0.62)
         self.send_key_up("d")
         self.sleep(0.30)
         self.send_key_down("s")
@@ -2369,7 +2366,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("a")
         self.sleep(0.40)
         self.send_key_down("s")
-        self.sleep(0.20)
+        self.sleep(0.22)
         self.send_key_down("space")
         self.sleep(0.07)
         self.send_key_up("space")
@@ -2430,11 +2427,11 @@ class PinkPawHeistCore3Path:
         self.send_key_up("a")
         self.sleep(0.11)
         self.send_key_down("s")
-        self.sleep(0.62)
+        self.sleep(0.65)
         self.send_key_up("s")
         self.sleep(0.11)
         self.send_key_down("a")
-        self.sleep(0.51)
+        self.sleep(0.53)
         self.send_key_up("a")
         self.sleep(0.13)
         self.send_key_down("s")
@@ -3072,7 +3069,7 @@ class PinkPawHeistCore3Path:
         self.send_key_down("space")
         self.sleep(0.14)
         self.send_key_up("space")
-        self.sleep(1.30)
+        self.sleep(1.25)
         self.start_interaction_watch()
         self.send_key_down("d")
         self.sleep(2.10)
@@ -3223,7 +3220,7 @@ class PinkPawHeistCore3Path:
         self.switch_to_runner()
         self.sleep(0.11)
         self.send_key_down("s")
-        self.sleep(2.75)
+        self.sleep(2.85)
         self.send_key_up("s")
         self.switch_to_runner()
         self.sleep(0.11)
