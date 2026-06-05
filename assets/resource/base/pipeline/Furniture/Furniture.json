@@ -46,44 +46,7 @@
             "FurnitureChooseEdenApartments",
             "FurnitureChooseSkyviewHalls",
             "FurnitureChooseGoldenCapital",
-            "FurnitureApartmentsSwipe"
-        ]
-    },
-    "FurnitureApartmentsSwipe": {
-        "desc": "滑动房产界面以选择其他房产",
-        "recognition": "TemplateMatch",
-        "roi": [
-            4,
-            7,
-            71,
-            70
-        ],
-        "template": [
-            "Furniture/FurnitureHousePropertyIcon.png"
-        ],
-        "action": "Swipe",
-        "begin": [
-            20,
-            520,
-            160,
-            1
-        ],
-        "end": [
-            20,
-            380,
-            160,
-            1
-        ],
-        "end_hold": 600,
-        "next": [
-            "FurnitureChooseApartmentsOthers"
-        ]
-    },
-    "FurnitureChooseApartmentsOthers": {
-        "desc": "中间节点，后续新房产的添加也在这里",
-        "pre_delay": 0,
-        "post_delay": 0,
-        "next": [
+            "FurnitureChooseTianJun",
             "FurnitureChooseFenglinVilla",
             "FurnitureExit"
         ]
@@ -91,21 +54,11 @@
     "FurnitureChooseWienerApartments": {
         "desc": "选择维纳公寓",
         "max_hit": 1,
-        "recognition": "OCR",
-        "roi": [
-            9,
-            84,
-            190,
-            562
-        ],
-        "expected": [
-            "维纳公寓",
-            "維納公寓",
-            "(?i)Wiener\\s*Apartments",
-            "メゾンVINA",
-            "위너 아파트"
-        ],
-        "action": "Click",
+        "action": "Custom",
+        "custom_action": "furniture_choose_property",
+        "custom_action_param": {
+            "target": "FurnitureWienerApartments"
+        },
         "next": [
             "FurnitureGoHome",
             "FurnitureGotoBuy"
@@ -114,20 +67,11 @@
     "FurnitureChooseEdenApartments": {
         "desc": "选择伊登公寓",
         "max_hit": 1,
-        "recognition": "OCR",
-        "roi": [
-            9,
-            84,
-            190,
-            562
-        ],
-        "expected": [
-            "伊登公寓",
-            "(?i)Eden\\s*Apartments",
-            "レジスEDEN",
-            "에덴 아파트"
-        ],
-        "action": "Click",
+        "action": "Custom",
+        "custom_action": "furniture_choose_property",
+        "custom_action_param": {
+            "target": "FurnitureEdenApartments"
+        },
         "next": [
             "FurnitureGoHome",
             "FurnitureGotoBuy"
@@ -136,21 +80,11 @@
     "FurnitureChooseSkyviewHalls": {
         "desc": "选择天景空馆",
         "max_hit": 1,
-        "recognition": "OCR",
-        "roi": [
-            9,
-            84,
-            190,
-            562
-        ],
-        "expected": [
-            "天景空馆",
-            "天景空館",
-            "(?i)Skyview\\s*Halls",
-            "天景の館",
-            "천공의 집"
-        ],
-        "action": "Click",
+        "action": "Custom",
+        "custom_action": "furniture_choose_property",
+        "custom_action_param": {
+            "target": "FurnitureSkyviewHalls"
+        },
         "next": [
             "FurnitureGoHome",
             "FurnitureGotoBuy"
@@ -159,21 +93,24 @@
     "FurnitureChooseGoldenCapital": {
         "desc": "选择金都云邸",
         "max_hit": 1,
-        "recognition": "OCR",
-        "roi": [
-            9,
-            84,
-            190,
-            562
-        ],
-        "expected": [
-            "金都云邸",
-            "金都雲邸",
-            "(?i)Golden\\s*Capital",
-            "パレス雲都",
-            "금빛 헤리티지"
-        ],
-        "action": "Click",
+        "action": "Custom",
+        "custom_action": "furniture_choose_property",
+        "custom_action_param": {
+            "target": "FurnitureGoldenCapital"
+        },
+        "next": [
+            "FurnitureGoHome",
+            "FurnitureGotoBuy"
+        ]
+    },
+    "FurnitureChooseTianJun": {
+        "desc": "选择天骏公阁",
+        "max_hit": 1,
+        "action": "Custom",
+        "custom_action": "furniture_choose_property",
+        "custom_action_param": {
+            "target": "FurnitureTianJun"
+        },
         "next": [
             "FurnitureGoHome",
             "FurnitureGotoBuy"
@@ -182,21 +119,11 @@
     "FurnitureChooseFenglinVilla": {
         "desc": "选择峰林别墅",
         "max_hit": 1,
-        "recognition": "OCR",
-        "roi": [
-            9,
-            84,
-            190,
-            562
-        ],
-        "expected": [
-            "峰林别墅",
-            "峰林別墅",
-            "(?i)Fenglin\\s*Villa",
-            "シルヴァ邸苑",
-            "봉우리 별장"
-        ],
-        "action": "Click",
+        "action": "Custom",
+        "custom_action": "furniture_choose_property",
+        "custom_action_param": {
+            "target": "FurnitureFenglinVilla"
+        },
         "next": [
             "FurnitureGoHome",
             "FurnitureGotoBuy"

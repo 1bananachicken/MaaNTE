@@ -1,5 +1,6 @@
 {
-    "FurnitureOcrRec": {
+    "FurnitureHamsterBall": {
+        "desc": "识别仓鼠球",
         "recognition": "OCR",
         "roi": [
             948,
@@ -9,10 +10,56 @@
         ],
         "expected": [
             "仓鼠球",
-            "倉鼠球",
-            "(?i)Hamster\\s*Ball",
-            "ハムスターボール",
-            "햄스터 볼"
+            "倉鼠球"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureFluff": {
+        "desc": "识别棉棉",
+        "recognition": "OCR",
+        "roi": [
+            948,
+            170,
+            308,
+            517
+        ],
+        "expected": [
+            "棉棉"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureDamagedCrate": {
+        "desc": "识别破损的木箱",
+        "recognition": "OCR",
+        "roi": [
+            948,
+            170,
+            308,
+            517
+        ],
+        "expected": [
+            "破损的木箱",
+            "破損的木箱"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureIntactCrate": {
+        "desc": "识别完整的木箱",
+        "recognition": "OCR",
+        "roi": [
+            948,
+            170,
+            308,
+            517
+        ],
+        "expected": [
+            "完整的木箱"
         ],
         "pre_delay": 0,
         "post_delay": 0,
@@ -51,12 +98,119 @@
             "time": 500,
             "timeout": 3000
         },
-        "rate_limit": 0,
-        "focus": {
-            "Node.Action.succeeded": "领取一个家具成功"
-        },
         "next": [
             "SceneClickBlankToExit"
         ]
+    },
+    "FurnitureWienerApartments": {
+        "desc": "识别维纳公寓",
+        "recognition": "OCR",
+        "roi": [
+            9,
+            84,
+            190,
+            562
+        ],
+        "expected": [
+            "维纳公寓",
+            "維納公寓",
+            "(?i)Wiener\\s*Apartments",
+            "メゾンVINA"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureEdenApartments": {
+        "desc": "识别伊登公寓",
+        "recognition": "OCR",
+        "roi": [
+            9,
+            84,
+            190,
+            562
+        ],
+        "expected": [
+            "伊登公寓",
+            "(?i)Eden\\s*Apartments",
+            "レジスEDEN"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureSkyviewHalls": {
+        "desc": "识别天景空馆",
+        "recognition": "OCR",
+        "roi": [
+            9,
+            84,
+            190,
+            562
+        ],
+        "expected": [
+            "天景空馆",
+            "天景空館",
+            "(?i)Skyview\\s*Halls",
+            "天景の館"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureGoldenCapital": {
+        "desc": "识别金都云邸",
+        "recognition": "OCR",
+        "roi": [
+            9,
+            84,
+            190,
+            562
+        ],
+        "expected": [
+            "金都云邸",
+            "金都雲邸",
+            "(?i)Golden\\s*Capital",
+            "パレス雲都"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureTianJun": {
+        "desc": "识别天骏公阁",
+        "recognition": "OCR",
+        "roi": [
+            9,
+            84,
+            190,
+            562
+        ],
+        "expected": [
+            "天骏公阁"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "FurnitureFenglinVilla": {
+        "desc": "识别峰林别墅",
+        "recognition": "OCR",
+        "roi": [
+            9,
+            84,
+            190,
+            562
+        ],
+        "expected": [
+            "峰林别墅",
+            "峰林別墅",
+            "(?i)Fenglin\\s*Villa",
+            "シルヴァ邸苑",
+            "봉우리 별장"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
     }
 }

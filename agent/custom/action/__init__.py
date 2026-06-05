@@ -18,7 +18,8 @@ from .auto_f_scroll import *
 from .Movement.mouse_move import *
 from .Movement.character_move import *
 from .Common.alt_click import *
-from .furniture_claim import *
+from .Furniture.furniture_claim import *
+from .Furniture.furniture_choose_property import *
 from .auto_piano.action import *
 from .withdraw_money_choose_item import *
 from .DatasetCollection.autonomous_driving_dataset_recorder import *
@@ -43,6 +44,7 @@ __all__ = [
     "AutoFScroll",
     "AltClick",
     "FurnitureClaim",
+    "FurnitureChooseProperty",
     "AutoPlayPiano",
     "WithdrawMoneyChooseItem",
     "AutonomousDrivingDatasetRecorder",
