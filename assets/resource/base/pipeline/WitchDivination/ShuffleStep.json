@@ -1,0 +1,85 @@
+{
+    // 自动魔女之家占卜 - 小碎步
+    // 用于从传送点直走到魔女之家
+    "ShuffleStepCheck": {
+        "desc": "检测「黑羽」文本，存在则结束小碎步",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    672,
+                    235,
+                    410,
+                    259
+                ],
+                "expected": [
+                    "黑羽"
+                ]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70 // 'F' 键与魔女交互
+            }
+        },
+        "next": [
+            "ShuffleStepTalkToWitch"
+        ],
+        "on_error": [
+            "ShuffleStepWalk"
+        ]
+    },
+    "ShuffleStepWalk": {
+        "desc": "按住W键向前走0.4秒",
+        "action": {
+            "type": "KeyDown",
+            "param": {
+                "key": 87
+            }
+        },
+        "post_delay": 400,
+        "next": [
+            "ShuffleStepPause"
+        ]
+    },
+    "ShuffleStepPause": {
+        "desc": "松开W键停顿1.4秒",
+        "action": {
+            "type": "KeyUp",
+            "param": {
+                "key": 87
+            }
+        },
+        "post_delay": 1500,
+        "next": [
+            "ShuffleStepCheck",
+            "ShuffleStepCheck2",
+            "ShuffleStepWalk"
+        ]
+    },
+    "ShuffleStepCheck2": {
+        "desc": "检测「轻叩」文本，存在则结束任务",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    672,
+                    235,
+                    410,
+                    259
+                ],
+                "expected": [
+                    "轻叩"
+                ]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70 // 'F' 键与门交互
+            }
+        },
+        "next": []
+    }
+}

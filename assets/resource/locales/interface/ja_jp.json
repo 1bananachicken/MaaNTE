@@ -144,6 +144,8 @@
     "task_auto_piano_input_transpose_label": "移調",
     "task_auto_piano_input_speed_pattern_msg": "0より大きい数値を入力してください。例：1.0、1.25。",
     "task_auto_piano_input_transpose_pattern_msg": "半音数を整数で入力してください。例：-12、0、7。",
+    "task_witch_divination_label": "魔女占い",
+    "task_witch_divination_desc": "自動で魔女の家に行き、占いを行います。[デスクトップ - フォアグラウンド] 接続方式が必要です",
     "task_auto_drive_dataset_recorder_label": "自動運転データセット収集",
     "task_auto_drive_dataset_recorder_desc": "このタスクを開始する前に、ミニマップの目的地が設定されていることを確認してください。デフォルトの録画時間は 60 秒で、1 秒あたり 2 回サンプリングします。",
     "task_auto_drive_dataset_option_settings": "録画設定",
