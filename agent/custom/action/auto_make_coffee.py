@@ -1,29 +1,24 @@
 import time
 import json
-import random
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
+from .Common.utils import click_rect as _click_rect_once
+from .Common.utils import click_rect_720 as _click_rect_720_once
+from .Common.utils import get_image
 from utils.maafocus import PrintT
 
 
-def get_image(controller):
-    job = controller.post_screencap()
-    job.wait()
-    img = controller.cached_image
-    return img
-
-
-def click_rect(controller, rect):
-    x, y, w, h = rect
-    cx = x + w // 2
-    cy = y + h // 2
+def click_rect(controller, rect, delay=0.05):
     for _ in range(3):
-        controller.post_touch_down(cx, cy).wait()
-        time.sleep(0.05)
-        controller.post_touch_up().wait()
+        _click_rect_once(controller, rect, delay)
+
+
+def click_rect_720(controller, rect, delay=0.05):
+    for _ in range(3):
+        _click_rect_720_once(controller, rect, delay)
 
 
 @AgentServer.custom_action("auto_make_coffee")
@@ -108,12 +103,12 @@ class AutoMakeCoffee(CustomAction):
             while True:
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
-                click_rect(controller, click_roi)
+                click_rect_720(controller, click_roi, delay=0.05)
                 img = get_image(controller)
                 star_result = context.run_recognition("MakeCoffeeStar", img)
                 if star_result and star_result.hit:
                     PrintT(context, "coffee.step_star_click")
-                    click_rect(controller, exit_roi)
+                    click_rect_720(controller, exit_roi, delay=0.05)
                     time.sleep(1)
                     break
                 time.sleep(2)

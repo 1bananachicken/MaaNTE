@@ -2,8 +2,7 @@ import cv2
 import time
 
 from pathlib import Path
-from ..Common.utils import get_image, match_template_in_region, click_rect
-from utils import screen
+from ..Common.utils import get_image, match_template_in_region_720, click_rect_720
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -42,6 +41,7 @@ class AutoSellFish(CustomAction):
     ) -> CustomAction.RunResult:
         PrintT(context, "autofish.sell_started")
         controller = context.tasker.controller
+        get_image(controller)
 
         KEY_Q = 81
         KEY_ESC = 27
@@ -53,29 +53,19 @@ class AutoSellFish(CustomAction):
         confirm_sell_region = [756, 461, 48, 21]
         sell_success_region = [565, 628, 149, 21]
         sell_fail_region = [739, 349, 202, 24]
-        no_valid_fish_region = [509, 350, 261, 22]
-
-        no_fish_to_sell_region = screen.map_rect(no_fish_to_sell_region)
-        sell_option_region = screen.map_rect(sell_option_region)
-        sell_option_selected_region = screen.map_rect(sell_option_selected_region)
-        sell_button_region = screen.map_rect(sell_button_region)
-        confirm_sell_region = screen.map_rect(confirm_sell_region)
-        sell_success_region = screen.map_rect(sell_success_region)
-        sell_fail_region = screen.map_rect(sell_fail_region)
-        no_valid_fish_region = screen.map_rect(no_valid_fish_region)
 
         while True:
             img = get_image(controller)
-            found_sell_option, _, _, _ = match_template_in_region(
+            found_sell_option, _, _, _ = match_template_in_region_720(
                 img, sell_option_region, self.sell_option_template, 0.7
             )
             if found_sell_option:
                 for _ in range(3):
-                    click_rect(controller, sell_option_region)
+                    click_rect_720(controller, sell_option_region)
                     time.sleep(0.1)
 
                 img = get_image(controller)
-                found_sell_option_selected, _, _, _ = match_template_in_region(
+                found_sell_option_selected, _, _, _ = match_template_in_region_720(
                     img,
                     sell_option_selected_region,
                     self.sell_option_selected_template,
@@ -92,7 +82,7 @@ class AutoSellFish(CustomAction):
 
         for _ in range(5):
             img = get_image(controller)
-            found_no_fish_to_sell, prob, _, _ = match_template_in_region(
+            found_no_fish_to_sell, prob, _, _ = match_template_in_region_720(
                 img, no_fish_to_sell_region, self.no_fish_to_sell_template, 0.8
             )
             time.sleep(0.1)
@@ -105,24 +95,24 @@ class AutoSellFish(CustomAction):
 
         while True:
             img = get_image(controller)
-            found_sell_button, _, _, _ = match_template_in_region(
+            found_sell_button, _, _, _ = match_template_in_region_720(
                 img, sell_button_region, self.sell_button_template, 0.8
             )
             if found_sell_button:
                 PrintT(context, "autofish.sell_button_detected")
                 while True:
-                    click_rect(controller, sell_button_region, 0.1)
+                    click_rect_720(controller, sell_button_region, 0.1)
                     time.sleep(0.5)
                     img = get_image(controller)
-                    found_confirm_sell, _, _, _ = match_template_in_region(
+                    found_confirm_sell, _, _, _ = match_template_in_region_720(
                         img, confirm_sell_region, self.confirm_sell_template, 0.8
                     )
-                    sell_fail, _, _, _ = match_template_in_region(
+                    sell_fail, _, _, _ = match_template_in_region_720(
                         img, sell_fail_region, self.sell_fail_template, 0.8
                     )
                     if found_confirm_sell:
                         PrintT(context, "autofish.confirm_sell_detected")
-                        click_rect(controller, confirm_sell_region, 0.2)
+                        click_rect_720(controller, confirm_sell_region, 0.2)
                         time.sleep(0.5)
                         break
                     elif sell_fail:
@@ -137,7 +127,7 @@ class AutoSellFish(CustomAction):
 
         while True:
             img = get_image(controller)
-            found_sell_success, _, _, _ = match_template_in_region(
+            found_sell_success, _, _, _ = match_template_in_region_720(
                 img, sell_success_region, self.sell_success_template, 0.8
             )
             if found_sell_success:

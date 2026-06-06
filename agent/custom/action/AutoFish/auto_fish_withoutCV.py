@@ -7,6 +7,7 @@ import json
 
 from utils.logger import logger
 from utils.maafocus import Print, PrintT
+from utils import screen
 
 # 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
 CURSOR_PX_PER_SEC = (
@@ -37,12 +38,16 @@ class AutoFishWithoutCV(CustomAction):
             except Exception:
                 pass
 
+        deadzone_720 = deadzone
+
         logger.debug("钓鱼开始：进入控条阶段（绿条/光标对齐）")
         # 钓鱼阶段
         while not context.tasker.stopping:
             image = (
                 context.tasker.controller.post_screencap().wait().get()
-            )  # (720, 1280, 3)，自动缩放至框架规定的标准res
+            )
+            screen.update_frame_size_from_image(image)
+            deadzone = max(1, int(round(deadzone_720 * screen.frame_scaling_factors()[0])))
             green_bar = context.run_recognition("FishGreenBar", image)
             cursor = context.run_recognition("FishCursor", image)
 
@@ -58,6 +63,8 @@ class AutoFishWithoutCV(CustomAction):
             ):
                 time.sleep(0.5)
                 image = context.tasker.controller.post_screencap().wait().get()
+                screen.update_frame_size_from_image(image)
+                deadzone = max(1, int(round(deadzone_720 * screen.frame_scaling_factors()[0])))
                 click_blank = context.run_recognition("SceneClickBlankToExit", image)
                 if click_blank and click_blank.hit:
                     PrintT(context, "autofish.fish_caught")
@@ -88,7 +95,7 @@ class AutoFishWithoutCV(CustomAction):
             offset = cursor_center_x - green_bar_center_x
 
             abs_offset = abs(offset)
-            scaled_px_per_sec = max(1.0, CURSOR_PX_PER_SEC)
+            scaled_px_per_sec = max(1.0, CURSOR_PX_PER_SEC * screen.frame_scaling_factors()[0])
             base_ms = (abs_offset / scaled_px_per_sec) * 1000.0
             duration_ms = min(cap_ms, max(floor_ms, int(base_ms * factor)))
 

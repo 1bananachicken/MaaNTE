@@ -5,6 +5,7 @@ from maa.agent.agent_server import AgentServer
 from maa.context import Context
 from maa.custom_action import CustomAction
 
+from ..Common.utils import click_rect, get_image, swipe_720
 from utils.logger import logger
 
 _TOP_RESET_COUNT = 1
@@ -18,9 +19,7 @@ _NEXT_SWIPE_END = (160, 170)
 
 
 def _screencap(controller):
-    job = controller.post_screencap()
-    job.wait()
-    return controller.cached_image
+    return get_image(controller)
 
 
 def _box_to_rect(box):
@@ -30,19 +29,12 @@ def _box_to_rect(box):
 
 
 def _click_rect(controller, rect):
-    cx = rect[0] + rect[2] // 2
-    cy = rect[1] + rect[3] // 2
-    controller.post_touch_move(cx, cy).wait()
-    controller.post_touch_down(cx, cy).wait()
-    time.sleep(0.05)
-    controller.post_touch_up().wait()
+    click_rect(controller, rect, delay=0.05, move=True)
     time.sleep(0.05)
 
 
 def _swipe(controller, begin, end):
-    controller.post_swipe(
-        begin[0], begin[1], end[0], end[1], duration=_SWIPE_DURATION_MS
-    ).wait()
+    swipe_720(controller, begin, end, duration=_SWIPE_DURATION_MS)
     time.sleep(_SWIPE_DELAY_SEC)
 
 

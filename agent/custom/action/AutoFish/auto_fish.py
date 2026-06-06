@@ -3,7 +3,7 @@ import time
 import json
 
 from pathlib import Path
-from ..Common.utils import get_image, match_template_in_region
+from ..Common.utils import get_image, match_template_in_region_720
 from ..Common.logger import get_logger
 from utils import screen
 
@@ -68,6 +68,7 @@ class AutoFish(CustomAction):
         KEY_F = 70
         KEY_ESC = 27
 
+        get_image(controller)
         success_region = [520, 160, 265, 30]
         settlement_region = [566, 642, 150, 23]
         game_region = [401, 39, 481, 24]
@@ -76,16 +77,10 @@ class AutoFish(CustomAction):
         fish_game_sign_region = [1141, 609, 87, 84]
         fish_game_sign_region_2 = [1224, 27, 30, 30]
         need_bait_region = [610, 350, 141, 21]
-        deadzone = max(1, int(round(15 * screen.scaling_factors()[0])))
+        deadzone_720 = 15
+        deadzone = max(1, int(round(deadzone_720 * screen.frame_scaling_factors()[0])))
 
-        success_region = screen.map_rect(success_region)
-        settlement_region = screen.map_rect(settlement_region)
-        game_region = screen.map_rect(game_region)
-        escape_region = screen.map_rect(escape_region)
-        prepare_region = screen.map_rect(prepare_region)
-        fish_game_sign_region = screen.map_rect(fish_game_sign_region)
-        fish_game_sign_region_2 = screen.map_rect(fish_game_sign_region_2)
-        need_bait_region = screen.map_rect(need_bait_region)
+        game_region_frame = screen.map_rect_to_frame(game_region)
 
         def press_esc():
             controller.post_key_down(KEY_ESC)
@@ -99,7 +94,7 @@ class AutoFish(CustomAction):
                     return False
 
                 img = get_image(controller)
-                matched, _, _, _ = match_template_in_region(
+                matched, _, _, _ = match_template_in_region_720(
                     img, settlement_region, self.settlement_template, 0.8
                 )
 
@@ -113,7 +108,7 @@ class AutoFish(CustomAction):
             for _ in range(10):
                 img = get_image(controller)
 
-                m_settle, _, _, _ = match_template_in_region(
+                m_settle, _, _, _ = match_template_in_region_720(
                     img, settlement_region, self.settlement_template, 0.8
                 )
                 if m_settle:
@@ -124,7 +119,7 @@ class AutoFish(CustomAction):
                     wait_until_settlement_disappears()
                     continue
 
-                m_game, game_prob, _, _ = match_template_in_region(
+                m_game, game_prob, _, _ = match_template_in_region_720(
                     img,
                     fish_game_sign_region_2,
                     self.fish_game_sign_template,
@@ -137,12 +132,13 @@ class AutoFish(CustomAction):
                 if m_game:
                     return True
 
-                m_prepare, _, x, y = match_template_in_region(
+                m_prepare, _, x, y = match_template_in_region_720(
                     img, prepare_region, self.prepare_start_template, 0.7
                 )
                 if m_prepare:
                     # logger.debug("On FishPrepare screen, pressing start...")
-                    controller.post_click(x + 15, y + 15)
+                    offset_x, offset_y = screen.map_point_to_frame(15, 15)
+                    controller.post_click(x + offset_x, y + offset_y)
                     time.sleep(1.5)
                     return True
 
@@ -169,7 +165,7 @@ class AutoFish(CustomAction):
 
                 for _ in range(5):
                     img = get_image(controller)
-                    m_need_bait, prob, _, _ = match_template_in_region(
+                    m_need_bait, prob, _, _ = match_template_in_region_720(
                         img, need_bait_region, self.need_bait_template, 0.7
                     )
                     # logger.debug(f"Checking for bait, probability: {prob:.2f}")
@@ -200,7 +196,7 @@ class AutoFish(CustomAction):
                     time.sleep(check_freq)
                     img = get_image(controller)
 
-                    m_settle_unexpected, _, _, _ = match_template_in_region(
+                    m_settle_unexpected, _, _, _ = match_template_in_region_720(
                         img, settlement_region, self.settlement_template, 0.8
                     )
                     if m_settle_unexpected:
@@ -209,7 +205,7 @@ class AutoFish(CustomAction):
                         # )
                         break
 
-                    m_catch, _, _, _ = match_template_in_region(
+                    m_catch, _, _, _ = match_template_in_region_720(
                         img, success_region, self.success_catch_template, 0.7
                     )
                     if m_catch:
@@ -224,10 +220,10 @@ class AutoFish(CustomAction):
 
                 start_time = time.time()
                 frame = 0
-                deadzone = 15
+                deadzone = max(1, int(round(deadzone_720 * screen.frame_scaling_factors()[0])))
                 current_ad_key = None
                 last_bar_width = 100
-                last_target = (game_region[0] + game_region[2]) / 2
+                last_target = (game_region_frame[0] + game_region_frame[2]) / 2
                 last_x_slider = last_target
                 slider_miss_count = 0
 
@@ -250,26 +246,26 @@ class AutoFish(CustomAction):
                     frame += 1
 
                     if frame % 10 == 0:
-                        m_settle, _, _, _ = match_template_in_region(
+                        m_settle, _, _, _ = match_template_in_region_720(
                             img, settlement_region, self.settlement_template, 0.8
                         )
                         if m_settle:
                             # logger.debug("Fish caught!")
                             break
-                        m_escape, _, _, _ = match_template_in_region(
+                        m_escape, _, _, _ = match_template_in_region_720(
                             img, escape_region, self.escape_template, 0.8
                         )
                         if m_escape:
                             # logger.debug("Fish escaped! Recasting...")
                             break
 
-                    m_left, _, x_left, _ = match_template_in_region(
+                    m_left, _, x_left, _ = match_template_in_region_720(
                         img, game_region, self.valid_region_left_template, 0.7
                     )
-                    m_right, _, x_right, _ = match_template_in_region(
+                    m_right, _, x_right, _ = match_template_in_region_720(
                         img, game_region, self.valid_region_right_template, 0.7
                     )
-                    m_slider, _, x_slider, _ = match_template_in_region(
+                    m_slider, _, x_slider, _ = match_template_in_region_720(
                         img, game_region, self.slider_template, 0.7
                     )
 
@@ -323,7 +319,7 @@ class AutoFish(CustomAction):
 
                 img = get_image(controller)
                 time.sleep(0.3)
-                m_escape, _, _, _ = match_template_in_region(
+                m_escape, _, _, _ = match_template_in_region_720(
                     img, escape_region, self.escape_template, 0.8
                 )
                 if m_escape:
@@ -339,7 +335,7 @@ class AutoFish(CustomAction):
                     return CustomAction.RunResult(success=False)
 
                 img = get_image(controller)
-                match_settle, settle_prob, _, _ = match_template_in_region(
+                match_settle, settle_prob, _, _ = match_template_in_region_720(
                     img, settlement_region, self.settlement_template, 0.8
                 )
                 # logger.debug(

@@ -9,6 +9,7 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
+from utils import screen
 from utils.maafocus import PrintT
 
 from ..utils.config import load_rhythm_config
@@ -73,7 +74,11 @@ class AutoRhythmSelectSong(CustomAction):
             if state == STATE_SONG_SELECT:
                 scroll_fn = lambda sx, sy, sd: (
                     controller.post_swipe(
-                        sx, sy, sx, sy + sd * 100, duration=250
+                        sx,
+                        sy,
+                        sx,
+                        sy + round(sd * 100 * screen.frame_scaling_factors()[1]),
+                        duration=250,
                     ).wait(),
                     time.sleep(0.15),
                 )

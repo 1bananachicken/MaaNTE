@@ -4,6 +4,8 @@ import logging
 import time
 from typing import Any, Callable
 
+from utils import screen
+
 logger = logging.getLogger(__name__)
 
 _SEL_IDLE = "idle"
@@ -111,6 +113,7 @@ class SongSelector:
         controller: Any,
         scroll_func: Callable[[int, int, int], None] | None = None,
     ) -> dict[str, Any]:
+        screen.update_frame_size_from_image(frame)
         now = time.perf_counter()
 
         if self._state == _SEL_IDLE:
@@ -151,8 +154,9 @@ class SongSelector:
             else:
                 self._consecutive_down_fails += 1
             if scroll_func is not None:
-                sx = self._song_list_roi[0] + self._song_list_roi[2] // 2
-                sy = self._song_list_roi[1] + self._song_list_roi[3] // 2
+                song_list_roi = screen.map_rect_to_frame(self._song_list_roi)
+                sx = song_list_roi[0] + song_list_roi[2] // 2
+                sy = song_list_roi[1] + song_list_roi[3] // 2
                 scroll_func(sx, sy, direction)
             self._scroll_attempts += 1
             self._last_action_time = now
