@@ -6,9 +6,7 @@
             "description": "$task_navi_websocket_desc",
             "entry": "NaviWebSocket",
             "option": [
-                "NaviWebSocketSettings",
-                "NaviWebSocketAngleBackend",
-                "NaviWebSocketDebug"
+                "NaviWebSocketSettings"
             ],
             "group": [
                 "RealTimeAssist"
@@ -42,6 +40,22 @@
                     "default": "0.1",
                     "pipeline_type": "string",
                     "verify": "^\\d+(\\.\\d+)?$"
+                },
+                {
+                    "name": "angle_backend",
+                    "label": "$task_navi_websocket_option_angle_backend",
+                    "description": "$task_navi_websocket_option_angle_backend_desc",
+                    "default": "auto",
+                    "pipeline_type": "string",
+                    "verify": "^(auto|directml|cpu)$"
+                },
+                {
+                    "name": "debug",
+                    "label": "$task_navi_websocket_option_debug",
+                    "description": "$task_navi_websocket_option_debug_desc",
+                    "default": "false",
+                    "pipeline_type": "bool",
+                    "verify": "^(true|false)$"
                 }
             ],
             "pipeline_override": {
@@ -49,81 +63,12 @@
                     "custom_action_param": {
                         "host": "{host}",
                         "port": "{port}",
-                        "frame_interval": "{frame_interval}"
+                        "frame_interval": "{frame_interval}",
+                        "angle_backend": "{angle_backend}",
+                        "debug": "{debug}"
                     }
                 }
             }
-        },
-        "NaviWebSocketAngleBackend": {
-            "type": "select",
-            "label": "$task_navi_websocket_option_angle_backend",
-            "description": "$task_navi_websocket_option_angle_backend_desc",
-            "cases": [
-                {
-                    "name": "auto",
-                    "label": "Auto",
-                    "pipeline_override": {
-                        "NaviWebSocket": {
-                            "custom_action_param": {
-                                "angle_backend": "auto"
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "directml",
-                    "label": "DirectML",
-                    "pipeline_override": {
-                        "NaviWebSocket": {
-                            "custom_action_param": {
-                                "angle_backend": "directml"
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "cpu",
-                    "label": "CPU",
-                    "pipeline_override": {
-                        "NaviWebSocket": {
-                            "custom_action_param": {
-                                "angle_backend": "cpu"
-                            }
-                        }
-                    }
-                }
-            ],
-            "default_case": "auto"
-        },
-        "NaviWebSocketDebug": {
-            "type": "switch",
-            "label": "$task_navi_websocket_option_debug",
-            "description": "$task_navi_websocket_option_debug_desc",
-            "cases": [
-                {
-                    "name": "Yes",
-                    "label": "$option_switch_case_yes",
-                    "pipeline_override": {
-                        "NaviWebSocket": {
-                            "custom_action_param": {
-                                "debug": true
-                            }
-                        }
-                    }
-                },
-                {
-                    "name": "No",
-                    "label": "$option_switch_case_no",
-                    "pipeline_override": {
-                        "NaviWebSocket": {
-                            "custom_action_param": {
-                                "debug": false
-                            }
-                        }
-                    }
-                }
-            ],
-            "default_case": "No"
         }
     }
 }
