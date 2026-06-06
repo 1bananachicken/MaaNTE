@@ -10,7 +10,57 @@
             ],
             "group": [
                 "HethereauHobbies"
+            ],
+            "option": [
+                "BagelSpamCaption",
+                "BagelSpamText"
             ]
         }
-    ]
+    ],
+    "option": {
+        "BagelSpamCaption": {
+            "type": "input",
+            "label": "$task_bagel_spam_option_caption_label",
+            "description": "$task_bagel_spam_option_caption_desc",
+            "inputs": [
+                {
+                    "name": "caption",
+                    "label": "$task_bagel_spam_option_caption_input_label",
+                    "default": "关注塔菲喵",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "BagelSpamInputTitle": {
+                    "action": {
+                        "param": {
+                            "input_text": "{caption}"
+                        }
+                    }
+                }
+            }
+        },
+        "BagelSpamText": {
+            "type": "input",
+            "label": "$task_bagel_spam_option_text_label",
+            "description": "$task_bagel_spam_option_text_desc",
+            "inputs": [
+                {
+                    "name": "text",
+                    "label": "$task_bagel_spam_option_text_input_label",
+                    "default": "关注塔菲谢谢喵",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "BagelSpamInputContent": {
+                    "action": {
+                        "param": {
+                            "input_text": "{text}"
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
