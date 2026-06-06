@@ -31,9 +31,9 @@
                 "key": 27
             }
         },
+        "post_wait_freezes": 500,
         "timeout": 1000,
         "rate_limit": 0,
-        "post_delay": 500,
         "next": [
             "BagelSpamOpenCamera"
         ],
@@ -52,7 +52,7 @@
                 "key": 27
             }
         },
-        "post_delay": 1000,
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamEnsureEscButton"
         ]
@@ -77,6 +77,7 @@
         "action": {
             "type": "Click"
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamTakeShot"
         ]
@@ -100,6 +101,7 @@
         "action": {
             "type": "Click"
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamSaveShot"
         ]
@@ -123,6 +125,7 @@
         "action": {
             "type": "Click"
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamVerifySaved"
         ]
@@ -179,8 +182,8 @@
                 "key": 27
             }
         },
+        "post_wait_freezes": 500,
         "timeout": 1000,
-        "post_delay": 1000,
         "next": [
             "BagelSpamWaitCameraAfterClose"
         ],
@@ -199,7 +202,7 @@
                 "key": 27
             }
         },
-        "post_delay": 1000,
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamWaitCameraAfterClose"
         ]
@@ -249,6 +252,7 @@
         "action": {
             "type": "Click"
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamClickRelease"
         ]
@@ -280,6 +284,7 @@
                 ]
             }
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamCheckDailyPublishCount"
         ]
@@ -326,6 +331,7 @@
                 ]
             }
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamClickDraftTab"
         ]
@@ -347,6 +353,7 @@
                 ]
             }
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamConfirmPublish"
         ]
@@ -374,6 +381,7 @@
         "action": {
             "type": "Click"
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamClickTitleInput"
         ],
@@ -414,6 +422,7 @@
                 ]
             }
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamInputTitle"
         ]
@@ -448,6 +457,7 @@
                 ]
             }
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamInputContent"
         ]
@@ -482,6 +492,7 @@
                 ]
             }
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamRepeatPublishDelay"
         ]
@@ -515,8 +526,8 @@
         "action": {
             "type": "Click"
         },
+        "post_wait_freezes": 500,
         "pre_delay": 0,
-        "post_delay": 0,
         "rate_limit": 0,
         "next": [
             "BagelSpamWaitEscButtonToFinish"
@@ -533,8 +544,9 @@
                 "key": 27
             }
         },
+        "post_wait_freezes": 500,
         "pre_delay": 0,
-        "post_delay": 1000,
+
         "rate_limit": 0,
         "next": [
             "BagelSpamWaitEscButtonToFinish"
