@@ -23,10 +23,14 @@ class NaviWebSocketAction(CustomAction):
         params = self.load_params(argv.custom_action_param)
         host = params.get("host", "0.0.0.0")
         port = params.get("port", 14514)
-        debug = bool(params.get("debug", False))
+        debug = params.get("debug", False)
         frame_interval = max(0.05, float(params.get("frame_interval", 0.1)))
 
+        navigation_websocket = NavigationWebSocketPublisher(host, port)
+        predictor: AnglePredictor | None = None
+
         try:
+            navigation_websocket.start()
             locator = MapLocator(
                 debug=debug,
             )
@@ -35,16 +39,15 @@ class NaviWebSocketAction(CustomAction):
                 threshold=0.0,
                 debug=debug,
             )
-            angle_provider = predictor.provider_name()
-            navigation_websocket = NavigationWebSocketPublisher(host, port)
-            navigation_websocket.start()
         except Exception as exc:
             logger.error(f"Navi WebSocket init failed: {exc}")
+            navigation_websocket.stop()
             return CustomAction.RunResult(success=False)
 
         logger.info(
             f"Navi WebSocket action started: map={locator.big_map_path}, "
-            f"angle_provider={angle_provider}, debug={debug}"
+            f"angle_backend={predictor.backend}, debug={debug}, "
+            f"endpoint=ws://{host}:{port}"
         )
         controller = context.tasker.controller
         last_location = MapLocationResult(False, None, None, 0.0, "init")
@@ -76,12 +79,14 @@ class NaviWebSocketAction(CustomAction):
                     time.sleep(sleep_time)
         except Exception as exc:
             logger.error(f"Navi WebSocket action failed: {exc}")
+            navigation_websocket.stop()
             return CustomAction.RunResult(success=False)
         finally:
+            navigation_websocket.stop()
             if debug:
                 cv2.destroyAllWindows()
 
-        return CustomAction.RunResult(success=last_location.found)
+        return CustomAction.RunResult(success=True)
 
     @staticmethod
     def load_params(custom_action_param) -> dict:

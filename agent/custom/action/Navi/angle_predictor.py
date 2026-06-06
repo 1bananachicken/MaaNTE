@@ -1,7 +1,5 @@
-import json
 import math
 import os
-import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -12,11 +10,8 @@ import onnxruntime
 from ..Common.logger import get_logger
 from .resources import resource_base_path
 
-from maa.agent.agent_server import AgentServer
-from maa.context import Context
-from maa.custom_action import CustomAction
-
 logger = get_logger(__name__)
+onnxruntime.set_default_logger_severity(3)
 
 
 @dataclass
