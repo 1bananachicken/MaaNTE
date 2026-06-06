@@ -10,11 +10,20 @@
         ],
         "expected": [
             "仓鼠球",
-            "倉鼠球"
+            "倉鼠球",
+            "(?i)Hamster\\s*Ball",
+            "ハムスターボール"
         ],
         "pre_delay": 0,
         "post_delay": 0,
         "rate_limit": 0
+    ,
+        "roi_offset": [
+            0,
+            0,
+            24,
+            0
+        ]
     },
     "FurnitureFluff": {
         "desc": "识别棉棉",
@@ -26,11 +35,20 @@
             517
         ],
         "expected": [
-            "棉棉"
+            "棉棉",
+            "(?i)Fluff",
+            "モフンモフン"
         ],
         "pre_delay": 0,
         "post_delay": 0,
         "rate_limit": 0
+    ,
+        "roi_offset": [
+            0,
+            0,
+            24,
+            0
+        ]
     },
     "FurnitureDamagedCrate": {
         "desc": "识别破损的木箱",
@@ -43,11 +61,20 @@
         ],
         "expected": [
             "破损的木箱",
-            "破損的木箱"
+            "破損的木箱",
+            "(?i)Damaged\\s*Crate",
+            "壊れた木箱"
         ],
         "pre_delay": 0,
         "post_delay": 0,
         "rate_limit": 0
+    ,
+        "roi_offset": [
+            0,
+            0,
+            24,
+            0
+        ]
     },
     "FurnitureIntactCrate": {
         "desc": "识别完整的木箱",
@@ -59,11 +86,20 @@
             517
         ],
         "expected": [
-            "完整的木箱"
+            "完整的木箱",
+            "(?i)Intact\\s*Crate",
+            "完全な木箱"
         ],
         "pre_delay": 0,
         "post_delay": 0,
         "rate_limit": 0
+    ,
+        "roi_offset": [
+            0,
+            0,
+            24,
+            0
+        ]
     },
     "FurnitureClaim": {
         "desc": " 识别按钮黄底",
