@@ -80,6 +80,17 @@ def download_dependencies(deps_dir, platform_tag):
         print("错误: requirements.txt 文件不存在")
         return False
 
+    # 部分纯Python包在PyPI上只有sdist，需要先用pip wheel本地构建成wheel
+    # 例如: proxy_tools (pywebview的依赖) 只有 .tar.gz
+    # 构建前先确保 setuptools 可用（嵌入式Python默认不含 setuptools）
+    SDIST_ONLY_PACKAGES = ["proxy_tools"]
+    print("预构建纯Python sdist包为wheel...")
+    subprocess.run(
+        [sys.executable, "-m", "pip", "install", "setuptools", "--quiet"],
+        check=False,
+        capture_output=True,
+    )
+
     # 首先尝试下载平台特定的wheel文件
     try:
         cmd = [
@@ -133,6 +144,8 @@ def download_dependencies(deps_dir, platform_tag):
                     "-d",
                     str(deps_path),
                     "--only-binary=:all:",
+                    "--find-links",
+                    str(deps_path),
                 ]
 
                 print(f"执行回退命令: {' '.join(cmd_fallback)}")

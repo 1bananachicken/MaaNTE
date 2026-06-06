@@ -144,6 +144,8 @@
     "task_auto_piano_input_transpose_label": "조옮김",
     "task_auto_piano_input_speed_pattern_msg": "0보다 큰 숫자를 입력하세요. 예: 1.0, 1.25.",
     "task_auto_piano_input_transpose_pattern_msg": "반음 수를 정수로 입력하세요. 예: -12, 0, 7.",
+    "task_witch_divination_label": "마녀 점술",
+    "task_witch_divination_desc": "자동으로 마녀의 집으로 이동하여 점술을 진행합니다. [데스크톱 - 포그라운드] 연결 방식이 필요합니다",
     "task_auto_drive_dataset_recorder_label": "자율 주행 데이터세트 수집",
     "task_auto_drive_dataset_recorder_desc": "이 작업을 시작하기 전에 미니맵 목적지가 설정되어 있는지 확인하세요. 기본 녹화 시간은 60초이며 초당 2회 샘플링합니다.",
     "task_auto_drive_dataset_option_settings": "녹화 설정",
@@ -158,5 +160,17 @@
     "task_touch_option_delay_after_f": "F 키 후 지연 (ms)",
     "task_touch_option_delay_after_f_desc": "F 키 누른 후 지연 시간 (밀리초)",
     "task_touch_option_delay_after_click": "클릭 후 지연 (ms)",
-    "task_touch_option_delay_after_click_desc": "상호작용 영역 클릭 후 지연 시간 (밀리초)"
+    "task_touch_option_delay_after_click_desc": "상호작용 영역 클릭 후 지연 시간 (밀리초)",
+    "task_navi_websocket_label": "온라인 지도 실시간 위치 확인",
+    "task_navi_websocket_desc": "Navi WebSocket 서비스를 시작하고 실시간 위치와 방향을 로컬 지도 프런트엔드로 브로드캐스트합니다.",
+    "task_navi_websocket_option_settings": "WebSocket 설정",
+    "task_navi_websocket_option_settings_desc": "실시간 위치 확인 서비스의 수신 주소와 샘플링 간격을 설정합니다.",
+    "task_navi_websocket_option_angle_backend": "방향 추론 백엔드",
+    "task_navi_websocket_option_angle_backend_desc": "방향 모델에서 사용할 추론 백엔드를 선택합니다. 기본값은 자동 선택입니다.",
+    "task_navi_websocket_option_debug": "디버그 모드",
+    "task_navi_websocket_option_debug_desc": "활성화하면 위치 확인 및 방향 예측 디버그 창을 표시합니다.",
+    "task_navi_websocket_input_host": "수신 주소",
+    "task_navi_websocket_input_port": "수신 포트",
+    "task_navi_websocket_input_frame_interval": "샘플링 간격 (초)",
+    "task_navi_websocket_input_frame_interval_desc": "스크린샷 위치 확인 사이의 최소 간격입니다. 작업에서 최소 0.05초로 제한됩니다."
 }

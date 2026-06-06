@@ -144,6 +144,8 @@
     "task_auto_piano_input_transpose_label": "转调",
     "task_auto_piano_input_speed_pattern_msg": "请输入大于 0 的数字，例如 1.0 或 1.25。",
     "task_auto_piano_input_transpose_pattern_msg": "请输入整数半音数，例如 -12、0、7。",
+    "task_witch_divination_label": "魔女占卜",
+    "task_witch_divination_desc": "自动前往魔女之家，进行占卜操作 需要 [桌面端-前台] 连接方式",
     "task_auto_drive_dataset_recorder_label": "自动驾驶数据集收集",
     "task_auto_drive_dataset_recorder_desc": "开始此任务前确保小地图已设置好目的地，默认录制时长为 60 秒，每秒采样 2 次。",
     "task_auto_drive_dataset_option_settings": "录制设置",
@@ -158,5 +160,17 @@
     "task_touch_option_delay_after_f": "按F后延迟 (ms)",
     "task_touch_option_delay_after_f_desc": "按下F键后的延迟时间（毫秒）",
     "task_touch_option_delay_after_click": "点击后延迟 (ms)",
-    "task_touch_option_delay_after_click_desc": "点击互动区域后的延迟时间（毫秒）"
+    "task_touch_option_delay_after_click_desc": "点击互动区域后的延迟时间（毫秒）",
+    "task_navi_websocket_label": "在线地图实时定位",
+    "task_navi_websocket_desc": "启动 Navi WebSocket 服务，将实时位置和方向广播给本地地图前端。",
+    "task_navi_websocket_option_settings": "WebSocket 设置",
+    "task_navi_websocket_option_settings_desc": "配置实时定位服务的监听地址和采样间隔。",
+    "task_navi_websocket_option_angle_backend": "方向推理后端",
+    "task_navi_websocket_option_angle_backend_desc": "选择方向模型使用的推理后端，默认自动选择。",
+    "task_navi_websocket_option_debug": "调试模式",
+    "task_navi_websocket_option_debug_desc": "启用后显示定位和方向预测调试窗口。",
+    "task_navi_websocket_input_host": "监听地址",
+    "task_navi_websocket_input_port": "监听端口",
+    "task_navi_websocket_input_frame_interval": "采样间隔 (秒)",
+    "task_navi_websocket_input_frame_interval_desc": "每次截图定位之间的最小间隔，最低会限制为 0.05 秒。"
 }

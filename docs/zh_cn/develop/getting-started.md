@@ -289,8 +289,11 @@ git push origin feat/touch-animal
 
 在 GitHub 上创建 PR（从你的 fork 到 `1bananachicken/MaaNTE` 的 `dev` 分支）。
 
+提交前请阅读 [PR 规范](./pull-request-guidelines.md)，补充关联 Issue、变更摘要、验证记录，以及必要的截图或日志。
+
 ## 接下来看什么
 
+- [PR 规范](./pull-request-guidelines.md)
 - [Pipeline 编写指南](./pipeline-guide.md)
 - [自定义动作开发](./custom-action.md)
 - [场景管理器](./scene-manager.md)

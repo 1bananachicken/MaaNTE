@@ -7,11 +7,12 @@
 建议按以下顺序阅读：
 
 1. 搭环境、跑起来、完成第一次改动和 PR → `getting-started.md`
-2. 了解 Pipeline 编写规范 → `pipeline-guide.md`
-3. 查阅编码规范 → `coding-standards.md`
-4. 需要编写 Python 自定义逻辑 → `custom-action.md`
-5. 理解场景跳转机制 → `scene-manager.md`
-6. 需要调试单节点 → `node-testing.md`
+2. 提交 PR 前检查格式、描述与验证记录 → `pull-request-guidelines.md`
+3. 了解 Pipeline 编写规范 → `pipeline-guide.md`
+4. 查阅编码规范 → `coding-standards.md`
+5. 需要编写 Python 自定义逻辑 → `custom-action.md`
+6. 理解场景跳转机制 → `scene-manager.md`
+7. 需要调试单节点 → `node-testing.md`
 
 ## 文档索引
 
@@ -20,6 +21,7 @@
 | 文档 | 说明 |
 |------|------|
 | [快速开始](./getting-started.md) | 以真实案例（#223 → #231）走一遍完整开发流程 |
+| [PR 规范](./pull-request-guidelines.md) | PR 标题、描述、验证记录、评审与提交前检查清单 |
 
 ### Tier 2 — 参考手册
 
@@ -36,6 +38,7 @@
 | 文档 | 说明 |
 |------|------|
 | [编码规范](./coding-standards.md) | Pipeline / Python 编码规则、提交前检查、常见坑 |
+| [PR 规范](./pull-request-guidelines.md) | 提交前检查、变更要求、评审协作约定 |
 
 ## Pipeline 基础组件
 
@@ -70,6 +73,7 @@
 | 我想做什么 | 该看哪里 |
 |-----------|---------|
 | 第一次参与，从零开始 | [getting-started.md](./getting-started.md) |
+| 准备提交 PR | [pull-request-guidelines.md](./pull-request-guidelines.md) |
 | 改 Pipeline 节点 | [pipeline-guide.md](./pipeline-guide.md) |
 | 写 Python 自定义逻辑 | [custom-action.md](./custom-action.md) |
 | 场景跳转/界面导航 | [scene-manager.md](./scene-manager.md) |
