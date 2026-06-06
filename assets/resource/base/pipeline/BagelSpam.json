@@ -68,8 +68,10 @@
                     95,
                     98
                 ],
-                "template": "BagelSpam/camera.png",
-                "threshold": 0.7
+                "template": "BagelSpam/camera_greenmask.png",
+                "threshold": 0.7,
+                "green_mask": true,
+                "order_by": "Score"
             }
         },
         "action": {
@@ -90,7 +92,9 @@
                     139,
                     141
                 ],
-                "template": "BagelSpam/shot.png"
+                "template": "BagelSpam/shot_greenmask.png",
+                "green_mask": true,
+                "order_by": "Score"
             }
         },
         "action": {
@@ -111,7 +115,9 @@
                     115,
                     104
                 ],
-                "template": "BagelSpam/save.png"
+                "template": "BagelSpam/save_greenmask.png",
+                "green_mask": true,
+                "order_by": "Score"
             }
         },
         "action": {
@@ -209,8 +215,10 @@
                     95,
                     98
                 ],
-                "template": "BagelSpam/camera.png",
-                "threshold": 0.7
+                "template": "BagelSpam/camera_greenmask.png",
+                "threshold": 0.7,
+                "green_mask": true,
+                "order_by": "Score"
             }
         },
         "timeout": 500,
@@ -233,7 +241,9 @@
                     120,
                     120
                 ],
-                "template": "BagelSpam/bagel.png"
+                "template": "BagelSpam/bagel_greenmask.png",
+                "green_mask": true,
+                "order_by": "Score"
             }
         },
         "action": {
@@ -254,7 +264,9 @@
                     89,
                     87
                 ],
-                "template": "BagelSpam/release.png"
+                "template": "BagelSpam/release_greenmask.png",
+                "green_mask": true,
+                "order_by": "Score"
             }
         },
         "action": {
@@ -495,7 +507,9 @@
                     108,
                     117
                 ],
-                "template": "BagelSpam/bagel_close.png"
+                "template": "BagelSpam/bagel_close_greenmask.png",
+                "green_mask": true,
+                "order_by": "Score"
             }
         },
         "action": {
@@ -537,11 +551,10 @@
                     95,
                     127
                 ],
-                "template": [
-                    "BagelSpam/esc_red.png",
-                    "BagelSpam/esc.png"
-                ],
-                "threshold": 0.65
+                "template": "BagelSpam/esc_red_greenmask.png",
+                "threshold": 0.65,
+                "green_mask": true,
+                "order_by": "Score"
             }
         },
         "pre_delay": 0,
