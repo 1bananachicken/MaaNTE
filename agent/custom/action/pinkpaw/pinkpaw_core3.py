@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -9,7 +8,6 @@ from pathlib import Path
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
-from maa.pipeline import JOCR, JRecognitionType
 
 try:
     import numpy as np
@@ -69,7 +67,6 @@ ROUTE_REWARD_CHECK_MIN_SLEEP = 0.5
 WAIT_UNTIL_POLL_INTERVAL = 0.02
 INTERAC_OCR_FALLBACK_INTERVAL = 1.0
 FOCUS_LOG_NODE = "_PINKPAW_CORE3_FOCUS_"
-DEFAULT_OCR_THRESHOLD = 0.2
 TIMING_SENSITIVE_KEYS = {"w", "a", "s", "d", "lshift", "space", "e"}
 TEAM_HEALTH_SLASH_ROI = [620, 654, 95, 42]
 CURRENT_CHAR_MARKER_ROI = [1168, 164, 68, 36]
@@ -164,15 +161,6 @@ class CharacterSwitchState:
     def advance(self):
         self.index += 1
         return self.index < len(self.keys)
-
-
-@dataclass
-class OCRText:
-    name: str
-    text: str
-    box: object = None
-    confidence: float = 1.0
-    score: float = 1.0
 
 
 def _is_hit(result) -> bool:
@@ -407,114 +395,6 @@ def _fast_recognize_node(node_name, image):
             return None
         return _fast_template_match(image, cfg)
     return None
-
-
-def _value_to_pixel(value, total, default=0):
-    try:
-        value = float(value)
-    except (TypeError, ValueError):
-        return int(default)
-    if 0 <= value <= 1:
-        return int(round(value * total))
-    return int(round(value))
-
-
-def _calc_ocr_roi(image, x, y, to_x, to_y, width, height, box=None):
-    if image is not None and hasattr(image, "shape") and len(image.shape) >= 2:
-        frame_height, frame_width = image.shape[:2]
-    else:
-        frame_width, frame_height = DEFAULT_WIDTH, DEFAULT_HEIGHT
-
-    if box is not None:
-        if isinstance(box, (list, tuple)) and len(box) >= 4:
-            bx, by, bw, bh = box[:4]
-            return [int(bx), int(by), max(1, int(bw)), max(1, int(bh))]
-        bx = getattr(box, "x", None)
-        by = getattr(box, "y", None)
-        bw = getattr(box, "width", getattr(box, "w", None))
-        bh = getattr(box, "height", getattr(box, "h", None))
-        if None not in (bx, by, bw, bh):
-            return [int(bx), int(by), max(1, int(bw)), max(1, int(bh))]
-
-    roi_x = _value_to_pixel(x, frame_width)
-    roi_y = _value_to_pixel(y, frame_height)
-    if not width:
-        width = float(to_x) - float(x)
-    if not height:
-        height = float(to_y) - float(y)
-    roi_w = max(1, _value_to_pixel(width, frame_width, default=frame_width - roi_x))
-    roi_h = max(1, _value_to_pixel(height, frame_height, default=frame_height - roi_y))
-
-    roi_x = max(0, min(frame_width - 1, roi_x))
-    roi_y = max(0, min(frame_height - 1, roi_y))
-    roi_w = max(1, min(frame_width - roi_x, roi_w))
-    roi_h = max(1, min(frame_height - roi_y, roi_h))
-    return [roi_x, roi_y, roi_w, roi_h]
-
-
-def _normalize_ocr_text(text: str) -> str:
-    return str(text or "").strip()
-
-
-def _ocr_text_matches(text: str, match) -> bool:
-    text = _normalize_ocr_text(text)
-    compact_text = re.sub(r"\s+", "", text)
-    if match is None:
-        return bool(text)
-    matches = match if isinstance(match, list) else [match]
-    for item in matches:
-        if isinstance(item, str) and (item == text or item == compact_text):
-            return True
-        if isinstance(item, re.Pattern) and (
-            re.search(item, text) or re.search(item, compact_text)
-        ):
-            return True
-    return False
-
-
-def _ocr_match_requests_text(match, text: str) -> bool:
-    if match is None:
-        return False
-    matches = match if isinstance(match, list) else [match]
-    for item in matches:
-        if isinstance(item, str) and text in item:
-            return True
-        if isinstance(item, re.Pattern) and text in item.pattern:
-            return True
-    return False
-
-
-def _ocr_result_items(result, match=None):
-    items = []
-    seen = set()
-    for item in getattr(result, "all_results", None) or []:
-        text = _normalize_ocr_text(getattr(item, "text", ""))
-        if not text or text in seen:
-            continue
-        seen.add(text)
-        if not _ocr_text_matches(text, match):
-            continue
-        score = float(getattr(item, "score", 1.0) or 0.0)
-        items.append(
-            OCRText(
-                name=text,
-                text=text,
-                box=getattr(item, "box", None),
-                confidence=score,
-                score=score,
-            )
-        )
-    return items
-
-
-def _normalize_ocr_frame(image):
-    if image is None:
-        return None
-    if not hasattr(image, "shape") or len(image.shape) != 3:
-        return image
-    if image.shape[2] <= 3:
-        return image
-    return np.ascontiguousarray(image[:, :, :3]) if np is not None else image[:, :, :3]
 
 
 class Core3ActionHelper:
@@ -1149,12 +1029,12 @@ class PinkPawHeistCore3Path:
         self.ah.raise_if_stopped()
         return _is_hit(result)
 
-    def _find_interac_in_image(self, image, include_ocr=False):
+    def _find_interac_in_image(self, image, include_text=False):
         if self._recognize_once("PinkPawHeist_Core3_CheckInteractPinkOnce", image):
             return True
         if self._recognize_once("PinkPawHeist_Core3_CheckInteractTemplateOnce", image):
             return True
-        if not include_ocr:
+        if not include_text:
             return False
         return any(
             self._recognize_once(node, image)
@@ -1167,132 +1047,13 @@ class PinkPawHeistCore3Path:
             )
         )
 
-    def find_interac(self, include_ocr=False):
+    def find_interac(self, include_text=False):
         self._checking_interaction = True
         try:
             image = self._screencap()
-            return self._find_interac_in_image(image, include_ocr=include_ocr)
+            return self._find_interac_in_image(image, include_text=include_text)
         finally:
             self._checking_interaction = False
-
-    def ocr_once(
-        self,
-        x=0,
-        y=0,
-        to_x=1,
-        to_y=1,
-        width=0,
-        height=0,
-        name=None,
-        box=None,
-        match=None,
-        threshold=0,
-        frame=None,
-        target_height=0,
-        time_out=0,
-        post_action=None,
-        raise_if_not_found=False,
-        log=False,
-        screenshot=False,
-        lib="default",
-    ):
-        image = frame if frame is not None else self._screencap()
-        image = _normalize_ocr_frame(image)
-        if image is None:
-            return None
-        roi = _calc_ocr_roi(image, x, y, to_x, to_y, width, height, box=box)
-        ocr_threshold = DEFAULT_OCR_THRESHOLD if not threshold else float(threshold)
-        try:
-            result = self.ctx.run_recognition_direct(
-                JRecognitionType.OCR,
-                JOCR(roi=roi, threshold=ocr_threshold),
-                image,
-            )
-        except Exception as exc:
-            self.log_warning(f"OCR failed roi={roi} match={match}: {exc}")
-            return None
-
-        items = _ocr_result_items(result, match=match)
-        if log:
-            all_texts = [
-                _normalize_ocr_text(getattr(item, "text", ""))
-                for item in getattr(result, "all_results", None) or []
-            ]
-            self.log_info(f"OCR roi={roi} match={match} hit={items} all={all_texts}")
-        return items or None
-
-    def wait_ocr(
-        self,
-        x=0,
-        y=0,
-        to_x=1,
-        to_y=1,
-        width=0,
-        height=0,
-        name=None,
-        box=None,
-        match=None,
-        threshold=0,
-        frame=None,
-        target_height=0,
-        time_out=0,
-        post_action=None,
-        raise_if_not_found=False,
-        log=False,
-        screenshot=False,
-        settle_time=-1,
-        lib="default",
-    ):
-        timeout = 1.5 if not time_out or time_out <= 0 else float(time_out)
-        deadline = time.monotonic() + timeout
-        settled_at = None
-        last_items = None
-        while time.monotonic() < deadline:
-            self.ah.raise_if_stopped()
-            items = self.ocr_once(
-                x=x,
-                y=y,
-                to_x=to_x,
-                to_y=to_y,
-                width=width,
-                height=height,
-                name=name,
-                box=box,
-                match=match,
-                threshold=threshold,
-                frame=frame,
-                target_height=target_height,
-                log=log,
-                screenshot=screenshot,
-                lib=lib,
-            )
-            if items:
-                last_items = items
-                if settle_time is not None and settle_time >= 0:
-                    if settled_at is None:
-                        settled_at = time.monotonic()
-                    if time.monotonic() - settled_at >= settle_time:
-                        if post_action:
-                            post_action()
-                        return last_items
-                else:
-                    if post_action:
-                        post_action()
-                    return items
-            else:
-                settled_at = None
-            if frame is not None:
-                break
-            self.sleep(WAIT_UNTIL_POLL_INTERVAL, check_reward=False, scaled=False)
-        if frame is None and _ocr_match_requests_text(match, "开门"):
-            if self._run_check_node("PinkPawHeist_CheckDoorOnce", timeout=0.25):
-                items = [OCRText(name="开门", text="开门")]
-                if post_action:
-                    post_action()
-                return items
-        if raise_if_not_found:
-            raise AbortException("timeout for wait_ocr")
-        return None
 
     def start_interaction_watch(self):
         self._interaction_watch_active = True
@@ -1338,15 +1099,18 @@ class PinkPawHeistCore3Path:
             settle_time=settle_time,
         )
 
+    def wait_door_open(self, time_out=1.5):
+        return self._run_check_node("PinkPawHeist_CheckDoorOnce", timeout=time_out)
+
     def has_safe_lock_prompt(self):
         image = self._screencap()
         return self._recognize_once("PinkPawHeist_Core3_CheckSafeLockPromptOnce", image)
 
-    def wait_for_interac(self, time_out=10, include_ocr_fallback=True):
+    def wait_for_interac(self, time_out=10, include_text_fallback=True):
         if self.wait_until(self.find_interac, time_out=time_out):
             return True
-        if include_ocr_fallback:
-            return self.find_interac(include_ocr=True)
+        if include_text_fallback:
+            return self.find_interac(include_text=True)
         return False
 
     def wait_and_interact(
@@ -1412,7 +1176,7 @@ class PinkPawHeistCore3Path:
             else:
                 self.log_warning("未确认撬锁开始，按保底时间等待后继续确认")
             wait_until_min_time()
-            if not interaction_closed and self.find_interac(include_ocr=True):
+            if not interaction_closed and self.find_interac(include_text=True):
                 self.log_warning("锁交互提示仍可见，继续路线")
             return True
         wait_until_min_time()
@@ -3010,8 +2774,6 @@ class PinkPawHeistCore3Path:
             self.log_round_info("配置避战角色浔，使用浔避战（路线B）")
             self.goto_lg1_skip_Hotori()
         self.wait_team_ui_settle()
-        # if not self.check_current_floor_str("办公"):
-        #     self.check_current_floor(1)
         self.switch_to_runner(check_switched=True)
         self.lg1_wp1_safer()
         self.lg1_wp2()
@@ -3026,8 +2788,6 @@ class PinkPawHeistCore3Path:
             self.lg1_wp4()
             self.lg1_wp5_avoid_combat_03()
         self.wait_team_ui_settle()
-        # if not self.check_current_floor_str("藏品"):
-        #     self.check_current_floor(2)
         self.lg2_wp1_to_exit1()  # self.lg2_wp1_to_exit1_safer(False)
         self.lg2_wp1_remains()
         self.lg2_wp2_to_exit2_safer()
@@ -3159,14 +2919,7 @@ class PinkPawHeistCore3Path:
         self.wait_and_interact(direction="d", is_lock=True, time_out=7.64)
         self.sleep(0.10)
         self.send_key_up("w")
-        if self.wait_ocr(
-            x=0.60,
-            y=0.52,
-            to_x=0.70,
-            to_y=0.57,
-            match=re.compile("开门"),
-            time_out=1.14,
-        ):
+        if self.wait_door_open(time_out=1.14):
             self.sleep(0.10)
             self.send_key("f", down_time=0.10)
             self.sleep(0.10)
@@ -3315,14 +3068,7 @@ class PinkPawHeistCore3Path:
         open_door = False
         open_loop = 0
         while not open_door and open_loop < check_time:
-            if self.wait_ocr(
-                x=0.60,
-                y=0.52,
-                to_x=0.70,
-                to_y=0.57,
-                match=re.compile("开门"),
-                time_out=1.14,
-            ):
+            if self.wait_door_open(time_out=1.14):
                 open_door = True
             else:
                 self.sleep(0.10)
@@ -3600,13 +3346,6 @@ class PinkPawHeistCore3Path:
         self.sleep(1.57)
         self.exit_state[2] = self.try_open_exit(direction="w", exit_index=2)
         self.sleep(0.40)
-
-    def check_current_floor_str(self, floor_str):
-        ret = self.wait_ocr(
-            0.04, 0.23, 0.17, 0.28, match=re.compile(floor_str), time_out=5
-        )
-        if ret:
-            return True
 
     def switch_to_fighter(self, check_switched=False, mode="all_desc"):
         """切换到可用战斗角色。
