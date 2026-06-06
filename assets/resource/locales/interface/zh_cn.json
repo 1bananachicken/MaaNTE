@@ -144,6 +144,8 @@
     "task_auto_piano_input_transpose_label": "转调",
     "task_auto_piano_input_speed_pattern_msg": "请输入大于 0 的数字，例如 1.0 或 1.25。",
     "task_auto_piano_input_transpose_pattern_msg": "请输入整数半音数，例如 -12、0、7。",
+    "task_witch_divination_label": "魔女占卜",
+    "task_witch_divination_desc": "自动前往魔女之家，进行占卜操作 需要 [桌面端-前台] 连接方式",
     "task_auto_drive_dataset_recorder_label": "自动驾驶数据集收集",
     "task_auto_drive_dataset_recorder_desc": "开始此任务前确保小地图已设置好目的地，默认录制时长为 60 秒，每秒采样 2 次。",
     "task_auto_drive_dataset_option_settings": "录制设置",

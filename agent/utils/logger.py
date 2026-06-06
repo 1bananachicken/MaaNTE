@@ -138,13 +138,24 @@ class _ConsoleFormatter(logging.Formatter):
 _FILE_FORMAT = logging.Formatter(
     "%(asctime)s | %(levelname)-8s | %(name)s:%(funcName)s:%(lineno)d | %(message)s"
 )
-_std_logger = logging.getLogger("maante")
+_APP_LOGGER_NAME = "maante"
+_ROOT_LOGGER = logging.getLogger()
+_NOISY_LOGGER_NAMES = ("cv2", "numpy", "PIL", "matplotlib", "urllib3", "asyncio")
 
 
 def _resolve_level(level) -> int:
     if isinstance(level, int):
         return level
     return getattr(logging, str(level).upper(), logging.INFO)
+
+
+def _configure_noisy_loggers():
+    for name in _NOISY_LOGGER_NAMES:
+        logging.getLogger(name).setLevel(logging.WARNING)
+
+
+def get_logger(name=None):
+    return logging.getLogger(name or _APP_LOGGER_NAME)
 
 
 def _setup_loguru_logger(log_dir="debug/custom", console_level="INFO"):
@@ -172,25 +183,26 @@ def _setup_loguru_logger(log_dir="debug/custom", console_level="INFO"):
         filter=_enrich_record,
     )
 
-    logging.root.handlers = [_InterceptHandler()]
-    logging.root.setLevel(logging.DEBUG)
-    for name in ("cv2", "numpy", "PIL", "matplotlib", "urllib3", "asyncio"):
-        logging.getLogger(name).setLevel(logging.WARNING)
+    _ROOT_LOGGER.handlers = [_InterceptHandler()]
+    _ROOT_LOGGER.setLevel(logging.DEBUG)
+    _configure_noisy_loggers()
 
-    return _loguru_logger
+    app_logger = get_logger(_APP_LOGGER_NAME)
+    app_logger.setLevel(logging.NOTSET)
+    app_logger.propagate = True
+    return app_logger
 
 
 def _setup_std_logger(log_dir="debug/custom", console_level="INFO"):
     os.makedirs(log_dir, exist_ok=True)
 
-    _std_logger.handlers.clear()
-    _std_logger.setLevel(logging.DEBUG)
-    _std_logger.propagate = False
+    _ROOT_LOGGER.handlers.clear()
+    _ROOT_LOGGER.setLevel(logging.DEBUG)
 
     console_handler = logging.StreamHandler(_resolve_console_stream())
     console_handler.setLevel(_resolve_level(console_level))
     console_handler.setFormatter(_ConsoleFormatter())
-    _std_logger.addHandler(console_handler)
+    _ROOT_LOGGER.addHandler(console_handler)
 
     file_handler = TimedRotatingFileHandler(
         os.path.join(log_dir, "runtime.log"),
@@ -201,13 +213,18 @@ def _setup_std_logger(log_dir="debug/custom", console_level="INFO"):
     )
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(_FILE_FORMAT)
-    _std_logger.addHandler(file_handler)
+    _ROOT_LOGGER.addHandler(file_handler)
 
-    return _std_logger
+    _configure_noisy_loggers()
+
+    app_logger = get_logger(_APP_LOGGER_NAME)
+    app_logger.setLevel(logging.NOTSET)
+    app_logger.propagate = True
+    return app_logger
 
 
 def setup_logger(log_dir="debug/custom", console_level="INFO"):
-    """设置 logger（优先 loguru，无 loguru 时回退到标准 logging）"""
+    """设置统一 logger（优先 loguru，无 loguru 时回退到标准 logging）"""
     if _HAS_LOGURU:
         return _setup_loguru_logger(log_dir=log_dir, console_level=console_level)
     return _setup_std_logger(log_dir=log_dir, console_level=console_level)
@@ -219,6 +236,7 @@ def change_console_level(level="DEBUG"):
     logger.info(f"控制台日志等级已更改为: {level}")
 
 
-logger = setup_logger(console_level="WARNING" if _is_mxu_client() else "INFO")
+setup_logger(console_level="WARNING" if _is_mxu_client() else "INFO")
+logger = get_logger(_APP_LOGGER_NAME)
 
-__all__ = ["setup_logger", "change_console_level", "logger"]
+__all__ = ["setup_logger", "change_console_level", "get_logger", "logger"]
