@@ -64,13 +64,34 @@ MAX_INTERACTION_PAUSE = 1.0
 MAX_ROUTE_SLEEP_ADJUST = 0.25
 ROUTE_SLEEP_ADJUST_RATIO_CAP = 0.08
 ROUTE_SLEEP_BUSY_WAIT = 0.02
-ROUTE_SLEEP_POLL_INTERVAL = 0.001
+ROUTE_SLEEP_POLL_INTERVAL = 0.005
 ROUTE_REWARD_CHECK_MIN_SLEEP = 0.5
 WAIT_UNTIL_POLL_INTERVAL = 0.02
 INTERAC_OCR_FALLBACK_INTERVAL = 1.0
 FOCUS_LOG_NODE = "_PINKPAW_CORE3_FOCUS_"
 DEFAULT_OCR_THRESHOLD = 0.2
 TIMING_SENSITIVE_KEYS = {"w", "a", "s", "d", "lshift", "space", "e"}
+TEAM_HEALTH_SLASH_ROI = [620, 654, 95, 42]
+CURRENT_CHAR_MARKER_ROI = [1168, 164, 68, 36]
+CURRENT_CHAR_MARKER_CORE_ROI = [1176, 172, 38, 16]
+CURRENT_CHAR_SLOT_SPACING = 88
+CURRENT_CHAR_MIN_SCORE = 16
+CURRENT_CHAR_MIN_MARGIN = 5
+CURRENT_CHAR_SLOT_WHITE_THRESHOLDS = [205, 188, 205, 205]
+CURRENT_CHAR_SLOT_COLORED_THRESHOLDS = [170, 145, 170, 170]
+CURRENT_CHAR_SLOT_SCORE_BONUS = [0, 4, 0, 0]
+CURRENT_CHAR_SLOT_MIN_SCORE = [16, 12, 16, 16]
+CURRENT_CHAR_SLOT_MIN_MARGIN = [5, 2, 5, 5]
+CURRENT_CHAR_CORE_SCORE_WEIGHT = 3
+CURRENT_CHAR_SLOT2_CORE_MIN_SCORE = 6
+CURRENT_CHAR_SLOT2_CORE_MIN_MARGIN = 2
+SWITCH_DEAD_SETTLE = 0.15
+SWITCH_BLACK_SCREEN_EXTENSION = 0.5
+SWITCH_CONFIRM_RETRY_COUNT = 1
+SWITCH_CONFIRM_RETRY_WINDOW = 0.7
+BLACK_SCREEN_MEAN_THRESHOLD = 18
+BLACK_SCREEN_BRIGHT_PIXEL_THRESHOLD = 80
+BLACK_SCREEN_BRIGHT_PIXEL_COUNT = 300
 FAST_TEMPLATE_SAMPLE_LIMIT = 64
 FAST_TEMPLATE_CANDIDATE_LIMIT = 5000
 FAST_TEMPLATE_ANCHOR_TOLERANCE = 45
@@ -118,6 +139,10 @@ _FAST_IMAGE_DIR = None
 
 
 class AbortException(Exception):
+    pass
+
+
+class EarlyExtractException(Exception):
     pass
 
 
@@ -188,6 +213,18 @@ def _parse_timing_scale(value) -> float:
     except (TypeError, ValueError):
         scale = DEFAULT_ROUTE_TIMING_SCALE
     return max(MIN_ROUTE_TIMING_SCALE, min(MAX_ROUTE_TIMING_SCALE, scale))
+
+
+def _parse_bool(value, default=False) -> bool:
+    if value is None:
+        return bool(default)
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on", "enable", "enabled"}
+    return bool(default)
 
 
 def _parse_interaction_pause(value) -> float:
@@ -297,6 +334,22 @@ def _crop_roi(image, roi):
     if x2 <= x1 or y2 <= y1:
         return None
     return bgr[y1:y2, x1:x2]
+
+
+def _scale_roi(roi, image):
+    bgr = _as_bgr_image(image)
+    if bgr is None:
+        return roi
+    ih, iw = bgr.shape[:2]
+    sx = iw / DEFAULT_WIDTH
+    sy = ih / DEFAULT_HEIGHT
+    x, y, w, h = roi
+    return [
+        int(round(x * sx)),
+        int(round(y * sy)),
+        max(1, int(round(w * sx))),
+        max(1, int(round(h * sy))),
+    ]
 
 
 def _fast_color_match(image, cfg):
@@ -620,6 +673,8 @@ class PinkPawHeistCore3Path:
     CONF_RUNNER = "runner"
     CONF_AVOIDER = "avoider"
     CONF_AVOID_MTH = "avoid_method"
+    CONF_EARLY_EXTRACT_EXIT1 = "early_extract_exit1"
+    CONF_EARLY_EXTRACT_EXIT2 = "early_extract_exit2"
     ROLE_FIGHTER = "fighter"
     ROLE_RUNNER = "runner"
     ROLE_AVOIDER = "avoider"
@@ -644,6 +699,10 @@ class PinkPawHeistCore3Path:
         self.interaction_pause = _parse_interaction_pause(
             (params or {}).get("interaction_pause", DEFAULT_INTERACTION_PAUSE)
         )
+        self.early_extract_exit = {
+            1: _parse_bool((params or {}).get(self.CONF_EARLY_EXTRACT_EXIT1), False),
+            2: _parse_bool((params or {}).get(self.CONF_EARLY_EXTRACT_EXIT2), False),
+        }
         self.config = {
             self.CONF_FIGHTER: ["4", "1"],
             self.CONF_RUNNER: ["3"],
@@ -653,6 +712,8 @@ class PinkPawHeistCore3Path:
         self._dead_fighter_keys: list[str] = []
         self._current_fighter_key: str | None = None
         self._switch_state: CharacterSwitchState | None = None
+        self._handling_switch_state = False
+        self._next_switch_poll_at = 0.0
         self._held_keys: set[str] = set()
         self._quick_pick_active = False
         self._quick_pick_ready_at = 0.0
@@ -765,6 +826,7 @@ class PinkPawHeistCore3Path:
         while time.perf_counter() < busy_from:
             self.ah.raise_if_stopped()
             self._poll_quick_pick()
+            self._poll_character_switch()
             timing_sensitive = self._has_timing_sensitive_key_held()
             if allow_reward_check and not timing_sensitive:
                 self._check_still_in_heist()
@@ -781,6 +843,7 @@ class PinkPawHeistCore3Path:
             if self.ah.is_stopping():
                 self.ah.raise_if_stopped()
         self._poll_quick_pick()
+        self._poll_character_switch()
         return True
 
     def next_frame(self):
@@ -920,8 +983,143 @@ class PinkPawHeistCore3Path:
         return False
 
     def wait_team_ui_settle(self):
-        self.sleep(0.5, check_reward=False)
+        self.wait_until(
+            lambda: not self.is_in_team(),
+            time_out=1,
+            raise_if_not_found=False,
+        )
+        self.wait_until(
+            self.is_in_team,
+            time_out=30,
+            settle_time=0.25,
+            raise_if_not_found=False,
+        )
+        self.sleep(0.1, check_reward=False)
         return True
+
+    def _is_black_screen_in_image(self, image):
+        bgr = _as_bgr_image(image)
+        if bgr is None:
+            return False
+        sample = bgr[::8, ::8]
+        if sample.size == 0:
+            return False
+        max_ch = sample.max(axis=2)
+        return (
+            float(max_ch.mean()) <= BLACK_SCREEN_MEAN_THRESHOLD
+            and int((max_ch >= BLACK_SCREEN_BRIGHT_PIXEL_THRESHOLD).sum())
+            <= BLACK_SCREEN_BRIGHT_PIXEL_COUNT
+        )
+
+    def _is_in_team_in_image(self, image):
+        if np is None:
+            return True
+        roi = _crop_roi(image, _scale_roi(TEAM_HEALTH_SLASH_ROI, image))
+        if roi is None:
+            return False
+        max_ch = roi.max(axis=2)
+        min_ch = roi.min(axis=2)
+        bright = (max_ch >= 175) & ((max_ch - min_ch) <= 95)
+        return int(bright.sum()) >= 10
+
+    def is_in_team(self):
+        image = self._screencap()
+        if image is None:
+            return True
+        return self._is_in_team_in_image(image)
+
+    def _current_char_roi_score(self, image, roi, index):
+        crop = _crop_roi(image, _scale_roi(roi, image))
+        if crop is None:
+            return 0
+        max_ch = crop.max(axis=2)
+        min_ch = crop.min(axis=2)
+        sat = max_ch - min_ch
+        white_threshold = CURRENT_CHAR_SLOT_WHITE_THRESHOLDS[index]
+        colored_threshold = CURRENT_CHAR_SLOT_COLORED_THRESHOLDS[index]
+        white = (max_ch >= white_threshold) & (sat <= 65)
+        colored = (max_ch >= colored_threshold) & (sat >= 55)
+        return int((white | colored).sum())
+
+    def _current_char_scores(self, image):
+        if np is None:
+            return [0, 0, 0, 0]
+        scores = []
+        for index in range(4):
+            broad_roi = list(CURRENT_CHAR_MARKER_ROI)
+            broad_roi[1] += CURRENT_CHAR_SLOT_SPACING * index
+            score = self._current_char_roi_score(image, broad_roi, index)
+            score += CURRENT_CHAR_SLOT_SCORE_BONUS[index]
+            scores.append(score)
+        return scores
+
+    def _current_char_core_scores(self, image):
+        if np is None:
+            return [0, 0, 0, 0]
+        scores = []
+        for index in range(4):
+            core_roi = list(CURRENT_CHAR_MARKER_CORE_ROI)
+            core_roi[1] += CURRENT_CHAR_SLOT_SPACING * index
+            scores.append(
+                self._current_char_roi_score(image, core_roi, index)
+                * CURRENT_CHAR_CORE_SCORE_WEIGHT
+            )
+        return scores
+
+    def _is_current_char_score_accepted(self, scores, index):
+        if not scores or not 0 <= index < len(scores):
+            return False
+        target_score = scores[index]
+        other_scores = [score for idx, score in enumerate(scores) if idx != index]
+        best_other = max(other_scores) if other_scores else 0
+        min_score = CURRENT_CHAR_SLOT_MIN_SCORE[index]
+        min_margin = CURRENT_CHAR_SLOT_MIN_MARGIN[index]
+        return target_score >= min_score and target_score - best_other >= min_margin
+
+    def _is_slot2_core_score_accepted(self, image):
+        scores = self._current_char_core_scores(image)
+        target_score = scores[1]
+        best_other = max(score for idx, score in enumerate(scores) if idx != 1)
+        return (
+            target_score >= CURRENT_CHAR_SLOT2_CORE_MIN_SCORE
+            and target_score - best_other >= CURRENT_CHAR_SLOT2_CORE_MIN_MARGIN
+        )
+
+    def get_current_char_index(self, image=None):
+        if image is None:
+            image = self._screencap()
+        if image is None:
+            return -1
+        scores = self._current_char_scores(image)
+        if not scores:
+            return -1
+        best_idx = max(range(len(scores)), key=lambda idx: scores[idx])
+        if self._is_current_char_score_accepted(scores, best_idx):
+            return best_idx
+        return -1
+
+    def is_char_at_index(self, index, image=None):
+        if image is None:
+            image = self._screencap()
+        if image is None:
+            return False
+        index = int(index)
+        if self._is_current_char_score_accepted(
+            self._current_char_scores(image), index
+        ):
+            return True
+        if index == 1:
+            return self._is_slot2_core_score_accepted(image)
+        return False
+
+    def ensure_in_team(self, time_out=2.0):
+        deadline = time.monotonic() + time_out
+        while time.monotonic() < deadline:
+            if self.is_in_team():
+                return True
+            self.send_key("esc", action_name="ensure_in_team", interval=0.3)
+            self.sleep(0.05, check_reward=False, scaled=False)
+        return self.is_in_team()
 
     def _run_check_node(self, node_name, timeout=1.5):
         deadline = time.monotonic() + timeout
@@ -1289,7 +1487,12 @@ class PinkPawHeistCore3Path:
     def has_extract_panel(self):
         return self._recognize_once("PinkPawHeist_CheckEvacuateOnce")
 
-    def try_open_exit(self, direction=None):
+    def should_early_extract(self, exit_index):
+        if exit_index is None:
+            return False
+        return bool(self.early_extract_exit.get(int(exit_index), False))
+
+    def try_open_exit(self, direction=None, exit_index=None):
         if not self.wait_for_interac(time_out=4):
             raise AbortException("not found exit interaction")
         if direction is not None:
@@ -1301,6 +1504,13 @@ class PinkPawHeistCore3Path:
             time_out=2.5,
         )
         if ret:
+            if self.should_early_extract(exit_index):
+                self.log_round_info(f"Exit {exit_index} available, early extract")
+                self._release_held_keys()
+                self.ah.release_controls()
+                if not self.exit_heist():
+                    raise AbortException(f"early extract at exit {exit_index} failed")
+                raise EarlyExtractException(f"early extracted at exit {exit_index}")
             self.sleep(0.3, check_reward=False)
             self.send_key("esc", interval=0.5)
             self.sleep(0.5, check_reward=False)
@@ -1376,14 +1586,142 @@ class PinkPawHeistCore3Path:
             self.sleep(0.2)
         return str(key)
 
+    def _send_current_switch_key(self):
+        state = self._switch_state
+        if state is None:
+            return None
+        key = state.current_key
+        if state.role == self.ROLE_FIGHTER:
+            self._current_fighter_key = key
+        state.deadline = time.monotonic() + self.SWITCH_CHECK_DURATION
+        self._next_switch_poll_at = time.monotonic() + 0.05
+        self.send_key(key)
+        return key
+
+    def _clear_switch_state(self):
+        self._switch_state = None
+        self._next_switch_poll_at = 0.0
+
+    def _handle_dead_switch_candidate(self, state: CharacterSwitchState):
+        role = state.role
+        key = state.current_key
+        self.log_warning(f"{role} char {key} may be dead, try next")
+        if role == self.ROLE_FIGHTER and key not in self._dead_fighter_keys:
+            self._dead_fighter_keys.append(key)
+        self.ensure_in_team()
+        if not state.advance():
+            self._clear_switch_state()
+            raise AbortException(f"{role} {state.keys} dead or empty")
+        self._send_current_switch_key()
+
+    def _poll_character_switch(self):
+        if self._switch_state is None or self._handling_switch_state:
+            return
+        now = time.monotonic()
+        if now < self._next_switch_poll_at:
+            return
+        self._next_switch_poll_at = now + 0.1
+
+        state = self._switch_state
+        if now > state.deadline:
+            self._clear_switch_state()
+            return
+
+        image = self._screencap()
+        if image is not None and self._is_black_screen_in_image(image):
+            state.deadline = max(
+                state.deadline,
+                time.monotonic() + SWITCH_BLACK_SCREEN_EXTENSION,
+            )
+            return
+        if image is None or self._is_in_team_in_image(image):
+            return
+
+        self._handling_switch_state = True
+        try:
+            self._handle_dead_switch_candidate(state)
+        finally:
+            self._handling_switch_state = False
+
+    def _wait_character_switch_success(self, role, key):
+        last_key = str(key)
+        retry_count = 0
+        retry_key = last_key
+        not_team_since = None
+        old_handling = self._handling_switch_state
+        self._handling_switch_state = True
+        try:
+            while self._switch_state is not None:
+                state = self._switch_state
+                last_key = state.current_key
+                if retry_key != last_key:
+                    retry_key = last_key
+                    retry_count = 0
+                now = time.monotonic()
+                if now > state.deadline:
+                    if retry_count < SWITCH_CONFIRM_RETRY_COUNT:
+                        retry_count += 1
+                        self.log_warning(
+                            f"{role} switch to {last_key} not confirmed, retry {retry_count}"
+                        )
+                        self.send_key(
+                            last_key,
+                            action_name=f"switch_char_retry:{last_key}",
+                            interval=-1,
+                        )
+                        state.deadline = time.monotonic() + SWITCH_CONFIRM_RETRY_WINDOW
+                        not_team_since = None
+                        continue
+                    self.log_warning(f"{role} switch to {last_key} not confirmed")
+                    self._clear_switch_state()
+                    return last_key
+
+                self.send_key(last_key, action_name="switch_char", interval=0.5)
+                image = self._screencap()
+                if image is not None and self.is_char_at_index(
+                    int(last_key) - 1, image=image
+                ):
+                    self._clear_switch_state()
+                    return last_key
+
+                if image is not None and self._is_black_screen_in_image(image):
+                    state.deadline = max(
+                        state.deadline,
+                        time.monotonic() + SWITCH_BLACK_SCREEN_EXTENSION,
+                    )
+                    not_team_since = None
+                    self.sleep(
+                        WAIT_UNTIL_POLL_INTERVAL,
+                        check_reward=False,
+                        scaled=False,
+                    )
+                    continue
+
+                in_team = True if image is None else self._is_in_team_in_image(image)
+                if in_team:
+                    not_team_since = None
+                else:
+                    if not_team_since is None:
+                        not_team_since = now
+                    elif now - not_team_since >= SWITCH_DEAD_SETTLE:
+                        self._handle_dead_switch_candidate(state)
+                        not_team_since = None
+
+                self.sleep(WAIT_UNTIL_POLL_INTERVAL, check_reward=False, scaled=False)
+        finally:
+            self._handling_switch_state = old_handling
+
+        return last_key
+
     def _begin_character_switch(self, role, keys, check_switched=False):
         keys = [str(key) for key in keys]
         if not keys:
             raise AbortException(f"{role} {keys} dead or empty")
-        key = keys[0]
-        if role == self.ROLE_FIGHTER:
-            self._current_fighter_key = key
-        return self.switch_to_key(key)
+        self._switch_state = CharacterSwitchState(role=role, keys=keys)
+        key = self._send_current_switch_key()
+        if check_switched:
+            return self._wait_character_switch_success(role, key)
+        return key
 
     def switch_to_runner(self, check_switched=False):
         return self._begin_character_switch(
@@ -1991,7 +2329,7 @@ class PinkPawHeistCore3Path:
         self.send_key_down("d")
         self.sleep(0.52)
         self.send_key_up("d")
-        self.sleep(0.59)
+        self.sleep(0.29)
         self.send_key_down("s")
         self.sleep(0.51)
         self.send_key_up("s")
@@ -1999,12 +2337,12 @@ class PinkPawHeistCore3Path:
         self.send_key_down("d")
         self.sleep(0.93)
         self.send_key_up("d")
-        self.sleep(0.41)
+        self.sleep(0.21)
         self.send_key_up("f")  # end pick
         self.sleep(0.11)
         self.send_key_down("w")
         self.sleep(2.71)
-        self.exit_state[1] = self.try_open_exit(direction="w")
+        self.exit_state[1] = self.try_open_exit(direction="w", exit_index=1)
 
     def lg2_wp1_remains(self):
         self.log_round_info("LG2 WP1剩余路线")
@@ -2039,12 +2377,12 @@ class PinkPawHeistCore3Path:
         self.send_key_down("d")
         self.sleep(0.2)
         self.send_key("lshift")
-        self.sleep(1.35)
+        self.sleep(1.37)
         self.send_key_up("d")
         self.switch_to_runner()
         self.sleep(0.11)
         self.send_key_down("w")
-        self.sleep(1.01)
+        self.sleep(2.31)
         self.send_key_up("w")
         self.sleep(0.18)
         self.send_key_down("d")
@@ -2077,11 +2415,15 @@ class PinkPawHeistCore3Path:
         self.send_key_down("space")
         self.sleep(0.13)
         self.send_key_up("space")
-        self.sleep(3.46)
+        self.sleep(3.96)
         self.send_key_down("a")
         self.sleep(0.13)
         self.send_key_up("a")
-        self.sleep(5.54)
+        self.sleep(0.53)
+        self.send_key_down("d")
+        self.sleep(0.13)
+        self.send_key_up("d")
+        self.sleep(4.64)
         self.send_key_down("d")
         self.sleep(1.31)
         self.send_key_up("d")
@@ -2249,7 +2591,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.40)
         self.send_key_up("a")
         self.sleep(1.57)
-        self.exit_state[2] = self.try_open_exit(direction="w")
+        self.exit_state[2] = self.try_open_exit(direction="w", exit_index=2)
         self.sleep(0.40)
 
     def lg2_wp3_to_layzer_room(self):
@@ -2295,7 +2637,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("f")  # end pick
         self.sleep(0.11)
         self.send_key_down("s")
-        self.sleep(2.96)
+        self.sleep(2.97)
         self.send_key_up("s")
 
     def lg2_wp3_in_layzer_room(self):
@@ -2318,14 +2660,24 @@ class PinkPawHeistCore3Path:
         self.send_key_up("w")
         self.sleep(0.36)
         self.send_key_down("a")
-        self.sleep(0.51)
+        self.sleep(2.01)
+        self.send_key_down("s")
+        self.sleep(0.23)
+        self.send_key_up("s")
+        self.sleep(1.01)
+        self.send_key_down("s")
+        self.sleep(0.23)
+        self.send_key_up("s")
+        self.sleep(1.01)
         self.send_key_down("w")
-        self.sleep(1.00)
+        self.sleep(0.71)
         self.send_key_up("a")
+        self.sleep(0.27)
         self.send_key_up("w")
 
+        self.sleep(0.37)
         self.send_key_down("d")
-        self.sleep(0.62)
+        self.sleep(0.81)
         self.send_key_up("d")
         self.sleep(0.30)
         self.send_key_down("s")
@@ -2338,7 +2690,7 @@ class PinkPawHeistCore3Path:
         self.send_key_down("s")
         self.sleep(1.41)
         self.send_key_up("a")
-        self.sleep(0.11)
+        self.sleep(0.05)
         self.send_key_up("s")
         self.sleep(0.11)
         self.send_key_down("d")
@@ -2354,7 +2706,15 @@ class PinkPawHeistCore3Path:
         self.send_key_up("s")
         self.sleep(0.16)
         self.send_key_down("a")
-        self.sleep(0.33)
+        self.sleep(2.01)
+        self.send_key_up("a")
+        self.sleep(0.16)
+        self.send_key_down("d")
+        self.sleep(0.91)
+        self.send_key_up("d")
+        self.sleep(0.13)
+        self.send_key_down("a")
+        self.sleep(0.13)
         self.send_key_down("space")
         self.sleep(0.14)
         self.send_key_up("space")
@@ -2366,7 +2726,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("a")
         self.sleep(0.40)
         self.send_key_down("s")
-        self.sleep(0.22)
+        self.sleep(0.24)
         self.send_key_down("space")
         self.sleep(0.07)
         self.send_key_up("space")
@@ -2382,7 +2742,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("a")
         self.sleep(0.80)
         self.send_key_down("d")
-        self.sleep(0.71)
+        self.sleep(0.70)
         self.send_key_up("d")
         self.sleep(0.11)
         self.send_key_up("f")  # end pick
@@ -2427,11 +2787,11 @@ class PinkPawHeistCore3Path:
         self.send_key_up("a")
         self.sleep(0.11)
         self.send_key_down("s")
-        self.sleep(0.65)
+        self.sleep(0.66)
         self.send_key_up("s")
         self.sleep(0.11)
         self.send_key_down("a")
-        self.sleep(0.53)
+        self.sleep(0.54)
         self.send_key_up("a")
         self.sleep(0.13)
         self.send_key_down("s")
@@ -3168,7 +3528,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.20)
         self.send_key_up("f")  # end pick
         self.send_key_down("w")
-        self.sleep(1.70)
+        self.sleep(1.80)
         self.send_key_up("w")
         self.sleep(0.11)
         self.send_key_down("d")
@@ -3207,22 +3567,18 @@ class PinkPawHeistCore3Path:
         self.send_key_down("w")
         self.sleep(2.60)
         self.send_key_up("w")
-        self.switch_to_runner()
         self.sleep(0.11)
         self.send_key_down("d")
         self.sleep(2.31)
         self.send_key_up("d")
-        self.switch_to_runner()
         self.sleep(0.11)
         self.send_key_down("w")
-        self.sleep(3.63)  # 4.03
+        self.sleep(4.03)  # 4.03
         self.send_key_up("w")
-        self.switch_to_runner()
         self.sleep(0.11)
         self.send_key_down("s")
         self.sleep(2.85)
         self.send_key_up("s")
-        self.switch_to_runner()
         self.sleep(0.11)
         self.send_key_down("d")
         self.sleep(1.51)
@@ -3242,7 +3598,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.40)
         self.send_key_up("a")
         self.sleep(1.57)
-        self.exit_state[2] = self.try_open_exit(direction="w")
+        self.exit_state[2] = self.try_open_exit(direction="w", exit_index=2)
         self.sleep(0.40)
 
     def check_current_floor_str(self, floor_str):
@@ -3323,6 +3679,11 @@ class PinkPawHeistScheme3Action(CustomAction):
             path._release_held_keys()
             path.ah.release_controls()
             return CustomAction.RunResult(success=False)
+        except EarlyExtractException as exc:
+            print(f"[PinkPawHeist/Core3] {exc}")
+            path._release_held_keys()
+            path.ah.release_controls()
+            return CustomAction.RunResult(success=True)
         except AbortException as exc:
             print(f"[PinkPawHeist/Core3] route aborted: {exc}")
             path._release_held_keys()

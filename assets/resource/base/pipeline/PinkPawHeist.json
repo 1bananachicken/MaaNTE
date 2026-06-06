@@ -213,6 +213,25 @@
             "PinkPawHeist_WaitReward",
             "[JumpBack]RealTimeSkipStoryDialog",
             "[JumpBack]RealTimeSkipStory"
+        ],
+        "on_error": [
+            "PinkPawHeist_AfterStory_Recover"
+        ]
+    },
+    "PinkPawHeist_AfterStory_Recover": {
+        "desc": "详情页进入失败恢复：可能被网络退回小吱或仍在剧情",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "post_delay": 2000,
+        "next": [
+            "[JumpBack]PinkPawHeist_DetectXiaoZhi",
+            "[JumpBack]RealTimeSkipStoryDialog",
+            "[JumpBack]RealTimeSkipStory",
+            "PinkPawHeist_AfterStory"
         ]
     },
     "PinkPawHeist_WaitReward": {
@@ -269,6 +288,7 @@
         },
         "post_delay": 2000,
         "next": [
+            "[JumpBack]PinkPawHeist_DetectXiaoZhi",
             "PinkPawHeist_WaitReward"
         ]
     },

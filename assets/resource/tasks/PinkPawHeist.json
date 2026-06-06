@@ -101,7 +101,8 @@
                     },
                     "option": [
                         "PinkPawHeist_Scheme_Core3_AvoidMethod",
-                        "PinkPawHeist_Scheme_Core3_TimingScale",
+                        "PinkPawHeist_Scheme_Core3_EarlyExtractExit1",
+                        "PinkPawHeist_Scheme_Core3_EarlyExtractExit2",
                         "PinkPawHeist_Scheme_Core3_desc"
                     ]
                 }
@@ -122,7 +123,7 @@
         "PinkPawHeist_Scheme_Core3_desc": {
             "type": "input",
             "label": "方案三说明",
-            "description": "<span style='color:orange'>移植自 ok-nte 粉爪路径2，请设置画质到性能档位，帧率设置120帧，关闭设置里的移动镜头修正！打开按下锁定镜头回正！到小吱旁边启动！</span><br><span style='color:green'>路线说明：</span>使用 ok 路径2，按固定站位配队；只需要在“方案三配队”里选择你实际使用的站位组合。",
+            "description": "<span style='color:orange'>移植自 ok-nte 粉爪路径2，请设置画质到性能档位，帧率设置120帧，关闭设置里的移动镜头修正！打开按下锁定镜头回正！到小吱旁边启动！包里要至少有一个复活药！</span><br><span style='color:green'>路线说明：</span>使用 ok 路径2，按固定站位配队；只需要在“方案三配队”里选择你实际使用的站位组合。",
             "inputs": []
         },
         "PinkPawHeist_Scheme_Core3_AvoidMethod": {
@@ -155,35 +156,61 @@
                 }
             ]
         },
-        "PinkPawHeist_Scheme_Core3_TimingScale": {
-            "type": "input",
-            "label": "路线时间微调",
-            "description": "默认 1.00。低延迟发键已启用，只有实测路线仍有固定偏差时再微调：走过头调小，没走到调大。锁门等待不会被这个倍率缩短。",
-            "inputs": [
+        "PinkPawHeist_Scheme_Core3_EarlyExtractExit1": {
+            "type": "switch",
+            "label": "方案三第一个撤离点提前撤离",
+            "description": "开启后，第一个撤离点检测到可撤离时直接撤离，不再继续后续搜刮路线。",
+            "default_case": "No",
+            "cases": [
                 {
-                    "name": "timing_scale",
-                    "label": "倍率",
-                    "default": "1.00",
-                    "pipeline_type": "string",
-                    "verify": "^0\\.(2[5-9]|[3-9]\\d?)$|^1(\\.0{1,2}|\\.1\\d?|\\.2)?$"
-                }
-            ],
-            "pipeline_override": {
-                "PinkPawHeist_Scheme3_Dash": {
-                    "custom_action_param": {
-                        "avoid_method": "dash",
-                        "interaction_pause": 0.2,
-                        "timing_scale": "{timing_scale}"
-                    }
+                    "name": "No",
+                    "label": "关闭"
                 },
-                "PinkPawHeist_Scheme3_Attack": {
-                    "custom_action_param": {
-                        "avoid_method": "attack",
-                        "interaction_pause": 0.2,
-                        "timing_scale": "{timing_scale}"
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "PinkPawHeist_Scheme3_Dash": {
+                            "custom_action_param": {
+                                "early_extract_exit1": true
+                            }
+                        },
+                        "PinkPawHeist_Scheme3_Attack": {
+                            "custom_action_param": {
+                                "early_extract_exit1": true
+                            }
+                        }
                     }
                 }
-            }
+            ]
+        },
+        "PinkPawHeist_Scheme_Core3_EarlyExtractExit2": {
+            "type": "switch",
+            "label": "方案三第二个撤离点提前撤离",
+            "description": "开启后，第二个撤离点检测到可撤离时直接撤离，不再继续后续搜刮路线。",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "No",
+                    "label": "关闭"
+                },
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "PinkPawHeist_Scheme3_Dash": {
+                            "custom_action_param": {
+                                "early_extract_exit2": true
+                            }
+                        },
+                        "PinkPawHeist_Scheme3_Attack": {
+                            "custom_action_param": {
+                                "early_extract_exit2": true
+                            }
+                        }
+                    }
+                }
+            ]
         }
     }
 }

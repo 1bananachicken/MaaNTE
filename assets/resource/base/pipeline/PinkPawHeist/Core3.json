@@ -19,7 +19,9 @@
         "custom_action_param": {
             "avoid_method": "dash",
             "timing_scale": 1.0,
-            "interaction_pause": 0.2
+            "interaction_pause": 0.2,
+            "early_extract_exit1": false,
+            "early_extract_exit2": false
         }
     },
     "PinkPawHeist_Scheme3_Attack": {
@@ -31,7 +33,9 @@
         "custom_action_param": {
             "avoid_method": "attack",
             "timing_scale": 1.0,
-            "interaction_pause": 0.2
+            "interaction_pause": 0.2,
+            "early_extract_exit1": false,
+            "early_extract_exit2": false
         }
     },
     "PinkPawHeist_Core3_CheckInteractPinkOnce": {
