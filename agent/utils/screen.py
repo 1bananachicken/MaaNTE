@@ -6,6 +6,9 @@ from typing import Any, NamedTuple
 BASELINE_WIDTH = 1280
 BASELINE_HEIGHT = 720
 BASELINE_ASPECT_RATIO = BASELINE_WIDTH / BASELINE_HEIGHT
+EDGE_ANCHOR_LEFT_TOP_RATIO = 0.35
+EDGE_ANCHOR_RIGHT_BOTTOM_RATIO = 0.65
+SCALE_KEY_PRECISION = 1000
 
 _current_width = BASELINE_WIDTH
 _current_height = BASELINE_HEIGHT
@@ -187,6 +190,7 @@ def _edge_aware_rect(
     height: int,
     scale: float,
 ) -> tuple[int, int, int, int]:
+    """Map HUD-like rects by anchoring near-edge regions to their nearest edge."""
     if len(rect) < 4:
         raise ValueError("rect must contain x, y, w, h")
 
@@ -194,16 +198,16 @@ def _edge_aware_rect(
     center_x = x + w / 2
     center_y = y + h / 2
 
-    if center_x < BASELINE_WIDTH * 0.35:
+    if center_x < BASELINE_WIDTH * EDGE_ANCHOR_LEFT_TOP_RATIO:
         mapped_x = round(x * scale)
-    elif center_x > BASELINE_WIDTH * 0.65:
+    elif center_x > BASELINE_WIDTH * EDGE_ANCHOR_RIGHT_BOTTOM_RATIO:
         mapped_x = round(width - (BASELINE_WIDTH - x) * scale)
     else:
         mapped_x = round(width / 2 + (center_x - BASELINE_WIDTH / 2) * scale - w * scale / 2)
 
-    if center_y < BASELINE_HEIGHT * 0.35:
+    if center_y < BASELINE_HEIGHT * EDGE_ANCHOR_LEFT_TOP_RATIO:
         mapped_y = round(y * scale)
-    elif center_y > BASELINE_HEIGHT * 0.65:
+    elif center_y > BASELINE_HEIGHT * EDGE_ANCHOR_RIGHT_BOTTOM_RATIO:
         mapped_y = round(height - (BASELINE_HEIGHT - y) * scale)
     else:
         mapped_y = round(height / 2 + (center_y - BASELINE_HEIGHT / 2) * scale - h * scale / 2)
@@ -243,7 +247,11 @@ def map_rect_to_frame_fit(rect: Sequence[int | float]) -> tuple[int, int, int, i
 
 
 def map_rect_to_frame_candidates(rect: Sequence[int | float]) -> tuple[RectMapping, ...]:
-    """Return plausible frame-space mappings for a 1280x720 baseline rect."""
+    """Return plausible frame-space mappings for a 1280x720 baseline rect.
+
+    The first candidate preserves the normal Maa-style stretch mapping. Non-16:9
+    frames add fit/fill and edge-anchored variants to cover common game layouts.
+    """
     candidates: list[RectMapping] = [
         RectMapping("stretch", map_rect_to_frame(rect), _frame_scale_x, _frame_scale_y)
     ]
@@ -298,8 +306,8 @@ def map_rect_to_frame_candidates(rect: Sequence[int | float]) -> tuple[RectMappi
             clamped[1],
             clamped[2],
             clamped[3],
-            round(candidate.scale_x * 1000),
-            round(candidate.scale_y * 1000),
+            round(candidate.scale_x * SCALE_KEY_PRECISION),
+            round(candidate.scale_y * SCALE_KEY_PRECISION),
         )
         if clamped[2] <= 0 or clamped[3] <= 0 or key in seen:
             continue

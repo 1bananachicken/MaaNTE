@@ -30,6 +30,7 @@ def _rect_to_tuple(rect) -> tuple[int, int, int, int]:
 
 
 def click_point(controller, point: Sequence[int | float], delay=0.001, move=False):
+    """Click a point that is already in the current input/frame coordinate space."""
     x, y = point[:2]
     if move:
         controller.post_touch_move(round(x), round(y)).wait()
@@ -39,25 +40,30 @@ def click_point(controller, point: Sequence[int | float], delay=0.001, move=Fals
 
 
 def click_point_720(controller, point: Sequence[int | float], delay=0.001, move=False):
+    """Click a 1280x720-baseline point after mapping it to the current frame."""
     click_point(controller, screen.map_point_to_frame(point[0], point[1]), delay, move)
 
 
 def click_rect(controller, rect, delay=0.001, move=False):
+    """Click a rect that is already in the current input/frame coordinate space."""
     x, y, w, h = _rect_to_tuple(rect)
     click_point(controller, (x + w / 2, y + h / 2), delay, move)
 
 
 def click_rect_720(controller, rect, delay=0.001, move=False):
+    """Click a 1280x720-baseline rect after mapping it to the current frame."""
     click_rect(controller, screen.map_rect_to_frame(rect), delay, move)
 
 
 def swipe(controller, begin: Sequence[int | float], end: Sequence[int | float], duration=200):
+    """Swipe between points that are already in the current input/frame coordinate space."""
     begin_x, begin_y = begin[:2]
     end_x, end_y = end[:2]
     controller.post_swipe(round(begin_x), round(begin_y), round(end_x), round(end_y), duration).wait()
 
 
 def swipe_720(controller, begin: Sequence[int | float], end: Sequence[int | float], duration=200):
+    """Swipe between 1280x720-baseline points after mapping them to the current frame."""
     swipe(controller, screen.map_point_to_frame(begin[0], begin[1]), screen.map_point_to_frame(end[0], end[1]), duration)
 
 
@@ -126,14 +132,18 @@ def match_template_in_region_720(
 
     screen.update_frame_size_from_image(img)
     best = (False, 0.0, 0, 0)
+    scaled_templates = {}
 
     for candidate in screen.map_rect_to_frame_candidates(region):
-        scaled_template = screen.resize_template(
-            template,
-            candidate.scale_x,
-            candidate.scale_y,
-            green_mask=green_mask,
-        )
+        scale_key = (round(candidate.scale_x, 6), round(candidate.scale_y, 6), green_mask)
+        if scale_key not in scaled_templates:
+            scaled_templates[scale_key] = screen.resize_template(
+                template,
+                candidate.scale_x,
+                candidate.scale_y,
+                green_mask=green_mask,
+            )
+        scaled_template = scaled_templates[scale_key]
         hit, score, x, y = match_template_in_region(
             img,
             candidate.rect,
