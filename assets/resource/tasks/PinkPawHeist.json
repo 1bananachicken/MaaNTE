@@ -123,13 +123,13 @@
         "PinkPawHeist_Scheme_Core3_desc": {
             "type": "input",
             "label": "方案三说明",
-            "description": "<span style='color:orange'>移植自 ok-nte 粉爪路径2，请设置画质到性能档位，帧率设置120帧，关闭设置里的移动镜头修正！打开按下锁定镜头回正！到小吱旁边启动！包里要至少有一个复活药！</span><br><span style='color:green'>路线说明：</span>使用 ok 路径2，按固定站位配队；只需要在“方案三配队”里选择你实际使用的站位组合。",
+            "description": "<span style='color:orange'>改编自 ok-nte 粉爪路径2，请设置画质到性能档位，帧率设置120帧，关闭设置里的移动镜头修正！打开按下锁定镜头回正！到小吱旁边启动！包里要至少有一个复活药！</span><br><span style='color:green'>路线说明：</span>使用 ok 路径2，按固定站位配队；只需要在“方案三配队”里选择你实际使用的站位组合。",
             "inputs": []
         },
         "PinkPawHeist_Scheme_Core3_AvoidMethod": {
             "type": "select",
             "label": "方案三配队",
-            "description": "选择你实际使用的固定站位配队；程序会据此切换 ok 路径2的对应分支。",
+            "description": "选择你实际使用的固定站位配队；程序会据此切换对应分支。",
             "default_case": "Dash",
             "cases": [
                 {

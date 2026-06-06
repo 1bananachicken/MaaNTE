@@ -156,14 +156,17 @@ class CharacterSwitchState:
 
     @property
     def current_key(self):
+        """返回当前正在尝试切换的角色按键。"""
         return self.keys[self.index]
 
     def advance(self):
+        """把角色切换候选推进到下一个按键，并返回是否还有候选可试。"""
         self.index += 1
         return self.index < len(self.keys)
 
 
 def _is_hit(result) -> bool:
+    """兼容 MAA 不同返回结构，统一判断识别或任务是否成功命中。"""
     if result is None:
         return False
     status = getattr(result, "status", None)
@@ -176,10 +179,12 @@ def _is_hit(result) -> bool:
 
 
 def _norm_key(key: str) -> str:
+    """把配置里的按键名规范成小写字符串，便于查虚拟键码。"""
     return str(key).lower()
 
 
 def _parse_custom_action_param(argv: CustomAction.RunArg) -> dict:
+    """解析节点传入的 custom_action_param，非法或空值时返回空配置。"""
     value = getattr(argv, "custom_action_param", None)
     if not value:
         return {}
@@ -196,6 +201,7 @@ def _parse_custom_action_param(argv: CustomAction.RunArg) -> dict:
 
 
 def _parse_timing_scale(value) -> float:
+    """解析路线时间微调倍率，并限制在允许范围内。"""
     try:
         scale = float(value)
     except (TypeError, ValueError):
@@ -204,6 +210,7 @@ def _parse_timing_scale(value) -> float:
 
 
 def _parse_bool(value, default=False) -> bool:
+    """把开关配置解析为布尔值，兼容字符串、数字和 bool。"""
     if value is None:
         return bool(default)
     if isinstance(value, bool):
@@ -216,6 +223,7 @@ def _parse_bool(value, default=False) -> bool:
 
 
 def _parse_interaction_pause(value) -> float:
+    """解析交互前停顿配置，避免停顿过短或过长。"""
     try:
         pause = float(value)
     except (TypeError, ValueError):
@@ -224,6 +232,7 @@ def _parse_interaction_pause(value) -> float:
 
 
 def _get_fast_image_dir():
+    """按资源目录约定查找 PinkPawHeist 的快速识别模板目录。"""
     global _FAST_IMAGE_DIR
     if _FAST_IMAGE_DIR is not None:
         return _FAST_IMAGE_DIR
@@ -245,6 +254,7 @@ def _get_fast_image_dir():
 
 
 def _load_fast_template(name):
+    """读取并缓存 OpenCV 模板图，供快速模板匹配复用。"""
     if np is None or Image is None:
         return None
     if name in _FAST_TEMPLATE_CACHE:
@@ -302,6 +312,7 @@ def _load_fast_template(name):
 
 
 def _as_bgr_image(image):
+    """把 MAA 截图转换为 OpenCV 使用的 BGR 三通道图。"""
     if np is None or not isinstance(image, np.ndarray):
         return None
     if image.ndim != 3 or image.shape[2] < 3 or image.size == 0:
@@ -310,6 +321,7 @@ def _as_bgr_image(image):
 
 
 def _crop_roi(image, roi):
+    """按给定坐标裁剪截图区域，并自动处理越界。"""
     bgr = _as_bgr_image(image)
     if bgr is None:
         return None
@@ -325,6 +337,7 @@ def _crop_roi(image, roi):
 
 
 def _scale_roi(roi, image):
+    """把以 1280x720 为基准的 ROI 缩放到当前截图尺寸。"""
     bgr = _as_bgr_image(image)
     if bgr is None:
         return roi
@@ -341,6 +354,7 @@ def _scale_roi(roi, image):
 
 
 def _fast_color_match(image, cfg):
+    """在本地用 OpenCV 做颜色点数量检测，替代对应颜色识别节点。"""
     roi = _crop_roi(image, cfg["roi"])
     if roi is None:
         return False
@@ -355,6 +369,7 @@ def _fast_color_match(image, cfg):
 
 
 def _fast_template_match(image, cfg):
+    """在本地用 OpenCV 做模板匹配，减少频繁调用 MAA 节点的延迟。"""
     if cv2 is None:
         return None
     roi = _crop_roi(image, cfg["roi"])
@@ -381,6 +396,7 @@ def _fast_template_match(image, cfg):
 
 
 def _fast_recognize_node(node_name, image):
+    """根据节点名选择本地快速识别实现；不支持时交回 MAA 节点识别。"""
     cfg = FAST_RECO_CONFIG.get(node_name)
     if cfg is None or np is None:
         return None
@@ -399,14 +415,17 @@ def _fast_recognize_node(node_name, image):
 
 class Core3ActionHelper:
     def __init__(self, ctx: Context):
+        """保存 MAA 上下文，并初始化鼠标当前位置缓存。"""
         self.ctx = ctx
         self.mx, self.my = DEFAULT_WIDTH // 2, DEFAULT_HEIGHT // 2
 
     @property
     def controller(self):
+        """取得当前 tasker 的控制器，用于直接发送按键、鼠标和截图请求。"""
         return getattr(getattr(self.ctx, "tasker", None), "controller", None)
 
     def is_stopping(self) -> bool:
+        """检查 MAA tasker 是否正在停止任务。"""
         tasker = getattr(self.ctx, "tasker", None)
         if tasker is None:
             return False
@@ -416,12 +435,14 @@ class Core3ActionHelper:
         return bool(stopping)
 
     def raise_if_stopped(self):
+        """任务停止时抛出专用异常，打断正在执行的路线。"""
         if self.is_stopping():
             raise TaskerStoppedException(
                 "PinkPawHeistScheme3Action stopped by Maa tasker."
             )
 
     def run_task(self, task_name, pipeline_override=None):
+        """运行一个 MAA pipeline 节点，并在调用前后检查停止状态。"""
         self.raise_if_stopped()
         if pipeline_override is None:
             result = self.ctx.run_task(task_name)
@@ -431,6 +452,7 @@ class Core3ActionHelper:
         return result
 
     def _call_key(self, node_type, key_str, extra=None):
+        """发送 KeyDown、KeyUp 或 ClickKey；有控制器时走低延迟直发，否则临时跑节点。"""
         if node_type != "KeyUp":
             self.raise_if_stopped()
         vk = VK.get(_norm_key(key_str))
@@ -463,15 +485,19 @@ class Core3ActionHelper:
         return ret
 
     def click_key(self, key_str):
+        """发送一次按键点击。"""
         return self._call_key("ClickKey", key_str)
 
     def key_down(self, key_str):
+        """发送按键按下事件。"""
         return self._call_key("KeyDown", key_str)
 
     def key_up(self, key_str):
+        """发送按键抬起事件。"""
         return self._call_key("KeyUp", key_str)
 
     def move_to(self, x, y, duration_ms=None):
+        """把鼠标移动到指定坐标，并维护内部鼠标位置缓存。"""
         self.raise_if_stopped()
         x, y = int(x), int(y)
         dx, dy = x - self.mx, y - self.my
@@ -500,6 +526,7 @@ class Core3ActionHelper:
         return ret
 
     def click(self, x, y):
+        """点击指定坐标；控制器可用时直接点击，否则走 MAA Click 节点。"""
         self.raise_if_stopped()
         controller = self.controller
         if controller is not None and hasattr(controller, "post_click"):
@@ -521,18 +548,21 @@ class Core3ActionHelper:
         return ret
 
     def mouse_down(self, key="left"):
+        """发送鼠标按下事件，主要用于长按攻击或鼠标键操作。"""
         vk = MOUSE_VK.get(key, MOUSE_VK["left"])
         controller = self.controller
         if controller is not None:
             controller.post_key_down(vk)
 
     def mouse_up(self, key="left"):
+        """发送鼠标抬起事件，配合 mouse_down 结束长按。"""
         vk = MOUSE_VK.get(key, MOUSE_VK["left"])
         controller = self.controller
         if controller is not None:
             controller.post_key_up(vk)
 
     def release_controls(self):
+        """释放脚本可能按住的移动键、交互键和鼠标键，防止异常后继续输入。"""
         for key in ("w", "a", "s", "d", "e", "f", "space", "lshift"):
             try:
                 self.key_up(key)
@@ -565,6 +595,7 @@ class PinkPawHeistCore3Path:
     QUICK_PICK_INTERVAL = 0.2
 
     def __init__(self, ctx: Context, params: dict | None = None):
+        """读取 Core3 配置，初始化路线状态、切人状态、拾取状态和撤离策略。"""
         self.ctx = ctx
         self.ah = Core3ActionHelper(ctx)
         self.exit_state = {1: False, 2: False, 3: False, 4: False}
@@ -607,19 +638,24 @@ class PinkPawHeistCore3Path:
         self._round_label = "Core3"
 
     def log_info(self, *args):
+        """输出 Core3 普通日志。"""
         print("[PinkPawHeist/Core3]", *args)
 
     def log_warning(self, *args):
+        """输出 Core3 警告日志。"""
         print("[PinkPawHeist/Core3][WARN]", *args)
 
     def log_error(self, *args):
+        """输出 Core3 错误日志。"""
         print("[PinkPawHeist/Core3][ERROR]", *args)
 
     def log_round_info(self, message):
-        self.log_info(f"{self._round_label}: {message}")
+        # self.log_info(f"{self._round_label}: {message}")
+        """把路线阶段信息写到前端日志/Toast，便于观察当前跑到哪里。"""
         self._log_to_frontend(str(message))
 
     def _log_to_frontend(self, message: str):
+        """通过临时 focus 节点把 Core3 日志显示到 MAA 前端。"""
         try:
             self.ctx.run_action(
                 FOCUS_LOG_NODE,
@@ -641,6 +677,7 @@ class PinkPawHeistCore3Path:
             pass
 
     def _check_interval(self, name: str, interval: float) -> bool:
+        """按动作名做节流，避免同一个按键或点击在短时间内重复触发。"""
         if interval is None or interval < 0:
             return True
         now = time.monotonic()
@@ -651,6 +688,7 @@ class PinkPawHeistCore3Path:
         return True
 
     def _poll_quick_pick(self):
+        """自动拾取/撬锁时按固定频率点 F，并用发送完成时间避免连点堆积。"""
         if not self._quick_pick_active:
             return
         now = time.monotonic()
@@ -660,9 +698,11 @@ class PinkPawHeistCore3Path:
         self._next_quick_pick_at = now + self.QUICK_PICK_INTERVAL
 
     def _has_timing_sensitive_key_held(self) -> bool:
+        """判断当前是否按着移动、冲刺、跳跃等会影响走位精度的键。"""
         return bool(self._held_keys & TIMING_SENSITIVE_KEYS)
 
     def _check_still_in_heist(self):
+        """低频检测本局收益 UI，判断脚本是否仍在粉爪局内。"""
         now = time.monotonic()
         if now - self.last_check_reward_time <= 2.0:
             return
@@ -683,6 +723,7 @@ class PinkPawHeistCore3Path:
             self.check_reward_fail_count = 0
 
     def _scale_route_duration(self, duration: float) -> float:
+        """按 timing_scale 对路线 sleep 做小幅自适应修正。"""
         if duration <= 0 or self.route_timing_scale == 1.0:
             return max(duration, 0.0)
 
@@ -697,6 +738,7 @@ class PinkPawHeistCore3Path:
         return duration + adjust
 
     def sleep(self, timeout, check_reward=True, scaled=True):
+        """路线专用等待：保持时间精度，同时轮询拾取、切人、交互监听和局内检测。"""
         duration = max(float(timeout), 0.0)
         if scaled:
             duration = self._scale_route_duration(duration)
@@ -727,12 +769,14 @@ class PinkPawHeistCore3Path:
         return True
 
     def next_frame(self):
+        """等待一个很短的轮询间隔，用在持续检测循环里。"""
         self.sleep(0.05)
         return True
 
     def send_key(
         self, key, down_time=0.02, interval=-1, after_sleep=0, action_name=None
     ):
+        """发送短按或长按按键，并支持动作节流和按后等待。"""
         key = _norm_key(key)
         name = action_name or f"key:{key}"
         if not self._check_interval(name, interval):
@@ -755,6 +799,7 @@ class PinkPawHeistCore3Path:
         return True
 
     def send_key_down(self, key, after_sleep=0):
+        """按下按键并记录内部状态；F 键会转为自动连点拾取模式。"""
         key = _norm_key(key)
         if key == "f":
             if not self._quick_pick_active:
@@ -771,6 +816,7 @@ class PinkPawHeistCore3Path:
         return ret
 
     def send_key_up(self, key, after_sleep=0):
+        """抬起按键并清理内部状态；F 键会停止自动连点拾取。"""
         key = _norm_key(key)
         if key == "f":
             self._quick_pick_active = False
@@ -783,15 +829,18 @@ class PinkPawHeistCore3Path:
                 self.sleep(after_sleep)
 
     def sleep_send_key(self, time_out, key, interval=0.2):
+        """在指定时间内按固定间隔重复短按某个键。"""
         deadline = time.monotonic() + time_out
         while time.monotonic() < deadline:
             self.send_key(key, interval=interval)
             self.sleep(0.01)
 
     def mouse_down(self, x=-1, y=-1, name=None, key="left"):
+        """发送鼠标按下事件，主要用于长按攻击或鼠标键操作。"""
         self.ah.mouse_down(key=key)
 
     def mouse_up(self, name=None, key="left"):
+        """发送鼠标抬起事件，配合 mouse_down 结束长按。"""
         self.ah.mouse_up(key=key)
 
     def click(
@@ -806,6 +855,7 @@ class PinkPawHeistCore3Path:
         down_time=0.01,
         after_sleep=0,
     ):
+        """点击指定坐标；控制器可用时直接点击，否则走 MAA Click 节点。"""
         name = name or f"click:{key}"
         if not self._check_interval(name, interval):
             return False
@@ -837,6 +887,7 @@ class PinkPawHeistCore3Path:
         raise_if_not_found=False,
         **kwargs,
     ):
+        """通用轮询等待函数，可在每轮检测前后插入动作并要求稳定命中。"""
         timeout = 10.0 if not time_out or time_out <= 0 else float(time_out)
         deadline = time.monotonic() + timeout
         settled_at = None
@@ -863,6 +914,7 @@ class PinkPawHeistCore3Path:
         return False
 
     def wait_team_ui_settle(self):
+        """等待加载、黑屏或楼层切换结束，直到队伍 UI 重新稳定出现。"""
         self.wait_until(
             lambda: not self.is_in_team(),
             time_out=1,
@@ -878,6 +930,7 @@ class PinkPawHeistCore3Path:
         return True
 
     def _is_black_screen_in_image(self, image):
+        """用画面亮度判断是否处于黑屏/加载状态，避免误判角色死亡。"""
         bgr = _as_bgr_image(image)
         if bgr is None:
             return False
@@ -892,6 +945,7 @@ class PinkPawHeistCore3Path:
         )
 
     def _is_in_team_in_image(self, image):
+        """检测底部队伍 UI 特征，判断当前是否已回到可操作界面。"""
         if np is None:
             return True
         roi = _crop_roi(image, _scale_roi(TEAM_HEALTH_SLASH_ROI, image))
@@ -903,12 +957,14 @@ class PinkPawHeistCore3Path:
         return int(bright.sum()) >= 10
 
     def is_in_team(self):
+        """截图并判断当前是否处于队伍可操作界面。"""
         image = self._screencap()
         if image is None:
             return True
         return self._is_in_team_in_image(image)
 
     def _current_char_roi_score(self, image, roi, index):
+        """计算指定角色槽位高亮区域中的亮色/彩色像素分数。"""
         crop = _crop_roi(image, _scale_roi(roi, image))
         if crop is None:
             return 0
@@ -922,6 +978,7 @@ class PinkPawHeistCore3Path:
         return int((white | colored).sum())
 
     def _current_char_scores(self, image):
+        """计算四个角色槽位的大区域高亮分数，用于判断当前角色。"""
         if np is None:
             return [0, 0, 0, 0]
         scores = []
@@ -934,6 +991,7 @@ class PinkPawHeistCore3Path:
         return scores
 
     def _current_char_core_scores(self, image):
+        """计算四个角色槽位的小核心高亮分数，给二号位暗头像兜底。"""
         if np is None:
             return [0, 0, 0, 0]
         scores = []
@@ -947,6 +1005,7 @@ class PinkPawHeistCore3Path:
         return scores
 
     def _is_current_char_score_accepted(self, scores, index):
+        """用最低分和领先差值判断目标槽位高亮是否可信。"""
         if not scores or not 0 <= index < len(scores):
             return False
         target_score = scores[index]
@@ -957,6 +1016,7 @@ class PinkPawHeistCore3Path:
         return target_score >= min_score and target_score - best_other >= min_margin
 
     def _is_slot2_core_score_accepted(self, image):
+        """二号位头像偏暗时，用核心高亮区域单独确认是否切到二号位。"""
         scores = self._current_char_core_scores(image)
         target_score = scores[1]
         best_other = max(score for idx, score in enumerate(scores) if idx != 1)
@@ -966,6 +1026,7 @@ class PinkPawHeistCore3Path:
         )
 
     def get_current_char_index(self, image=None):
+        """返回当前高亮的角色槽位索引；无法可靠判断时返回 -1。"""
         if image is None:
             image = self._screencap()
         if image is None:
@@ -979,6 +1040,7 @@ class PinkPawHeistCore3Path:
         return -1
 
     def is_char_at_index(self, index, image=None):
+        """判断当前高亮角色是否为指定槽位，二号位会额外走核心兜底。"""
         if image is None:
             image = self._screencap()
         if image is None:
@@ -993,6 +1055,7 @@ class PinkPawHeistCore3Path:
         return False
 
     def ensure_in_team(self, time_out=2.0):
+        """尝试按 Esc 关闭弹窗或复活界面，直到回到队伍 UI。"""
         deadline = time.monotonic() + time_out
         while time.monotonic() < deadline:
             if self.is_in_team():
@@ -1002,6 +1065,7 @@ class PinkPawHeistCore3Path:
         return self.is_in_team()
 
     def _run_check_node(self, node_name, timeout=1.5):
+        """在超时时间内反复执行某个单次识别节点，命中即返回。"""
         deadline = time.monotonic() + timeout
         while time.monotonic() < deadline:
             self.ah.raise_if_stopped()
@@ -1011,12 +1075,14 @@ class PinkPawHeistCore3Path:
         return False
 
     def _screencap(self):
+        """通过控制器截取当前游戏画面。"""
         controller = getattr(getattr(self.ctx, "tasker", None), "controller", None)
         if controller is None:
             return None
         return controller.post_screencap().wait().get()
 
     def _recognize_once(self, node_name, image=None):
+        """执行一次识别：优先使用本地快速识别，不支持时调用 MAA 节点。"""
         self.ah.raise_if_stopped()
         if image is None:
             image = self._screencap()
@@ -1030,6 +1096,7 @@ class PinkPawHeistCore3Path:
         return _is_hit(result)
 
     def _find_interac_in_image(self, image, include_text=False):
+        """在截图中查找可交互提示；可选文字节点兜底。"""
         if self._recognize_once("PinkPawHeist_Core3_CheckInteractPinkOnce", image):
             return True
         if self._recognize_once("PinkPawHeist_Core3_CheckInteractTemplateOnce", image):
@@ -1048,6 +1115,7 @@ class PinkPawHeistCore3Path:
         )
 
     def find_interac(self, include_text=False):
+        """截图后查找交互提示，用于门、锁、撤离点等交互前定位。"""
         self._checking_interaction = True
         try:
             image = self._screencap()
@@ -1056,26 +1124,32 @@ class PinkPawHeistCore3Path:
             self._checking_interaction = False
 
     def start_interaction_watch(self):
+        """开启移动过程中的交互监听，用来记录途中是否经过可交互点。"""
         self._interaction_watch_active = True
         self._interaction_watch_found = False
         return True
 
     def stop_interaction_watch(self):
+        """关闭移动过程中的交互监听并清理监听状态。"""
         self._interaction_watch_active = False
         self._interaction_watch_found = False
         return True
 
     def is_lock_pick_active_fast(self):
+        """截图并通过撬锁中文节点判断是否正在撬锁。"""
         image = self._screencap()
         return self._is_lock_pick_active_fast_in_image(image)
 
     def _is_lock_pick_active_fast_in_image(self, image):
+        """在指定截图上检测“撬锁中/奋力撬锁中”状态。"""
         return self._recognize_once("PinkPawHeist_Core3_CheckLockPickActiveOnce", image)
 
     def is_lock_pick_active(self):
+        """检测当前是否处于撬锁状态。"""
         return self.is_lock_pick_active_fast()
 
     def wait_lock_pick_active(self, time_out=2, settle_time=-1):
+        """等待撬锁状态出现，用于确认按 F 后确实开始开锁。"""
         if self.wait_until(
             self.is_lock_pick_active_fast,
             time_out=time_out,
@@ -1085,6 +1159,7 @@ class PinkPawHeistCore3Path:
         return self.is_lock_pick_active()
 
     def is_safe_lock_pick_active(self):
+        """检测保险柜撬锁状态；OCR 不稳时再用模板兜底。"""
         image = self._screencap()
         if self._is_lock_pick_active_fast_in_image(image):
             return True
@@ -1093,6 +1168,7 @@ class PinkPawHeistCore3Path:
         )
 
     def wait_safe_lock_pick_active(self, time_out=2, settle_time=-1):
+        """等待保险柜撬锁状态出现。"""
         return self.wait_until(
             self.is_safe_lock_pick_active,
             time_out=time_out,
@@ -1100,13 +1176,16 @@ class PinkPawHeistCore3Path:
         )
 
     def wait_door_open(self, time_out=1.5):
+        """用 PinkPawHeist_CheckDoorOnce 节点等待“开门”提示出现。"""
         return self._run_check_node("PinkPawHeist_CheckDoorOnce", timeout=time_out)
 
     def has_safe_lock_prompt(self):
+        """检测保险柜旁的撬锁交互提示是否出现。"""
         image = self._screencap()
         return self._recognize_once("PinkPawHeist_Core3_CheckSafeLockPromptOnce", image)
 
     def wait_for_interac(self, time_out=10, include_text_fallback=True):
+        """等待交互点出现；快速识别失败时可追加文字节点兜底。"""
         if self.wait_until(self.find_interac, time_out=time_out):
             return True
         if include_text_fallback:
@@ -1121,25 +1200,30 @@ class PinkPawHeistCore3Path:
         is_lock=False,
         time_out=10,
     ):
+        """等待交互点、按 F，并在锁类交互里确认撬锁开始/结束和保底等待。"""
         timeout = 10.0 if not time_out or time_out <= 0 else float(time_out)
         lock_min_done_at = 0.0
 
         def start_lock_min_timer():
+            """锁类交互首次按 F 时启动最短等待计时，避免识别过快导致提前离开。"""
             nonlocal lock_min_done_at
             if is_lock and lock_min_done_at <= 0:
                 lock_min_done_at = time.monotonic() + timeout
 
         def remaining_min_time():
+            """计算锁类交互距离保底 time_out 还差多久。"""
             if not is_lock or lock_min_done_at <= 0:
                 return 0.0
             return max(0.0, lock_min_done_at - time.monotonic())
 
         def wait_until_min_time():
+            """锁类交互未满保底时间时补足等待。"""
             remaining = remaining_min_time()
             if remaining > 0:
                 self.sleep(remaining, check_reward=False, scaled=False)
 
         def press_interact():
+            """等待交互消失期间持续按 F，并负责启动锁类保底计时。"""
             start_lock_min_timer()
             self.send_key("f", interval=0.5)
 
@@ -1185,6 +1269,7 @@ class PinkPawHeistCore3Path:
     def loot_safes_while_walking(
         self, direction=None, min_walk_time=0, time_out=10, hold=False, send_pick=False
     ):
+        """边走边处理保险柜：到时间后连点 F，遇到保险柜撬锁则停下等完成。"""
         start_time = time.monotonic()
         deadline = start_time + time_out
         earliest_lock_pick_time = start_time + min_walk_time
@@ -1193,6 +1278,7 @@ class PinkPawHeistCore3Path:
         pick_started = False
 
         def wait_until_pick_time():
+            """行走拾取时等到最早撬锁时间，再按住 F 开始连点拾取。"""
             nonlocal pick_started
             remaining = earliest_lock_pick_time - time.monotonic()
             if remaining > 0:
@@ -1231,6 +1317,7 @@ class PinkPawHeistCore3Path:
                 self.send_key_up("f")
 
     def wait_for_safe_loot(self, time_out=10, raise_timeout=False):
+        """等待保险柜撬锁开始并结束；需要时超时抛错。"""
         deadline = time.monotonic() + time_out
         while time.monotonic() < deadline:
             if self.has_safe_lock_prompt():
@@ -1249,14 +1336,17 @@ class PinkPawHeistCore3Path:
         return False
 
     def has_extract_panel(self):
+        """检测撤离确认面板是否已经打开。"""
         return self._recognize_once("PinkPawHeist_CheckEvacuateOnce")
 
     def should_early_extract(self, exit_index):
+        """读取配置，判断某个撤离点是否启用“开着就提前撤离”。"""
         if exit_index is None:
             return False
         return bool(self.early_extract_exit.get(int(exit_index), False))
 
     def try_open_exit(self, direction=None, exit_index=None):
+        """尝试与撤离点交互；确认可撤离后记录出口状态或直接提前撤离。"""
         if not self.wait_for_interac(time_out=4):
             raise AbortException("not found exit interaction")
         if direction is not None:
@@ -1281,6 +1371,7 @@ class PinkPawHeistCore3Path:
         return ret
 
     def walk_until_extract_panel(self, direction=None, time_out=10):
+        """一边朝撤离点走一边按 F，直到撤离确认面板出现。"""
         if direction is not None:
             self.send_key_down(direction)
         try:
@@ -1295,16 +1386,19 @@ class PinkPawHeistCore3Path:
                 self.send_key_up(direction)
 
     def clear_current_combat(self, fighter_mode="all_desc"):
+        """切到战斗角色清怪，确认无怪后切回跑图角色。"""
         self.switch_to_fighter(check_switched=True, mode=fighter_mode)
         self.fight_until_no_monster(timeout_no_monster=10000, wait_for_monster=True)
         self.switch_to_runner(check_switched=True)
 
     def check_monster(self):
+        """通过血条颜色节点判断当前画面是否有怪物。"""
         image = self.ctx.tasker.controller.post_screencap().wait().get()
         result = self.ctx.run_recognition("PinkPawHeist_CheckMonsterOnce", image)
         return result is not None and getattr(result, "hit", False)
 
     def wait_monster(self, timeout=6000):
+        """在指定时间内等待怪物出现。"""
         deadline = time.monotonic() + timeout / 1000.0
         while time.monotonic() < deadline:
             if self.check_monster():
@@ -1313,6 +1407,7 @@ class PinkPawHeistCore3Path:
         return False
 
     def attack_cycle(self, times=3, loot=False):
+        """执行一轮基础攻击动作，必要时顺手按 F 拾取。"""
         for _ in range(times):
             self.ah.run_task("PinkPawHeist_Core1_Attack_Space")
         if loot:
@@ -1326,6 +1421,7 @@ class PinkPawHeistCore3Path:
         loot=False,
         attack_cycles=3,
     ):
+        """循环攻击直到持续一段时间检测不到怪物。"""
         if wait_for_monster and not self.wait_monster(timeout=timeout_no_monster):
             return False
         no_monster_start = None
@@ -1345,12 +1441,14 @@ class PinkPawHeistCore3Path:
         return True
 
     def switch_to_key(self, key):
+        """直接多次短按指定角色键，适合不需要确认的强制切人。"""
         for _ in range(4):
             self.send_key(str(key))
             self.sleep(0.2)
         return str(key)
 
     def _send_current_switch_key(self):
+        """发送当前候选角色键，并刷新切换确认截止时间。"""
         state = self._switch_state
         if state is None:
             return None
@@ -1363,10 +1461,12 @@ class PinkPawHeistCore3Path:
         return key
 
     def _clear_switch_state(self):
+        """清空正在进行的角色切换状态。"""
         self._switch_state = None
         self._next_switch_poll_at = 0.0
 
     def _handle_dead_switch_candidate(self, state: CharacterSwitchState):
+        """切人后疑似不在队伍 UI 时，按角色死亡处理并尝试下一个候选。"""
         role = state.role
         key = state.current_key
         self.log_warning(f"{role} char {key} may be dead, try next")
@@ -1379,6 +1479,7 @@ class PinkPawHeistCore3Path:
         self._send_current_switch_key()
 
     def _poll_character_switch(self):
+        """后台监控未确认切人过程，处理黑屏、死亡和复活界面。"""
         if self._switch_state is None or self._handling_switch_state:
             return
         now = time.monotonic()
@@ -1408,6 +1509,7 @@ class PinkPawHeistCore3Path:
             self._handling_switch_state = False
 
     def _wait_character_switch_success(self, role, key):
+        """等待目标槽位高亮确认；没确认时重按，疑似死亡时换下一个候选。"""
         last_key = str(key)
         retry_count = 0
         retry_key = last_key
@@ -1478,6 +1580,7 @@ class PinkPawHeistCore3Path:
         return last_key
 
     def _begin_character_switch(self, role, keys, check_switched=False):
+        """创建切人状态并发出首个候选按键，必要时等待高亮确认。"""
         keys = [str(key) for key in keys]
         if not keys:
             raise AbortException(f"{role} {keys} dead or empty")
@@ -1488,11 +1591,13 @@ class PinkPawHeistCore3Path:
         return key
 
     def switch_to_runner(self, check_switched=False):
+        """切到跑图角色，默认是三号位薄荷。"""
         return self._begin_character_switch(
             self.ROLE_RUNNER, self.config.get(self.CONF_RUNNER, []), check_switched
         )
 
     def switch_to_avoider(self, check_switched=False):
+        """切到避战角色；未配置避战角色时直接返回。"""
         keys = self.config.get(self.CONF_AVOIDER, [])
         if not keys:
             self.log_info("no avoider")
@@ -1500,6 +1605,7 @@ class PinkPawHeistCore3Path:
         return self._begin_character_switch(self.ROLE_AVOIDER, keys, check_switched)
 
     def avoider_strategy_index(self):
+        """根据避战方式返回路线分支：无避战、早雾/翳、浔。"""
         keys = self.config.get(self.CONF_AVOIDER, [])
         if not keys:
             return -1
@@ -1509,6 +1615,7 @@ class PinkPawHeistCore3Path:
         return self.avoid_methods.index(method_name)
 
     def perform_avoidance_action(self):
+        """执行当前避战动作：翳长按 Shift 或浔长按攻击。"""
         method_name = self.config.get(self.CONF_AVOID_MTH)
         if method_name == self.AVOID_METHOD_ATTACK:
             self.click(down_time=0.6)
@@ -1522,6 +1629,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("w")
 
     def exit_heist(self):
+        """点击确认撤离，等待收益识别并记录奖励。"""
         self.log_round_info("Confirm extract")
         self.sleep(1.0, check_reward=False, scaled=False)
         result = self.ah.run_task("PinkPawHeist_EvacuateOnce")
@@ -1534,6 +1642,7 @@ class PinkPawHeistCore3Path:
         return False
 
     def abort_heist(self):
+        """路线异常时释放按键、退出界面并记录失败。"""
         self.log_round_info("Abort and return to main")
         self.ah.release_controls()
         for _ in range(4):
@@ -1544,6 +1653,7 @@ class PinkPawHeistCore3Path:
         notify_pinkpaw_reward(self.ctx, success=False)
 
     def _release_held_keys(self):
+        """释放脚本内部记录为按住状态的键，防止异常后持续移动。"""
         held = list(self._held_keys)
         self._held_keys.clear()
         for key in held:
@@ -1554,6 +1664,7 @@ class PinkPawHeistCore3Path:
         self._quick_pick_active = False
 
     def run_path(self):
+        """按所选配队/避战分支执行完整 Core3 路线，并根据出口状态选择撤离路线。"""
         self.goto_lg1()
         self.wait_team_ui_settle()
         # self.check_current_floor(1)
@@ -1584,6 +1695,7 @@ class PinkPawHeistCore3Path:
             self.lg2_wp4_to_exit3()
 
     def goto_lg1(self):
+        """原始开局路线：从小吱大厅进入 LG1，并处理开锁、保险柜和清怪。"""
         self.log_round_info("寻路到LG1")
         self.switch_to_runner(check_switched=True)
         self.sleep(0.81)
@@ -1703,6 +1815,7 @@ class PinkPawHeistCore3Path:
         self.wait_and_interact(direction="s")
 
     def goto_lg1_interrupted(self):
+        """LG1 开锁被怪打断后的恢复路线，清怪后回到门前继续。"""
         self.log_round_info("LG1开锁中断恢复")
         self.clear_current_combat()
         self.send_key_down("w")
@@ -1729,6 +1842,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.5)
 
     def lg1_wp1(self):
+        """LG1 第一段搜刮路线：经过保险柜区并保持拾取。"""
         self.log_round_info("LG1 WP1")
         self.sleep(0.75)
         self.send_key_down("w")
@@ -1778,6 +1892,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.12)
 
     def lg1_wp2(self):
+        """LG1 第二段路线：穿过镭射区域并继续搜刮。"""
         self.log_round_info("LG1 WP2")
         self.send_key_down("d")
         self.sleep(1.80)
@@ -1813,6 +1928,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.33)
 
     def lg1_wp3(self):
+        """LG1 第三段路线：继续保险柜搜刮并穿过后续走廊。"""
         self.log_round_info("LG1 WP3")
         self.send_key_down("f")  # start pick
         self.sleep(0.11)
@@ -1866,6 +1982,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.12)
 
     def lg1_wp4(self):
+        """LG1 第四段通用路线：处理跳跃、拾取和长距离移动。"""
         self.log_round_info("LG1 WP4")
         self.send_key_down("d")
         self.sleep(0.11)
@@ -1975,6 +2092,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.31)
 
     def lg1_wp5_avoid_combat_01(self):
+        """LG1 第五段原始避战路线：无专用避战角色时使用。"""
         self.log_round_info("LG1 WP5避战路线1")
         self.send_key_down("w")
         self.sleep(2.02)
@@ -2005,6 +2123,7 @@ class PinkPawHeistCore3Path:
         self.wait_and_interact(direction="w")
 
     def lg1_wp5_avoid_combat_02(self):
+        """LG1 第五段早雾/翳避战路线：先避战再进门。"""
         self.log_round_info("LG1 WP5避战路线2")
         self.send_key_down("s")
         self.sleep(1.50)
@@ -2027,6 +2146,7 @@ class PinkPawHeistCore3Path:
         self.wait_and_interact(direction="w")
 
     def lg1_wp5_avoid_combat_03(self):
+        """LG1 第五段浔避战路线：用长按攻击规避战斗。"""
         self.log_round_info("LG1 WP5避战路线3")
         self.switch_to_avoider(check_switched=True)
         self.sleep(0.5)
@@ -2060,6 +2180,7 @@ class PinkPawHeistCore3Path:
         self.wait_and_interact(direction="w")
 
     def lg2_wp1_to_exit1(self):
+        """LG2 第一段路线：搜刮后尝试第一个撤离点是否可用。"""
         self.log_round_info("LG2 WP1尝试出口1")
         self.sleep(2.65)  # 2.65
         self.send_key_down("w")
@@ -2109,6 +2230,7 @@ class PinkPawHeistCore3Path:
         self.exit_state[1] = self.try_open_exit(direction="w", exit_index=1)
 
     def lg2_wp1_remains(self):
+        """第一个撤离点不可直接撤时，继续执行 LG2 WP1 剩余搜刮路线。"""
         self.log_round_info("LG2 WP1剩余路线")
         self.send_key_down("w")
         self.sleep(2.05)
@@ -2266,6 +2388,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.11)
 
     def lg2_wp2_to_exit2(self):
+        """LG2 第二段路线：搜刮后尝试第二个撤离点是否可用。"""
         self.log_round_info("LG2 WP2尝试出口2")
         self.send_key_down("f")  # start pick
         self.sleep(0.11)
@@ -2359,6 +2482,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.40)
 
     def lg2_wp3_to_layzer_room(self):
+        """从 LG2 WP3 前往镭射房入口的路线。"""
         self.log_round_info("LG2 WP3前往镭射房")
         self.send_key_down("a")
         self.sleep(3.03)
@@ -2405,6 +2529,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("s")
 
     def lg2_wp3_in_layzer_room(self):
+        """镭射房内部搜刮路线，包含多次跳跃、保险柜和拾取。"""
         self.log_round_info("LG2 WP3镭射房")
         self.send_key_down("d")
         self.sleep(0.36)
@@ -2636,6 +2761,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.11)
 
     def lg2_wp4(self):
+        """LG2 后段公共路线，进入最终撤离路线选择前的位置。"""
         self.log_round_info("LG2 WP4")
         self.send_key_down("w")
         self.sleep(4.40)
@@ -2652,6 +2778,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("f")  # end pick
 
     def lg2_wp4_to_exit1(self):
+        """出口1可用时，从 LG2 WP4 前往出口1撤离。"""
         self.log_round_info("LG2 WP4前往出口1")
         self.send_key_down("f")  # start pick
         self.sleep(0.01)
@@ -2695,6 +2822,7 @@ class PinkPawHeistCore3Path:
         self.walk_until_extract_panel(direction="w")
 
     def lg2_wp4_to_exit2(self):
+        """出口2可用时，从 LG2 WP4 前往出口2撤离。"""
         self.log_round_info("LG2 WP4前往出口2")
         self.send_key_down("f")  # start pick
         self.sleep(0.01)
@@ -2736,6 +2864,7 @@ class PinkPawHeistCore3Path:
         self.walk_until_extract_panel(direction="d")
 
     def lg2_wp4_to_exit3(self):
+        """出口1/2都不可用时，前往默认出口3撤离。"""
         self.log_round_info("LG2 WP4前往出口3")
         self.send_key_down("w")
         self.sleep(0.14)
@@ -2763,6 +2892,7 @@ class PinkPawHeistCore3Path:
         self.walk_until_extract_panel(direction="d")
 
     def run_path(self):
+        """按所选配队/避战分支执行完整 Core3 路线，并根据出口状态选择撤离路线。"""
         idx = self.avoider_strategy_index()
         if idx == -1:
             self.log_round_info("没有配置避战角色，全程使用原始线路（路线A）")
@@ -2802,6 +2932,7 @@ class PinkPawHeistCore3Path:
             self.lg2_wp4_to_exit3()
 
     def goto_lg1_skip_Sakiri(self):
+        """早雾分支开局：用翳/早雾处理大厅避战和控怪后进入 LG1。"""
         self.log_round_info("早雾、大厅前往LG1")
         self.sleep(0.30)
         self.switch_to_runner(check_switched=True)
@@ -2930,6 +3061,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.30)
 
     def goto_lg1_skip_Hotori(self):
+        """浔分支开局：用浔长按攻击规避大厅战斗后进入 LG1。"""
         self.log_round_info("浔、大厅前往LG1")
         self.sleep(0.30)
         self.switch_to_avoider(check_switched=True)
@@ -3065,6 +3197,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.30)
 
     def lobby_open_door_check(self, check_time=3):
+        """大厅门口循环检测“开门”节点，没开就按 F 再试。"""
         open_door = False
         open_loop = 0
         while not open_door and open_loop < check_time:
@@ -3078,6 +3211,7 @@ class PinkPawHeistCore3Path:
         return open_door
 
     def lg1_wp1_safer(self):
+        """更稳的 LG1 WP1 路线：少停门口，优先保证安全通过。"""
         self.log_round_info("LG1 WP1 Safer")
         self.switch_to_runner(check_switched=True)  # 确认切到薄荷跑图
         self.sleep(0.20)
@@ -3129,6 +3263,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.12)
 
     def lg1_wp4_buster(self):
+        """早雾/翳分支使用的 LG1 WP4 变体路线。"""
         self.log_round_info("LG1 WP4 bUSTER")
         self.send_key_down("d")
         self.sleep(0.11)
@@ -3237,6 +3372,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("w")
 
     def lg1_wp5_buster(self):
+        """早雾/翳分支使用的 LG1 WP5 避战与进门路线。"""
         self.log_round_info("LG1 WP5 Buster 开始避战路线")
         self.switch_to_avoider(check_switched=True)
         self.sleep(0.50)
@@ -3261,6 +3397,7 @@ class PinkPawHeistCore3Path:
         self.wait_and_interact(direction="w")
 
     def lg2_wp2_to_exit2_safer(self):
+        """更稳的 LG2 WP2 路线：调整前半段走位后再尝试第二撤离点。"""
         self.log_round_info("LG2 WP2 Safer 尝试出口2")
         self.send_key_down("f")  # start pick
         self.sleep(0.11)
@@ -3348,14 +3485,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.40)
 
     def switch_to_fighter(self, check_switched=False, mode="all_desc"):
-        """切换到可用战斗角色。
-        `mode` 调度策略（配置重新从小到大排序后）：
-        - "all_desc": [默认]按键位从大到小完整尝试（如 ["4", "1"]）
-        - "all_asc" : 按键位从小到大完整尝试（如 ["1", "4"]）
-        -     1     : 只切当前最小的那个键位
-        -    -1     : 只切当前最大的那个键位
-        -     n     : 只切重新排序后的【第 n 个】角色
-        """
+        """切换到战斗角色；可按升序、降序或指定排序位置选择候选。"""
         config_keys = list(self.config.get(self.CONF_FIGHTER, []))
         if not config_keys:
             dead_keys = set(self._dead_fighter_keys)
@@ -3392,6 +3522,7 @@ class PinkPawHeistScheme3Action(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
+        """MAA 自定义动作入口：创建 Core3 路线对象，执行路线，并统一处理停止、提前撤离和异常恢复。"""
         params = _parse_custom_action_param(argv)
         if PinkPawHeistCore3Path.CONF_AVOID_MTH not in params:
             node_name = getattr(argv, "node_name", "")
@@ -3406,7 +3537,7 @@ class PinkPawHeistScheme3Action(CustomAction):
         path = PinkPawHeistCore3Path(context, params=params)
         try:
             path.log_round_info(
-                f"Start copied OK-NTE route B, method {path.config[path.CONF_AVOID_MTH]}, timing x{path.route_timing_scale:.2f}"
+                f"Start, method {path.config[path.CONF_AVOID_MTH]}, timing x{path.route_timing_scale:.2f}"
             )
             path.run_path()
             path._release_held_keys()
