@@ -2,7 +2,8 @@
     "BagelSpamEntrance": {
         "desc": "贝果灌水任务入口",
         "next": [
-            "BagelSpamEnsureEscButton"
+            "BagelSpamEnsureEscButton",
+            "BagelSpamPressEscRetry"
         ]
     },
     "BagelSpamEnsureEscButton": {
@@ -32,13 +33,11 @@
             }
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "timeout": 1000,
         "rate_limit": 0,
         "next": [
             "BagelSpamOpenCamera"
-        ],
-        "on_error": [
-            "BagelSpamPressEscRetry"
         ]
     },
     "BagelSpamPressEscRetry": {
@@ -53,8 +52,10 @@
             }
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
-            "BagelSpamEnsureEscButton"
+            "BagelSpamEnsureEscButton",
+            "BagelSpamPressEscRetry"
         ]
     },
     "BagelSpamOpenCamera": {
@@ -78,6 +79,7 @@
             "type": "Click"
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
             "BagelSpamTakeShot"
         ]
@@ -102,6 +104,7 @@
             "type": "Click"
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
             "BagelSpamSaveShot"
         ]
@@ -126,8 +129,10 @@
             "type": "Click"
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
-            "BagelSpamVerifySaved"
+            "BagelSpamVerifySaved",
+            "BagelSpamSaveShot"
         ]
     },
     "BagelSpamVerifySaved": {
@@ -154,10 +159,8 @@
         "timeout": 2000,
         "rate_limit": 0,
         "next": [
-            "BagelSpamCloseCamera"
-        ],
-        "on_error": [
-            "BagelSpamSaveShot"
+            "BagelSpamCloseCamera",
+            "BagelSpamPressEscUntilCamera"
         ]
     },
     "BagelSpamCloseCamera": {
@@ -183,11 +186,10 @@
             }
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "timeout": 1000,
         "next": [
-            "BagelSpamWaitCameraAfterClose"
-        ],
-        "on_error": [
+            "BagelSpamWaitCameraAfterClose",
             "BagelSpamPressEscUntilCamera"
         ]
     },
@@ -202,9 +204,11 @@
                 "key": 27
             }
         },
-        "post_wait_freezes": 500,
+        "post_wait_freezes": 1000,
+        "post_delay": 500,
         "next": [
-            "BagelSpamWaitCameraAfterClose"
+            "BagelSpamWaitCameraAfterClose",
+            "BagelSpamPressEscUntilCamera"
         ]
     },
     "BagelSpamWaitCameraAfterClose": {
@@ -228,9 +232,6 @@
         "rate_limit": 0,
         "next": [
             "BagelSpamOpenBagel"
-        ],
-        "on_error": [
-            "BagelSpamPressEscUntilCamera"
         ]
     },
     "BagelSpamOpenBagel": {
@@ -253,6 +254,7 @@
             "type": "Click"
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
             "BagelSpamClickRelease"
         ]
@@ -285,8 +287,10 @@
             }
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
-            "BagelSpamCheckDailyPublishCount"
+            "BagelSpamCheckDailyPublishCount",
+            "BagelSpamClickDraftArea"
         ]
     },
     "BagelSpamCheckDailyPublishCount": {
@@ -311,9 +315,6 @@
         "rate_limit": 0,
         "next": [
             "BagelSpamCloseBagelToFinish"
-        ],
-        "on_error": [
-            "BagelSpamClickDraftArea"
         ]
     },
     "BagelSpamClickDraftArea": {
@@ -332,6 +333,7 @@
             }
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
             "BagelSpamClickDraftTab"
         ]
@@ -354,8 +356,10 @@
             }
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
-            "BagelSpamConfirmPublish"
+            "BagelSpamConfirmPublish",
+            "BagelSpamConfirmFailed"
         ]
     },
     "BagelSpamConfirmPublish": {
@@ -382,11 +386,9 @@
             "type": "Click"
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
             "BagelSpamClickTitleInput"
-        ],
-        "on_error": [
-            "BagelSpamConfirmFailed"
         ]
     },
     "BagelSpamConfirmFailed": {
@@ -423,6 +425,7 @@
             }
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
             "BagelSpamInputTitle"
         ]
@@ -458,6 +461,7 @@
             }
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
             "BagelSpamInputContent"
         ]
@@ -493,6 +497,7 @@
             }
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "next": [
             "BagelSpamRepeatPublishDelay"
         ]
@@ -527,10 +532,12 @@
             "type": "Click"
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "pre_delay": 0,
         "rate_limit": 0,
         "next": [
-            "BagelSpamWaitEscButtonToFinish"
+            "BagelSpamWaitEscButtonToFinish",
+            "BagelSpamPressEscToFinish"
         ]
     },
     "BagelSpamPressEscToFinish": {
@@ -545,11 +552,13 @@
             }
         },
         "post_wait_freezes": 500,
+        "post_delay": 500,
         "pre_delay": 0,
 
         "rate_limit": 0,
         "next": [
-            "BagelSpamWaitEscButtonToFinish"
+            "BagelSpamWaitEscButtonToFinish",
+            "BagelSpamPressEscToFinish"
         ]
     },
     "BagelSpamWaitEscButtonToFinish": {
@@ -575,9 +584,6 @@
         "rate_limit": 0,
         "next": [
             "BagelSpamExit"
-        ],
-        "on_error": [
-            "BagelSpamPressEscToFinish"
         ]
     },
     "BagelSpamExit": {
