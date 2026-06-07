@@ -69,6 +69,22 @@
                             "next": [
                                 "PinkPawHeist_Scheme1"
                             ]
+                        },
+                        "PinkPawHeist_FindXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core1",
+                                "runner": [
+                                    "3"
+                                ]
+                            }
+                        },
+                        "PinkPawHeist_RecoverXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core1",
+                                "runner": [
+                                    "3"
+                                ]
+                            }
                         }
                     },
                     "option": [
@@ -83,6 +99,22 @@
                             "next": [
                                 "PinkPawHeist_Scheme2"
                             ]
+                        },
+                        "PinkPawHeist_FindXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core2",
+                                "runner": [
+                                    "4"
+                                ]
+                            }
+                        },
+                        "PinkPawHeist_RecoverXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core2",
+                                "runner": [
+                                    "4"
+                                ]
+                            }
                         }
                     },
                     "option": [
@@ -97,6 +129,22 @@
                             "next": [
                                 "PinkPawHeist_Scheme3"
                             ]
+                        },
+                        "PinkPawHeist_FindXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core3",
+                                "runner": [
+                                    "3"
+                                ]
+                            }
+                        },
+                        "PinkPawHeist_RecoverXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core3",
+                                "runner": [
+                                    "3"
+                                ]
+                            }
                         }
                     },
                     "option": [

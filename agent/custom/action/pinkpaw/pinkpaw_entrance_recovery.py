@@ -13,6 +13,7 @@ try:
         DEFAULT_WIDTH,
         PinkPawHeistCore3Path,
         TaskerStoppedException,
+        _parse_custom_action_param,
         _is_hit,
     )
 except ImportError:
@@ -22,12 +23,83 @@ except ImportError:
         DEFAULT_WIDTH,
         PinkPawHeistCore3Path,
         TaskerStoppedException,
+        _parse_custom_action_param,
         _is_hit,
     )
 
 
+RECOVERY_ENTRANCE_ROUTE_MINT = [
+    ("w", 9.22, 0.20),
+    ("d", 2.80, 0.20),
+    ("w", 1.60, 0.20),
+    ("d", 1.00, 0.20),
+    ("w", 0.10, 0.10),
+    ("w", 0.10, 0.10),
+    ("d", 0.10, 0.10),
+    ("d", 0.10, 0.10),
+    ("s", 0.38, 0.20),
+    ("a", 1.28, 0.20),
+    ("w", 0.72, 0.20),
+]
+
+RECOVERY_ENTRANCE_ROUTE_MINT2 = [
+    ("w", 7.42, 0.20),
+    ("d", 2.80, 0.20),
+    ("w", 1.60, 0.20),
+    ("d", 1.00, 0.20),
+    ("w", 0.10, 0.10),
+    ("w", 0.10, 0.10),
+    ("d", 0.10, 0.10),
+    ("d", 0.10, 0.10),
+    ("s", 0.38, 0.20),
+    ("a", 1.08, 0.20),
+    ("w", 0.52, 0.20),
+]
+
+RECOVERY_ROUTE_PROFILES = {
+    "core1": {
+        "label": "方案一跑图位",
+        "runner": ["3"],
+        "steps": RECOVERY_ENTRANCE_ROUTE_MINT,
+    },
+    "core2": {
+        "label": "方案二跑图位",
+        "runner": ["4"],
+        "steps": RECOVERY_ENTRANCE_ROUTE_MINT2,
+    },
+    "core3": {
+        "label": "方案三薄荷跑图位",
+        "runner": ["3"],
+        "steps": RECOVERY_ENTRANCE_ROUTE_MINT,
+    },
+}
+
+
+def _normalize_key_list(value, default):
+    """把 custom_action_param 中的单个键位或键位列表统一成字符串列表。"""
+    if value is None:
+        return list(default)
+    if isinstance(value, (list, tuple)):
+        keys = value
+    else:
+        keys = [value]
+    result = [str(key) for key in keys if str(key)]
+    return result or list(default)
+
+
 class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
     """粉爪入口恢复路线：找不到小吱时传送回大塔，并跑回小吱位置。"""
+
+    def __init__(self, ctx: Context, params: dict | None = None):
+        """读取当前粉爪方案，选择对应跑图角色和入口恢复路线。"""
+        super().__init__(ctx, params=params)
+        params = params or {}
+        scheme = str(params.get("scheme", "core3")).lower()
+        profile = RECOVERY_ROUTE_PROFILES.get(scheme, RECOVERY_ROUTE_PROFILES["core3"])
+        runner = _normalize_key_list(params.get("runner"), profile["runner"])
+        self.recovery_scheme = scheme
+        self.recovery_route_profile = profile
+        self.config[self.CONF_RUNNER] = runner
 
     def _has_xiaozhi_prompt(self, time_out=1.0):
         """检测当前画面是否已经能看到小吱交互提示。"""
@@ -114,21 +186,15 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
 
     def _run_heist_entrance_path_from_teleport(self):
         """从粉爪传送点跑回小吱位置。"""
-        self.log_round_info("正在寻路到小吱")
+        runner = "/".join(self.config.get(self.CONF_RUNNER, []))
+        self.log_round_info(
+            f"正在寻路到小吱（{self.recovery_route_profile['label']}：{runner}号位）"
+        )
         self.sleep(0.50, check_reward=False, scaled=False)
         self.switch_to_runner()
         self.sleep(0.20, check_reward=False, scaled=False)
-        self._recovery_press_key("w", 9.22, 0.20)
-        self._recovery_press_key("d", 2.80, 0.20)
-        self._recovery_press_key("w", 1.60, 0.20)
-        self._recovery_press_key("d", 1.00, 0.20)
-        self._recovery_press_key("w", 0.10, 0.10)
-        self._recovery_press_key("w", 0.10, 0.10)
-        self._recovery_press_key("d", 0.10, 0.10)
-        self._recovery_press_key("d", 0.10, 0.10)
-        self._recovery_press_key("s", 0.38, 0.20)
-        self._recovery_press_key("a", 1.28, 0.20)
-        self._recovery_press_key("w", 0.72, 0.20)
+        for key, down_time, after_sleep in self.recovery_route_profile["steps"]:
+            self._recovery_press_key(key, down_time, after_sleep)
         self.log_round_info("完成寻路到小吱")
         self.sleep(0.30, check_reward=False, scaled=False)
         return True
@@ -157,7 +223,8 @@ class PinkPawHeistReturnToEntranceAction(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         """找不到小吱时的恢复入口：传送到粉爪大塔并跑回小吱位置。"""
-        path = PinkPawHeistEntranceRecoveryPath(context, params={})
+        params = _parse_custom_action_param(argv)
+        path = PinkPawHeistEntranceRecoveryPath(context, params=params)
         try:
             path.recover_to_heist_entrance()
             return CustomAction.RunResult(success=True)
@@ -179,7 +246,8 @@ class PinkPawHeistFindXiaoZhiAction(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         """寻找小吱入口；找不到时先恢复到粉爪入口，再重新确认交互提示。"""
-        path = PinkPawHeistEntranceRecoveryPath(context, params={})
+        params = _parse_custom_action_param(argv)
+        path = PinkPawHeistEntranceRecoveryPath(context, params=params)
         try:
             path.log_round_info("开始寻找小吱")
             if path._has_xiaozhi_prompt(time_out=30.0):
