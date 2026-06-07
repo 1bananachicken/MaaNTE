@@ -1665,37 +1665,6 @@ class PinkPawHeistCore3Path:
                 self.log_error(f"release held key {key} failed", exc)
         self._quick_pick_active = False
 
-    def run_path(self):
-        """按所选配队/避战分支执行完整 Core3 路线，并根据出口状态选择撤离路线。"""
-        self.goto_lg1()
-        self.wait_team_ui_settle()
-        # self.check_current_floor(1)
-        self.lg1_wp1()
-        self.lg1_wp2()
-        self.lg1_wp3()
-        self.lg1_wp4()
-        idx = self.avoider_strategy_index()
-        if idx == -1:
-            self.lg1_wp5_avoid_combat_01()
-        elif idx == 0:
-            self.lg1_wp5_avoid_combat_02()
-        elif idx == 1:
-            self.lg1_wp5_avoid_combat_03()
-        self.wait_team_ui_settle()
-        # self.check_current_floor(2)
-        self.lg2_wp1_to_exit1()
-        self.lg2_wp1_remains()
-        self.lg2_wp2_to_exit2()
-        self.lg2_wp3_to_layzer_room()
-        self.lg2_wp3_in_layzer_room()
-        self.lg2_wp4()
-        if self.exit_state[1]:
-            self.lg2_wp4_to_exit1()
-        elif self.exit_state[2]:
-            self.lg2_wp4_to_exit2()
-        else:
-            self.lg2_wp4_to_exit3()
-
     def goto_lg1(self):
         """原始开局路线：从小吱大厅进入 LG1，并处理开锁、保险柜和清怪。"""
         self.log_round_info("寻路到LG1")
@@ -1716,10 +1685,10 @@ class PinkPawHeistCore3Path:
         self.sleep(0.25)
 
         self.send_key_down("f")
-        start = time.time()
-        while time.time() < start + 10:
+        start = time.monotonic()
+        while time.monotonic() < start + 10:
             self.send_key("space", down_time=0.14, interval=0.25)
-            if time.time() > start + 6.4 and self.find_interac():
+            if time.monotonic() > start + 6.4 and self.find_interac():
                 break
             self.next_frame()
 
@@ -2123,8 +2092,8 @@ class PinkPawHeistCore3Path:
         self.send_key_down("w")
         self.sleep(0.11)
 
-        deadline = time.time() + 4.5
-        while time.time() < deadline:
+        deadline = time.monotonic() + 4.5
+        while time.monotonic() < deadline:
             self.send_key("lshift")
             self.sleep(0.51)
 
@@ -2169,8 +2138,8 @@ class PinkPawHeistCore3Path:
         self.send_key_down("w")
         self.sleep(0.11)
 
-        deadline = time.time() + 4.5
-        while time.time() < deadline:
+        deadline = time.monotonic() + 4.5
+        while time.monotonic() < deadline:
             self.send_key("lshift")
             self.sleep(0.51)
 
@@ -2824,8 +2793,8 @@ class PinkPawHeistCore3Path:
         self.send_key_up("f")  # end pick
         self.sleep(0.11)
 
-        deadline = time.time() + 1.29
-        while time.time() < deadline:
+        deadline = time.monotonic() + 1.29
+        while time.monotonic() < deadline:
             self.send_key("space")
             self.sleep(0.25)
 
