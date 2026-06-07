@@ -26,7 +26,7 @@
                 {
                     "name": "caption",
                     "label": "$task_bagel_spam_option_caption_input_label",
-                    "default": "关注塔菲喵",
+                    "default": "关注伊波恩喵",
                     "pipeline_type": "string"
                 }
             ],
@@ -48,7 +48,7 @@
                 {
                     "name": "text",
                     "label": "$task_bagel_spam_option_text_input_label",
-                    "default": "关注塔菲谢谢喵",
+                    "default": "关注伊波恩谢谢喵",
                     "pipeline_type": "string"
                 }
             ],

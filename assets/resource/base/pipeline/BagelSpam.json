@@ -438,7 +438,7 @@
         "action": {
             "type": "InputText",
             "param": {
-                "input_text": "关注塔菲喵"
+                "input_text": "关注伊波恩喵"
             }
         },
         "next": [
@@ -474,7 +474,7 @@
         "action": {
             "type": "InputText",
             "param": {
-                "input_text": "关注塔菲谢谢喵"
+                "input_text": "关注伊波恩谢谢喵"
             }
         },
         "next": [
