@@ -262,7 +262,12 @@
         },
         "pre_delay": 2000,
         "next": [
-            "PinkPawHeist_AfterStory"
+            "PinkPawHeist_AfterStory",
+            "[JumpBack]RealTimeSkipStoryDialog",
+            "[JumpBack]RealTimeSkipStory"
+        ],
+        "on_error": [
+            "PinkPawHeist_AfterStory_Recover"
         ]
     },
     "PinkPawHeist_AfterStory": {
