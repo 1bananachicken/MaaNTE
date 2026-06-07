@@ -523,7 +523,7 @@
                     108,
                     117
                 ],
-                "template": "BagelSpam/bagel_close_greenmask.png",
+                "template": "BagelSpam/bagel_close.png",
                 "green_mask": true,
                 "order_by": "Score"
             }
