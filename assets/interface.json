@@ -115,13 +115,17 @@
         "resource/tasks/BagelSpam.json",
         // group:RealTimeAssist
         "resource/tasks/RealTime.json",
+        "resource/tasks/NaviWebSocket.json",
         "resource/tasks/SoundDodge.json",
         "resource/tasks/AutoFScroll.json",
         // group:others
         "resource/tasks/FountainCheckin.json",
         "resource/tasks/AutoPiano.json",
+        "resource/tasks/WitchDivination.json",
         // group:DatasetCollection
         "resource/tasks/AutonomousDrivingDataset.json",
+        // group:others
+        "resource/tasks/Touch.json",
         // preset
         "resource/tasks/preset/AFK.json",
         // "resource/tasks/preset/FullDaily.json",

@@ -1,0 +1,76 @@
+{
+    "TouchDetect": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [731, 326, 182, 136],
+                "expected": [
+                    "抚摸",
+                    "撫摸",
+                    "(?i)Pet",
+                    "なでる"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    91,
+                    0
+                ]
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "max_hit": 100,
+        "next": ["TouchPressF"]
+    },
+    "TouchPressF": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "next": ["TouchClickInteractionArea"]
+    },
+    "TouchClickInteractionArea": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [660, 480]
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "next": ["TouchPressEsc"]
+    },
+    "TouchPressEsc": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 27
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": ["TouchDetect"]
+    }
+}

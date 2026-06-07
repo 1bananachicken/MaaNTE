@@ -521,7 +521,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.delay(3000)
             ah.key_up("W")
             # 躲第一道激光
-            ah.delay(1400)
+            ah.delay(1500)
             ah.key_down("W")
             ah.delay(2500)
             ah.key_up("W")
@@ -568,7 +568,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.delay(500)
             current_ctrl = ah.ctx.tasker.controller
             current_ctrl.post_key_down(32).wait()
-            ah.delay(200)
+            ah.delay(100)
             current_ctrl.post_key_up(32).wait()
             ah.delay(200)
             current_ctrl.post_key_down(32).wait()
@@ -586,10 +586,10 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_up("W")
             ah.delay(200)
             ah.key_down("D")
-            ah.delay(1500)
+            ah.delay(1600)
             current_ctrl = ah.ctx.tasker.controller
             current_ctrl.post_key_down(32).wait()
-            ah.delay(200)
+            ah.delay(100)
             current_ctrl.post_key_up(32).wait()
             ah.delay(200)
             current_ctrl.post_key_down(32).wait()
@@ -683,7 +683,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_up("W")
             ah.delay(100)
             ah.key_down("D")
-            ah.delay(1000)
+            ah.delay(1100)
             ah.key_up("D")
             ah.delay(100)
 
@@ -700,7 +700,7 @@ class PinkPawHeistScheme2Action(CustomAction):
 
             # 偷左前边展柜藏品
             ah.key_down("D")
-            ah.delay(1500)
+            ah.delay(1400)
             ah.key_up("D")
             ah.delay(100)
 
@@ -723,7 +723,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_down("W")
             for _ in range(12):
                 ah.click_key("F")
-                ah.delay(200)
+                ah.delay(190)
             ah.key_up("W")
             ah.delay(100)
 
@@ -743,8 +743,12 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_up("W")
             ah.delay(100)
             # 准备穿激光
+            ah.key_down("A")
+            ah.delay(1000)
+            ah.key_up("A")
+            ah.delay(200)
             ah.key_down("D")
-            ah.delay(2600)
+            ah.delay(3100)
             ah.key_up("D")
             ah.delay(100)
 
@@ -760,9 +764,9 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.delay(100)
 
             ah.key_down("D")
-            ah.delay(1100)
+            ah.delay(900)
             ah.key_up("D")
-            ah.delay(1700)
+            ah.delay(1800)
             # 穿过第一道激光
             ah.key_down("D")
             ah.delay(500)
@@ -789,7 +793,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_down("S")
             ah.delay(500)
             ah.key_up("S")
-            ah.delay(1800)
+            ah.delay(1700)
 
             # 穿过第二道竖激光和第三道和第四道激光
             ah.key_down("D")
@@ -820,7 +824,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             # 开始吃右前边展柜藏品
 
             ah.key_down("D")
-            ah.delay(600)
+            ah.delay(700)
             ah.key_up("D")
             for _ in range(3):
                 ah.click_key("F")
@@ -833,7 +837,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_down("S")
             for _ in range(12):
                 ah.click_key("F")
-                ah.delay(200)
+                ah.delay(190)
             ah.key_up("S")
             ah.delay(100)
 
@@ -844,7 +848,7 @@ class PinkPawHeistScheme2Action(CustomAction):
                 ah.click_key("F")
                 ah.delay(200)
             ah.key_down("A")
-            ah.delay(600)
+            ah.delay(700)
             ah.key_up("A")
             ah.delay(100)
 
@@ -862,7 +866,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.delay(100)
 
             ah.key_down("D")
-            ah.delay(1300)
+            ah.delay(1400)
             ah.key_up("D")
             ah.delay(100)
             ah.key_down("W")
@@ -886,8 +890,12 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_up("W")
 
             ah.key_down("D")
-            ah.delay(5900)
+            ah.delay(7000)
             ah.key_up("D")
+            ah.delay(100)
+            ah.key_down("A")
+            ah.delay(300)
+            ah.key_up("A")
             ah.delay(100)
             # 开始吃二楼右边
             for _ in range(3):
@@ -895,14 +903,14 @@ class PinkPawHeistScheme2Action(CustomAction):
                 ah.delay(200)
 
             ah.key_down("S")
-            ah.delay(1900)
+            ah.delay(1950)
             ah.key_up("S")
             for _ in range(10):
                 ah.click_key("F")
                 ah.delay(200)
 
             ah.key_down("S")
-            ah.delay(2750)
+            ah.delay(2700)
             ah.key_up("S")
             ah.delay(100)
 
@@ -919,7 +927,7 @@ class PinkPawHeistScheme2Action(CustomAction):
             ah.key_down("S")
             ah.delay(150)
             ah.key_up("S")
-            ah.delay(250)
+            ah.delay(230)
             ah.key_up("D")
             ah.delay(100)
             # 吃激光藏品房门口下面的藏品
@@ -993,24 +1001,24 @@ class PinkPawHeistScheme2Action(CustomAction):
                 ah.delay(200)
 
             ah.key_down("W")
-            for _ in range(6):
+            for _ in range(8):
                 ah.click_key("F")
                 ah.delay(200)
             current_ctrl = ah.ctx.tasker.controller
             current_ctrl.post_key_down(2).wait()  # 按下右键
             ah.delay(200)
             current_ctrl.post_key_up(2).wait()
-            ah.delay(1000)
+            ah.delay(400)
             current_ctrl.post_key_down(2).wait()  # 按下右键
             ah.delay(200)
             current_ctrl.post_key_up(2).wait()
-            ah.delay(3400)
+            ah.delay(3450)
             ah.key_up("W")
             ah.delay(100)
             ah.key_down("S")
             ah.delay(200)
             ah.key_up("S")
-            ah.delay(100)
+            ah.delay(50)
             ah.key_down("A")
             ah.delay(500)
             current_ctrl = ah.ctx.tasker.controller
@@ -1034,7 +1042,7 @@ class PinkPawHeistScheme2Action(CustomAction):
                 ah.click_key("F")
                 ah.delay(200)
             current_ctrl.post_key_down(32).wait()
-            ah.delay(200)
+            ah.delay(100)
             current_ctrl.post_key_up(32).wait()
             ah.delay(200)
             current_ctrl.post_key_down(32).wait()
@@ -1130,7 +1138,7 @@ class PinkPawHeistScheme2Action(CustomAction):
                     ah.delay(2000)
                     ah.key_up("D")
                     ah.key_down("S")
-                    ah.delay(3100)
+                    ah.delay(3200)
                     ah.key_up("S")
 
                     ah.key_down("D")

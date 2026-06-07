@@ -69,10 +69,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    700,
-                    315,
-                    240,
-                    170
+                    766,
+                    305,
+                    241,
+                    171
                 ],
                 "expected": [
                     "泯除方块",
@@ -82,9 +82,7 @@
                     "테트로미노"
                 ]
             }
-        },
-        "pre_delay": 0,
-        "post_delay": 0
+        }
     },
     "TetrisSceneWorldWithPrompt": {
         "desc": "泯除方块 - 大世界场景且有方块入口提示",
@@ -94,26 +92,6 @@
                 "all_of": [
                     "InWorld",
                     "TetrisSceneWorldPrompt"
-                ]
-            }
-        },
-        "pre_delay": 0,
-        "post_delay": 0,
-        "next": []
-    },
-    "TetrisScenePrepareOneMarker": {
-        "desc": "泯除方块 - 检测准备界面一标记",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    779,
-                    151,
-                    245,
-                    366
-                ],
-                "template": [
-                    "Tetris/prepare_one_marker.png"
                 ]
             }
         },
@@ -175,7 +153,6 @@
             "type": "Or",
             "param": {
                 "any_of": [
-                    "TetrisScenePrepareOneMarker",
                     "TetrisScenePrepareOneSingle",
                     "TetrisScenePrepareOneMulti"
                 ]
@@ -206,7 +183,7 @@
         "next": []
     },
     "TetrisSceneStartMatch": {
-        "desc": "泯除方块 - 检测开始匹配按钮",
+        "desc": "泯除方块 - 检测开始游戏按钮",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -217,11 +194,11 @@
                     36
                 ],
                 "expected": [
-                    "开始匹配",
-                    "開始匹配",
-                    "(?i)Start\\s*Matchmaking",
-                    "マッチング開始",
-                    "매칭 시작"
+                    "开始游戏",
+                    "開始遊戲",
+                    "(?i)Start\\s*Game",
+                    "ゲーム開始",
+                    "게임 시작"
                 ]
             }
         },
@@ -286,24 +263,47 @@
         "pre_delay": 0,
         "post_delay": 0
     },
-    "TetrisSceneDrop": {
-        "desc": "泯除方块 - 检测下落按钮（游戏中标志）",
+    "TetrisGamingNext": {
+        "desc": "泯除方块 - 识别游戏中Next队列文字",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "OCR",
             "param": {
                 "roi": [
-                    270,
-                    425,
-                    92,
-                    97
+                    792,
+                    52,
+                    45,
+                    25
                 ],
-                "template": [
-                    "Tetris/drop.png"
+                "expected": [
+                    "Next",
+                    "次の",
+                    "다음"
                 ]
             }
-        },
-        "pre_delay": 0,
-        "post_delay": 0
+        }
+    },
+    "TetrisGamingExisting": {
+        "desc": "泯除方块 - 识别游戏中当前存活文字",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    783,
+                    489,
+                    65,
+                    23
+                ],
+                "expected": [
+                    "当前存活",
+                    "當前存活",
+                    "(?i)Active",
+                    "残り人数",
+                    "(?i)Existing",
+                    "現在の生存",
+                    "현재 생존"
+                ]
+            }
+        }
     },
     "TetrisSceneMatchend": {
         "desc": "泯除方块 - 检测对局结束界面",
@@ -326,12 +326,14 @@
         "post_delay": 0
     },
     "TetrisSceneGameActive": {
-        "desc": "泯除方块 - 检测游戏中（下落按钮可见）",
+        "desc": "泯除方块 - 检测游戏中（下落按钮或游戏标记可见）",
         "recognition": {
-            "type": "And",
+            "type": "Or",
             "param": {
-                "all_of": [
-                    "TetrisSceneDrop"
+                "any_of": [
+                    "TetrisSceneGameIdle",
+                    "TetrisGamingNext",
+                    "TetrisGamingExisting"
                 ]
             }
         },

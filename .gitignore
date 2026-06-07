@@ -460,7 +460,7 @@ debug
 .maa/Debugger/store.json
 assets/resource/base/model/detect/limbo_stage_lightest.onnx
 assets/resource/base/model/detect/sos_nodes.onnx
-
+.claude/
 .nicegui/
 
 # local gui test
