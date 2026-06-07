@@ -112,6 +112,7 @@
         "resource/tasks/MakeCoffee.json",
         "resource/tasks/Rhythm.json",
         "resource/tasks/Tetris.json",
+        "resource/tasks/BagelSpam.json",
         // group:RealTimeAssist
         "resource/tasks/RealTime.json",
         "resource/tasks/NaviWebSocket.json",
