@@ -238,14 +238,12 @@ def _get_fast_image_dir():
     global _FAST_IMAGE_DIR
     if _FAST_IMAGE_DIR is not None:
         return _FAST_IMAGE_DIR
+    project_root = Path(__file__).resolve().parents[4]
     candidates = [
         Path.cwd() / "assets" / "resource" / "base" / "image" / "PinkPawHeist",
-        Path(__file__).resolve().parents[4]
-        / "assets"
-        / "resource"
-        / "base"
-        / "image"
-        / "PinkPawHeist",
+        Path.cwd() / "resource" / "base" / "image" / "PinkPawHeist",
+        project_root / "assets" / "resource" / "base" / "image" / "PinkPawHeist",
+        project_root / "resource" / "base" / "image" / "PinkPawHeist",
     ]
     for candidate in candidates:
         if candidate.exists():
