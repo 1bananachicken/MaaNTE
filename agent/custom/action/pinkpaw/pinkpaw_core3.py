@@ -38,6 +38,7 @@ VK = {
     "2": 0x32,
     "3": 0x33,
     "4": 0x34,
+    "m": 0x4D,
     "esc": 0x1B,
     "lshift": 0xA0,
     "shift": 0x10,
@@ -64,6 +65,7 @@ ROUTE_SLEEP_ADJUST_RATIO_CAP = 0.08
 ROUTE_SLEEP_BUSY_WAIT = 0.02
 ROUTE_SLEEP_POLL_INTERVAL = 0.005
 ROUTE_REWARD_CHECK_MIN_SLEEP = 0.5
+REWARD_CHECK_INTERVAL = 1.0
 WAIT_UNTIL_POLL_INTERVAL = 0.02
 INTERAC_OCR_FALLBACK_INTERVAL = 1.0
 FOCUS_LOG_NODE = "_PINKPAW_CORE3_FOCUS_"
@@ -704,7 +706,7 @@ class PinkPawHeistCore3Path:
     def _check_still_in_heist(self):
         """低频检测本局收益 UI，判断脚本是否仍在粉爪局内。"""
         now = time.monotonic()
-        if now - self.last_check_reward_time <= 2.0:
+        if now - self.last_check_reward_time <= REWARD_CHECK_INTERVAL:
             return
         self.last_check_reward_time = now
 
@@ -1954,30 +1956,45 @@ class PinkPawHeistCore3Path:
         self.sleep(0.11)
         self.start_interaction_watch()
         self.send_key_down("w")
-        self.sleep(3.19)
+        self.sleep(3.23)
         self.send_key_down("a")
         self.sleep(0.31)
         self.send_key_up("a")
-        self.sleep(5.16)
+        self.sleep(3.86)
+        self.send_key_down("lshift")
+        self.sleep(0.13)
+        self.send_key_up("lshift")
         self.send_key_up("w")
         self.stop_interaction_watch()
         self.sleep(0.11)
         self.send_key_down("s")
-        self.sleep(0.15)
+        self.sleep(0.13)
         self.send_key_up("s")
+        self.sleep(0.13)
+        self.send_key_down("d")
         self.sleep(0.11)
+        self.send_key_down("lshift")
+        self.sleep(0.13)
+        self.send_key_up("lshift")
+        self.sleep(0.13)
+        self.send_key_down("lshift")
+        self.sleep(0.13)
+        self.send_key_up("lshift")
+        self.sleep(1.51)
+        self.send_key_up("d")
+        self.sleep(0.51)
         self.send_key_up("f")  # end pick
         self.sleep(0.11)
-        self.send_key_down("d")
-        self.sleep(2.51)
-        self.send_key_up("d")
-        self.sleep(0.11)
+        self.send_key_down("a")
+        self.sleep(0.13)
+        self.send_key_up("a")
+        self.sleep(0.41)
         self.send_key_down("a")
         self.sleep(0.40)
         self.send_key_up("a")
         self.sleep(0.11)
         self.send_key_down("w")
-        self.sleep(5.31)
+        self.sleep(5.33)
         self.send_key_up("w")
         self.sleep(0.12)
 
@@ -1985,7 +2002,7 @@ class PinkPawHeistCore3Path:
         """LG1 第四段通用路线：处理跳跃、拾取和长距离移动。"""
         self.log_round_info("LG1 WP4")
         self.send_key_down("d")
-        self.sleep(0.11)
+        self.sleep(0.21)
         self.send_key_down("s")
         self.sleep(3.31)
         self.send_key_up("s")
@@ -2167,12 +2184,12 @@ class PinkPawHeistCore3Path:
         self.switch_to_runner(check_switched=True)
         self.sleep(0.5)
         self.send_key_down("d")
-        self.sleep(0.20)
+        self.sleep(0.30)
         self.send_key_up("d")
         self.wait_and_interact(is_lock=True)
         self.sleep(0.11)
         self.send_key_down("a")
-        self.sleep(0.20)
+        self.sleep(0.25)
         self.send_key_up("a")
         self.sleep(0.10)
         self.send_key_down("w")
@@ -2226,7 +2243,10 @@ class PinkPawHeistCore3Path:
         self.send_key_up("f")  # end pick
         self.sleep(0.11)
         self.send_key_down("w")
-        self.sleep(2.71)
+        self.sleep(2.61)
+        self.send_key_down("a")
+        self.sleep(0.15)
+        self.send_key_up("a")
         self.exit_state[1] = self.try_open_exit(direction="w", exit_index=1)
 
     def lg2_wp1_remains(self):
@@ -2603,7 +2623,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("d")
         self.sleep(0.13)
         self.send_key_down("a")
-        self.sleep(0.13)
+        self.sleep(0.15)
         self.send_key_down("space")
         self.sleep(0.14)
         self.send_key_up("space")
@@ -2617,9 +2637,9 @@ class PinkPawHeistCore3Path:
         self.send_key_down("s")
         self.sleep(0.24)
         self.send_key_down("space")
-        self.sleep(0.07)
+        self.sleep(0.08)
         self.send_key_up("space")
-        self.sleep(1.21)
+        self.sleep(1.20)
         self.send_key_up("s")
         self.sleep(0.11)
         self.send_key_down("w")
@@ -2977,7 +2997,7 @@ class PinkPawHeistCore3Path:
         self.sleep(0.10)
         self.switch_to_fighter(check_switched=True, mode=1)  # 切到早雾控怪
         self.sleep(0.10)
-        self.send_key("a", down_time=0.20)
+        self.send_key("a", down_time=0.23)
         self.sleep(0.10)
         self.send_key_down("w")
         self.wait_and_interact(direction="w", is_lock=True, time_out=6.4)
@@ -2991,6 +3011,7 @@ class PinkPawHeistCore3Path:
             self.send_key("e", down_time=2.40)
             self.send_key_down("w")
             self.wait_and_interact(direction="w", is_lock=True, time_out=6.4)
+        self.send_key("s", down_time=0.10)
         self.switch_to_avoider(check_switched=True)  # 切到狗哥潜行避免碰到怪改变路径
         self.send_key_down("w")
         self.sleep(0.32)
@@ -3266,7 +3287,7 @@ class PinkPawHeistCore3Path:
         """早雾/翳分支使用的 LG1 WP4 变体路线。"""
         self.log_round_info("LG1 WP4 bUSTER")
         self.send_key_down("d")
-        self.sleep(0.11)
+        self.sleep(0.21)
         self.send_key_down("s")
         self.sleep(3.31)
         self.send_key_up("s")
@@ -3384,12 +3405,12 @@ class PinkPawHeistCore3Path:
         self.switch_to_runner(check_switched=True)
         self.sleep(0.32)
         self.send_key_down("d")
-        self.sleep(0.20)
+        self.sleep(0.30)
         self.send_key_up("d")
         self.wait_and_interact(is_lock=True)
         self.sleep(0.10)
         self.send_key_down("a")
-        self.sleep(0.15)
+        self.sleep(0.25)
         self.send_key_up("a")
         self.sleep(0.10)
         self.send_key_down("w")

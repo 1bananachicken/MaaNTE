@@ -50,7 +50,7 @@
                 }
             ],
             "pipeline_override": {
-                "PinkPawHeist_CoreSequence": {
+                "PinkPawHeist_PressF": {
                     "max_hit": "{count}"
                 }
             }

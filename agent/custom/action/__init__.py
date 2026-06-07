@@ -11,6 +11,7 @@ from .Navi import *
 from .pinkpaw.pinkpaw_core1 import *
 from .pinkpaw.pinkpaw_core2 import *
 from .pinkpaw.pinkpaw_core3 import *
+from .pinkpaw.pinkpaw_entrance_recovery import *
 from .pinkpaw.pinkpaw_reward_logger import *
 from .auto_tetris import *
 from .AutoFish.auto_fish_withoutCV import *
@@ -40,6 +41,8 @@ __all__ = [
     "PinkPawHeistScheme1Action",
     "PinkPawHeistScheme2Action",
     "PinkPawHeistScheme3Action",
+    "PinkPawHeistFindXiaoZhiAction",
+    "PinkPawHeistReturnToEntranceAction",
     "PinkPawRewardSummary",
     "AutoFishWithoutCV",
     "SoundDodgeAction",

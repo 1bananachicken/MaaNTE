@@ -47,9 +47,38 @@
             "type": "DoNothing"
         },
         "next": [
-            "PinkPawHeist_DetectXiaoZhi",
-            "[JumpBack]SceneAnyEnterWorld"
+            "PinkPawHeist_FindXiaoZhi"
         ]
+    },
+    "PinkPawHeist_FindXiaoZhi": {
+        "desc": "寻找小吱；找不到则尝试回到粉爪入口",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": "Custom",
+        "custom_action": "PinkPawHeistFindXiaoZhiAction",
+        "next": [
+            "PinkPawHeist_PressF"
+        ],
+        "on_error": [
+            "PinkPawHeist_StopTask"
+        ],
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "开始寻找小吱",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            },
+            "Node.Action.Failed": {
+                "content": "❌ 未找到小吱且恢复失败，请手动回到小吱面前重新开始",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            }
+        }
     },
     "PinkPawHeist_DetectXiaoZhi": {
         "desc": "检测小吱交互按钮",
@@ -75,12 +104,7 @@
         "action": {
             "type": "DoNothing"
         },
-        "next": [
-            "PinkPawHeist_PressF"
-        ],
-        "on_error": [
-            "PinkPawHeist_StopTask"
-        ],
+        "next": [],
         "focus": {
             "Node.Action.Starting": {
                 "content": "开始寻找小吱",
@@ -90,7 +114,7 @@
                 ]
             },
             "Node.Action.Failed": {
-                "content": "❌ 未找到小吱，请确保在小吱面前开始任务",
+                "content": "未找到小吱，准备尝试回到粉爪入口",
                 "display": [
                     "log",
                     "toast"
@@ -98,6 +122,36 @@
             },
             "Node.Action.Succeeded": {
                 "content": "✅ 成功找到小吱，开始任务",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            }
+        }
+    },
+    "PinkPawHeist_RecoverXiaoZhi": {
+        "desc": "找不到小吱时尝试回到粉爪入口",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": "Custom",
+        "custom_action": "PinkPawHeistReturnToEntranceAction",
+        "next": [
+            "[JumpBack]PinkPawHeist_FindXiaoZhi"
+        ],
+        "on_error": [
+            "PinkPawHeist_StopTask"
+        ],
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "未找到小吱，尝试传送并跑回粉爪入口",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            },
+            "Node.Action.Failed": {
+                "content": "❌ 回到粉爪入口失败，请手动回到小吱面前重新开始",
                 "display": [
                     "log",
                     "toast"
@@ -223,7 +277,7 @@
         },
         "post_delay": 2000,
         "next": [
-            "[JumpBack]PinkPawHeist_DetectXiaoZhi",
+            "[JumpBack]PinkPawHeist_FindXiaoZhi",
             "[JumpBack]RealTimeSkipStoryDialog",
             "[JumpBack]RealTimeSkipStory",
             "PinkPawHeist_AfterStory"
@@ -283,7 +337,7 @@
         },
         "post_delay": 2000,
         "next": [
-            "[JumpBack]PinkPawHeist_DetectXiaoZhi",
+            "[JumpBack]PinkPawHeist_FindXiaoZhi",
             "PinkPawHeist_WaitReward"
         ]
     },
