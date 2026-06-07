@@ -236,21 +236,18 @@ jobs:
           name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
           path: "install-mxu"
 
-  changelog:
-    name: Generate changelog
-    needs: meta
+  release:
+    if: ${{ needs.meta.outputs.is_release == 'true' }}
+    needs: [meta, windows]
     runs-on: ubuntu-latest
-    outputs:
-      release_body: ${{ steps.git-cliff.outputs.content }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Generate a changelog
+      - name: Generate release notes
         uses: orhun/git-cliff-action@v4
-        id: git-cliff
         with:
           config: .github/cliff.toml
           # 正式版：使用 tag-pattern 只匹配正式版标签，包含所有从上一个正式版以来的提交
@@ -262,11 +259,12 @@ jobs:
           OUTPUT: CHANGES.md
           GITHUB_REPO: ${{ github.repository }}
 
-  release:
-    if: ${{ needs.meta.outputs.is_release == 'true' }}
-    needs: [meta, windows, changelog]
-    runs-on: ubuntu-latest
-    steps:
+      - name: Check release notes
+        shell: bash
+        run: |
+          test -s CHANGES.md
+          cat CHANGES.md
+
       - uses: actions/download-artifact@v4
         with:
           path: assets
@@ -315,7 +313,7 @@ jobs:
         with:
           files: assets/*
           tag_name: ${{ needs.meta.outputs.tag }}
-          body: ${{ needs.changelog.outputs.release_body }}
+          body_path: CHANGES.md
           draft: false
           prerelease: ${{ needs.meta.outputs.is_prerelease == 'true' }}
 
