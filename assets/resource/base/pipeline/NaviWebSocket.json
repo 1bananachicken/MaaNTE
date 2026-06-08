@@ -9,5 +9,17 @@
             "frame_interval": "0.1",
             "angle_backend": "auto"
         }
+    },
+    "NaviWebSocketAngleBackendConfig": {
+        "enabled": false,
+        "attach": {
+            "angle_backend": "auto"
+        }
+    },
+    "NaviWebSocketDebugConfig": {
+        "enabled": false,
+        "attach": {
+            "debug": false
+        }
     }
 }

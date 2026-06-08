@@ -29,8 +29,8 @@ class MapLocator:
         660,
     )  # 大地图匹配模板尺寸（对应不同缩放级别下的小地图尺寸）
     SEARCH_RADIUS = 256  # 邻域搜索半径
-    GLOBAL_MIN_SCORE = 0.75  # 全局搜索的最低置信度
-    LOCAL_MIN_SCORE = 0.65  # 邻域搜索的最低置信度
+    GLOBAL_MIN_SCORE = 0.85  # 全局搜索的最低置信度
+    LOCAL_MIN_SCORE = 0.75  # 邻域搜索的最低置信度
     SMOOTHING_ALPHA = 0.7  # 越小越平滑，但是响应越慢
     MIN_FILTER_PIXELS = (
         120  # 模板中至少要有这么多有效像素才进行匹配，否则直接放弃，避免误匹配

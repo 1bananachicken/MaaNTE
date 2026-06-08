@@ -21,9 +21,10 @@ class NaviWebSocketAction(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         params = self.load_params(argv.custom_action_param)
+        params.update(self.load_option_params(context))
         host = params.get("host", "0.0.0.0")
         port = params.get("port", 14514)
-        debug = params.get("debug", False)
+        debug = bool(params.get("debug", False))
         frame_interval = max(0.05, float(params.get("frame_interval", 0.1)))
 
         navigation_websocket = NavigationWebSocketPublisher(host, port)
@@ -100,3 +101,23 @@ class NaviWebSocketAction(CustomAction):
         except Exception as exc:
             logger.warning(f"Parse custom_action_param failed, use defaults: {exc}")
             return {}
+
+    @staticmethod
+    def load_option_params(context: Context) -> dict:
+        params = {}
+
+        node_data = context.get_node_data("NaviWebSocketAngleBackendConfig") or {}
+        attach = node_data.get("attach")
+        if isinstance(attach, dict) and attach.get("angle_backend") in {
+            "auto",
+            "directml",
+            "cpu",
+        }:
+            params["angle_backend"] = attach["angle_backend"]
+
+        node_data = context.get_node_data("NaviWebSocketDebugConfig") or {}
+        attach = node_data.get("attach")
+        if isinstance(attach, dict) and "debug" in attach:
+            params["debug"] = attach["debug"]
+
+        return params
