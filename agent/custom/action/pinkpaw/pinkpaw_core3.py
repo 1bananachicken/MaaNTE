@@ -1868,7 +1868,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("d")
         self.sleep(0.11)
         self.send_key_down("w")
-        self.sleep(0.71)
+        self.sleep(0.68)
         self.send_key_up("w")
         self.sleep(0.11)
         self.send_key_down("a")
@@ -1880,15 +1880,15 @@ class PinkPawHeistCore3Path:
         self.send_key_up("d")
         self.sleep(0.11)
         self.send_key_down("w")
-        self.sleep(1.26)
+        self.sleep(1.46)
         self.send_key_up("w")
         self.sleep(0.11)
         self.send_key_up("f")  # end pick
-        self.sleep(2.93)
+        self.sleep(2.78)
         self.send_key_down("w")  # 过镭射1
-        self.sleep(2.01)
+        self.sleep(1.81)
         self.send_key_up("w")
-        self.sleep(0.44)
+        self.sleep(0.54)
         self.start_interaction_watch()
         self.send_key_down("w")  # 过镭射2
         self.sleep(8.51)
@@ -1930,10 +1930,10 @@ class PinkPawHeistCore3Path:
         self.sleep(1.86)
         self.send_key_up("w")
         self.send_key_down("d")
-        self.sleep(1.61)
+        self.sleep(1.41)
         self.send_key_up("d")
         self.send_key_down("w")
-        self.sleep(2.53)
+        self.sleep(2.33)
         self.send_key_up("f")  # end pick
         self.send_key_down("lshift")
         self.sleep(0.10)
@@ -2153,7 +2153,7 @@ class PinkPawHeistCore3Path:
         self.log_round_info("LG2 WP1尝试出口1")
         self.sleep(2.65)  # 2.65
         self.send_key_down("w")
-        self.sleep(4.92)
+        self.sleep(4.95)
         self.send_key_up("w")
         self.sleep(0.13)
         self.send_key_down("f")  # start pick
@@ -3203,7 +3203,7 @@ class PinkPawHeistCore3Path:
         self.send_key_down("f")  # start pick
         self.sleep(0.11)
         self.send_key_down("s")
-        self.sleep(1.25)
+        self.sleep(1.22)
         self.send_key_up("s")
         self.sleep(0.11)
         self.send_key_down("d")
@@ -3227,7 +3227,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("d")
         self.sleep(0.06)
         self.send_key_down("w")
-        self.sleep(2.02)
+        self.sleep(2.00)
         self.send_key_up("w")
         self.sleep(0.11)
         self.send_key_down("d")
