@@ -28,14 +28,14 @@ class FurnitureClaim(CustomAction):
                     "FurnitureClaim",
                     image,
                     pipeline_override={
-                        "FurnitureClaim": {"recogniton": {"param": roi}}
+                        "FurnitureClaim": {"roi": roi}
                     },
                 )
                 if result.hit:
                     context.run_task(
                         "FurnitureClaim",
                         pipeline_override={
-                            "FurnitureClaim": {"recogniton": {"param": roi}}
+                            "FurnitureClaim": {"roi": roi}
                         },
                     )
                     PrintT(context, f"furniture.claimed.{msg_key}")
