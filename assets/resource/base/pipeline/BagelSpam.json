@@ -42,6 +42,7 @@
     },
     "BagelSpamPressEscRetry": {
         "desc": "未识别到菜单时，按 Esc 后重试，用来逐层返回大世界",
+        "max_hit":10,
         "recognition": {
             "type": "DirectHit"
         },
@@ -194,6 +195,7 @@
     },
     "BagelSpamPressEscUntilCamera": {
         "desc": "持续按 Esc 直到回到可见相机入口的界面",
+        "max_hit":10,
         "recognition": {
             "type": "DirectHit"
         },
