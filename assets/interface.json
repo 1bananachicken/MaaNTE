@@ -115,6 +115,8 @@
         // group:RealTimeAssist
         "resource/tasks/RealTime.json",
         "resource/tasks/NaviWebSocket.json",
+        "resource/tasks/NaviMoveTo.json",
+        "resource/tasks/NaviRouteFollow.json",
         "resource/tasks/SoundDodge.json",
         "resource/tasks/AutoFScroll.json",
         // group:others

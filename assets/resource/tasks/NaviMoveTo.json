@@ -1,0 +1,81 @@
+{
+    "task": [
+        {
+            "name": "NaviMoveTo",
+            "label": "$task_navi_move_to_label",
+            "description": "$task_navi_move_to_desc",
+            "entry": "NaviMoveTo",
+            "option": [
+                "NaviMoveToSettings"
+            ],
+            "group": [
+                "RealTimeAssist"
+            ]
+        }
+    ],
+    "option": {
+        "NaviMoveToSettings": {
+            "type": "input",
+            "label": "$task_navi_move_to_option_settings",
+            "description": "$task_navi_move_to_option_settings_desc",
+            "inputs": [
+                {
+                    "name": "target_x",
+                    "label": "$task_navi_move_to_input_x",
+                    "default": "5600",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                },
+                {
+                    "name": "target_y",
+                    "label": "$task_navi_move_to_input_y",
+                    "default": "5600",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                },
+                {
+                    "name": "tolerance",
+                    "label": "$task_navi_move_to_input_tolerance",
+                    "default": "10",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                },
+                {
+                    "name": "max_duration",
+                    "label": "$task_navi_move_to_input_max_duration",
+                    "default": "120",
+                    "pipeline_type": "string",
+                    "verify": "^\\d+(\\.\\d+)?$"
+                },
+                {
+                    "name": "angle_backend",
+                    "label": "$task_navi_websocket_option_angle_backend",
+                    "description": "$task_navi_websocket_option_angle_backend_desc",
+                    "default": "auto",
+                    "pipeline_type": "string",
+                    "verify": "^(auto|directml|cpu)$"
+                },
+                {
+                    "name": "debug",
+                    "label": "$task_navi_websocket_option_debug",
+                    "description": "$task_navi_websocket_option_debug_desc",
+                    "default": "false",
+                    "pipeline_type": "bool",
+                    "verify": "^(true|false)$"
+                }
+            ],
+            "pipeline_override": {
+                "NaviMoveTo": {
+                    "custom_action_param": {
+                        "target_x": "{target_x}",
+                        "target_y": "{target_y}",
+                        "tolerance": "{tolerance}",
+                        "max_duration": "{max_duration}",
+                        "angle_backend": "{angle_backend}",
+                        "debug": "{debug}"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -36,6 +36,8 @@ __all__ = [
     "AutoRhythmSelectSong",
     "RealTimeTaskAction",
     "NaviWebSocketAction",
+    "NaviMoveToAction",
+    "NaviRouteFollowAction",
     "PinkPawHeistScheme1Action",
     "PinkPawHeistScheme2Action",
     "PinkPawRewardSummary",

@@ -17,9 +17,10 @@ get_logger("websockets.protocol").setLevel(logging.WARNING)
 
 
 class NavigationWebSocketPublisher:
-    def __init__(self, host="0.0.0.0", port="14514") -> None:
+    def __init__(self, host="0.0.0.0", port="14514", message_handler=None) -> None:
         self._host = str(host)
         self._port = int(port)
+        self._message_handler = message_handler
         self._state_lock = threading.Lock()
         self._start_lock = threading.Lock()
         self._started = False
@@ -35,6 +36,12 @@ class NavigationWebSocketPublisher:
             "position": None,
             "angle": None,
             "angleConfidence": 0.0,
+            "route": {
+                "waypoints": [],
+                "active": False,
+                "currentIndex": 0,
+                "status": "idle",
+            },
             "timestamp": 0.0,
         }
 
@@ -127,6 +134,25 @@ class NavigationWebSocketPublisher:
             self._state["timestamp"] = time.time()
         self._schedule_broadcast()
 
+    def publish_route(
+        self,
+        waypoints: list[dict[str, Any]],
+        *,
+        active: bool,
+        current_index: int,
+        status: str,
+    ) -> None:
+        self.start()
+        with self._state_lock:
+            self._state["route"] = {
+                "waypoints": waypoints,
+                "active": bool(active),
+                "currentIndex": int(current_index),
+                "status": str(status),
+            }
+            self._state["timestamp"] = time.time()
+        self._schedule_broadcast()
+
     def _serialize_state(self) -> str:
         with self._state_lock:
             return json.dumps(self._state, ensure_ascii=False)
@@ -141,9 +167,35 @@ class NavigationWebSocketPublisher:
         self._clients.add(websocket)
         try:
             await websocket.send(self._serialize_state())
-            await websocket.wait_closed()
+            async for message in websocket:
+                await self._handle_message(message, websocket)
         finally:
             self._clients.discard(websocket)
+
+    async def _handle_message(self, message: Any, websocket: Any) -> None:
+        if self._message_handler is None:
+            return
+        try:
+            data = json.loads(message) if isinstance(message, str) else message
+            result = self._message_handler(data)
+            if inspect.isawaitable(result):
+                result = await result
+            if result is not None:
+                await websocket.send(json.dumps(result, ensure_ascii=False))
+        except Exception as exc:
+            logger.warning("Navigation WebSocket message failed: %s", exc)
+            try:
+                await websocket.send(
+                    json.dumps(
+                        {
+                            "type": "navi-error",
+                            "message": str(exc),
+                        },
+                        ensure_ascii=False,
+                    )
+                )
+            except Exception:
+                self._clients.discard(websocket)
 
     async def _broadcast_latest(self) -> None:
         if not self._clients:

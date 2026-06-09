@@ -1,0 +1,13 @@
+{
+    "NaviRouteFollow": {
+        "action": "Custom",
+        "custom_action": "navi_route_follow",
+        "custom_action_param": {
+            "host": "0.0.0.0",
+            "port": 14514,
+            "tolerance": 80,
+            "angle_backend": "auto",
+            "debug": false
+        }
+    }
+}
