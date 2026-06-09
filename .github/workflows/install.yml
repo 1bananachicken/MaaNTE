@@ -231,10 +231,39 @@ jobs:
           rm -rf install-mxu/deps
           echo "Deps directory removed. Package size reduced by ~171MB."
 
+      - name: Install NSIS
+        if: matrix.arch == 'x86_64'
+        shell: pwsh
+        run: |
+          choco install nsis --version=3.12.0 -y
+
+      - name: Build NSIS installer
+        if: matrix.arch == 'x86_64'
+        shell: pwsh
+        run: |
+          $tag = "${{ needs.meta.outputs.tag }}"
+          $arch = "${{ steps.platform.outputs.tag }}"
+          $env:Path = "C:\Program Files (x86)\NSIS;$env:Path"
+          makensis `
+            -DVERSION="$tag" `
+            -DARCH="$arch" `
+            -DSOURCE_DIR="${{ github.workspace }}\install-mxu" `
+            -DICON_FILE="${{ github.workspace }}\maante.ico" `
+            -DOUTFILE="${{ github.workspace }}\MaaNTE-win-$arch-$tag-Setup.exe" `
+            tools/ci/installer.nsi
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - uses: actions/upload-artifact@v4
         with:
           name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
           path: "install-mxu"
+
+      - name: Upload NSIS installer artifact
+        if: matrix.arch == 'x86_64'
+        uses: actions/upload-artifact@v4
+        with:
+          name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-Setup
+          path: "MaaNTE-win-${{ steps.platform.outputs.tag }}-${{ needs.meta.outputs.tag }}-Setup.exe"
 
   changelog:
     name: Generate changelog
@@ -274,7 +303,17 @@ jobs:
       - name: Process and package artifacts
         run: |
           cd assets
+          # Move NSIS .exe installers to assets root for direct upload
+          for d in *Setup*; do
+            if [ -d "$d" ]; then
+              mv "$d"/*.exe . 2>/dev/null || true
+              rm -rf "$d"
+            fi
+          done
           for f in *; do
+            if [ ! -d "$f" ]; then
+              continue
+            fi
             if [[ $f == *"win"* ]]; then
               (cd "$f" && zip -r "../$f.zip" .)
             else
