@@ -49,6 +49,21 @@ def _image_to_base64(image) -> str | None:  # image: numpy.ndarray, [H,W,3], BGR
         return None
 
 
+# ---------------------------------------------------------------------------
+# 硬编码基础提示词（角色定位 + 基本规则 + 输出格式）
+# ---------------------------------------------------------------------------
+_BASE_PROMPT_PREFIX = (
+    "你是一个《异环》（Neverness to Everness / NTE）玩家，正在游戏内的「贝果」社区发帖。\n"
+    "请遵循以下要求：\n"
+    "1. 先识别截图中文字的语言，用同一种语言发帖\n"
+    "2. 正文控制在 1~2 句话，标题 5~10 个字\n"
+    "3. 贴合截图内容，不要编造\n"
+    "4. 不要写成广告或官方公告风格\n"
+)
+
+_BASE_PROMPT_SUFFIX = '返回 JSON: {"title": "标题", "body": "正文"}'
+
+
 def _call_llm(
     api_base: str,  # API 端点，如 "https://api.openai.com/v1"
     model: str,  # 模型名，如 "gpt-4o"
@@ -138,14 +153,8 @@ class BagelSpamLLMGenerate(CustomRecognition):
         api_base = params.get("api_base", "https://api.openai.com/v1")
         model = params.get("model", "gpt-4o")
         api_key = params.get("api_key", "")
-        prompt = params.get(
-            "prompt",
-            "你是一个异环（Neverness to Everness / NTE）玩家，正在论坛发帖。\n"
-            "1. 先识别截图中文字的语言\n"
-            "2. 用同一种语言发帖\n"
-            "3. 模仿异环社区玩家的说话语气和用词\n"
-            '返回 JSON: {"title": "标题", "body": "正文"}',
-        )
+        style = params.get("prompt", "随意简短，带点整活或感叹的味道")
+        prompt = _BASE_PROMPT_PREFIX + "风格要求：" + style + "\n" + _BASE_PROMPT_SUFFIX
 
         if not api_key:
             logger.error("LLM api_key is empty")

@@ -136,7 +136,7 @@
                     "name": "llm_prompt",
                     "label": "$task_bagel_spam_option_llm_prompt_label",
                     "description": "$task_bagel_spam_option_llm_prompt_desc",
-                    "default": "你是一个《异环》（Neverness to Everness / NTE）玩家，正在游戏内的「贝果」社区发帖。\n1. 先识别截图中文字的语言，用同一种语言发帖\n2. 语气随意简短，就像随手发的朋友圈，不要说太长\n3. 正文控制在 1~2 句话，标题 5~10 个字\n4. 贴合截图内容，带点整活或感叹的味道\n5. 不要写成广告或官方公告风格\n返回 JSON: {\"title\": \"标题\", \"body\": \"正文\"}",
+                    "default": "随意简短，带点整活或感叹的味道",
                     "pipeline_type": "string"
                 }
             ],
