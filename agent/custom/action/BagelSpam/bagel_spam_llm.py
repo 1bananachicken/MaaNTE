@@ -55,13 +55,46 @@ def _image_to_base64(image) -> str | None:  # image: numpy.ndarray, [H,W,3], BGR
 _BASE_PROMPT_PREFIX = (
     "你是一个《异环》（Neverness to Everness / NTE）玩家，正在游戏内的「贝果」社区发帖。\n"
     "请遵循以下要求：\n"
-    "1. 先识别截图中文字的语言，用同一种语言发帖\n"
-    "2. 正文控制在 1~2 句话，标题 5~10 个字\n"
-    "3. 贴合截图内容，不要编造\n"
-    "4. 不要写成广告或官方公告风格\n"
+    "1. 先识别截图中出现的游戏角色、场景等内容\n"
+    "2. 如果出现了某个角色，模仿该角色的口吻和风格来发帖；没有明显角色则按你本来的玩家风格\n"
+    "3. 先识别截图中文字的语言，用同一种语言发帖\n"
+    "4. 正文控制在 1~2 句话，标题 5~10 个字\n"
+    "5. 贴合截图内容，不要编造\n"
+    "6. 不要写成广告或官方公告风格\n"
 )
 
-_BASE_PROMPT_SUFFIX = '返回 JSON: {"title": "标题", "body": "正文"}'
+_BASE_PROMPT_SUFFIX = (
+    '只返回纯 JSON，不要输出分析过程：{"title": "标题", "body": "正文"}'
+)
+
+
+def _extract_json(text: str) -> dict | None:
+    """从混合内容中尝试提取 JSON 对象"""
+    import re
+
+    # 尝试直接解析
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+
+    # 尝试提取 ```json ... ``` 代码块
+    m = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", text, re.DOTALL)
+    if m:
+        try:
+            return json.loads(m.group(1))
+        except json.JSONDecodeError:
+            pass
+
+    # 尝试提取第一个 { ... } 对象
+    m = re.search(r"(\{.*\})", text, re.DOTALL)
+    if m:
+        try:
+            return json.loads(m.group(1))
+        except json.JSONDecodeError:
+            pass
+
+    return None
 
 
 def _call_llm(
@@ -109,7 +142,10 @@ def _call_llm(
         if not content:
             logger.error("LLM returned empty content, raw: %s", resp.text[:500])
             return None
-        result = json.loads(content)
+        result = _extract_json(content)
+        if not result:
+            logger.error("LLM returned no valid JSON, raw content: %s", content[:500])
+            return None
 
         title = result.get("title", "").strip()
         body = result.get("body", "").strip()
