@@ -20,10 +20,10 @@
                 "template": [
                     "BagelSpam/esc_red_greenmask.png",
                     "BagelSpam/esc.png"
-                ],              
+                ],
                 "threshold": 0.65,
-                "green_mask":true,
-                "order_by":"Score"                
+                "green_mask": true,
+                "order_by": "Score"
             }
         },
         "action": {
@@ -33,8 +33,13 @@
             }
         },
         "post_wait_freezes": {
-            "target":[893,43,359,649],
-            "time":500
+            "target": [
+                893,
+                43,
+                359,
+                649
+            ],
+            "time": 500
         },
         "post_delay": 500,
         "timeout": 1000,
@@ -45,7 +50,7 @@
     },
     "BagelSpamPressEscRetry": {
         "desc": "未识别到菜单时，按 Esc 后重试，用来逐层返回大世界",
-        "max_hit":10,
+        "max_hit": 10,
         "recognition": {
             "type": "DirectHit"
         },
@@ -83,7 +88,12 @@
             "type": "Click"
         },
         "post_wait_freezes": {
-            "target": [1026, 6, 243, 705],
+            "target": [
+                1026,
+                6,
+                243,
+                705
+            ],
             "time": 500
         },
         "post_delay": 500,
@@ -181,8 +191,8 @@
                     122
                 ],
                 "template": "BagelSpam/close_greenmask.png",
-                "green_mask":true,
-                "order_by":"Score"   
+                "green_mask": true,
+                "order_by": "Score"
             }
         },
         "action": {
@@ -192,8 +202,13 @@
             }
         },
         "post_wait_freezes": {
-            "target":[893,43,359,649],
-            "time":500
+            "target": [
+                893,
+                43,
+                359,
+                649
+            ],
+            "time": 500
         },
         "post_delay": 500,
         "timeout": 1000,
@@ -204,7 +219,7 @@
     },
     "BagelSpamPressEscUntilCamera": {
         "desc": "持续按 Esc 直到回到可见相机入口的界面",
-        "max_hit":10,
+        "max_hit": 10,
         "recognition": {
             "type": "DirectHit"
         },
@@ -215,8 +230,13 @@
             }
         },
         "post_wait_freezes": {
-            "target":[893,43,359,649],
-            "time":1000
+            "target": [
+                893,
+                43,
+                359,
+                649
+            ],
+            "time": 1000
         },
         "post_delay": 500,
         "next": [
@@ -475,8 +495,7 @@
                     "(?i)Confirm",
                     "確定"
                 ],
-                "threshold": 0.8
-            ,
+                "threshold": 0.8,
                 "roi_offset": [
                     0,
                     0,
@@ -665,8 +684,13 @@
             "type": "Click"
         },
         "post_wait_freezes": {
-            "target":[893,43,359,649],
-            "time":500
+            "target": [
+                893,
+                43,
+                359,
+                649
+            ],
+            "time": 500
         },
         "post_delay": 500,
         "pre_delay": 0,
@@ -688,8 +712,13 @@
             }
         },
         "post_wait_freezes": {
-            "target":[893,43,359,649],
-            "time":500
+            "target": [
+                893,
+                43,
+                359,
+                649
+            ],
+            "time": 500
         },
         "post_delay": 500,
         "pre_delay": 0,
