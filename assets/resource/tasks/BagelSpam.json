@@ -86,7 +86,6 @@
         "BagelSpamTakePhoto": {
             "type": "switch",
             "label": "$task_bagel_spam_option_take_photo_label",
-            "description": "$task_bagel_spam_option_take_photo_desc",
             "default_case": "Yes",
             "cases": [
                 {
