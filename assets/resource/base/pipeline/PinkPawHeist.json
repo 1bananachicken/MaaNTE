@@ -181,10 +181,7 @@
             "InCityTycoonMenu"
         ],
         "action": {
-            "type": "Click",
-            "param": {
-                "target": true
-            }
+            "type": "DoNothing"
         },
         "timeout": 5000,
         "next": []

@@ -74,6 +74,8 @@ RECOVERY_ROUTE_PROFILES = {
     },
 }
 
+FIND_XIAOZHI_RECOVERY_ATTEMPTS = 3
+
 
 def _normalize_key_list(value, default):
     """把 custom_action_param 中的单个键位或键位列表统一成字符串列表。"""
@@ -155,7 +157,6 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
                 return True
 
             self.log_round_info(f"进入都市闲趣（第 {attempt} 次）")
-            self._clear_recovery_menu_blockers()
             if not self._is_in_city_tycoon_menu():
                 self.ah.run_task(
                     "SceneAnyEnterWorld",
@@ -164,7 +165,9 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
                 self.sleep(0.5, check_reward=False, scaled=False)
                 self.ah.run_task(
                     "SceneAnyEnterCityTycoonsMenu",
-                    pipeline_override={"SceneAnyEnterCityTycoonsMenu": {"timeout": 15000}},
+                    pipeline_override={
+                        "SceneAnyEnterCityTycoonsMenu": {"timeout": 15000}
+                    },
                 )
 
             if not self.wait_until(self._is_in_city_tycoon_menu, time_out=5):
@@ -172,18 +175,16 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
                 self._clear_recovery_menu_blockers()
                 continue
 
-            result = self.ah.run_task(
-                "PinkPawHeist_CityTycoonToHethereauHobbies",
-                pipeline_override={
-                    "PinkPawHeist_CityTycoonToHethereauHobbies": {
-                        "enabled": True,
-                        "timeout": 5000,
-                    }
-                },
+            found = self.wait_until(
+                lambda: self._recognize_once(
+                    "PinkPawHeist_CityTycoonToHethereauHobbies"
+                ),
+                time_out=5,
             )
-            if not _is_hit(result):
+            if not found:
                 self.log_warning("未识别到都市闲趣入口，使用固定位置点击兜底")
-                self.ah.click(665, 308)
+            self.ah.click(665, 318)
+            self.sleep(0.5, check_reward=False, scaled=False)
 
             if self.wait_until(self._is_in_hethereau_hobbies_menu, time_out=5):
                 return True
@@ -341,13 +342,49 @@ class PinkPawHeistFindXiaoZhiAction(CustomAction):
                 path.log_round_info("成功找到小吱，开始任务")
                 return CustomAction.RunResult(success=True)
 
-            path.log_round_info("未找到小吱，尝试恢复到粉爪入口")
-            path.recover_to_heist_entrance()
-            if path._has_xiaozhi_prompt(time_out=10.0):
-                path.log_round_info("恢复后已找到小吱，开始任务")
-                return CustomAction.RunResult(success=True)
+            for attempt in range(1, FIND_XIAOZHI_RECOVERY_ATTEMPTS + 1):
+                path.log_round_info(
+                    f"未找到小吱，尝试恢复到粉爪入口（第 {attempt}/{FIND_XIAOZHI_RECOVERY_ATTEMPTS} 次）"
+                )
+                recovered = False
+                try:
+                    path.recover_to_heist_entrance()
+                    recovered = True
+                except TaskerStoppedException:
+                    raise
+                except Exception as exc:
+                    path.log_warning(f"第 {attempt} 次恢复失败：{exc}")
+                    print(
+                        f"[PinkPawHeist/Recovery] recover attempt {attempt} failed: {exc}"
+                    )
+                finally:
+                    path._release_held_keys()
+                    path.ah.release_controls()
 
-            path.log_warning("恢复后仍未找到小吱")
+                try:
+                    path.ah.run_task(
+                        "SceneAnyEnterWorld",
+                        pipeline_override={"SceneAnyEnterWorld": {"timeout": 15000}},
+                    )
+                    path.sleep(0.5, check_reward=False, scaled=False)
+                    path._clear_recovery_menu_blockers()
+                except TaskerStoppedException:
+                    raise
+                except Exception as exc:
+                    path.log_warning(f"第 {attempt} 次恢复后清理界面失败：{exc}")
+
+                if path._has_xiaozhi_prompt(time_out=10.0):
+                    path.log_round_info("恢复后已找到小吱，开始任务")
+                    return CustomAction.RunResult(success=True)
+
+                if recovered:
+                    path.log_warning(f"第 {attempt} 次恢复已执行，但仍未找到小吱")
+                else:
+                    path.log_warning(f"第 {attempt} 次恢复失败后仍未找到小吱")
+
+            path.log_warning(
+                f"连续 {FIND_XIAOZHI_RECOVERY_ATTEMPTS} 次恢复后仍未找到小吱"
+            )
             return CustomAction.RunResult(success=False)
         except TaskerStoppedException as exc:
             print(f"[PinkPawHeist/Recovery] find XiaoZhi stopped: {exc}")
