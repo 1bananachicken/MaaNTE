@@ -1944,7 +1944,7 @@ class PinkPawHeistCore3Path:
         self.send_key_down("w")
         self.sleep(0.12)
         self.send_key_down("a")
-        self.sleep(0.23)
+        self.sleep(0.13)
         self.send_key_up("a")
         self.sleep(4.03)
         self.send_key_up("w")

@@ -158,10 +158,7 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
 
             self.log_round_info(f"进入都市闲趣（第 {attempt} 次）")
             if not self._is_in_city_tycoon_menu():
-                self.ah.run_task(
-                    "SceneAnyEnterWorld",
-                    pipeline_override={"SceneAnyEnterWorld": {"timeout": 15000}},
-                )
+                self.ah.run_task("SceneAnyEnterWorld")
                 self.sleep(0.5, check_reward=False, scaled=False)
                 self.ah.run_task(
                     "SceneAnyEnterCityTycoonsMenu",
@@ -183,22 +180,19 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
             )
             if not found:
                 self.log_warning("未识别到都市闲趣入口，使用固定位置点击兜底")
-            for click_attempt in range(1, 3):
+            for click_attempt in range(1, 4):
                 self.ah.click(665, 318)
                 self.sleep(0.5, check_reward=False, scaled=False)
                 if self.wait_until(self._is_in_hethereau_hobbies_menu, time_out=3):
                     return True
-                if click_attempt == 1 and self._is_in_city_tycoon_menu():
+                if click_attempt < 3 and self._is_in_city_tycoon_menu():
                     self.log_warning("点击都市闲趣后未进入，当前界面再点一次")
                     continue
                 break
 
             self.log_warning("未确认进入都市闲趣，返回大世界后重试")
             self._clear_recovery_menu_blockers()
-            self.ah.run_task(
-                "SceneAnyEnterWorld",
-                pipeline_override={"SceneAnyEnterWorld": {"timeout": 15000}},
-            )
+            self.ah.run_task("SceneAnyEnterWorld")
             self.sleep(0.5, check_reward=False, scaled=False)
         return False
 
@@ -213,22 +207,22 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
                 lambda: self._recognize_once("PinkPawHeist_HethereauHobbiesToHeistMap"),
                 time_out=8,
             )
-            if found:
-                self.ah.click(637, 486)
-                if self.wait_until(
-                    lambda: not self._is_in_hethereau_hobbies_menu(),
-                    time_out=3,
-                ):
-                    return True
-            self.log_warning(f"都市闲趣中未找到粉爪大劫案，第 {attempt} 次")
+            if not found:
+                self.log_warning(
+                    f"都市闲趣中未识别到粉爪大劫案，第 {attempt} 次，使用固定位置点击兜底"
+                )
             if self._is_in_hethereau_hobbies_menu():
-                self.log_warning("使用粉爪大劫案卡片固定位置点击兜底")
-                self.ah.click(637, 486)
-                if self.wait_until(
-                    lambda: not self._is_in_hethereau_hobbies_menu(),
-                    time_out=3,
-                ):
-                    return True
+                for click_attempt in range(1, 4):
+                    self.ah.click(637, 486)
+                    if self.wait_until(
+                        lambda: not self._is_in_hethereau_hobbies_menu(),
+                        time_out=3,
+                    ):
+                        return True
+                    if click_attempt < 3 and self._is_in_hethereau_hobbies_menu():
+                        self.log_warning("点击粉爪大劫案后未进入地图，当前界面再点一次")
+                        continue
+                    break
             else:
                 if not self._enter_recovery_hethereau_hobbies_menu():
                     break
@@ -299,8 +293,11 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
         self._release_held_keys()
         self.ah.release_controls()
         self.ah.run_task("SceneAnyEnterWorld")
-        self.sleep(0.5, check_reward=False, scaled=False)
-        self._clear_recovery_menu_blockers()
+        if not self.wait_until(self._is_in_world_by_node, time_out=5):
+            self._clear_recovery_menu_blockers()
+            self.ah.run_task("SceneAnyEnterWorld")
+            if not self.wait_until(self._is_in_world_by_node, time_out=10):
+                raise AbortException("清理界面后仍未回到大世界，暂不执行传送恢复")
         if self._has_xiaozhi_prompt(time_out=5.0):
             self.log_round_info("清理界面后已找到小吱")
             return True
@@ -345,8 +342,8 @@ class PinkPawHeistFindXiaoZhiAction(CustomAction):
         path = PinkPawHeistEntranceRecoveryPath(context, params=params)
         try:
             path.log_round_info("开始寻找小吱")
-            path._clear_recovery_menu_blockers()
-            if path._has_xiaozhi_prompt(time_out=30.0):
+            path.ah.run_task("SceneAnyEnterWorld")
+            if path._has_xiaozhi_prompt(time_out=10.0):
                 path.log_round_info("成功找到小吱，开始任务")
                 return CustomAction.RunResult(success=True)
 
@@ -370,10 +367,7 @@ class PinkPawHeistFindXiaoZhiAction(CustomAction):
                     path.ah.release_controls()
 
                 try:
-                    path.ah.run_task(
-                        "SceneAnyEnterWorld",
-                        pipeline_override={"SceneAnyEnterWorld": {"timeout": 15000}},
-                    )
+                    path.ah.run_task("SceneAnyEnterWorld")
                     path.sleep(0.5, check_reward=False, scaled=False)
                     path._clear_recovery_menu_blockers()
                 except TaskerStoppedException:
