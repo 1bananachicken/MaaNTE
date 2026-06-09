@@ -55,7 +55,12 @@ class BagelSpamOutputText(CustomAction):
         text = pairs[idx][0] if output == "title" else pairs[idx][1]
 
         logger.debug("output %s[%d]: %s", output, idx, text)
-        context.tasker.controller.post_input_text(text).wait()
+
+        controller = context.tasker.controller
+        controller.post_press_key(0x24).wait()
+        for _ in range(50):
+            controller.post_press_key(0x2E).wait()
+        controller.post_input_text(text).wait()
 
         return CustomAction.RunResult(success=True)
 
