@@ -128,11 +128,8 @@
         "action": {
             "type": "Click"
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
         "next": [
-            "BagelSpamVerifySaved",
-            "BagelSpamSaveShot"
+            "BagelSpamVerifySaved"
         ]
     },
     "BagelSpamVerifySaved": {
