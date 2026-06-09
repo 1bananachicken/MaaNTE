@@ -12,6 +12,7 @@
                 "HethereauHobbies"
             ],
             "option": [
+                "BagelSpamTakePhoto",
                 "BagelSpamTextMode"
             ]
         }
@@ -81,6 +82,29 @@
                     }
                 }
             }
+        },
+        "BagelSpamTakePhoto": {
+            "type": "switch",
+            "label": "$task_bagel_spam_option_take_photo_label",
+            "description": "$task_bagel_spam_option_take_photo_desc",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes"
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "BagelSpamEnsureEscButton": {
+                            "next": [
+                                "BagelSpamOpenBagel"
+                            ]
+                        }
+                    }
+                }
+            ]
         },
         "BagelSpamLLMConfig": {
             "type": "input",

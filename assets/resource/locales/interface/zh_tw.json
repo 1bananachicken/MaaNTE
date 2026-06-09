@@ -123,6 +123,8 @@
     "task_bagel_spam_option_llm_api_key_desc": "你的 API Key",
     "task_bagel_spam_option_llm_prompt_label": "提示詞",
     "task_bagel_spam_option_llm_prompt_desc": "告訴 AI 要根據截圖生成什麼內容",
+    "task_bagel_spam_option_take_photo_label": "是否拍照",
+    "task_bagel_spam_option_take_photo_desc": "拍照後發布 / 跳過拍照直接發布",
     "task_sound_dodge_label": "音頻閃避",
     "task_sound_dodge_desc": "基於音頻識別的自動閃避與反擊，需要<span style='color:red'>“桌面端-前台”</span>控制器",
     "task_sound_dodge_option_enable": "啟用音頻閃避",

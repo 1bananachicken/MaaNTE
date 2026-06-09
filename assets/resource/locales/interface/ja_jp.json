@@ -123,6 +123,8 @@
     "task_bagel_spam_option_llm_api_key_desc": "あなたの API Key",
     "task_bagel_spam_option_llm_prompt_label": "プロンプト",
     "task_bagel_spam_option_llm_prompt_desc": "スクリーンショットに基づいてAIに何を生成させるか指示",
+    "task_bagel_spam_option_take_photo_label": "写真を撮る",
+    "task_bagel_spam_option_take_photo_desc": "写真を撮ってから投稿 / 写真を撮らずに直接投稿",
     "task_sound_dodge_label": "音の回避",
     "task_sound_dodge_desc": "音声識別に基づく自動回避および反撃には、<span style='color:red'>“デスクトップ端末（フォアグラウンド）”</span>コントローラーが必要です",
     "task_sound_dodge_option_enable": "音の回避を有効にする",

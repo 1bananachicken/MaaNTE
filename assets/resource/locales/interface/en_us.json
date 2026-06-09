@@ -94,6 +94,8 @@
     "task_bagel_spam_option_llm_api_key_desc": "Your API Key",
     "task_bagel_spam_option_llm_prompt_label": "Prompt",
     "task_bagel_spam_option_llm_prompt_desc": "Tell the AI what to generate based on the screenshot",
+    "task_bagel_spam_option_take_photo_label": "Take Photo",
+    "task_bagel_spam_option_take_photo_desc": "Take a photo before publishing / Skip photo and publish directly",
     "task_sound_dodge_label": "Audio evasion",
     "task_sound_dodge_desc": "Audio-based automatic evasion and counterattack, require<span style='color:red'>“Win32 - Front Desk”</span>Controller",
     "task_autofscroll_label": "Fast picking for mission: Pink Paws Heist (Hold down F to trigger)",

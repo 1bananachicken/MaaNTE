@@ -94,6 +94,8 @@
     "task_bagel_spam_option_llm_api_key_desc": "你的 API Key",
     "task_bagel_spam_option_llm_prompt_label": "提示词",
     "task_bagel_spam_option_llm_prompt_desc": "告诉 AI 要根据截图生成什么内容",
+    "task_bagel_spam_option_take_photo_label": "是否拍照",
+    "task_bagel_spam_option_take_photo_desc": "拍照后发布 / 跳过拍照直接发布",
     "task_sound_dodge_label": "音频闪避",
     "task_sound_dodge_desc": "基于音频识别的自动闪避与反击，需要<span style='color:red'>“桌面端-前台”</span>控制器",
     "task_autofscroll_label": "粉爪快速拾取 (按住F触发)",
