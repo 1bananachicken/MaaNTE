@@ -94,6 +94,7 @@ def _call_llm(
         "response_format": {"type": "json_object"},
     }
 
+    resp = None
     try:
         resp = requests.post(
             f"{api_base.rstrip('/')}/chat/completions",
@@ -105,6 +106,9 @@ def _call_llm(
         data = resp.json()
 
         content = data["choices"][0]["message"]["content"]
+        if not content:
+            logger.error("LLM returned empty content, raw: %s", resp.text[:500])
+            return None
         result = json.loads(content)
 
         title = result.get("title", "").strip()
@@ -119,7 +123,8 @@ def _call_llm(
         logger.error("LLM API request failed: %s", e)
         return None
     except (json.JSONDecodeError, KeyError, TypeError) as e:
-        logger.error("LLM API response parse failed: %s", e)
+        raw = resp.text[:500] if resp is not None else "N/A"
+        logger.error("LLM API response parse failed: %s, raw: %s", e, raw)
         return None
 
 
