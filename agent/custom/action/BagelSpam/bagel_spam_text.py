@@ -65,11 +65,6 @@ class BagelSpamOutputText(CustomAction):
         logger.debug("output %s[%d]: %s", output, idx, text)
 
         controller = context.tasker.controller
-        controller.post_key_down(0x11).wait()  # Ctrl down
-        controller.post_key_down(0x41).wait()  # A down
-        controller.post_key_up(0x41).wait()  # A up
-        controller.post_key_up(0x11).wait()  # Ctrl up
-        controller.post_press_key(0x2E).wait()  # Delete to clear
         controller.post_input_text(text).wait()
 
         return CustomAction.RunResult(success=True)

@@ -534,23 +534,98 @@
             }
         }
     },
-    "BagelSpamClickTitleInput": {
-        "desc": "点击标题输入区域",
+    "BagelSpamLLMGenerate": {
+        "desc": "AI 生成标题和正文",
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "bagel_spam_llm_generate"
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        }
+    },
+    "BagelSpamSwipeTitleSelect": {
+        "desc": "滑动选中标题文字",
         "recognition": {
             "type": "DirectHit"
         },
         "pre_delay": 500,
         "action": {
-            "type": "Click",
+            "type": "Swipe",
             "param": {
-                "target": [
-                    950,
-                    160
-                ]
+                "begin": [
+                    937,
+                    166
+                ],
+                "end": [
+                    1279,
+                    719
+                ],
+                "duration": 500
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 200,
+        "next": [
+            "BagelSpamDeleteTitle"
+        ]
+    },
+    "BagelSpamDeleteTitle": {
+        "desc": "删除选中文字",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "pre_delay": 100,
+        "post_delay": 100,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 46
+            }
+        },
+        "next": [
+            "BagelSpamSwipeTitleReverse"
+        ]
+    },
+    "BagelSpamSwipeTitleReverse": {
+        "desc": "反向滑动选中剩余文字",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "pre_delay": 100,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1201,
+                    166
+                ],
+                "end": [
+                    0,
+                    0
+                ],
+                "duration": 300
+            }
+        },
+        "post_delay": 200,
+        "next": [
+            "BagelSpamDeleteTitle2"
+        ]
+    },
+    "BagelSpamDeleteTitle2": {
+        "desc": "再次删除",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "pre_delay": 100,
+        "post_delay": 100,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 46
+            }
+        },
         "next": [
             "BagelSpamInputTitle"
         ]
@@ -569,7 +644,7 @@
         "pre_delay": 0,
         "post_delay": 0,
         "next": [
-            "BagelSpamClickTitleInput"
+            "BagelSpamSwipeTitleSelect"
         ]
     },
     "BagelSpamInputTitle": {
@@ -589,26 +664,89 @@
             }
         },
         "next": [
-            "BagelSpamClickContentInput"
+            "BagelSpamSwipeContentSelect"
         ]
     },
-    "BagelSpamClickContentInput": {
-        "desc": "点击正文输入区域",
+    "BagelSpamSwipeContentSelect": {
+        "desc": "滑动选中正文文字",
         "recognition": {
             "type": "DirectHit"
         },
         "pre_delay": 200,
         "action": {
-            "type": "Click",
+            "type": "Swipe",
             "param": {
-                "target": [
-                    1080,
-                    400
-                ]
+                "begin": [
+                    931,
+                    288
+                ],
+                "end": [
+                    1279,
+                    719
+                ],
+                "duration": 300
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 200,
+        "next": [
+            "BagelSpamDeleteContent"
+        ]
+    },
+    "BagelSpamDeleteContent": {
+        "desc": "删除选中文字",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "pre_delay": 100,
+        "post_delay": 100,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 46
+            }
+        },
+        "next": [
+            "BagelSpamSwipeContentReverse"
+        ]
+    },
+    "BagelSpamSwipeContentReverse": {
+        "desc": "反向滑动选中剩余文字",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "pre_delay": 100,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1234,
+                    594
+                ],
+                "end": [
+                    0,
+                    0
+                ],
+                "duration": 300
+            }
+        },
+        "post_delay": 200,
+        "next": [
+            "BagelSpamDeleteContent2"
+        ]
+    },
+    "BagelSpamDeleteContent2": {
+        "desc": "再次删除",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "pre_delay": 100,
+        "post_delay": 100,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 46
+            }
+        },
         "next": [
             "BagelSpamInputContent"
         ]

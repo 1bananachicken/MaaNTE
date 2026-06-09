@@ -123,6 +123,9 @@
                     ]
                 },
                 "BagelSpamLLMGenerate": {
+                    "next": [
+                        "BagelSpamSwipeTitleSelect"
+                    ],
                     "recognition": {
                         "param": {
                             "custom_recognition_param": {
