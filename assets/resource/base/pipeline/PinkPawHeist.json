@@ -159,6 +159,36 @@
             }
         }
     },
+    "PinkPawHeist_CityTycoonToHethereauHobbies": {
+        "desc": "都市大亨界面点击都市闲趣",
+        "recognition": "And",
+        "all_of": [
+            {
+                "recognition": "OCR",
+                "roi": [
+                    567,
+                    251,
+                    196,
+                    113
+                ],
+                "expected": [
+                    "都市闲趣",
+                    "都市閒趣",
+                    "(?i)Hethereau\\s*Hobbies",
+                    "シティライフ"
+                ]
+            },
+            "InCityTycoonMenu"
+        ],
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": true
+            }
+        },
+        "timeout": 5000,
+        "next": []
+    },
     "PinkPawHeist_HethereauHobbiesToHeistMap": {
         "desc": "都市闲趣界面点击粉爪大劫案并定位到地图传送点",
         "recognition": {
@@ -166,27 +196,18 @@
             "param": {
                 "roi": [
                     624,
-                    527,
+                    477,
                     152,
-                    40
+                    50
                 ],
                 "expected": [
                     "粉爪大劫案",
                     "(?i)Pink\\s*Paw\\s*Heist"
-                ],
-                "roi_offset": [
-                    0,
-                    0,
-                    35,
-                    0
                 ]
             }
         },
         "action": {
-            "type": "Click",
-            "param": {
-                "target": true
-            }
+            "type": "DoNothing"
         },
         "timeout": 5000,
         "next": []

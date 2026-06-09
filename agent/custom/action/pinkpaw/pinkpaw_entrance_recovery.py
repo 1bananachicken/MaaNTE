@@ -120,25 +120,110 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
             return False
         return self._recognize_once("InWorld", image)
 
+    def _is_in_city_tycoon_menu(self):
+        """确认当前已经打开都市大亨菜单。"""
+        image = self._screencap()
+        if image is None:
+            return False
+        return self._recognize_once("InCityTycoonMenu", image)
+
+    def _is_in_hethereau_hobbies_menu(self):
+        """确认当前已经进入都市闲趣菜单。"""
+        image = self._screencap()
+        if image is None:
+            return False
+        return self._recognize_once("InHethereauHobbiesMenu", image)
+
+    def _clear_recovery_menu_blockers(self):
+        """清理可能挡住都市大亨入口的弹窗或残留界面。"""
+        for node_name in ("SceneClickCloseButton", "SceneClickBlankToExit"):
+            self.ah.run_task(
+                node_name,
+                pipeline_override={
+                    node_name: {
+                        "enabled": True,
+                        "timeout": 1000,
+                    }
+                },
+            )
+            self.sleep(0.1, check_reward=False, scaled=False)
+
+    def _enter_recovery_hethereau_hobbies_menu(self):
+        """稳定进入都市闲趣，避免公共跳转节点停在都市大亨菜单就继续执行。"""
+        for attempt in range(1, 4):
+            if self._is_in_hethereau_hobbies_menu():
+                return True
+
+            self.log_round_info(f"进入都市闲趣（第 {attempt} 次）")
+            self._clear_recovery_menu_blockers()
+            if not self._is_in_city_tycoon_menu():
+                self.ah.run_task(
+                    "SceneAnyEnterWorld",
+                    pipeline_override={"SceneAnyEnterWorld": {"timeout": 15000}},
+                )
+                self.sleep(0.5, check_reward=False, scaled=False)
+                self.ah.run_task(
+                    "SceneAnyEnterCityTycoonsMenu",
+                    pipeline_override={"SceneAnyEnterCityTycoonsMenu": {"timeout": 15000}},
+                )
+
+            if not self.wait_until(self._is_in_city_tycoon_menu, time_out=5):
+                self.log_warning("未确认进入都市大亨菜单，清理界面后重试")
+                self._clear_recovery_menu_blockers()
+                continue
+
+            result = self.ah.run_task(
+                "PinkPawHeist_CityTycoonToHethereauHobbies",
+                pipeline_override={
+                    "PinkPawHeist_CityTycoonToHethereauHobbies": {
+                        "enabled": True,
+                        "timeout": 5000,
+                    }
+                },
+            )
+            if not _is_hit(result):
+                self.log_warning("未识别到都市闲趣入口，使用固定位置点击兜底")
+                self.ah.click(665, 308)
+
+            if self.wait_until(self._is_in_hethereau_hobbies_menu, time_out=5):
+                return True
+
+            self.log_warning("未确认进入都市闲趣，返回大世界后重试")
+            self._clear_recovery_menu_blockers()
+            self.ah.run_task(
+                "SceneAnyEnterWorld",
+                pipeline_override={"SceneAnyEnterWorld": {"timeout": 15000}},
+            )
+            self.sleep(0.5, check_reward=False, scaled=False)
+        return False
+
     def _open_recovery_heist_map_from_hobbies(self):
         """进入都市闲趣并点击粉爪大劫案，让游戏定位到粉爪传送点。"""
         self.log_round_info("打开都市闲趣并定位粉爪大劫案")
-        if not _is_hit(self.ah.run_task("SceneAnyEnterHethereauHobbiesMenu")):
+        if not self._enter_recovery_hethereau_hobbies_menu():
             raise AbortException("进入都市闲趣失败，无法恢复到小吱")
-        self.sleep(0.3, check_reward=False, scaled=False)
-        result = self.ah.run_task(
-            "PinkPawHeist_HethereauHobbiesToHeistMap",
-            pipeline_override={
-                "PinkPawHeist_HethereauHobbiesToHeistMap": {
-                    "enabled": True,
-                    "timeout": 5000,
-                }
-            },
-        )
-        if not _is_hit(result):
-            raise AbortException("都市闲趣中未找到粉爪大劫案")
-        self.sleep(1.0, check_reward=False, scaled=False)
-        return True
+        for attempt in range(1, 3):
+            self.sleep(0.3, check_reward=False, scaled=False)
+            found = self.wait_until(
+                lambda: self._recognize_once("PinkPawHeist_HethereauHobbiesToHeistMap"),
+                time_out=8,
+            )
+            if found:
+                self.ah.click(637, 486)
+                self.sleep(1.0, check_reward=False, scaled=False)
+                if not self._is_in_hethereau_hobbies_menu():
+                    return True
+            self.log_warning(f"都市闲趣中未找到粉爪大劫案，第 {attempt} 次")
+            if self._is_in_hethereau_hobbies_menu():
+                self.log_warning("使用粉爪大劫案卡片固定位置点击兜底")
+                self.ah.click(637, 486)
+                self.sleep(1.0, check_reward=False, scaled=False)
+                if not self._is_in_hethereau_hobbies_menu():
+                    return True
+            else:
+                if not self._enter_recovery_hethereau_hobbies_menu():
+                    break
+        raise AbortException("都市闲趣中未找到粉爪大劫案")
 
     def _confirm_recovery_teleport(self):
         """点击地图右下角传送按钮，并等待加载回大世界。"""
@@ -206,6 +291,7 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
         self.ah.release_controls()
         self.ah.run_task("SceneAnyEnterWorld")
         self.sleep(0.5, check_reward=False, scaled=False)
+        self._clear_recovery_menu_blockers()
         if self._has_xiaozhi_prompt(time_out=5.0):
             self.log_round_info("清理界面后已找到小吱")
             return True
@@ -250,6 +336,7 @@ class PinkPawHeistFindXiaoZhiAction(CustomAction):
         path = PinkPawHeistEntranceRecoveryPath(context, params=params)
         try:
             path.log_round_info("开始寻找小吱")
+            path._clear_recovery_menu_blockers()
             if path._has_xiaozhi_prompt(time_out=30.0):
                 path.log_round_info("成功找到小吱，开始任务")
                 return CustomAction.RunResult(success=True)
