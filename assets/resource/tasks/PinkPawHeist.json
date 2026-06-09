@@ -59,7 +59,7 @@
             "type": "select",
             "label": "地图方案",
             "description": "选择本次战斗的地图移动方案。。",
-            "default_case": "Core2",
+            "default_case": "Core3",
             "cases": [
                 {
                     "name": "Core1",
