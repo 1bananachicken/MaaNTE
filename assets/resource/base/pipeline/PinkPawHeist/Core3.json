@@ -1,0 +1,223 @@
+{
+    "PinkPawHeist_Scheme3": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "PinkPawHeist_Scheme3_Dash"
+        ]
+    },
+    "PinkPawHeist_Scheme3_Dash": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": "Custom",
+        "custom_action": "PinkPawHeistScheme3Action",
+        "custom_action_param": {
+            "avoid_method": "dash",
+            "timing_scale": 1.0,
+            "interaction_pause": 0.2,
+            "early_extract_exit1": false,
+            "early_extract_exit2": false
+        }
+    },
+    "PinkPawHeist_Scheme3_Attack": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": "Custom",
+        "custom_action": "PinkPawHeistScheme3Action",
+        "custom_action_param": {
+            "avoid_method": "attack",
+            "timing_scale": 1.0,
+            "interaction_pause": 0.2,
+            "early_extract_exit1": false,
+            "early_extract_exit2": false
+        }
+    },
+    "PinkPawHeist_Core3_CheckInteractPinkOnce": {
+        "desc": "Core3 single pink interaction prompt color check",
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    650,
+                    240,
+                    520,
+                    460
+                ],
+                "method": 4,
+                "lower": [
+                    197,
+                    71,
+                    119
+                ],
+                "upper": [
+                    221,
+                    78,
+                    133
+                ],
+                "connected": true,
+                "count": 80
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 80,
+        "next": []
+    },
+    "PinkPawHeist_Core3_CheckInteractTemplateOnce": {
+        "desc": "Core3 single interaction icon template check",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    680,
+                    250,
+                    430,
+                    430
+                ],
+                "template": [
+                    "PinkPawHeist/interactable.png",
+                    "PinkPawHeist/heist_interac_lock_pick.png"
+                ],
+                "threshold": 0.62
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 100,
+        "next": []
+    },
+    "PinkPawHeist_Core3_CheckSafeLockPromptOnce": {
+        "desc": "Core3 single safe lock-pick prompt check",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    680,
+                    250,
+                    430,
+                    430
+                ],
+                "template": "PinkPawHeist/heist_interac_lock_pick.png",
+                "threshold": 0.56
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 100,
+        "next": []
+    },
+    "PinkPawHeist_Core3_CheckLockPickActiveOnce": {
+        "desc": "Core3 single lock-pick active OCR check",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "奋力撬锁中",
+                    "撬锁中",
+                    "奋力撬",
+                    "锁中"
+                ],
+                "roi": [
+                    700,
+                    390,
+                    160,
+                    80
+                ],
+                "threshold": 0.65
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 100,
+        "next": []
+    },
+    "PinkPawHeist_Core3_CheckLockPickActiveTemplateOnce": {
+        "desc": "Core3 single lock-pick active template fallback check",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    720,
+                    260,
+                    360,
+                    260
+                ],
+                "template": "PinkPawHeist/heist_lock_pick.png",
+                "threshold": 0.40
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 100,
+        "next": []
+    },
+    "PinkPawHeist_Core3_CheckLockPickTextOnce": {
+        "desc": "Core3 single lock-pick active text check",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "奋力撬锁中",
+                    "撬锁中",
+                    "奋力撬",
+                    "锁中"
+                ],
+                "roi": [
+                    700,
+                    390,
+                    160,
+                    80
+                ],
+                "threshold": 0.65
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 120,
+        "next": []
+    },
+    "PinkPawHeist_Core3_CheckInteractOnce": {
+        "desc": "Core3 single interaction prompt check",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "F",
+                    "^撬锁$",
+                    "开门",
+                    "强制开启",
+                    "安全撤离",
+                    "撤离",
+                    "(?i)Open",
+                    "(?i)Force\\s*Open",
+                    "(?i)Retreat",
+                    "(?i)Extract"
+                ],
+                "roi": [
+                    720,
+                    300,
+                    360,
+                    260
+                ],
+                "threshold": 0.75
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 300,
+        "next": []
+    }
+}
