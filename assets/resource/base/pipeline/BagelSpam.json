@@ -627,6 +627,26 @@
             }
         },
         "next": [
+            "BagelSpamClickTitleAfterClear"
+        ]
+    },
+    "BagelSpamClickTitleAfterClear": {
+        "desc": "删除后点击标题区域，确保焦点",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "pre_delay": 100,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1069,
+                    166
+                ]
+            }
+        },
+        "post_delay": 100,
+        "next": [
             "BagelSpamInputTitle"
         ]
     },
@@ -747,6 +767,26 @@
                 "key": 46
             }
         },
+        "next": [
+            "BagelSpamClickContentAfterClear"
+        ]
+    },
+    "BagelSpamClickContentAfterClear": {
+        "desc": "删除后点击正文区域，确保焦点",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "pre_delay": 100,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1082,
+                    400
+                ]
+            }
+        },
+        "post_delay": 100,
         "next": [
             "BagelSpamInputContent"
         ]
