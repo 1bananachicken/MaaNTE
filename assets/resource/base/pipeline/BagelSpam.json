@@ -390,6 +390,7 @@
                 ]
             }
         },
+        "post_wait_freezes": 500,
         "next": [
             "BagelSpamClickLastRow2"
         ]
@@ -410,6 +411,7 @@
                 ]
             }
         },
+        "post_delay": 500,
         "next": [
             "BagelSpamClickLastRow3"
         ]
@@ -430,6 +432,7 @@
                 ]
             }
         },
+        "post_delay": 500,
         "next": [
             "BagelSpamClickLastRow4"
         ]
