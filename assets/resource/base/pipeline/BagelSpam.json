@@ -664,7 +664,10 @@
         "action": {
             "type": "Click"
         },
-        "post_wait_freezes": 500,
+        "post_wait_freezes": {
+            "target":[893,43,359,649],
+            "time":500
+        },
         "post_delay": 500,
         "pre_delay": 0,
         "rate_limit": 0,
@@ -684,7 +687,10 @@
                 "key": 27
             }
         },
-        "post_wait_freezes": 500,
+        "post_wait_freezes": {
+            "target":[893,43,359,649],
+            "time":500
+        },
         "post_delay": 500,
         "pre_delay": 0,
 
