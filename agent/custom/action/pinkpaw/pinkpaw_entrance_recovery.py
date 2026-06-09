@@ -157,6 +157,29 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
             )
             self.sleep(0.1, check_reward=False, scaled=False)
 
+    def _ensure_world_or_city_tycoon_menu(self, world_timeout=5, city_timeout=10):
+        """确认当前可操作大世界；InWorld 识别失败时尝试打开都市大亨兜底。"""
+        if self.wait_until(self._is_in_world_by_node, time_out=world_timeout):
+            return True
+        self.log_warning("未识别到大世界图标，尝试按 F5 打开都市大亨兜底确认")
+        self._clear_recovery_menu_blockers()
+        self.ah.click_key("f5")
+        self.sleep(0.5, check_reward=False, scaled=False)
+        return self.wait_until(self._is_in_city_tycoon_menu, time_out=city_timeout)
+
+    def _confirm_world_after_teleport(self):
+        """传送后确认回到可操作大世界；必要时用 F5 打开都市大亨再 Esc 返回。"""
+        if self.wait_until(self._is_in_world_by_node, time_out=30):
+            return True
+        self.log_warning("传送后未识别到大世界图标，尝试 F5 兜底确认")
+        self.ah.click_key("f5")
+        self.sleep(0.5, check_reward=False, scaled=False)
+        if not self.wait_until(self._is_in_city_tycoon_menu, time_out=10):
+            return False
+        self.send_key("esc")
+        self.sleep(1.0, check_reward=False, scaled=False)
+        return True
+
     def _enter_recovery_hethereau_hobbies_menu(self):
         """稳定进入都市闲趣，避免公共跳转节点停在都市大亨菜单就继续执行。"""
         for attempt in range(1, 4):
@@ -249,11 +272,9 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
             )
             if _is_hit(result):
                 self.sleep(1.0, check_reward=False, scaled=False)
-                ret = self.wait_until(
-                    self._is_in_world_by_node,
-                    time_out=30,
-                    raise_if_not_found=True,
-                )
+                ret = self._confirm_world_after_teleport()
+                if not ret:
+                    raise AbortException("传送后未确认回到大世界")
                 self.wait_team_ui_settle()
                 self.sleep(1.0, check_reward=False, scaled=False)
                 return ret
@@ -294,6 +315,22 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
         self.ah.run_task("SceneAnyEnterWorld")
         return True
 
+    def _leave_unexpected_heist_round_if_needed(self):
+        """如仍在粉爪局内则退出，并确认回到可操作的大世界或都市大亨菜单。"""
+        if not self._leave_unexpected_heist_round():
+            return False
+        if not self.wait_until(
+            lambda: not self._is_in_heist_round(),
+            time_out=10,
+            settle_time=1.0,
+        ):
+            raise AbortException("仍在粉爪局内，暂不执行传送恢复")
+        if not self._ensure_world_or_city_tycoon_menu(
+            world_timeout=10, city_timeout=10
+        ):
+            raise AbortException("退出粉爪局内后未确认大世界或都市大亨菜单")
+        return True
+
     def _run_heist_entrance_path_from_teleport(self):
         """从粉爪传送点跑回小吱位置。"""
         runner = "/".join(self.config.get(self.CONF_RUNNER, []))
@@ -315,21 +352,21 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
         self._release_held_keys()
         self.ah.release_controls()
         self.ah.run_task("SceneAnyEnterWorld")
-        if not self.wait_until(self._is_in_world_by_node, time_out=5):
-            self._clear_recovery_menu_blockers()
+        if (
+            not self._leave_unexpected_heist_round_if_needed()
+            and not self._ensure_world_or_city_tycoon_menu(
+                world_timeout=5, city_timeout=10
+            )
+        ):
             self.ah.run_task("SceneAnyEnterWorld")
-            if not self.wait_until(self._is_in_world_by_node, time_out=10):
-                raise AbortException("清理界面后仍未回到大世界，暂不执行传送恢复")
-        if self._leave_unexpected_heist_round():
-            if not self.wait_until(
-                lambda: not self._is_in_heist_round(),
-                time_out=10,
-                settle_time=1.0,
+            if not self._ensure_world_or_city_tycoon_menu(
+                world_timeout=10, city_timeout=10
             ):
-                raise AbortException("仍在粉爪局内，暂不执行传送恢复")
-            if not self.wait_until(self._is_in_world_by_node, time_out=10):
-                raise AbortException("退出粉爪局内后未回到大世界，暂不执行传送恢复")
-        if self._has_xiaozhi_prompt(time_out=5.0):
+                raise AbortException("仍未确认大世界或都市大亨菜单，暂不执行传送恢复")
+        self._leave_unexpected_heist_round_if_needed()
+        if not self._is_in_city_tycoon_menu() and self._has_xiaozhi_prompt(
+            time_out=5.0
+        ):
             self.log_round_info("清理界面后已找到小吱")
             return True
         self._open_recovery_heist_map_from_hobbies()
