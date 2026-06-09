@@ -165,12 +165,12 @@
         "timeout": 2000,
         "rate_limit": 0,
         "next": [
-            "BagelSpamCloseCamera",
+            "BagelSpamCloseSavedPhoto",
             "BagelSpamPressEscUntilCamera"
         ]
     },
-    "BagelSpamCloseCamera": {
-        "desc": "识别关闭按钮后按 Esc 退出相机",
+    "BagelSpamCloseSavedPhoto": {
+        "desc": "识别关闭按钮后按 Esc 退出保存照片界面",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
