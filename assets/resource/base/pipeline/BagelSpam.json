@@ -7,7 +7,7 @@
         ]
     },
     "BagelSpamEnsureEscButton": {
-        "desc": "确认当前可通过 Esc 退出当前界面",
+        "desc": "识别并点击菜单按钮",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -41,7 +41,7 @@
         ]
     },
     "BagelSpamPressEscRetry": {
-        "desc": "未识别到 Esc 标识，按 Esc 后重试",
+        "desc": "未识别到菜单时，按 Esc 后重试，用来逐层返回大世界",
         "recognition": {
             "type": "DirectHit"
         },
