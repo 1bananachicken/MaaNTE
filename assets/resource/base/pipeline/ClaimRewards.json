@@ -34,6 +34,7 @@
             }
         },
         "action": "Click",
+        "post_delay": 500,
         "next": [
             "[JumpBack]ClaimRewardsActivityPoints",
             "[JumpBack]ClaimRewardsActivityRewards",
