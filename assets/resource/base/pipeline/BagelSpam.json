@@ -611,7 +611,6 @@
             }
         },
         "next": [
-            "BagelSpamExit",
             "BagelSpamSubmitPost"
         ]
     },
