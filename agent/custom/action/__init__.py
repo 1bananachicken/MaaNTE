@@ -23,7 +23,7 @@ from .Furniture.furniture_choose_property import *
 from .auto_piano.action import *
 from .withdraw_money_choose_item import *
 from .DatasetCollection.autonomous_driving_dataset_recorder import *
-from .bagel_spam_text import *
+from .BagelSpam import *
 
 __all__ = [
     "AutoMakeCoffee",
@@ -51,4 +51,5 @@ __all__ = [
     "AutonomousDrivingDatasetRecorder",
     "BagelSpamPickIndex",
     "BagelSpamOutputText",
+    "BagelSpamLLMGenerate",
 ]

@@ -12,11 +12,33 @@
                 "HethereauHobbies"
             ],
             "option": [
-                "BagelSpamText"
+                "BagelSpamTextMode"
             ]
         }
     ],
     "option": {
+        "BagelSpamTextMode": {
+            "type": "select",
+            "label": "$task_bagel_spam_option_text_mode_label",
+            "description": "$task_bagel_spam_option_text_mode_desc",
+            "default_case": "preset",
+            "cases": [
+                {
+                    "name": "preset",
+                    "label": "$task_bagel_spam_option_text_mode_preset",
+                    "option": [
+                        "BagelSpamText"
+                    ]
+                },
+                {
+                    "name": "llm",
+                    "label": "$task_bagel_spam_option_text_mode_llm",
+                    "option": [
+                        "BagelSpamLLMConfig"
+                    ]
+                }
+            ]
+        },
         "BagelSpamText": {
             "type": "input",
             "label": "$task_bagel_spam_option_text_label",
@@ -54,6 +76,60 @@
                                 "titles": "{title}",
                                 "bodies": "{body}",
                                 "output": "body"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "BagelSpamLLMConfig": {
+            "type": "input",
+            "label": "$task_bagel_spam_option_llm_config_label",
+            "description": "$task_bagel_spam_option_llm_config_desc",
+            "inputs": [
+                {
+                    "name": "llm_api_base",
+                    "label": "$task_bagel_spam_option_llm_api_base_label",
+                    "description": "$task_bagel_spam_option_llm_api_base_desc",
+                    "default": "https://api.openai.com/v1",
+                    "pipeline_type": "string"
+                },
+                {
+                    "name": "llm_model",
+                    "label": "$task_bagel_spam_option_llm_model_label",
+                    "description": "$task_bagel_spam_option_llm_model_desc",
+                    "default": "gpt-4o",
+                    "pipeline_type": "string"
+                },
+                {
+                    "name": "llm_api_key",
+                    "label": "$task_bagel_spam_option_llm_api_key_label",
+                    "description": "$task_bagel_spam_option_llm_api_key_desc",
+                    "default": "",
+                    "pipeline_type": "string"
+                },
+                {
+                    "name": "llm_prompt",
+                    "label": "$task_bagel_spam_option_llm_prompt_label",
+                    "description": "$task_bagel_spam_option_llm_prompt_desc",
+                    "default": "你是一个《异环》（Neverness to Everness / NTE）玩家，正在游戏内的「贝果」社区发帖。\n1. 先识别截图中文字的语言，用同一种语言发帖\n2. 语气随意简短，就像随手发的朋友圈，不要说太长\n3. 正文控制在 1~2 句话，标题 5~10 个字\n4. 贴合截图内容，带点整活或感叹的味道\n5. 不要写成广告或官方公告风格\n返回 JSON: {\"title\": \"标题\", \"body\": \"正文\"}",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "BagelSpamConfirmPublish": {
+                    "next": [
+                        "BagelSpamLLMGenerate"
+                    ]
+                },
+                "BagelSpamLLMGenerate": {
+                    "recognition": {
+                        "param": {
+                            "custom_recognition_param": {
+                                "api_base": "{llm_api_base}",
+                                "model": "{llm_model}",
+                                "api_key": "{llm_api_key}",
+                                "prompt": "{llm_prompt}"
                             }
                         }
                     }

@@ -6,6 +6,10 @@ from maa.custom_action import CustomAction
 from maa.context import Context
 from utils.logger import logger
 
+# LLM 生成模式下，BagelSpamLLMGenerate 会把结果存在这两个变量里
+# 我们优先使用 LLM 生成的内容，没有才走预设随机
+from . import bagel_spam_llm as _llm_mod
+
 
 def _split(text):
     return [t.strip() for t in re.split(r"[;；]", text) if t.strip()]
@@ -20,7 +24,6 @@ class BagelSpamPickIndex(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         global _bagel_spam_cached_index
-
         _bagel_spam_cached_index = random.randint(0, 999999)
         logger.debug("cached index: %d", _bagel_spam_cached_index)
 
@@ -35,9 +38,14 @@ class BagelSpamOutputText(CustomAction):
         global _bagel_spam_cached_index
 
         params = _parse_params(argv)
-        titles_str = params.get("titles", "")
-        bodies_str = params.get("bodies", "")
         output = params.get("output", "title")
+
+        if _llm_mod._bagel_spam_llm_title and _llm_mod._bagel_spam_llm_body:
+            titles_str = _llm_mod._bagel_spam_llm_title
+            bodies_str = _llm_mod._bagel_spam_llm_body
+        else:
+            titles_str = params.get("titles", "")
+            bodies_str = params.get("bodies", "")
 
         titles = _split(titles_str)
         bodies = _split(bodies_str)
@@ -57,9 +65,11 @@ class BagelSpamOutputText(CustomAction):
         logger.debug("output %s[%d]: %s", output, idx, text)
 
         controller = context.tasker.controller
-        controller.post_press_key(0x24).wait()
-        for _ in range(50):
-            controller.post_press_key(0x2E).wait()
+        controller.post_key_down(0x11).wait()  # Ctrl down
+        controller.post_key_down(0x41).wait()  # A down
+        controller.post_key_up(0x41).wait()  # A up
+        controller.post_key_up(0x11).wait()  # Ctrl up
+        controller.post_press_key(0x2E).wait()  # Delete to clear
         controller.post_input_text(text).wait()
 
         return CustomAction.RunResult(success=True)
