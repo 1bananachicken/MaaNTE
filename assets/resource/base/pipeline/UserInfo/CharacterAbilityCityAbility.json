@@ -1,0 +1,125 @@
+{
+    "CharacterAbilityCityAbilityEntrance": {
+        "desc": "识别角色都市技能入口",
+        "next": [
+            "CharacterAbilityCityAbilityPage",
+            "[JumpBack]SceneAnyEnterCharactersMenu"
+        ]
+    },
+    "CharacterAbilityCityAbilityPage": {
+        "desc": "进入角色都市技能页面",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Character_UI/CharacterAbility.png"
+                ],
+                "roi": [
+                    25,
+                    390,
+                    40,
+                    40
+                ],
+                "threshold": 0.7,
+                "green_mask": true
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "CharacterAbilityCityAbilityFirstCharacter"
+        ]
+    },
+    "CharacterAbilityCityAbilityOCRName": {
+        "desc": "OCR角色名字",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    865,
+                    120,
+                    210,
+                    40
+                ]
+            }
+        }
+    },
+    "CharacterAbilityCityAbilityOCRSkill0": {
+        "desc": "OCR角色技能0",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    355,
+                    405,
+                    40,
+                    20
+                ]
+            }
+        }
+    },
+    "CharacterAbilityCityAbilityOCRSkill1": {
+        "desc": "OCR角色技能1",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    435,
+                    410,
+                    41,
+                    21
+                ]
+            }
+        }
+    },
+    "CharacterAbilityCityAbilityFirstCharacterClick": {
+        "desc": "点击第一个角色",
+        "action": {
+            "type": "Click",
+            "target": [
+                1205,
+                105,
+                50,
+                50
+            ]
+        }
+    },
+    "CharacterAbilityCityAbilityFirstCharacter": {
+        "desc": "切换至第一个角色",
+        "action": {
+            "type": "Swipe",
+            "begin": [
+                1230,
+                200
+            ],
+            "end": [
+                1230,
+                500
+            ],
+            "duration": 500
+        },
+        "next": [
+            "CharacterAbilityCityAbilityFirstCharacterClick"
+        ],
+        "repeat": 5
+    },
+    "CharacterAbilityCityAbilityNextCharacter": {
+        "desc": "切换下一个角色",
+        "action": {
+            "type": "Swipe",
+            "begin": [
+                1230,
+                278
+            ],
+            "end": [
+                1230,
+                200
+            ],
+            "duration": 500
+        },
+        "next": [
+            "CharacterAbilityCityAbilityFirstCharacterClick"
+        ]
+    }
+}
