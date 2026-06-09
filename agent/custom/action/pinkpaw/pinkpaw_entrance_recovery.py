@@ -183,11 +183,15 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
             )
             if not found:
                 self.log_warning("未识别到都市闲趣入口，使用固定位置点击兜底")
-            self.ah.click(665, 318)
-            self.sleep(0.5, check_reward=False, scaled=False)
-
-            if self.wait_until(self._is_in_hethereau_hobbies_menu, time_out=5):
-                return True
+            for click_attempt in range(1, 3):
+                self.ah.click(665, 318)
+                self.sleep(0.5, check_reward=False, scaled=False)
+                if self.wait_until(self._is_in_hethereau_hobbies_menu, time_out=3):
+                    return True
+                if click_attempt == 1 and self._is_in_city_tycoon_menu():
+                    self.log_warning("点击都市闲趣后未进入，当前界面再点一次")
+                    continue
+                break
 
             self.log_warning("未确认进入都市闲趣，返回大世界后重试")
             self._clear_recovery_menu_blockers()
@@ -211,15 +215,19 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
             )
             if found:
                 self.ah.click(637, 486)
-                self.sleep(1.0, check_reward=False, scaled=False)
-                if not self._is_in_hethereau_hobbies_menu():
+                if self.wait_until(
+                    lambda: not self._is_in_hethereau_hobbies_menu(),
+                    time_out=3,
+                ):
                     return True
             self.log_warning(f"都市闲趣中未找到粉爪大劫案，第 {attempt} 次")
             if self._is_in_hethereau_hobbies_menu():
                 self.log_warning("使用粉爪大劫案卡片固定位置点击兜底")
                 self.ah.click(637, 486)
-                self.sleep(1.0, check_reward=False, scaled=False)
-                if not self._is_in_hethereau_hobbies_menu():
+                if self.wait_until(
+                    lambda: not self._is_in_hethereau_hobbies_menu(),
+                    time_out=3,
+                ):
                     return True
             else:
                 if not self._enter_recovery_hethereau_hobbies_menu():
