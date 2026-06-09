@@ -408,7 +408,7 @@
         "post_wait_freezes": 500,
         "post_delay": 500,
         "next": [
-            "BagelSpamClickTitleInput"
+            "BagelSpamPickIndex"
         ]
     },
     "BagelSpamConfirmFailed": {
@@ -450,15 +450,37 @@
             "BagelSpamInputTitle"
         ]
     },
-    "BagelSpamInputTitle": {
-        "desc": "输入标题",
+    "BagelSpamPickIndex": {
+        "desc": "生成随机索引",
         "recognition": {
             "type": "DirectHit"
         },
         "action": {
-            "type": "InputText",
+            "type": "Custom",
             "param": {
-                "input_text": "关注伊波恩喵"
+                "custom_action": "bagel_spam_pick_index"
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "BagelSpamClickTitleInput"
+        ]
+    },
+    "BagelSpamInputTitle": {
+        "desc": "输出标题",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "bagel_spam_output_text",
+                "custom_action_param": {
+                    "titles": "关注伊波恩喵",
+                    "bodies": "关注伊波恩谢谢喵",
+                    "output": "title"
+                }
             }
         },
         "next": [
@@ -487,14 +509,19 @@
         ]
     },
     "BagelSpamInputContent": {
-        "desc": "输入正文",
+        "desc": "输出正文",
         "recognition": {
             "type": "DirectHit"
         },
         "action": {
-            "type": "InputText",
+            "type": "Custom",
             "param": {
-                "input_text": "关注伊波恩谢谢喵"
+                "custom_action": "bagel_spam_output_text",
+                "custom_action_param": {
+                    "titles": "关注伊波恩喵",
+                    "bodies": "关注伊波恩谢谢喵",
+                    "output": "body"
+                }
             }
         },
         "next": [

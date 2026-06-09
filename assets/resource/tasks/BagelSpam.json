@@ -12,21 +12,26 @@
                 "HethereauHobbies"
             ],
             "option": [
-                "BagelSpamCaption",
                 "BagelSpamText"
             ]
         }
     ],
     "option": {
-        "BagelSpamCaption": {
+        "BagelSpamText": {
             "type": "input",
-            "label": "$task_bagel_spam_option_caption_label",
-            "description": "$task_bagel_spam_option_caption_desc",
+            "label": "$task_bagel_spam_option_text_label",
+            "description": "$task_bagel_spam_option_text_desc",
             "inputs": [
                 {
-                    "name": "caption",
-                    "label": "$task_bagel_spam_option_caption_input_label",
+                    "name": "title",
+                    "label": "$task_bagel_spam_option_text_title_label",
                     "default": "关注伊波恩喵",
+                    "pipeline_type": "string"
+                },
+                {
+                    "name": "body",
+                    "label": "$task_bagel_spam_option_text_body_label",
+                    "default": "关注伊波恩谢谢喵",
                     "pipeline_type": "string"
                 }
             ],
@@ -34,29 +39,22 @@
                 "BagelSpamInputTitle": {
                     "action": {
                         "param": {
-                            "input_text": "{caption}"
+                            "custom_action_param": {
+                                "titles": "{title}",
+                                "bodies": "{body}",
+                                "output": "title"
+                            }
                         }
                     }
-                }
-            }
-        },
-        "BagelSpamText": {
-            "type": "input",
-            "label": "$task_bagel_spam_option_text_label",
-            "description": "$task_bagel_spam_option_text_desc",
-            "inputs": [
-                {
-                    "name": "text",
-                    "label": "$task_bagel_spam_option_text_input_label",
-                    "default": "关注伊波恩谢谢喵",
-                    "pipeline_type": "string"
-                }
-            ],
-            "pipeline_override": {
+                },
                 "BagelSpamInputContent": {
                     "action": {
                         "param": {
-                            "input_text": "{text}"
+                            "custom_action_param": {
+                                "titles": "{title}",
+                                "bodies": "{body}",
+                                "output": "body"
+                            }
                         }
                     }
                 }
