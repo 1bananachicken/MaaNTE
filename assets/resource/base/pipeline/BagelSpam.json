@@ -82,7 +82,10 @@
         "action": {
             "type": "Click"
         },
-        "post_wait_freezes": 500,
+        "post_wait_freezes": {
+            "target": [1026, 6, 243, 705],
+            "time": 500
+        },
         "post_delay": 500,
         "next": [
             "BagelSpamTakeShot"
