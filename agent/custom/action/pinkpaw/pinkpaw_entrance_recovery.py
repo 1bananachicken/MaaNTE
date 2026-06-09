@@ -136,6 +136,13 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
             return False
         return self._recognize_once("InHethereauHobbiesMenu", image)
 
+    def _is_in_heist_round(self):
+        """判断当前是否仍在粉爪局内，避免把局内 UI 误当成大世界。"""
+        image = self._screencap()
+        if image is None:
+            return False
+        return self._recognize_once("PinkPawHeist_CheckReward", image)
+
     def _clear_recovery_menu_blockers(self):
         """清理可能挡住都市大亨入口的弹窗或残留界面。"""
         for node_name in ("SceneClickCloseButton", "SceneClickBlankToExit"):
@@ -272,6 +279,21 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
         if after_sleep:
             self.sleep(after_sleep, check_reward=False, scaled=False)
 
+    def _leave_unexpected_heist_round(self):
+        """恢复入口发现仍在局内时，先退出本局，避免在局内误开大世界恢复。"""
+        if not self._is_in_heist_round():
+            return False
+        self.log_round_info("检测到仍在粉爪局内，先退出本局")
+        self._release_held_keys()
+        self.ah.release_controls()
+        for _ in range(4):
+            self.send_key("esc")
+            self.sleep(1.0, check_reward=False, scaled=False)
+        self.ah.run_task("PinkPawHeist_Once")
+        self.sleep(5.0, check_reward=False, scaled=False)
+        self.ah.run_task("SceneAnyEnterWorld")
+        return True
+
     def _run_heist_entrance_path_from_teleport(self):
         """从粉爪传送点跑回小吱位置。"""
         runner = "/".join(self.config.get(self.CONF_RUNNER, []))
@@ -298,6 +320,15 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
             self.ah.run_task("SceneAnyEnterWorld")
             if not self.wait_until(self._is_in_world_by_node, time_out=10):
                 raise AbortException("清理界面后仍未回到大世界，暂不执行传送恢复")
+        if self._leave_unexpected_heist_round():
+            if not self.wait_until(
+                lambda: not self._is_in_heist_round(),
+                time_out=10,
+                settle_time=1.0,
+            ):
+                raise AbortException("仍在粉爪局内，暂不执行传送恢复")
+            if not self.wait_until(self._is_in_world_by_node, time_out=10):
+                raise AbortException("退出粉爪局内后未回到大世界，暂不执行传送恢复")
         if self._has_xiaozhi_prompt(time_out=5.0):
             self.log_round_info("清理界面后已找到小吱")
             return True
