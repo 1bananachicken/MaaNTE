@@ -303,7 +303,7 @@
         "post_delay": 500,
         "next": [
             "BagelSpamCheckDailyPublishCount",
-            "BagelSpamClickDraftArea"
+            "BagelSpamClickPublishContent"
         ]
     },
     "BagelSpamCheckDailyPublishCount": {
@@ -330,8 +330,8 @@
             "BagelSpamCloseBagelToFinish"
         ]
     },
-    "BagelSpamClickDraftArea": {
-        "desc": "等待后点击草稿区域",
+    "BagelSpamClickPublishContent": {
+        "desc": "点击发布内容",
         "recognition": {
             "type": "DirectHit"
         },
@@ -348,28 +348,108 @@
         "post_wait_freezes": 500,
         "post_delay": 500,
         "next": [
-            "BagelSpamClickDraftTab"
+            "BagelSpamScrollToBottom"
         ]
     },
-    "BagelSpamClickDraftTab": {
-        "desc": "点击目标标签区域",
+    "BagelSpamScrollToBottom": {
+        "desc": "滚动照片列表到底部",
         "recognition": {
             "type": "DirectHit"
         },
-        "pre_delay": 500,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1250,
+                    114
+                ],
+                "end": [
+                    1251,
+                    700
+                ],
+                "duration": 400
+            }
+        },
+        "next": [
+            "BagelSpamClickLastRow1"
+        ]
+    },
+    "BagelSpamClickLastRow1": {
+        "desc": "点击最后一行第1张",
+        "recognition": {
+            "type": "DirectHit"
+        },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    148,
-                    142,
-                    116,
-                    77
+                    70,
+                    454,
+                    200,
+                    120
                 ]
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "next": [
+            "BagelSpamClickLastRow2"
+        ]
+    },
+    "BagelSpamClickLastRow2": {
+        "desc": "点击最后一行第2张",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    352,
+                    452,
+                    200,
+                    120
+                ]
+            }
+        },
+        "next": [
+            "BagelSpamClickLastRow3"
+        ]
+    },
+    "BagelSpamClickLastRow3": {
+        "desc": "点击最后一行第3张",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    653,
+                    455,
+                    200,
+                    120
+                ]
+            }
+        },
+        "next": [
+            "BagelSpamClickLastRow4"
+        ]
+    },
+    "BagelSpamClickLastRow4": {
+        "desc": "点击最后一行第4张",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    951,
+                    444,
+                    200,
+                    120
+                ]
+            }
+        },
         "next": [
             "BagelSpamConfirmPublish",
             "BagelSpamConfirmFailed"
@@ -528,6 +608,7 @@
             }
         },
         "next": [
+            "BagelSpamExit",
             "BagelSpamSubmitPost"
         ]
     },
