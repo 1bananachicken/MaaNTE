@@ -267,20 +267,32 @@ jobs:
 
       - uses: actions/download-artifact@v4
         with:
-          path: assets
+          path: downloaded-artifacts
 
       - name: Process and package artifacts
+        shell: bash
         run: |
-          cd assets
-          for f in *; do
-            if [[ $f == *"win"* ]]; then
-              (cd "$f" && zip -r "../$f.zip" .)
+          artifact_dir="$PWD/downloaded-artifacts"
+          release_dir="$PWD/release-assets"
+          mkdir -p "$release_dir"
+
+          for f in "$artifact_dir"/*; do
+            artifact_name="$(basename "$f")"
+
+            if [[ ! -d "$f" ]]; then
+              echo "Skipping non-directory artifact entry: $artifact_name"
+              continue
+            fi
+
+            if [[ $artifact_name == *"win"* ]]; then
+              echo "Processing Windows artifact: $artifact_name"
+              (cd "$f" && zip -r "$release_dir/$artifact_name.zip" .)
             else
-              echo "Processing Unix artifact: $f"
+              echo "Processing Unix artifact: $artifact_name"
 
               if [[ -f "$f/MaaPiCli" ]]; then
                 chmod +x "$f/MaaPiCli"
-                echo "Set execute permission for $f/MaaPiCli"
+                echo "Set execute permission for $artifact_name/MaaPiCli"
               fi
 
               find "$f" -type f -name "MFAUpdater*" -exec chmod +x {} \; 2>/dev/null || true
@@ -288,30 +300,29 @@ jobs:
 
               if [[ -f "$f/MaaNTE" ]]; then
                 chmod +x "$f/MaaNTE"
-                echo "Set execute permission for $f/MaaNTE"
+                echo "Set execute permission for $artifact_name/MaaNTE"
               fi
 
-              PYTHON_PATHS=(
-                "$f/python/bin/python3"
-                "$f/python/python"
-                "$f/python/bin/python"
-                "$f/python/python.exe"
-              )
-              for PYTHON_PATH in "${PYTHON_PATHS[@]}"; do
+              for PYTHON_PATH in "$f/python/bin/python3" "$f/python/python" "$f/python/bin/python" "$f/python/python.exe"; do
                 if [[ -f "$PYTHON_PATH" ]]; then
                   chmod +x "$PYTHON_PATH"
-                  echo "Set execute permission for $PYTHON_PATH"
+                  echo "Set execute permission for ${PYTHON_PATH#$artifact_dir/}"
                 fi
               done
 
-              tar -cpzf "$f.tar.gz" -C "$f" .
-              echo "Created archive with preserved permissions: $f.tar.gz"
+              tar -cpzf "$release_dir/$artifact_name.tar.gz" -C "$f" .
+              echo "Created archive with preserved permissions: $artifact_name.tar.gz"
             fi
           done
 
+          if [[ -z "$(find "$release_dir" -maxdepth 1 -type f -print -quit)" ]]; then
+            echo "No release assets were created."
+            exit 1
+          fi
+
       - uses: softprops/action-gh-release@v2.2.2
         with:
-          files: assets/*
+          files: release-assets/*
           tag_name: ${{ needs.meta.outputs.tag }}
           body_path: CHANGES.md
           draft: false
