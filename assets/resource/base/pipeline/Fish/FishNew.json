@@ -78,7 +78,7 @@
         "pre_delay": 0,
         "next": [
             "[Anchor]FishNewRestart",
-            "[JumpBack]SceneClickBlankToExit"
+            "[JumpBack]FishNewGameResult"
         ]
     },
     "FishNewGameResult": {
@@ -101,16 +101,14 @@
             "閉じる",
             "빈 곳을 터치해 닫기"
         ],
-        "action": "ClickKey",
-        "key": [
-            27 // Esc
-        ],
-        "focus": {
-            "Node.Action.Succeeded": "钓到鱼了！"
-        }
+        "action": "Custom",
+        "custom_action": "fish_catch_logger"
     },
     "FishNewTaskExit": {
         "desc": "钓鱼任务完成",
+        "recognition": "DirectHit",
+        "action": "Custom",
+        "custom_action": "fish_catch_summary",
         "focus": {
             "Node.Action.Succeeded": "钓鱼任务结束"
         }
