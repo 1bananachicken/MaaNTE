@@ -1,6 +1,5 @@
 import time
 import json
-import random
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -26,10 +25,11 @@ class AutoMakeCoffee(CustomAction):
                 params = json.loads(argv.custom_action_param)
                 make_count = params.get("count", 10)
                 check_freq = params.get("freq", 0.5)
-            except:
-                pass
-
-        KEY_F = 70
+            except json.JSONDecodeError as e:  
+                PrintT(  
+                    f"[AutoCoffee] Failed to parse custom_action_param as JSON: {e}. "  
+                    f"Raw value: {argv.custom_action_param!r}"  
+                )  
 
         click_roi = [28, 272, 65, 56]
         exit_roi = [11, 12, 38, 37]
