@@ -175,8 +175,7 @@
                     "Your fish hold is full",
                     "生け簀が一杯です",
                     "저장고가 가득 찼습니다. 일부 어획물을 판매한 뒤 다시 시도해 주세요"
-                ]
-            ,
+                ],
                 "roi_offset": [
                     0,
                     0,
@@ -363,9 +362,6 @@
         },
         "next": [
             "FishNewOnStore"
-        ],
-        "on_error": [
-            "[Anchor]FishNewRestart"
         ]
     },
     "FishNewOnStore": {
