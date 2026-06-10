@@ -1,0 +1,13 @@
+{
+    "task": [
+        {
+            "name": "SyncCharacterAbilityCityAbilityNextCharacter",
+            "label": "$task.SyncCharacterAbilityCityAbility.label",
+            "entry": "SyncCharacterAbilityCityAbilityEntrance",
+            "description": "$task.SyncCharacterAbilityCityAbility.description",
+            "group": [
+                "UserInfo"
+            ]
+        }
+    ]
+}

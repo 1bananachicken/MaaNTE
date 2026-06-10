@@ -122,7 +122,7 @@
         // group:DatasetCollection
         "resource/tasks/AutonomousDrivingDataset.json",
         // group:UserInfo
-        "resource/tasks/CharacterAbilityCityAbility.json",
+        "resource/tasks/SyncCharacterAbilityCityAbility.json",
         // preset
         "resource/tasks/preset/AFK.json",
         // "resource/tasks/preset/FullDaily.json",

@@ -1,12 +1,12 @@
 {
-    "CharacterAbilityCityAbilityEntrance": {
+    "SyncCharacterAbilityCityAbilityEntrance": {
         "desc": "识别角色都市技能入口",
         "next": [
-            "CharacterAbilityCityAbilityPage",
+            "SyncCharacterAbilityCityAbilityPage",
             "[JumpBack]SceneAnyEnterCharactersMenu"
         ]
     },
-    "CharacterAbilityCityAbilityPage": {
+    "SyncCharacterAbilityCityAbilityPage": {
         "desc": "进入角色都市技能页面",
         "recognition": {
             "type": "TemplateMatch",
@@ -28,10 +28,16 @@
             "type": "Click"
         },
         "next": [
-            "CharacterAbilityCityAbilityFirstCharacter"
+            "SyncCharacterAbilityCityAbilityFirstCharacter"
         ]
     },
-    "CharacterAbilityCityAbilityOCRName": {
+    "SyncCharacterAbilityCityAbilityMain": {
+        "desc": "角色都市技能主流程",
+        "action": {
+            "type": "Custom"
+        }
+    },
+    "SyncCharacterAbilityCityAbilityOCRName": {
         "desc": "OCR角色名字",
         "recognition": {
             "type": "OCR",
@@ -45,7 +51,7 @@
             }
         }
     },
-    "CharacterAbilityCityAbilityOCRSkill0": {
+    "SyncCharacterAbilityCityAbilityOCRSkill0": {
         "desc": "OCR角色技能0",
         "recognition": {
             "type": "OCR",
@@ -59,7 +65,7 @@
             }
         }
     },
-    "CharacterAbilityCityAbilityOCRSkill1": {
+    "SyncCharacterAbilityCityAbilityOCRSkill1": {
         "desc": "OCR角色技能1",
         "recognition": {
             "type": "OCR",
@@ -73,19 +79,7 @@
             }
         }
     },
-    "CharacterAbilityCityAbilityFirstCharacterClick": {
-        "desc": "点击第一个角色",
-        "action": {
-            "type": "Click",
-            "target": [
-                1205,
-                105,
-                50,
-                50
-            ]
-        }
-    },
-    "CharacterAbilityCityAbilityFirstCharacter": {
+    "SyncCharacterAbilityCityAbilityFirstCharacter": {
         "desc": "切换至第一个角色",
         "action": {
             "type": "Swipe",
@@ -100,11 +94,11 @@
             "duration": 500
         },
         "next": [
-            "CharacterAbilityCityAbilityFirstCharacterClick"
+            "SyncCharacterAbilityCityAbilityCharacter1Click"
         ],
         "repeat": 5
     },
-    "CharacterAbilityCityAbilityNextCharacter": {
+    "SyncCharacterAbilityCityAbilityNextCharacter": {
         "desc": "切换下一个角色",
         "action": {
             "type": "Swipe",
@@ -119,7 +113,67 @@
             "duration": 500
         },
         "next": [
-            "CharacterAbilityCityAbilityFirstCharacterClick"
+            "SyncCharacterAbilityCityAbilityCharacter1Click"
         ]
+    },
+    "SyncCharacterAbilityCityAbilityCharacter1Click": {
+        "desc": "点击第1个角色",
+        "action": {
+            "type": "Click",
+            "target": [
+                1205,
+                105,
+                50,
+                50
+            ]
+        }
+    },
+    "SyncCharacterAbilityCityAbilityCharacter2Click": {
+        "desc": "点击第2个角色",
+        "action": {
+            "type": "Click",
+            "target": [
+                1205,
+                215,
+                50,
+                50
+            ]
+        }
+    },
+    "SyncCharacterAbilityCityAbilityCharacter3Click": {
+        "desc": "点击第3个角色",
+        "action": {
+            "type": "Click",
+            "target": [
+                1205,
+                320,
+                50,
+                50
+            ]
+        }
+    },
+    "SyncCharacterAbilityCityAbilityCharacter4Click": {
+        "desc": "点击第4个角色",
+        "action": {
+            "type": "Click",
+            "target": [
+                1205,
+                425,
+                50,
+                50
+            ]
+        }
+    },
+    "SyncCharacterAbilityCityAbilityCharacter5Click": {
+        "desc": "点击第5个角色",
+        "action": {
+            "type": "Click",
+            "target": [
+                1205,
+                530,
+                50,
+                50
+            ]
+        }
     }
 }
