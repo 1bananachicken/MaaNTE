@@ -1,0 +1,52 @@
+{
+    "AutoMakeCoffeeLiteEntrance": {
+        "desc": "平民版做咖啡入口",
+        "next": [
+            "MakeCoffeeLiteWaitStart",
+            "[JumpBack]MakeCoffeeEnterShop",
+            "[JumpBack]MakeCoffeeEnterShopTemplate"
+        ]
+    },
+    "MakeCoffeeLiteWaitStart": {
+        "desc": "等待开始营业按钮出现",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1057,
+                    648,
+                    178,
+                    44
+                ],
+                "expected": [
+                    "开始营业",
+                    "開始營業",
+                    "(?i)Open\\s*Shop",
+                    "営業開始",
+                    "영업 개시"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "next": [
+            "MakeCoffeeLiteRun"
+        ]
+    },
+    "MakeCoffeeLiteRun": {
+        "desc": "执行平民版做咖啡逻辑",
+        "action": "Custom",
+        "custom_action": "auto_make_coffee_lite",
+        "custom_action_param": {
+            "count": 1,
+            "freq": 2,
+            "timeout": 5
+        },
+        "on_error": [
+            "MakeCoffeeLiteErrorScreencap"
+        ]
+    },
+    "MakeCoffeeLiteErrorScreencap": {
+        "desc": "做咖啡失败时截图",
+        "action": "Screencap"
+    }
+}
