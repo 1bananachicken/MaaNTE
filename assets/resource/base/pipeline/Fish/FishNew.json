@@ -9,7 +9,6 @@
     },
     "FishNewStart": {
         "desc": "钓鱼功能主流程",
-        "anchor": "FishNewRestart",
         "recognition": {
             "type": "And",
             "param": {
@@ -46,6 +45,9 @@
             "FishNewFishFull",
             "FishNewCast",
             "[JumpBack]FishNewFishHooked"
+        ],
+        "on_error": [
+            "[Anchor]FishNewRestart"
         ]
     },
     "FishNewFishHooked": {
@@ -288,7 +290,7 @@
         },
         "action": "ClickKey",
         "key": [
-            27
+            27 //ESC
         ],
         "focus": {
             "Node.Action.Succeeded": "未开启自动买鱼饵，尝试前往卖鱼"
@@ -361,6 +363,9 @@
         },
         "next": [
             "FishNewOnStore"
+        ],
+        "on_error": [
+            "[Anchor]FishNewRestart"
         ]
     },
     "FishNewOnStore": {
@@ -383,6 +388,9 @@
         "next": [
             "FishNewStoreChooseGeneralBait"
             // "[JumpBack]FishNewStoreScrollMouse"
+        ],
+        "on_error": [
+            "[Anchor]FishNewRestart"
         ]
     },
     "FishNewUseBait": {
@@ -582,6 +590,9 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewExitStore"
+        ],
+        "on_error": [
+            "[Anchor]FishNewRestart"
         ]
     },
     "FishNewExitStore": {
@@ -666,7 +677,7 @@
         ],
         "action": "ClickKey",
         "key": [
-            81
+            81 // Q
         ],
         "post_wait_freezes": 200,
         "next": [
@@ -907,6 +918,9 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterExit"
+        ],
+        "on_error": [
+            "[Anchor]FishNewRestart"
         ]
     },
     "FishNewSellFishNoFish": {
@@ -930,6 +944,9 @@
         },
         "next": [
             "FishNewTaskExit"
+        ],
+        "on_error": [
+            "[Anchor]FishNewRestart"
         ]
     },
     "FishNewFishingMasterExit": {
