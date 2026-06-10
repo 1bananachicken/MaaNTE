@@ -1,7 +1,7 @@
 {
     "FishNewEntrance": {
         "desc": "钓鱼(新)功能入口",
-        "anchor": "FishNewRestart1",
+        "anchor": "FishNewErrorRestart",
         "next": [
             "FishNewStart",
             "[JumpBack]FishSceneAnyEnterFishGame"
@@ -9,7 +9,7 @@
     },
     "FishNewStart": {
         "desc": "钓鱼功能主流程",
-        "anchor": "FishNewRestart2",
+        "anchor": "FishNewRestart",
         "recognition": {
             "type": "And",
             "param": {
@@ -48,7 +48,7 @@
             "FishNewFishHooked"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart1"
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishHooked": {
@@ -80,11 +80,11 @@
         },
         "pre_delay": 0,
         "next": [
-            "[Anchor]FishNewRestart2",
+            "[Anchor]FishNewRestart",
             "[JumpBack]SceneClickBlankToExit"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart1"
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewGameResult": {
@@ -390,7 +390,7 @@
             // "[JumpBack]FishNewStoreScrollMouse"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart1"
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewUseBait": {
@@ -422,7 +422,7 @@
         },
         "action": "Click",
         "next": [
-            "[Anchor]FishNewRestart2"
+            "[Anchor]FishNewRestart"
         ]
     },
     "FishNewStoreChooseGeneralBait": {
@@ -592,7 +592,7 @@
             "FishNewExitStore"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart1"
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewExitStore": {
@@ -614,7 +614,10 @@
             }
         },
         "next": [
-            "[Anchor]FishNewRestart2"
+            "[Anchor]FishNewRestart"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewSellFishEntrance": {
@@ -756,7 +759,7 @@
             "FishNewFishingMasterPage1Sell2"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart1"
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage1Sell2": {
@@ -802,7 +805,7 @@
             "FishNewFishingMasterPage1Sell3"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart1"
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage1Sell3": {
@@ -848,7 +851,7 @@
             "FishNewFishingMasterSwitchToPage2"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart1"
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterSwitchToPage2": {
@@ -929,7 +932,7 @@
             "FishNewFishingMasterExit"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart1"
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewSellFishNoFish": {
@@ -955,7 +958,7 @@
             "FishNewTaskExit"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart1"
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterExit": {
@@ -975,7 +978,7 @@
             27 // Esc
         ],
         "next": [
-            "[Anchor]FishNewRestart2"
+            "[Anchor]FishNewRestart"
         ]
     }
 }
