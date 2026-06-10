@@ -73,7 +73,7 @@
     "task_make_coffee_label": "自動做咖啡",
     "task_make_coffee_desc": "在選擇關卡頁面開始任務，需要帶上娜娜莉並將都市技能點到3級",
     "task_make_coffee_lite_label": "自動做咖啡（平民版）",
-    "task_make_coffee_lite_desc": "在選擇關卡頁面開始任務，無需特殊角色。",
+    "task_make_coffee_lite_desc": "在選擇關卡頁面開始任務，無需特殊角色",
     "task_make_coffee_option_loop_time": "製作次數",
     "task_make_coffee_lite_option_loop_time": "製作次數",
     "task_make_coffee_lite_option_timeout": "製作超時退出時間(秒)",

@@ -30,7 +30,7 @@ class AutoMakeCoffeeLite(CustomAction):
                 check_freq = params.get("freq", 0.5)
                 timeout = params.get("timeout", 5)
             except json.JSONDecodeError as e:  
-                PrintT(  
+                PrintT(context,  
                     f"[AutoCoffeeLite] Failed to parse custom_action_param as JSON: {e}. "  
                     f"Raw value: {argv.custom_action_param!r}"  
                 )  

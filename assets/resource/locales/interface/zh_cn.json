@@ -51,7 +51,7 @@
     "task_realtime_label": "实时辅助",
     "task_realtime_desc": "实时辅助小工具",
     "task_make_coffee_label": "自动做咖啡",
-    "task_make_coffee_desc": "在选择关卡页面开始任务，需要带上娜娜莉并将都市技能点到3级。",
+    "task_make_coffee_desc": "在选择关卡页面开始任务，需要带上娜娜莉并将都市技能点到3级",
     "task_make_coffee_lite_label": "自动做咖啡(平民版)",
     "task_make_coffee_lite_desc": "在选择关卡页面开始任务，无需特殊角色",
     "task_make_coffee_option_loop_time": "制作次数",

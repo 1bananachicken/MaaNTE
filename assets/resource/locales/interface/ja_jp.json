@@ -71,7 +71,7 @@
     "task_realtime_option_teleport_phone": "ReroRero電話ボックス",
     "task_realtime_option_teleport_phone_desc": "ReroRero電話ボックスのテレポートポイントを検出する",
     "task_make_coffee_label": "自動でコーヒーを作ります",
-    "task_make_coffee_desc": "ステージ選択画面でタスクを開始してください。ナナリーを編成し、都市スキルをレベル3まで上げる必要があります。",
+    "task_make_coffee_desc": "ステージ選択画面でタスクを開始してください。ナナリーを編成し、都市スキルをレベル3まで上げる必要があります",
     "task_make_coffee_lite_label": "自動でコーヒーを作ります（簡易版）",
     "task_make_coffee_lite_desc": "ステージ選択画面でタスクを開始します。特別なキャラクターは不要です",
     "task_make_coffee_option_loop_time": "製作回数",

@@ -26,7 +26,7 @@ class AutoMakeCoffee(CustomAction):
                 make_count = params.get("count", 10)
                 check_freq = params.get("freq", 0.5)
             except json.JSONDecodeError as e:  
-                PrintT(  
+                PrintT(context,  
                     f"[AutoCoffee] Failed to parse custom_action_param as JSON: {e}. "  
                     f"Raw value: {argv.custom_action_param!r}"  
                 )  
