@@ -2,11 +2,21 @@
     "SyncCharacterAbilityCityAbilityEntrance": {
         "desc": "识别角色都市技能入口",
         "next": [
-            "SyncCharacterAbilityCityAbilityPage",
+            "SyncCharacterAbilityCityAbilityFirstCharacter",
             "[JumpBack]SceneAnyEnterCharactersMenu"
         ]
     },
-    "SyncCharacterAbilityCityAbilityPage": {
+    "SyncCharacterAbilityCityAbilityMain": {
+        "desc": "角色都市技能主流程",
+        "anchor": {
+            "CityAbilityAfterClick": ""
+        },
+        "action": {
+            "type": "Custom",
+            "custom_action": "SyncCharacterAbilityCityAbilityMainAction"
+        }
+    },
+    "SyncCharacterAbilityCityAbilityOpenAbilityPage": {
         "desc": "进入角色都市技能页面",
         "recognition": {
             "type": "TemplateMatch",
@@ -20,21 +30,34 @@
                     40,
                     40
                 ],
-                "threshold": 0.7,
+                "threshold": 0.8,
                 "green_mask": true
             }
         },
         "action": {
             "type": "Click"
-        },
-        "next": [
-            "SyncCharacterAbilityCityAbilityFirstCharacter"
-        ]
+        }
     },
-    "SyncCharacterAbilityCityAbilityMain": {
-        "desc": "角色都市技能主流程",
+    "SyncCharacterAbilityCityAbilityOpenInfoPage": {
+        "desc": "进入角色信息页面",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Character_UI/CharacterInfo.png"
+                ],
+                "roi": [
+                    25,
+                    150,
+                    40,
+                    40
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        },
         "action": {
-            "type": "Custom"
+            "type": "Click"
         }
     },
     "SyncCharacterAbilityCityAbilityOCRName": {
@@ -81,6 +104,9 @@
     },
     "SyncCharacterAbilityCityAbilityFirstCharacter": {
         "desc": "切换至第一个角色",
+        "anchor": {
+            "CityAbilityAfterClick": "SyncCharacterAbilityCityAbilityMain"
+        },
         "action": {
             "type": "Swipe",
             "begin": [
@@ -126,7 +152,10 @@
                 50,
                 50
             ]
-        }
+        },
+        "next": [
+            "[Anchor]CityAbilityAfterClick"
+        ]
     },
     "SyncCharacterAbilityCityAbilityCharacter2Click": {
         "desc": "点击第2个角色",
