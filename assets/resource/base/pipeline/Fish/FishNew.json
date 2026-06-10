@@ -1,7 +1,7 @@
 {
     "FishNewEntrance": {
         "desc": "钓鱼(新)功能入口",
-        "anchor": "FishNewRestart",
+        "anchor": "FishNewRestart1",
         "next": [
             "FishNewStart",
             "[JumpBack]FishSceneAnyEnterFishGame"
@@ -9,6 +9,7 @@
     },
     "FishNewStart": {
         "desc": "钓鱼功能主流程",
+        "anchor": "FishNewRestart2",
         "recognition": {
             "type": "And",
             "param": {
@@ -43,11 +44,11 @@
         "next": [
             "FishNewBaitLack",
             "FishNewFishFull",
-            "FishNewCast",
-            "[JumpBack]FishNewFishHooked"
+            //"FishNewCast",
+            "FishNewFishHooked"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart"
+            "[Anchor]FishNewRestart1"
         ]
     },
     "FishNewFishHooked": {
@@ -79,8 +80,11 @@
         },
         "pre_delay": 0,
         "next": [
-            "[Anchor]FishNewRestart",
+            "[Anchor]FishNewRestart2",
             "[JumpBack]SceneClickBlankToExit"
+        ],
+        "on_error": [
+            "[Anchor]FishNewRestart1"
         ]
     },
     "FishNewGameResult": {
@@ -386,7 +390,7 @@
             // "[JumpBack]FishNewStoreScrollMouse"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart"
+            "[Anchor]FishNewRestart1"
         ]
     },
     "FishNewUseBait": {
@@ -418,7 +422,7 @@
         },
         "action": "Click",
         "next": [
-            "[Anchor]FishNewRestart"
+            "[Anchor]FishNewRestart2"
         ]
     },
     "FishNewStoreChooseGeneralBait": {
@@ -588,7 +592,7 @@
             "FishNewExitStore"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart"
+            "[Anchor]FishNewRestart1"
         ]
     },
     "FishNewExitStore": {
@@ -610,7 +614,7 @@
             }
         },
         "next": [
-            "[Anchor]FishNewRestart"
+            "[Anchor]FishNewRestart2"
         ]
     },
     "FishNewSellFishEntrance": {
@@ -916,7 +920,7 @@
             "FishNewFishingMasterExit"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart"
+            "[Anchor]FishNewRestart1"
         ]
     },
     "FishNewSellFishNoFish": {
@@ -942,7 +946,7 @@
             "FishNewTaskExit"
         ],
         "on_error": [
-            "[Anchor]FishNewRestart"
+            "[Anchor]FishNewRestart1"
         ]
     },
     "FishNewFishingMasterExit": {
@@ -962,7 +966,7 @@
             27 // Esc
         ],
         "next": [
-            "[Anchor]FishNewRestart"
+            "[Anchor]FishNewRestart2"
         ]
     }
 }
