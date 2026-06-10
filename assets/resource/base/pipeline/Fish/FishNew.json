@@ -754,6 +754,9 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell2"
+        ],
+        "on_error": [
+            "[Anchor]FishNewRestart1"
         ]
     },
     "FishNewFishingMasterPage1Sell2": {
@@ -797,6 +800,9 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell3"
+        ],
+        "on_error": [
+            "[Anchor]FishNewRestart1"
         ]
     },
     "FishNewFishingMasterPage1Sell3": {
@@ -840,6 +846,9 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterSwitchToPage2"
+        ],
+        "on_error": [
+            "[Anchor]FishNewRestart1"
         ]
     },
     "FishNewFishingMasterSwitchToPage2": {
