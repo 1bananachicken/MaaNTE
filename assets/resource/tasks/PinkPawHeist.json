@@ -193,7 +193,7 @@
                 },
                 {
                     "name": "Attack",
-                    "label": "1战斗 2浔 3薄荷 4任意",
+                    "label": "1翳 2浔 3薄荷 4任意",
                     "pipeline_override": {
                         "PinkPawHeist_Scheme3": {
                             "next": [
