@@ -44,7 +44,7 @@
         "next": [
             "FishNewBaitLack",
             "FishNewFishFull",
-            //"FishNewCast",
+            "FishNewCast",
             "FishNewFishHooked"
         ],
         "on_error": [
