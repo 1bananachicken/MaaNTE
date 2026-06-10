@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 
 from ..Common.logger import get_logger
+from ..Common.utils import match_template_in_region
 from .resources import resource_base_path
 
 logger = get_logger(__name__)
@@ -23,6 +24,7 @@ class MapLocationResult:
 class MapLocator:
     MAP_SIZE = (11264, 11264)  # 大地图模板尺寸
     MINI_MAP_ROI = (28, 15, 150, 150)  # 小地图ROI
+    BUTTON_ROI = (1163, 11, 40, 40)
     MAP_CROP_SIZES = (
         268,
         530,
@@ -55,6 +57,17 @@ class MapLocator:
 
     def __init__(self, debug: bool = False):
         self.big_map_path = resource_base_path() / "image/map/bigworldmapSecond.png"
+        self.sceen_button_path = (
+            resource_base_path() / "image/Common/Button/InWorld/Characters.png"
+        )
+        self.sceen_button_with_red_dot_path = (
+            resource_base_path()
+            / "image/Common/Button/InWorld/CharactersWithRedDot.png"
+        )
+        self.button_template = cv2.imread(str(self.sceen_button_path), cv2.IMREAD_COLOR)
+        self.button_with_red_dot_template = cv2.imread(
+            str(self.sceen_button_with_red_dot_path), cv2.IMREAD_COLOR
+        )
         self.debug = debug
         self.last_center: tuple[int, int] | None = None
         self.smoothed_center: tuple[float, float] | None = None
@@ -134,6 +147,22 @@ class MapLocator:
                 f"NCC map crop size switched: {previous_size} -> {self.map_crop_size}"
             )
 
+    def last_location_result(self, mode: str, score: float = 0.0) -> MapLocationResult:
+        point = None
+        if self.smoothed_center is not None:
+            point = tuple(int(round(value)) for value in self.smoothed_center)
+        elif self.last_center is not None:
+            point = self.last_center
+
+        return MapLocationResult(
+            found=point is not None,
+            point=point,
+            raw_point=self.last_center,
+            score=score,
+            mode=mode,
+            polygon=None,
+        )
+
     def locate(self, frame: np.ndarray) -> MapLocationResult:
         x, y, w, h = self.MINI_MAP_ROI
         if frame is None or y + h > frame.shape[0] or x + w > frame.shape[1]:
@@ -161,6 +190,32 @@ class MapLocator:
 
         # 5. 大地图灰度 = 小地图灰度 - 3，在这里做严格对齐
         template = cv2.subtract(mini_gray, 3)
+
+        # 检查是否在大世界界面
+        button_found, _, _, _ = match_template_in_region(
+            frame,
+            self.BUTTON_ROI,
+            self.button_template,
+            min_similarity=0.6,
+            green_mask=True,
+        )
+
+        button_with_red_dot_found, _, _, _ = match_template_in_region(
+            frame,
+            self.BUTTON_ROI,
+            self.button_with_red_dot_template,
+            min_similarity=0.6,
+            green_mask=True,
+        )
+
+        if not (button_found or button_with_red_dot_found):
+            result = self.last_location_result(
+                "not_in_world",
+                1.0 if self.last_center is not None else 0.0,
+            )
+            if self.debug:
+                self.show_debug(template, result)
+            return result
 
         # 多尺度匹配
         matches = [
