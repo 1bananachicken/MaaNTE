@@ -717,6 +717,9 @@
         ],
         "next": [
             "FishNewFishingMasterPage1Sell1"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage1Sell1": {
@@ -875,6 +878,9 @@
         "next": [
             "FishNewFishingMasterPage2Submit",
             "FishNewSellFishNoFish"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage2Submit": {
