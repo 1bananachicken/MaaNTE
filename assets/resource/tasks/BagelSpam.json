@@ -13,7 +13,8 @@
             ],
             "option": [
                 "BagelSpamTakePhoto",
-                "BagelSpamTextMode"
+                "BagelSpamTextMode",
+                "BagelSpamPublishCount"
             ]
         }
     ],
@@ -159,6 +160,24 @@
                             }
                         }
                     }
+                }
+            }
+        },
+        "BagelSpamPublishCount": {
+            "type": "input",
+            "label": "$task_bagel_spam_option_publish_count_label",
+            "description": "$task_bagel_spam_option_publish_count_desc",
+            "inputs": [
+                {
+                    "name": "count",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "BagelSpamClickPublishContent": {
+                    "max_hit": "{count}"
                 }
             }
         }

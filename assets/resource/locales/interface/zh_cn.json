@@ -95,6 +95,8 @@
     "task_bagel_spam_option_llm_prompt_label": "风格描述",
     "task_bagel_spam_option_llm_prompt_desc": "描述你想要的发帖风格，如：随意简短、带点整活味道、用网络流行语等",
     "task_bagel_spam_option_take_photo_label": "发布前先拍个照",
+    "task_bagel_spam_option_publish_count_label": "发布次数",
+    "task_bagel_spam_option_publish_count_desc": "设置要发布的次数",
     "task_sound_dodge_label": "音频闪避",
     "task_sound_dodge_desc": "基于音频识别的自动闪避与反击，需要<span style='color:red'>“桌面端-前台”</span>控制器",
     "task_autofscroll_label": "粉爪快速拾取 (按住F触发)",

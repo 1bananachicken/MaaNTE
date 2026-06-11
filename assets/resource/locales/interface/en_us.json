@@ -95,6 +95,8 @@
     "task_bagel_spam_option_llm_prompt_label": "Style Description",
     "task_bagel_spam_option_llm_prompt_desc": "Describe the desired posting style, e.g.: casual, humorous, use internet slang, etc.",
     "task_bagel_spam_option_take_photo_label": "Take a photo first",
+    "task_bagel_spam_option_publish_count_label": "Publish Count",
+    "task_bagel_spam_option_publish_count_desc": "Set the number of times to publish",
     "task_sound_dodge_label": "Audio evasion",
     "task_sound_dodge_desc": "Audio-based automatic evasion and counterattack, require<span style='color:red'>“Win32 - Front Desk”</span>Controller",
     "task_autofscroll_label": "Fast picking for mission: Pink Paws Heist (Hold down F to trigger)",

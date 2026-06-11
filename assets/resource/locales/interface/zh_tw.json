@@ -124,6 +124,8 @@
     "task_bagel_spam_option_llm_prompt_label": "風格描述",
     "task_bagel_spam_option_llm_prompt_desc": "描述你想要的發帖風格，如：隨意簡短、帶點整活味道、用網路流行語等",
     "task_bagel_spam_option_take_photo_label": "發布前先拍個照",
+    "task_bagel_spam_option_publish_count_label": "發布次數",
+    "task_bagel_spam_option_publish_count_desc": "設定要發布的次數",
     "task_sound_dodge_label": "音頻閃避",
     "task_sound_dodge_desc": "基於音頻識別的自動閃避與反擊，需要<span style='color:red'>“桌面端-前台”</span>控制器",
     "task_sound_dodge_option_enable": "啟用音頻閃避",
