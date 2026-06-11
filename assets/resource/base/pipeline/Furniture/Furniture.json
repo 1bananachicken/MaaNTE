@@ -23,7 +23,7 @@
             "不動産",
             "부동산"
         ],
-        "pre_delay": 500,
+        "pre_wait_freezes": 200,
         "action": "Click",
         "next": [
             "FurnitureChooseApartments"
