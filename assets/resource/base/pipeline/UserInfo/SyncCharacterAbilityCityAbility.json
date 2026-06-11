@@ -36,7 +36,8 @@
         },
         "action": {
             "type": "Click"
-        }
+        },
+        "post_delay": 1000
     },
     "SyncCharacterAbilityCityAbilityOpenInfoPage": {
         "desc": "进入角色信息页面",
@@ -70,12 +71,57 @@
                     120,
                     210,
                     40
+                ],
+                "replace": [
+                    [
+                        "[一二三—#-]",
+                        ""
+                    ],
+                    [
+                        "小(咬|岐).*",
+                        "小吱"
+                    ],
+                    [
+                        "^[黯霸]$",
+                        "翳"
+                    ],
+                    [
+                        "^[海涛]$",
+                        "浔"
+                    ]
                 ]
+            }
+        }
+    },
+    "SyncCharacterAbilityCityAbilityMatchCharacter": {
+        "desc": "TemplateMatch识别角色（OCR失败时兜底）",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Character_UI/Character_Pic/Chiz.png",
+                    "Character_UI/Character_Pic/Hotori.png",
+                    "Character_UI/Character_Pic/Skia.png",
+                    "Character_UI/Character_Pic/Zero.png"
+                ],
+                "roi": [
+                    390,
+                    80,
+                    200,
+                    210
+                ],
+                "threshold": 0.8,
+                "green_mask": true
             }
         }
     },
     "SyncCharacterAbilityCityAbilityOCRSkill0": {
         "desc": "OCR角色技能0",
+        "pre_wait_freezes": {
+            "time": 200,
+            "timeout": 1000,
+            "rate_limit": 200
+        },
         "recognition": {
             "type": "OCR",
             "param": {
@@ -90,6 +136,11 @@
     },
     "SyncCharacterAbilityCityAbilityOCRSkill1": {
         "desc": "OCR角色技能1",
+        "pre_wait_freezes": {
+            "time": 200,
+            "timeout": 1000,
+            "rate_limit": 200
+        },
         "recognition": {
             "type": "OCR",
             "param": {
@@ -106,6 +157,22 @@
         "desc": "切换至第一个角色",
         "anchor": {
             "CityAbilityAfterClick": "SyncCharacterAbilityCityAbilityMain"
+        },
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Character_UI/CharacterIcon.png"
+                ],
+                "roi": [
+                    20,
+                    20,
+                    40,
+                    40
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
         },
         "action": {
             "type": "Swipe",

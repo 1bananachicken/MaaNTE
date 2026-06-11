@@ -7,7 +7,35 @@
             "description": "$task.SyncCharacterAbilityCityAbility.description",
             "group": [
                 "UserInfo"
+            ],
+            "option": [
+                "SyncCharacterAbilityCityAbilityFreshRecord"
             ]
         }
-    ]
+    ],
+    "option": {
+        "SyncCharacterAbilityCityAbilityFreshRecord": {
+            "type": "switch",
+            "label": "$task.SyncCharacterAbilityCityAbility.option.fresh_record",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "SyncCharacterAbilityCityAbilityMain": {
+                            "custom_action_param": {
+                                "fresh_record": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {}
+                }
+            ]
+        }
+    }
 }
