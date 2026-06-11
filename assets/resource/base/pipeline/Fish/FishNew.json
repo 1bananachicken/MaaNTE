@@ -551,6 +551,9 @@
         "next": [
             "FishNewConfirmBuyBait",
             "FishNewSellFishEntrance"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewConfirmBuyBait": {
