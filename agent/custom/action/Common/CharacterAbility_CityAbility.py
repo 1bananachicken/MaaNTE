@@ -280,6 +280,13 @@ class CharacterCityAbilityManager:
             self._load()
             logger.info("已重新加载角色技能配置")
 
+    def clear_all(self) -> None:
+        """清空所有角色技能记录。"""
+        with self._lock:
+            self._data.clear()
+            self._save()
+            logger.info("已清空全部角色技能记录")
+
 
 # ======================================================================
 # 模块级单例 + 便捷函数
@@ -356,3 +363,8 @@ def list_characters() -> list[str]:
 def reload() -> None:
     """从 JSON 文件重新加载数据（模块级快捷函数）。"""
     get_manager().reload()
+
+
+def clear_all() -> None:
+    """清空所有角色技能记录（模块级快捷函数）。"""
+    get_manager().clear_all()
