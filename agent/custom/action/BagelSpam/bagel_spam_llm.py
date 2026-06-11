@@ -145,7 +145,7 @@ def _call_llm(
             f"{api_base.rstrip('/')}/chat/completions",
             headers=headers,
             json=payload,
-            timeout=60,
+            timeout=300,
         )
         resp.raise_for_status()
         data = resp.json()
@@ -165,7 +165,7 @@ def _call_llm(
         return {"title": title, "body": body}
 
     except requests.exceptions.Timeout:
-        logger.error("LLM API timeout (60s)")
+        logger.error("LLM API timeout (300s)")
         return None
     except requests.exceptions.RequestException as e:
         logger.error("LLM API request failed: %s", e)
