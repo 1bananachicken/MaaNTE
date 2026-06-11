@@ -893,6 +893,9 @@
         "post_wait_freezes": 1000,
         "next": [
             "FishNewConfirmSellFish"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewConfirmSellFish": {
@@ -979,6 +982,9 @@
         ],
         "next": [
             "[Anchor]FishNewRestart"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     }
 }
