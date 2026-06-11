@@ -187,23 +187,49 @@
             "duration": 500
         },
         "next": [
-            "SyncCharacterAbilityCityAbilityCharacter1Click"
+            "SyncCharacterAbilityCityAbilityCharacter1Move"
         ],
         "repeat": 5
     },
     "SyncCharacterAbilityCityAbilityNextCharacter": {
-        "desc": "切换下一个角色",
+        "desc": "移动鼠标后切换下一个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                276
+            ]
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityNextCharacterSwipe"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityNextCharacterSwipe": {
+        "desc": "滑动切换下一个角色",
         "action": {
             "type": "Swipe",
             "begin": [
                 1230,
-                278
+                276
             ],
             "end": [
                 1230,
                 200
             ],
             "duration": 500
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter1Move"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityCharacter1Move": {
+        "desc": "移动鼠标到第1个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                130
+            ]
         },
         "next": [
             "SyncCharacterAbilityCityAbilityCharacter1Click"
@@ -214,14 +240,25 @@
         "action": {
             "type": "Click",
             "target": [
-                1205,
-                105,
-                50,
-                50
+                1230,
+                130
             ]
         },
         "next": [
             "[Anchor]CityAbilityAfterClick"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityCharacter2Move": {
+        "desc": "移动鼠标到第2个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                240
+            ]
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter2Click"
         ]
     },
     "SyncCharacterAbilityCityAbilityCharacter2Click": {
@@ -229,46 +266,77 @@
         "action": {
             "type": "Click",
             "target": [
-                1205,
-                215,
-                50,
-                50
+                1230,
+                240
             ]
         }
+    },
+    "SyncCharacterAbilityCityAbilityCharacter3Move": {
+        "desc": "移动鼠标到第3个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                345
+            ]
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter3Click"
+        ]
     },
     "SyncCharacterAbilityCityAbilityCharacter3Click": {
         "desc": "点击第3个角色",
         "action": {
             "type": "Click",
             "target": [
-                1205,
-                320,
-                50,
-                50
+                1230,
+                345
             ]
         }
+    },
+    "SyncCharacterAbilityCityAbilityCharacter4Move": {
+        "desc": "移动鼠标到第4个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                450
+            ]
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter4Click"
+        ]
     },
     "SyncCharacterAbilityCityAbilityCharacter4Click": {
         "desc": "点击第4个角色",
         "action": {
             "type": "Click",
             "target": [
-                1205,
-                425,
-                50,
-                50
+                1230,
+                450
             ]
         }
+    },
+    "SyncCharacterAbilityCityAbilityCharacter5Move": {
+        "desc": "移动鼠标到第5个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                555
+            ]
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter5Click"
+        ]
     },
     "SyncCharacterAbilityCityAbilityCharacter5Click": {
         "desc": "点击第5个角色",
         "action": {
             "type": "Click",
             "target": [
-                1205,
-                530,
-                50,
-                50
+                1230,
+                555
             ]
         }
     }

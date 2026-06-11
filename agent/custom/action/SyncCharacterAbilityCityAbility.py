@@ -44,10 +44,10 @@ _NODE_OCR_SKILL0 = "SyncCharacterAbilityCityAbilityOCRSkill0"
 _NODE_OCR_SKILL1 = "SyncCharacterAbilityCityAbilityOCRSkill1"
 _NODE_MATCH_CHAR = "SyncCharacterAbilityCityAbilityMatchCharacter"
 _CLICK_NODES = [
-    "SyncCharacterAbilityCityAbilityCharacter2Click",
-    "SyncCharacterAbilityCityAbilityCharacter3Click",
-    "SyncCharacterAbilityCityAbilityCharacter4Click",
-    "SyncCharacterAbilityCityAbilityCharacter5Click",
+    "SyncCharacterAbilityCityAbilityCharacter2Move",
+    "SyncCharacterAbilityCityAbilityCharacter3Move",
+    "SyncCharacterAbilityCityAbilityCharacter4Move",
+    "SyncCharacterAbilityCityAbilityCharacter5Move",
 ]
 
 # OCR pipeline override — only_rec=True 让 OCR 返回 ROI 内所有文本，无需 expected
@@ -267,7 +267,8 @@ class SyncCharacterAbilityCityAbilityMainAction(CustomAction):
         if argv.custom_action_param:
             try:
                 params = json.loads(argv.custom_action_param)
-                fresh_record = bool(params.get("fresh_record", False))
+                if isinstance(params, dict):
+                    fresh_record = bool(params.get("fresh_record", False))
             except (json.JSONDecodeError, TypeError):
                 pass
 
