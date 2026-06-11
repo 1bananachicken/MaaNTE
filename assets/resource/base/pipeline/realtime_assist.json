@@ -7,8 +7,10 @@
             "nodes": [
                 "RealTimeTeleportWitte",
                 "RealTimeTeleportPhone",
+                "RealTimeLoot",
                 "RealTimeSkipStory",
                 "RealTimeSkipStoryDialog",
+                "RealTimeSkipStorySummary",
                 "RealTimeSleep"
             ]
         },

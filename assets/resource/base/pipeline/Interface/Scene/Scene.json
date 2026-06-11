@@ -3,14 +3,19 @@
     "SceneAnyEnterWorld": {
         "desc": "从任意界面返回大世界界面",
         "next": [
+            "[JumpBack]__SceneCheckOSD",
             "__ScenePrivateMenuListEnterWorld",
+            "__ScenePrivateMiniWorldEnterWorld",
             "__ScenePrivateAnyEnterWorldSuccess",
             "[JumpBack]__ScenePrivateLogin",
+            "[JumpBack]SceneLoadingType1",
+            "[JumpBack]SceneLoadingType2",
+            //"[JumpBack]SceneClickCloseButton",
             "[JumpBack]__ScenePrivateAnyExit"
         ]
     },
-    "SceneLoading": {
-        "desc": "在加载界面(右下角有一只塔吉多)",
+    "SceneLoadingType1": {
+        "desc": "加载界面类型1, 右下角有一只塔吉多",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -20,7 +25,27 @@
             }
         },
         "next": [
-            "SceneLoading",
+            "SceneLoadingType1",
+            "__ScenePrivateNextTrue"
+        ]
+    },
+    "SceneLoadingType2": {
+        "desc": "加载界面类型2, 左边风景右下加载进度",
+        "recognition": "OCR",
+        "roi": [
+            1158,
+            644,
+            101,
+            49
+        ],
+        "expected": [
+            // @i18n-skip 
+            "%"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "SceneLoadingType2",
             "__ScenePrivateNextTrue"
         ]
     },
@@ -46,5 +71,13 @@
         ],
         "action": "ClickKey",
         "key": 27
+    },
+    "SceneClickCloseButton": {
+        "desc": "点击关闭按钮",
+        "recognition": "And",
+        "all_of": [
+            "CloseButton"
+        ],
+        "action": "Click"
     }
 }

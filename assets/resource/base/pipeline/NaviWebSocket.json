@@ -1,0 +1,13 @@
+{
+    "NaviWebSocket": {
+        "action": "Custom",
+        "custom_action": "navi_websocket",
+        "custom_action_param": {
+            "host": "0.0.0.0",
+            "port": 14514,
+            "debug": false,
+            "frame_interval": "0.1",
+            "angle_backend": "auto"
+        }
+    }
+}

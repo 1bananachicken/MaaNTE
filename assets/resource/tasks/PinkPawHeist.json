@@ -50,7 +50,7 @@
                 }
             ],
             "pipeline_override": {
-                "PinkPawHeist_CoreSequence": {
+                "PinkPawHeist_PressF": {
                     "max_hit": "{count}"
                 }
             }
@@ -59,7 +59,7 @@
             "type": "select",
             "label": "地图方案",
             "description": "选择本次战斗的地图移动方案。。",
-            "default_case": "Core2",
+            "default_case": "Core3",
             "cases": [
                 {
                     "name": "Core1",
@@ -69,6 +69,22 @@
                             "next": [
                                 "PinkPawHeist_Scheme1"
                             ]
+                        },
+                        "PinkPawHeist_FindXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core1",
+                                "runner": [
+                                    "3"
+                                ]
+                            }
+                        },
+                        "PinkPawHeist_RecoverXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core1",
+                                "runner": [
+                                    "3"
+                                ]
+                            }
                         }
                     },
                     "option": [
@@ -83,10 +99,59 @@
                             "next": [
                                 "PinkPawHeist_Scheme2"
                             ]
+                        },
+                        "PinkPawHeist_FindXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core2",
+                                "runner": [
+                                    "4"
+                                ]
+                            }
+                        },
+                        "PinkPawHeist_RecoverXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core2",
+                                "runner": [
+                                    "4"
+                                ]
+                            }
                         }
                     },
                     "option": [
                         "PinkPawHeist_Scheme_Core2_desc"
+                    ]
+                },
+                {
+                    "name": "Core3",
+                    "label": "方案三",
+                    "pipeline_override": {
+                        "PinkPawHeist_ExecuteScheme": {
+                            "next": [
+                                "PinkPawHeist_Scheme3"
+                            ]
+                        },
+                        "PinkPawHeist_FindXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core3",
+                                "runner": [
+                                    "3"
+                                ]
+                            }
+                        },
+                        "PinkPawHeist_RecoverXiaoZhi": {
+                            "custom_action_param": {
+                                "scheme": "core3",
+                                "runner": [
+                                    "3"
+                                ]
+                            }
+                        }
+                    },
+                    "option": [
+                        "PinkPawHeist_Scheme_Core3_AvoidMethod",
+                        "PinkPawHeist_Scheme_Core3_EarlyExtractExit1",
+                        "PinkPawHeist_Scheme_Core3_EarlyExtractExit2",
+                        "PinkPawHeist_Scheme_Core3_desc"
                     ]
                 }
             ]
@@ -102,6 +167,98 @@
             "label": "方案二说明",
             "description": "<span style='color:orange'>更稳定收益更高，请设置画质到性能档位，帧率设置120帧，关闭设置里的移动镜头修正！到小吱旁边启动！</span><br><span style='color:green'>配队要求：</span>1娜娜莉2任意位3早雾4狼（没有娜娜莉可换埃德加）<br><span style='color:green'>路线说明：</span>走藏品层路线撤离",
             "inputs": []
+        },
+        "PinkPawHeist_Scheme_Core3_desc": {
+            "type": "input",
+            "label": "方案三说明",
+            "description": "<span style='color:orange'>改编自 ok-nte 粉爪路径2，请设置画质到性能档位，帧率设置120帧，关闭设置里的移动镜头修正！打开按下锁定镜头回正！到小吱旁边启动！包里要至少有一个复活药！</span><br><span style='color:green'>路线说明：</span>使用 ok 路径2，按固定站位配队；只需要在“方案三配队”里选择你实际使用的站位组合。",
+            "inputs": []
+        },
+        "PinkPawHeist_Scheme_Core3_AvoidMethod": {
+            "type": "select",
+            "label": "方案三配队",
+            "description": "选择你实际使用的固定站位配队；程序会据此切换对应分支。",
+            "default_case": "Dash",
+            "cases": [
+                {
+                    "name": "Dash",
+                    "label": "1早雾 2翳 3薄荷 4任意",
+                    "pipeline_override": {
+                        "PinkPawHeist_Scheme3": {
+                            "next": [
+                                "PinkPawHeist_Scheme3_Dash"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Attack",
+                    "label": "1战斗 2浔 3薄荷 4任意",
+                    "pipeline_override": {
+                        "PinkPawHeist_Scheme3": {
+                            "next": [
+                                "PinkPawHeist_Scheme3_Attack"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "PinkPawHeist_Scheme_Core3_EarlyExtractExit1": {
+            "type": "switch",
+            "label": "方案三第一个撤离点提前撤离",
+            "description": "开启后，第一个撤离点检测到可撤离时直接撤离，不再继续后续搜刮路线。",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "No",
+                    "label": "关闭"
+                },
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "PinkPawHeist_Scheme3_Dash": {
+                            "custom_action_param": {
+                                "early_extract_exit1": true
+                            }
+                        },
+                        "PinkPawHeist_Scheme3_Attack": {
+                            "custom_action_param": {
+                                "early_extract_exit1": true
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "PinkPawHeist_Scheme_Core3_EarlyExtractExit2": {
+            "type": "switch",
+            "label": "方案三第二个撤离点提前撤离",
+            "description": "开启后，第二个撤离点检测到可撤离时直接撤离，不再继续后续搜刮路线。",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "No",
+                    "label": "关闭"
+                },
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "PinkPawHeist_Scheme3_Dash": {
+                            "custom_action_param": {
+                                "early_extract_exit2": true
+                            }
+                        },
+                        "PinkPawHeist_Scheme3_Attack": {
+                            "custom_action_param": {
+                                "early_extract_exit2": true
+                            }
+                        }
+                    }
+                }
+            ]
         }
     }
 }

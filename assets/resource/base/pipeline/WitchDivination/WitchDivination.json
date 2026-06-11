@@ -1,0 +1,268 @@
+{
+    // 自动魔女之家占卜
+    // WitchDivination
+    // 1. 回到大世界, 点击地图
+    // 2. 点击地图中左下角任务图标，在右侧新弹出的窗口找到魔女之家提示 (找不到则代表已经占卜 结束任务)
+    // 3. 点击后定位到魔女之家, 点击传送
+    // 4. 从传送点开始,使用小碎步走进魔女之家
+    // 5. 和黑羽对话选择 [卜运]
+    // 6. 依次选择每一个占卜，直至全部没有使用次数后结束任务
+    "WitchDivinationEntrance": {
+        "desc": "魔女之家占卜入口",
+        "action": "DoNothing",
+        "next": [
+            "WitchDivinationStart",
+            "[JumpBack]SceneAnyEnterWorld"
+        ]
+    },
+    "WitchDivinationStart": {
+        "desc": "女巫占卜主流程 — 在大世界按下M进入地图",
+        "max_hit": 5, // 超过这个数就算失败了
+        "recognition": "And",
+        "all_of": [
+            "InWorld"
+        ],
+        "action": {
+            "type": "ClickKey", // 'M' 键打开地图
+            "param": {
+                "key": [
+                    77
+                ]
+            }
+        },
+        "post_wait_freezes": 500, // 全屏等待地图界面稳定
+        "next": [
+            "WitchDivinationFindMapTask"
+        ]
+    },
+    "WitchDivinationFindMapTask": {
+        "desc": "在地图页面模板匹配任务图标并点击",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "WitchDivination/MapTask.png",
+                "roi": [
+                    140,
+                    637,
+                    56,
+                    54
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": { // 等待右侧面板稳定
+            "time": 500,
+            "target": [
+                884,
+                46,
+                390,
+                623
+            ]
+        },
+        "next": [
+            "WitchDivinationCheckTodayGuide",
+            "WitchDivinationFindMapTask",
+            "WitchDivinationActionEnd"
+        ],
+        "on_error": [
+            "WitchDivinationEntrance"
+        ]
+    },
+    "WitchDivinationCheckTodayGuide": {
+        "desc": "检测是否存在「今日指引」字样",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    915,
+                    78,
+                    105,
+                    35
+                ],
+                "expected": [
+                    "今日指引",
+                    "(?i)Daily\\s*Guide",
+                    "デイリーガイド"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    79,
+                    0
+                ]
+            }
+        },
+        "action": "DoNothing",
+        "next": [
+            "WitchDivinationMoveToWitchHouse",
+            "WitchDivinationPressEscTwice"
+        ],
+        "on_error": [
+            "WitchDivinationEntrance"
+        ]
+    },
+    "WitchDivinationMoveToWitchHouse": {
+        "desc": "鼠标移动到 OCR 匹配到的「魔女之家」坐标位置",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    893,
+                    120,
+                    367,
+                    533
+                ],
+                "expected": [
+                    "魔女之家",
+                    "(?i)The\\s*Witch\\s*'\\s*s\\s*House",
+                    "魔女の家"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    20,
+                    0
+                ]
+            }
+        },
+        "action": {
+            "type": "TouchMove",
+            "param": {
+                "target": true // 先移动鼠标到匹配位置，避免直接点击触发滑动
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "WitchDivinationClickWitchHouse"
+        ],
+        "on_error": [
+            "WitchDivinationActionEnd"
+        ]
+    },
+    "WitchDivinationClickWitchHouse": {
+        "desc": "在「魔女之家」位置执行点击",
+        "action": {
+            "type": "TouchDown",
+            "param": {
+                "target": "WitchDivinationMoveToWitchHouse" // 鼠标已在目标位置，直接点击
+            }
+        },
+        "post_wait_freezes": 50, // 点击后等待全屏稳定 
+        "next": [
+            "WitchDivinationClickWitchHouse2",
+            "WitchDivinationCheckTodayGuide"
+        ]
+    },
+    "WitchDivinationClickWitchHouse2": {
+        "desc": "在「魔女之家」位置执行点击",
+        "action": {
+            "type": "TouchUp",
+            "param": {
+                "target": "WitchDivinationMoveToWitchHouse" // 鼠标已在目标位置，直接点击
+            }
+        },
+        "post_wait_freezes": 50, // 点击后等待全屏稳定 
+        "next": [
+            "WitchDivinationVerifyWitchHouse",
+            "WitchDivinationEntrance"
+        ]
+    },
+    "WitchDivinationVerifyWitchHouse": {
+        "desc": "验证是否出现「魔女之家」标题文本",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    925,
+                    36,
+                    254,
+                    106
+                ],
+                "expected": [
+                    "魔女之家",
+                    "(?i)The\\s*Witch\\s*'\\s*s\\s*House",
+                    "魔女の家"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    101,
+                    0
+                ]
+            }
+        },
+        "action": "DoNothing",
+        "next": [
+            "WitchDivinationTeleportToWitchHouse"
+        ],
+        "on_error": [
+            "WitchDivinationEntrance"
+        ]
+    },
+    "WitchDivinationTeleportToWitchHouse": {
+        "desc": "匹配「传送」文本并点击执行传送",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    917,
+                    614,
+                    363,
+                    52
+                ],
+                "expected": [
+                    "传送",
+                    "傳送",
+                    "(?i)Teleport",
+                    "転送"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": true
+            }
+        },
+        "timeout": 1000,
+        "next": [
+            "[JumpBack]SceneLoadingType1",
+            "ShuffleStepWalk"
+        ],
+        "on_error": [
+            "WitchDivinationEntrance"
+        ]
+    },
+    "WitchDivinationPressEscTwice": {
+        "desc": "按两次 ESC 后结束任务",
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "WitchDivinationActionEnd"
+        ]
+    },
+    "WitchDivinationActionEnd": {
+        "desc": "占卜流程结束 — 等待画面静止后按ESC退出",
+        "pre_wait_freezes": 2000,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    27
+                ]
+            }
+        }
+    }
+}
