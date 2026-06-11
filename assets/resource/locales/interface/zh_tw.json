@@ -10,6 +10,7 @@
     "group.CityTycoon.label": "都市大亨",
     "group.HethereauHobbies.label": "都市閒趣",
     "group.RealTimeAssist.label": "實時輔助",
+    "group.UserInfo.label": "玩家資訊",
     "group.DatasetCollection.label": "數據集收集",
     "preset.AFK.label": "掛機任務",
     "preset.AFK.description": "適合掛機長時間進行的任務",
@@ -143,5 +144,9 @@
     "task_auto_drive_dataset_input_output_dir_label": "輸出目錄",
     "task_auto_drive_dataset_input_duration_label": "錄製時長",
     "task_auto_drive_dataset_input_duration_desc": "錄製時長，預設為 60 秒。",
-    "task_auto_drive_dataset_input_start_delay_label": "錄製延遲"
+    "task_auto_drive_dataset_input_start_delay_label": "錄製延遲",
+    "task.SyncCharacterAbilityCityAbility.label": "記錄角色都市特技",
+    "task.SyncCharacterAbilityCityAbility.description": "自動識別全部角色的都市特技等級並記錄於設定檔。",
+    "task.SyncCharacterAbilityCityAbility.option.fresh_record": "全新記錄",
+    "task.SyncCharacterAbilityCityAbility.option.fresh_record.desc": "覆蓋已有的角色都市特技記錄<br><span style='color:red'>注意，會清空之前的全部記錄。</span><br><span style='color:orange'>發現之前的記錄有問題時可以使用該選項清空並覆蓋之前的內容。</span>"
 }

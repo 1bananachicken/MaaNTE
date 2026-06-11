@@ -10,6 +10,7 @@
     "group.CityTycoon.label": "シティ名声",
     "group.HethereauHobbies.label": "シティライフ",
     "group.RealTimeAssist.label": "リアルタイム支援",
+    "group.UserInfo.label": "プレイヤー情報",
     "group.DatasetCollection.label": "データセットコレクション",
     "preset.AFK.label": "放置タスク",
     "preset.AFK.description": "長時間の放置プレイに適したタスク",
@@ -143,5 +144,9 @@
     "task_auto_drive_dataset_input_output_dir_label": "出力ディレクトリ",
     "task_auto_drive_dataset_input_duration_label": "録画時間",
     "task_auto_drive_dataset_input_duration_desc": "録画時間。デフォルトは 60 秒です。",
-    "task_auto_drive_dataset_input_start_delay_label": "開始遅延"
+    "task_auto_drive_dataset_input_start_delay_label": "開始遅延",
+    "task.SyncCharacterAbilityCityAbility.label": "キャラクターシティスキルを記録",
+    "task.SyncCharacterAbilityCityAbility.description": "全キャラクターのシティスキルレベルを自動識別し、設定ファイルに記録します。",
+    "task.SyncCharacterAbilityCityAbility.option.fresh_record": "新規記録",
+    "task.SyncCharacterAbilityCityAbility.option.fresh_record.desc": "既存のキャラクターシティスキル記録を上書きします<br><span style='color:red'>注意：これまでの全ての記録が消去されます。</span><br><span style='color:orange'>以前の記録に問題がある場合、このオプションで消去して上書きできます。</span>"
 }

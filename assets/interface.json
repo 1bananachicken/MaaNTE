@@ -97,6 +97,11 @@
             "name": "DatasetCollection",
             "label": "$group.DatasetCollection.label",
             "default_expand": true
+        },
+        {
+            "name": "UserInfo",
+            "label": "$group.UserInfo.label",
+            "default_expand": true
         }
     ],
     "task": [],

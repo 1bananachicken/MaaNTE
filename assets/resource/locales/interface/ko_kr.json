@@ -10,6 +10,7 @@
     "group.CityTycoon.label": "도시 타이쿤",
     "group.HethereauHobbies.label": "도시 일상",
     "group.RealTimeAssist.label": "실시간 지원",
+    "group.UserInfo.label": "플레이어 정보",
     "group.DatasetCollection.label": "데이터셋 수집",
     "preset.AFK.label": "잠수 작업",
     "preset.AFK.description": "장시간 잠수 모드에 적합한 작업",
@@ -143,5 +144,9 @@
     "task_auto_drive_dataset_input_output_dir_label": "출력 디렉터리",
     "task_auto_drive_dataset_input_duration_label": "녹화 시간",
     "task_auto_drive_dataset_input_duration_desc": "녹화 시간이며 기본값은 60초입니다.",
-    "task_auto_drive_dataset_input_start_delay_label": "시작 지연"
+    "task_auto_drive_dataset_input_start_delay_label": "시작 지연",
+    "task.SyncCharacterAbilityCityAbility.label": "캐릭터 도시 스킬 기록",
+    "task.SyncCharacterAbilityCityAbility.description": "모든 캐릭터의 도시 스킬 레벨을 자동으로 식별하여 설정 파일에 기록합니다.",
+    "task.SyncCharacterAbilityCityAbility.option.fresh_record": "새로 기록",
+    "task.SyncCharacterAbilityCityAbility.option.fresh_record.desc": "기존 캐릭터 도시 스킬 기록을 덮어씁니다<br><span style='color:red'>주의: 이전의 모든 기록이 삭제됩니다.</span><br><span style='color:orange'>이전 기록에 문제가 있을 경우 이 옵션으로 삭제하고 덮어쓸 수 있습니다.</span>"
 }
