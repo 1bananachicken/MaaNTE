@@ -12,33 +12,34 @@
                 "HethereauHobbies"
             ],
             "option": [
-                "BagelSpamCaption",
-                "BagelSpamText"
+                "BagelSpamTakePhoto",
+                "BagelSpamTextMode",
+                "BagelSpamPublishCount"
             ]
         }
     ],
     "option": {
-        "BagelSpamCaption": {
-            "type": "input",
-            "label": "$task_bagel_spam_option_caption_label",
-            "description": "$task_bagel_spam_option_caption_desc",
-            "inputs": [
+        "BagelSpamTextMode": {
+            "type": "select",
+            "label": "$task_bagel_spam_option_text_mode_label",
+            "description": "$task_bagel_spam_option_text_mode_desc",
+            "default_case": "preset",
+            "cases": [
                 {
-                    "name": "caption",
-                    "label": "$task_bagel_spam_option_caption_input_label",
-                    "default": "关注伊波恩喵",
-                    "pipeline_type": "string"
+                    "name": "preset",
+                    "label": "$task_bagel_spam_option_text_mode_preset",
+                    "option": [
+                        "BagelSpamText"
+                    ]
+                },
+                {
+                    "name": "llm",
+                    "label": "$task_bagel_spam_option_text_mode_llm",
+                    "option": [
+                        "BagelSpamLLMConfig"
+                    ]
                 }
-            ],
-            "pipeline_override": {
-                "BagelSpamInputTitle": {
-                    "action": {
-                        "param": {
-                            "input_text": "{caption}"
-                        }
-                    }
-                }
-            }
+            ]
         },
         "BagelSpamText": {
             "type": "input",
@@ -46,19 +47,137 @@
             "description": "$task_bagel_spam_option_text_desc",
             "inputs": [
                 {
-                    "name": "text",
-                    "label": "$task_bagel_spam_option_text_input_label",
+                    "name": "title",
+                    "label": "$task_bagel_spam_option_text_title_label",
+                    "default": "关注伊波恩喵",
+                    "pipeline_type": "string"
+                },
+                {
+                    "name": "body",
+                    "label": "$task_bagel_spam_option_text_body_label",
                     "default": "关注伊波恩谢谢喵",
                     "pipeline_type": "string"
                 }
             ],
             "pipeline_override": {
+                "BagelSpamInputTitle": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "titles": "{title}",
+                                "bodies": "{body}",
+                                "output": "title"
+                            }
+                        }
+                    }
+                },
                 "BagelSpamInputContent": {
                     "action": {
                         "param": {
-                            "input_text": "{text}"
+                            "custom_action_param": {
+                                "titles": "{title}",
+                                "bodies": "{body}",
+                                "output": "body"
+                            }
                         }
                     }
+                }
+            }
+        },
+        "BagelSpamTakePhoto": {
+            "type": "switch",
+            "label": "$task_bagel_spam_option_take_photo_label",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes"
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "BagelSpamEnsureEscButton": {
+                            "next": [
+                                "BagelSpamOpenBagel"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "BagelSpamLLMConfig": {
+            "type": "input",
+            "label": "$task_bagel_spam_option_llm_config_label",
+            "description": "$task_bagel_spam_option_llm_config_desc",
+            "inputs": [
+                {
+                    "name": "llm_api_base",
+                    "label": "$task_bagel_spam_option_llm_api_base_label",
+                    "description": "$task_bagel_spam_option_llm_api_base_desc",
+                    "default": "https://api.openai.com/v1",
+                    "pipeline_type": "string"
+                },
+                {
+                    "name": "llm_model",
+                    "label": "$task_bagel_spam_option_llm_model_label",
+                    "description": "$task_bagel_spam_option_llm_model_desc",
+                    "default": "gpt-4o",
+                    "pipeline_type": "string"
+                },
+                {
+                    "name": "llm_api_key",
+                    "label": "$task_bagel_spam_option_llm_api_key_label",
+                    "description": "$task_bagel_spam_option_llm_api_key_desc",
+                    "default": "",
+                    "pipeline_type": "string"
+                },
+                {
+                    "name": "llm_prompt",
+                    "label": "$task_bagel_spam_option_llm_prompt_label",
+                    "description": "$task_bagel_spam_option_llm_prompt_desc",
+                    "default": "随意简短，带点整活或感叹的味道",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "BagelSpamConfirmPublish": {
+                    "next": [
+                        "BagelSpamLLMGenerate"
+                    ]
+                },
+                "BagelSpamLLMGenerate": {
+                    "next": [
+                        "BagelSpamSwipeTitleSelect"
+                    ],
+                    "recognition": {
+                        "param": {
+                            "custom_recognition_param": {
+                                "api_base": "{llm_api_base}",
+                                "model": "{llm_model}",
+                                "api_key": "{llm_api_key}",
+                                "prompt": "{llm_prompt}"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "BagelSpamPublishCount": {
+            "type": "input",
+            "label": "$task_bagel_spam_option_publish_count_label",
+            "description": "$task_bagel_spam_option_publish_count_desc",
+            "inputs": [
+                {
+                    "name": "count",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "BagelSpamClickPublishContent": {
+                    "max_hit": "{count}"
                 }
             }
         }
