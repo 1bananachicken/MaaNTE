@@ -47,33 +47,16 @@
             "type": "DoNothing"
         },
         "next": [
-            "PinkPawHeist_DetectXiaoZhi",
-            "[JumpBack]SceneAnyEnterWorld"
+            "PinkPawHeist_FindXiaoZhi"
         ]
     },
-    "PinkPawHeist_DetectXiaoZhi": {
-        "desc": "检测小吱交互按钮",
+    "PinkPawHeist_FindXiaoZhi": {
+        "desc": "寻找小吱；找不到则尝试回到粉爪入口",
         "recognition": {
-            "type": "OCR",
-            "param": {
-                "expected": [
-                    "小吱",
-                    "小岐", // @i18n-skip
-                    "(?i)Chiz",
-                    "ちぃちゃん",
-                    "치즈"
-                ],
-                "roi": [
-                    765,
-                    374,
-                    209,
-                    37
-                ]
-            }
+            "type": "DirectHit"
         },
-        "action": {
-            "type": "DoNothing"
-        },
+        "action": "Custom",
+        "custom_action": "PinkPawHeistFindXiaoZhiAction",
         "next": [
             "PinkPawHeist_PressF"
         ],
@@ -89,7 +72,49 @@
                 ]
             },
             "Node.Action.Failed": {
-                "content": "❌ 未找到小吱，请确保在小吱面前开始任务",
+                "content": "❌ 未找到小吱且恢复失败，请手动回到小吱面前重新开始",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            }
+        }
+    },
+    "PinkPawHeist_DetectXiaoZhi": {
+        "desc": "检测小吱交互按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "expected": [
+                    "小吱",
+                    "小岐", // @i18n-skip
+                    "小咕", // @i18n-skip
+                    "(?i)Chiz",
+                    "ちぃちゃん",
+                    "치즈"
+                ],
+                "roi": [
+                    765,
+                    374,
+                    209,
+                    37
+                ]
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [],
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "开始寻找小吱",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            },
+            "Node.Action.Failed": {
+                "content": "未找到小吱，准备尝试回到粉爪入口",
                 "display": [
                     "log",
                     "toast"
@@ -103,6 +128,86 @@
                 ]
             }
         }
+    },
+    "PinkPawHeist_RecoverXiaoZhi": {
+        "desc": "找不到小吱时尝试回到粉爪入口",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": "Custom",
+        "custom_action": "PinkPawHeistReturnToEntranceAction",
+        "next": [
+            "[JumpBack]PinkPawHeist_FindXiaoZhi"
+        ],
+        "on_error": [
+            "PinkPawHeist_StopTask"
+        ],
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "未找到小吱，尝试传送并跑回粉爪入口",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            },
+            "Node.Action.Failed": {
+                "content": "❌ 回到粉爪入口失败，请手动回到小吱面前重新开始",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            }
+        }
+    },
+    "PinkPawHeist_CityTycoonToHethereauHobbies": {
+        "desc": "都市大亨界面点击都市闲趣",
+        "recognition": "And",
+        "all_of": [
+            {
+                "recognition": "OCR",
+                "roi": [
+                    567,
+                    251,
+                    196,
+                    113
+                ],
+                "expected": [
+                    "都市闲趣",
+                    "都市閒趣",
+                    "(?i)Hethereau\\s*Hobbies",
+                    "シティライフ"
+                ]
+            },
+            "InCityTycoonMenu"
+        ],
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 5000,
+        "next": []
+    },
+    "PinkPawHeist_HethereauHobbiesToHeistMap": {
+        "desc": "都市闲趣界面点击粉爪大劫案并定位到地图传送点",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    624,
+                    477,
+                    152,
+                    50
+                ],
+                "expected": [
+                    "粉爪大劫案",
+                    "(?i)Pink\\s*Paw\\s*Heist"
+                ]
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "timeout": 5000,
+        "next": []
     },
     "PinkPawHeist_StopTask": {
         "recognition": {
@@ -175,7 +280,12 @@
         },
         "pre_delay": 2000,
         "next": [
-            "PinkPawHeist_AfterStory"
+            "PinkPawHeist_AfterStory",
+            "[JumpBack]RealTimeSkipStoryDialog",
+            "[JumpBack]RealTimeSkipStory"
+        ],
+        "on_error": [
+            "PinkPawHeist_AfterStory_Recover"
         ]
     },
     "PinkPawHeist_AfterStory": {
@@ -207,6 +317,26 @@
             "PinkPawHeist_WaitReward",
             "[JumpBack]RealTimeSkipStoryDialog",
             "[JumpBack]RealTimeSkipStory"
+        ],
+        "on_error": [
+            "PinkPawHeist_AfterStory_Recover"
+        ]
+    },
+    "PinkPawHeist_AfterStory_Recover": {
+        "desc": "详情页进入失败恢复：可能被网络退回小吱或仍在剧情",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "post_delay": 2000,
+        "next": [
+            "[JumpBack]PinkPawHeist_OCR_Join",
+            "[JumpBack]RealTimeSkipStoryDialog",
+            "[JumpBack]RealTimeSkipStory",
+            "PinkPawHeist_AfterStory",
+            "[JumpBack]PinkPawHeist_FindXiaoZhi"
         ]
     },
     "PinkPawHeist_WaitReward": {
@@ -263,6 +393,8 @@
         },
         "post_delay": 2000,
         "next": [
+            "[JumpBack]PinkPawHeist_OCR_Join",
+            "[JumpBack]PinkPawHeist_FindXiaoZhi",
             "PinkPawHeist_WaitReward"
         ]
     },

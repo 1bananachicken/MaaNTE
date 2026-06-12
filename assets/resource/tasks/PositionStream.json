@@ -42,6 +42,22 @@
                     "default": "0.1",
                     "pipeline_type": "string",
                     "verify": "^\\d+(\\.\\d+)?$"
+                },
+                {
+                    "name": "angle_backend",
+                    "label": "$task_position_stream_option_angle_backend",
+                    "description": "$task_position_stream_option_angle_backend_desc",
+                    "default": "auto",
+                    "pipeline_type": "string",
+                    "verify": "^(auto|directml|cpu)$"
+                },
+                {
+                    "name": "debug",
+                    "label": "$task_position_stream_option_debug",
+                    "description": "$task_position_stream_option_debug_desc",
+                    "default": "false",
+                    "pipeline_type": "bool",
+                    "verify": "^(true|false)$"
                 }
             ],
             "pipeline_override": {
@@ -49,7 +65,9 @@
                     "custom_action_param": {
                         "host": "{host}",
                         "port": "{port}",
-                        "frame_interval": "{frame_interval}"
+                        "frame_interval": "{frame_interval}",
+                        "angle_backend": "{angle_backend}",
+                        "debug": "{debug}"
                     }
                 }
             }

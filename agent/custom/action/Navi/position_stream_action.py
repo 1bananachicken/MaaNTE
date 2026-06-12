@@ -88,6 +88,7 @@ class PositionStreamAction(CustomAction):
                     time.sleep(sleep_time)
         except Exception as exc:
             logger.error(f"Navi WebSocket action failed: {exc}")
+            navigation_websocket.stop()
             return CustomAction.RunResult(success=False)
         finally:
             navigation_websocket.stop()

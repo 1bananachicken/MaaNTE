@@ -194,7 +194,6 @@ class MapLocator:
             min_similarity=0.2,
             green_mask=True,
         )
-        print(f"Chat button found: {button_found}, prob: {prob:.2f}")
         if not button_found:
 
             result = self.last_location_result(
