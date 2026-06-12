@@ -16,7 +16,7 @@ get_logger("websockets.client").setLevel(logging.WARNING)
 get_logger("websockets.protocol").setLevel(logging.WARNING)
 
 
-class NavigationWebSocketPublisher:
+class NavigationWebSocketServer:
     def __init__(self, host="0.0.0.0", port="14514", message_handler=None) -> None:
         self._host = str(host)
         self._port = int(port)

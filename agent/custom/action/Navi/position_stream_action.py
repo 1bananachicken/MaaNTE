@@ -1,4 +1,3 @@
-import json
 import time
 
 import cv2
@@ -8,26 +7,27 @@ from maa.context import Context
 from maa.custom_action import CustomAction
 
 from ..Common.logger import get_logger
-from .map_locator import MapLocationResult, MapLocator
 from .angle_predictor import AnglePredictionResult, AnglePredictor
-from .websocket_backend import NavigationWebSocketPublisher
+from .map_locator import MapLocationResult, MapLocator
+from .navigation_server import NavigationWebSocketServer
+from .waypoint_navigator import load_params, parse_bool
 
 logger = get_logger(__name__)
 
 
-@AgentServer.custom_action("navi_websocket")
-class NaviWebSocketAction(CustomAction):
+@AgentServer.custom_action("position_stream")
+class PositionStreamAction(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        params = self.load_params(argv.custom_action_param)
+        params = load_params(argv.custom_action_param)
         params.update(self.load_option_params(context))
         host = params.get("host", "0.0.0.0")
         port = params.get("port", 14514)
-        debug = bool(params.get("debug", False))
+        debug = parse_bool(params.get("debug", False))
         frame_interval = max(0.05, float(params.get("frame_interval", 0.1)))
 
-        navigation_websocket = NavigationWebSocketPublisher(host, port)
+        navigation_websocket = NavigationWebSocketServer(host, port)
         predictor: AnglePredictor | None = None
 
         try:
@@ -75,6 +75,14 @@ class NaviWebSocketAction(CustomAction):
                 if debug and (cv2.waitKey(1) & 0xFF == ord("q")):
                     break
 
+                if debug:
+                    print(
+                        f"Location: {last_location.point}, score: {last_location.score:.2f}, "
+                        f"mode: {last_location.mode}; "
+                        f"Angle: {last_angle.angle}, confidence: {last_angle.confidence:.2f}"
+                        f" (processing time: {time.perf_counter() - started:.2f}s)"
+                    )
+
                 sleep_time = frame_interval - (time.perf_counter() - started)
                 if sleep_time > 0:
                     time.sleep(sleep_time)
@@ -89,23 +97,10 @@ class NaviWebSocketAction(CustomAction):
         return CustomAction.RunResult(success=True)
 
     @staticmethod
-    def load_params(custom_action_param) -> dict:
-        if not custom_action_param:
-            return {}
-        if isinstance(custom_action_param, dict):
-            return custom_action_param
-        try:
-            params = json.loads(custom_action_param)
-            return params if isinstance(params, dict) else {}
-        except Exception as exc:
-            logger.warning(f"Parse custom_action_param failed, use defaults: {exc}")
-            return {}
-
-    @staticmethod
     def load_option_params(context: Context) -> dict:
         params = {}
 
-        node_data = context.get_node_data("NaviWebSocketAngleBackendConfig") or {}
+        node_data = context.get_node_data("PositionStreamAngleBackendConfig") or {}
         attach = node_data.get("attach")
         if isinstance(attach, dict) and attach.get("angle_backend") in {
             "auto",
@@ -114,7 +109,7 @@ class NaviWebSocketAction(CustomAction):
         }:
             params["angle_backend"] = attach["angle_backend"]
 
-        node_data = context.get_node_data("NaviWebSocketDebugConfig") or {}
+        node_data = context.get_node_data("PositionStreamDebugConfig") or {}
         attach = node_data.get("attach")
         if isinstance(attach, dict) and "debug" in attach:
             params["debug"] = attach["debug"]

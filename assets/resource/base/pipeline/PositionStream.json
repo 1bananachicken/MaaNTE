@@ -1,0 +1,25 @@
+{
+    "PositionStream": {
+        "action": "Custom",
+        "custom_action": "position_stream",
+        "custom_action_param": {
+            "host": "0.0.0.0",
+            "port": 14514,
+            "debug": false,
+            "frame_interval": "0.1",
+            "angle_backend": "auto"
+        }
+    },
+    "PositionStreamAngleBackendConfig": {
+        "enabled": false,
+        "attach": {
+            "angle_backend": "auto"
+        }
+    },
+    "PositionStreamDebugConfig": {
+        "enabled": false,
+        "attach": {
+            "debug": false
+        }
+    }
+}

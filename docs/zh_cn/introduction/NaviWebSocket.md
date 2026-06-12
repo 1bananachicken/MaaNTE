@@ -1,12 +1,12 @@
 # Navi 本地 WebSocket
 
-`navi_websocket` custom action 会在同一个截图循环中执行 NCC 定位和方向预测，再把两个结果作为同一条状态广播给本地地图前端。Maa 同时只能运行一个 action，因此实时地图应直接运行组合 action：
+`position_stream` custom action 会在同一个截图循环中执行 NCC 定位和方向预测，再把两个结果作为同一条状态广播给本地地图前端。Maa 同时只能运行一个 action，因此实时地图应直接运行组合 action：
 
 ```json
 {
-  "NaviWebSocket": {
+  "PositionStream": {
     "action": "Custom",
-    "custom_action": "navi_websocket",
+    "custom_action": "position_stream",
     "custom_action_param": {
       "host": "0.0.0.0",
       "port": 14514,
@@ -18,7 +18,7 @@
 }
 ```
 
-该入口位于 `assets/resource/base/pipeline/NaviWebSocket.json`，任务设置位于 `assets/resource/tasks/NaviWebSocket.json`。
+该入口位于 `assets/resource/base/pipeline/PositionStream.json`，任务设置位于 `assets/resource/tasks/PositionStream.json`。
 
 默认监听地址：
 

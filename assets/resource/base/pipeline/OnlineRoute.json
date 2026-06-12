@@ -1,22 +1,20 @@
 {
-    "NaviWebSocket": {
+    "OnlineRoute": {
         "action": "Custom",
-        "custom_action": "navi_websocket",
+        "custom_action": "online_route",
         "custom_action_param": {
             "host": "0.0.0.0",
             "port": 14514,
-            "debug": false,
-            "frame_interval": "0.1",
-            "angle_backend": "auto"
+            "tolerance": 5
         }
     },
-    "NaviWebSocketAngleBackendConfig": {
+    "OnlineRouteAngleBackendConfig": {
         "enabled": false,
         "attach": {
             "angle_backend": "auto"
         }
     },
-    "NaviWebSocketDebugConfig": {
+    "OnlineRouteDebugConfig": {
         "enabled": false,
         "attach": {
             "debug": false

@@ -1,14 +1,14 @@
 {
     "task": [
         {
-            "name": "NaviWebSocket",
-            "label": "$task_navi_websocket_label",
-            "description": "$task_navi_websocket_desc",
-            "entry": "NaviWebSocket",
+            "name": "PositionStream",
+            "label": "$task_position_stream_label",
+            "description": "$task_position_stream_desc",
+            "entry": "PositionStream",
             "option": [
-                "NaviWebSocketSettings",
-                "NaviWebSocketAngleBackend",
-                "NaviWebSocketDebug"
+                "PositionStreamSettings",
+                "PositionStreamAngleBackend",
+                "PositionStreamDebug"
             ],
             "group": [
                 "RealTimeAssist"
@@ -16,36 +16,36 @@
         }
     ],
     "option": {
-        "NaviWebSocketSettings": {
+        "PositionStreamSettings": {
             "type": "input",
-            "label": "$task_navi_websocket_option_settings",
-            "description": "$task_navi_websocket_option_settings_desc",
+            "label": "$task_position_stream_option_settings",
+            "description": "$task_position_stream_option_settings_desc",
             "inputs": [
                 {
                     "name": "host",
-                    "label": "$task_navi_websocket_input_host",
+                    "label": "$task_position_stream_input_host",
                     "default": "0.0.0.0",
                     "pipeline_type": "string",
                     "verify": "^.+$"
                 },
                 {
                     "name": "port",
-                    "label": "$task_navi_websocket_input_port",
+                    "label": "$task_position_stream_input_port",
                     "default": "14514",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
                 },
                 {
                     "name": "frame_interval",
-                    "label": "$task_navi_websocket_input_frame_interval",
-                    "description": "$task_navi_websocket_input_frame_interval_desc",
+                    "label": "$task_position_stream_input_frame_interval",
+                    "description": "$task_position_stream_input_frame_interval_desc",
                     "default": "0.1",
                     "pipeline_type": "string",
                     "verify": "^\\d+(\\.\\d+)?$"
                 }
             ],
             "pipeline_override": {
-                "NaviWebSocket": {
+                "PositionStream": {
                     "custom_action_param": {
                         "host": "{host}",
                         "port": "{port}",
@@ -54,16 +54,16 @@
                 }
             }
         },
-        "NaviWebSocketAngleBackend": {
+        "PositionStreamAngleBackend": {
             "type": "select",
-            "label": "$task_navi_websocket_option_angle_backend",
-            "description": "$task_navi_websocket_option_angle_backend_desc",
+            "label": "$task_position_stream_option_angle_backend",
+            "description": "$task_position_stream_option_angle_backend_desc",
             "cases": [
                 {
                     "name": "auto",
                     "label": "Auto",
                     "pipeline_override": {
-                        "NaviWebSocketAngleBackendConfig": {
+                        "PositionStreamAngleBackendConfig": {
                             "attach": {
                                 "angle_backend": "auto"
                             }
@@ -74,7 +74,7 @@
                     "name": "directml",
                     "label": "DirectML",
                     "pipeline_override": {
-                        "NaviWebSocketAngleBackendConfig": {
+                        "PositionStreamAngleBackendConfig": {
                             "attach": {
                                 "angle_backend": "directml"
                             }
@@ -85,7 +85,7 @@
                     "name": "cpu",
                     "label": "CPU",
                     "pipeline_override": {
-                        "NaviWebSocketAngleBackendConfig": {
+                        "PositionStreamAngleBackendConfig": {
                             "attach": {
                                 "angle_backend": "cpu"
                             }
@@ -95,16 +95,16 @@
             ],
             "default_case": "auto"
         },
-        "NaviWebSocketDebug": {
+        "PositionStreamDebug": {
             "type": "switch",
-            "label": "$task_navi_websocket_option_debug",
-            "description": "$task_navi_websocket_option_debug_desc",
+            "label": "$task_position_stream_option_debug",
+            "description": "$task_position_stream_option_debug_desc",
             "cases": [
                 {
                     "name": "Yes",
                     "label": "$option_switch_case_yes",
                     "pipeline_override": {
-                        "NaviWebSocketDebugConfig": {
+                        "PositionStreamDebugConfig": {
                             "attach": {
                                 "debug": true
                             }
@@ -115,7 +115,7 @@
                     "name": "No",
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
-                        "NaviWebSocketDebugConfig": {
+                        "PositionStreamDebugConfig": {
                             "attach": {
                                 "debug": false
                             }

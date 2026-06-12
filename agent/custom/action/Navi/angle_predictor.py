@@ -8,7 +8,7 @@ import numpy as np
 import onnxruntime
 
 from ..Common.logger import get_logger
-from .resources import resource_base_path
+from .resource_paths import resource_base_path
 
 logger = get_logger(__name__)
 onnxruntime.set_default_logger_severity(3)

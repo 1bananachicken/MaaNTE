@@ -1,6 +1,7 @@
 import json
 import math
 import time
+from dataclasses import dataclass
 from typing import Any, Callable
 
 import cv2
@@ -16,7 +17,61 @@ logger = get_logger(__name__)
 _KEY_W = 87
 
 
-class PathNavigator:
+@dataclass
+class AnglePidController:
+    """将角度误差平滑转换为受限的鼠标转向指令。"""
+
+    kp: float = 0.85
+    ki: float = 0.04
+    kd: float = 0.10
+    output_limit: float = 35.0
+    integral_limit: float = 120.0
+    deadband: float = 4.0
+    max_dt: float = 0.25
+    _integral: float = 0.0
+    _last_error: float | None = None
+    _last_time: float | None = None
+
+    def reset(self) -> None:
+        self._integral = 0.0
+        self._last_error = None
+        self._last_time = None
+
+    def update(self, error: float, now: float) -> float:
+        if abs(error) <= self.deadband:
+            self.reset()
+            return 0.0
+
+        if self._last_time is None:
+            dt = self.max_dt
+            derivative = 0.0
+        else:
+            dt = max(1e-3, min(self.max_dt, now - self._last_time))
+            derivative = (
+                0.0
+                if self._last_error is None
+                else (error - self._last_error) / dt
+            )
+
+        if self._last_error is not None and error * self._last_error < 0:
+            self._integral = 0.0
+        self._integral += error * dt
+        self._integral = max(
+            -self.integral_limit,
+            min(self.integral_limit, self._integral),
+        )
+
+        output = self.kp * error + self.ki * self._integral + self.kd * derivative
+        output = max(-self.output_limit, min(self.output_limit, output))
+
+        self._last_error = error
+        self._last_time = now
+        return output
+
+
+class WaypointNavigator:
+    """根据实时位置和朝向，将角色移动到单个地图路径点。"""
+
     def __init__(
         self,
         context: Context,
@@ -38,8 +93,12 @@ class PathNavigator:
         self.frame_interval = 0.1
         self.turn_pixels_per_degree = 10.0
         self.max_turn_degrees = 35.0
-        self.align_threshold = 12.0
+        self.align_threshold = 4.0
         self.move_pulse = 0.12
+        self.turn_pid = AnglePidController(
+            output_limit=self.max_turn_degrees,
+            deadband=self.align_threshold,
+        )
         self.w_down = False
         self.current_point: tuple[int, int] | None = None
         self.locator = MapLocator(debug=debug)
@@ -69,10 +128,11 @@ class PathNavigator:
             else None
         )
         last_log_time = 0.0
+        self.turn_pid.reset()
 
         while not self.context.tasker.stopping:
             if deadline is not None and time.monotonic() >= deadline:
-                logger.info("PathNavigator timeout: target=%s", target)
+                logger.info("WaypointNavigator timeout: target=%s", target)
                 self.release()
                 return False
             if self.should_cancel is not None and self.should_cancel():
@@ -91,6 +151,7 @@ class PathNavigator:
                 or not angle.found
                 or angle.angle is None
             ):
+                self.turn_pid.reset()
                 self.sleep_remaining(started)
                 continue
 
@@ -100,7 +161,7 @@ class PathNavigator:
             distance = math.hypot(dx, dy)
             if distance <= self.tolerance:
                 logger.info(
-                    "PathNavigator arrived: target=%s current=%s distance=%.1f",
+                    "WaypointNavigator arrived: target=%s current=%s distance=%.1f",
                     target,
                     location.point,
                     distance,
@@ -110,12 +171,7 @@ class PathNavigator:
 
             desired_angle = math.degrees(math.atan2(dx, -dy)) % 360.0
             angle_delta = (desired_angle - angle.angle + 540.0) % 360.0 - 180.0
-            turn_degrees = max(
-                -self.max_turn_degrees,
-                min(self.max_turn_degrees, angle_delta),
-            )
-            if abs(angle_delta) <= self.align_threshold:
-                turn_degrees = 0.0
+            turn_degrees = self.turn_pid.update(angle_delta, time.monotonic())
             turn_dx = int(round(turn_degrees * self.turn_pixels_per_degree))
 
             if not self.w_down:
@@ -130,12 +186,13 @@ class PathNavigator:
             now = time.monotonic()
             if now - last_log_time >= 2.0:
                 logger.info(
-                    "PathNavigator moving: target=%s current=%s distance=%.1f "
-                    "angle_delta=%.1f",
+                    "WaypointNavigator moving: target=%s current=%s distance=%.1f "
+                    "angle_delta=%.1f turn=%.1f",
                     target,
                     location.point,
                     distance,
                     angle_delta,
+                    turn_degrees,
                 )
                 last_log_time = now
 
@@ -148,6 +205,7 @@ class PathNavigator:
         return False
 
     def release(self) -> None:
+        self.turn_pid.reset()
         if self.w_down:
             self.controller.post_key_up(_KEY_W).wait()
             self.w_down = False

@@ -6,7 +6,7 @@ import numpy as np
 
 from ..Common.logger import get_logger
 from ..Common.utils import match_template_in_region
-from .resources import resource_base_path
+from .resource_paths import resource_base_path
 
 logger = get_logger(__name__)
 
@@ -24,7 +24,7 @@ class MapLocationResult:
 class MapLocator:
     MAP_SIZE = (11264, 11264)  # 大地图模板尺寸
     MINI_MAP_ROI = (28, 15, 150, 150)  # 小地图ROI
-    BUTTON_ROI = (1163, 11, 40, 40)
+    BUTTON_ROI = (16, 656, 31, 35)
     MAP_CROP_SIZES = (
         268,
         530,
@@ -33,6 +33,7 @@ class MapLocator:
     SEARCH_RADIUS = 256  # 邻域搜索半径
     GLOBAL_MIN_SCORE = 0.85  # 全局搜索的最低置信度
     LOCAL_MIN_SCORE = 0.75  # 邻域搜索的最低置信度
+    TELEPORT_DISTANCE = 320
     SMOOTHING_ALPHA = 0.7  # 越小越平滑，但是响应越慢
     MIN_FILTER_PIXELS = (
         120  # 模板中至少要有这么多有效像素才进行匹配，否则直接放弃，避免误匹配
@@ -57,17 +58,11 @@ class MapLocator:
 
     def __init__(self, debug: bool = False):
         self.big_map_path = resource_base_path() / "image/map/bigworldmapSecond.png"
-        self.sceen_button_path = (
-            resource_base_path() / "image/Common/Button/InWorld/Characters.png"
+        self.chat_button_path = (
+            resource_base_path() / "image/Common/Button/InWorld/Chat.png"
         )
-        self.sceen_button_with_red_dot_path = (
-            resource_base_path()
-            / "image/Common/Button/InWorld/CharactersWithRedDot.png"
-        )
-        self.button_template = cv2.imread(str(self.sceen_button_path), cv2.IMREAD_COLOR)
-        self.button_with_red_dot_template = cv2.imread(
-            str(self.sceen_button_with_red_dot_path), cv2.IMREAD_COLOR
-        )
+
+        self.chat_template = cv2.imread(str(self.chat_button_path), cv2.IMREAD_COLOR)
         self.debug = debug
         self.last_center: tuple[int, int] | None = None
         self.smoothed_center: tuple[float, float] | None = None
@@ -192,23 +187,16 @@ class MapLocator:
         template = cv2.subtract(mini_gray, 3)
 
         # 检查是否在大世界界面
-        button_found, _, _, _ = match_template_in_region(
+        button_found, prob, _, _ = match_template_in_region(
             frame,
             self.BUTTON_ROI,
-            self.button_template,
-            min_similarity=0.6,
+            self.chat_template,
+            min_similarity=0.2,
             green_mask=True,
         )
+        print(f"Chat button found: {button_found}, prob: {prob:.2f}")
+        if not button_found:
 
-        button_with_red_dot_found, _, _, _ = match_template_in_region(
-            frame,
-            self.BUTTON_ROI,
-            self.button_with_red_dot_template,
-            min_similarity=0.6,
-            green_mask=True,
-        )
-
-        if not (button_found or button_with_red_dot_found):
             result = self.last_location_result(
                 "not_in_world",
                 1.0 if self.last_center is not None else 0.0,
@@ -218,24 +206,22 @@ class MapLocator:
             return result
 
         # 多尺度匹配
-        matches = [
-            self.match_template(template, template_mask, w, h, index)
-            for index in range(len(self.MAP_CROP_SIZES))
-        ]
-        valid_matches = [
-            (index, match) for index, match in enumerate(matches) if match.found
-        ]
-        if valid_matches:
-            selected_index, result = max(
-                valid_matches,
-                key=lambda item: (
-                    item[1].score,
-                    item[0] == self._active_map_crop_index,
-                ),
-            )
+        selected_index, result = self.match_template_all_scales(
+            template,
+            template_mask,
+            w,
+            h,
+        )
+        if result.found:
             self.activate_map_crop_size(selected_index)
-        else:
-            result = matches[self._active_map_crop_index]
+
+        result = self.recover_from_teleport(
+            template,
+            template_mask,
+            w,
+            h,
+            result,
+        )
 
         raw_point = result.raw_point  # 原始坐标
         polygon = result.polygon  # 匹配区域的四边形顶点坐标
@@ -246,7 +232,7 @@ class MapLocator:
             self.last_center = None
             self.smoothed_center = None
             point = None
-        elif self.smoothed_center is None:
+        elif self.smoothed_center is None or mode == "global_teleport":
             self.smoothed_center = tuple(float(value) for value in raw_point)
             point = raw_point
         else:
@@ -272,6 +258,81 @@ class MapLocator:
 
         return result
 
+    def match_template_all_scales(
+        self,
+        template: np.ndarray,
+        template_mask: np.ndarray,
+        w: int,
+        h: int,
+        *,
+        force_global: bool = False,
+    ) -> tuple[int, MapLocationResult]:
+        matches = [
+            self.match_template(
+                template,
+                template_mask,
+                w,
+                h,
+                index,
+                force_global=force_global,
+            )
+            for index in range(len(self.MAP_CROP_SIZES))
+        ]
+        valid_matches = [
+            (index, match) for index, match in enumerate(matches) if match.found
+        ]
+        if valid_matches:
+            return max(
+                valid_matches,
+                key=lambda item: (
+                    item[1].score,
+                    item[0] == self._active_map_crop_index,
+                ),
+            )
+        return self._active_map_crop_index, matches[self._active_map_crop_index]
+
+    def recover_from_teleport(
+        self,
+        template: np.ndarray,
+        template_mask: np.ndarray,
+        w: int,
+        h: int,
+        result: MapLocationResult,
+    ) -> MapLocationResult:
+        if self.last_center is None:
+            return result
+
+        should_recover = not result.found or result.raw_point is None
+        if result.mode == "local" and result.raw_point is not None:
+            distance = math.hypot(
+                result.raw_point[0] - self.last_center[0],
+                result.raw_point[1] - self.last_center[1],
+            )
+            should_recover = should_recover or distance >= self.TELEPORT_DISTANCE
+
+        if not should_recover:
+            return result
+
+        global_index, global_result = self.match_template_all_scales(
+            template,
+            template_mask,
+            w,
+            h,
+            force_global=True,
+        )
+        if not global_result.found or global_result.raw_point is None:
+            return result
+
+        self.activate_map_crop_size(global_index)
+        return MapLocationResult(
+            found=global_result.found,
+            point=global_result.point,
+            raw_point=global_result.raw_point,
+            score=global_result.score,
+            mode="global_teleport",
+            polygon=global_result.polygon,
+        )
+
     def match_template(
         self,
         template: np.ndarray,
@@ -279,6 +340,8 @@ class MapLocator:
         w: int,
         h: int,
         map_crop_index: int,
+        *,
+        force_global: bool = False,
     ) -> MapLocationResult:
         scale, big_match = self._match_maps[map_crop_index]
         raw_point = None
@@ -290,7 +353,7 @@ class MapLocator:
             min_score = self.GLOBAL_MIN_SCORE
             mode = "global"
 
-            if self.last_center is not None:
+            if self.last_center is not None and not force_global:
                 # 邻域搜索
                 center_x = self.last_center[0] * scale
                 center_y = self.last_center[1] * scale
@@ -381,7 +444,7 @@ class MapLocator:
         )
 
     def setup_debug_window(self) -> None:
-        """Create the OpenCV window with trackbar and mouse callback (once)."""
+        """创建带滑块和鼠标回调的 OpenCV 调试窗口。"""
         cv2.namedWindow(self.DEBUG_WIN, cv2.WINDOW_AUTOSIZE)
 
         def _on_zoom(val: int) -> None:
