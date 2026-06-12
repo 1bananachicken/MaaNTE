@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import ctypes
 import json
 import time
 from dataclasses import dataclass
 from pathlib import Path
+from ctypes import wintypes
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -57,6 +59,7 @@ DEFAULT_WIDTH = 1280
 DEFAULT_HEIGHT = 720
 DEFAULT_ROUTE_TIMING_SCALE = 1.0
 DEFAULT_INTERACTION_PAUSE = 0.7
+DEFAULT_DIRECT_INPUT = True
 MIN_ROUTE_TIMING_SCALE = 0.25
 MAX_ROUTE_TIMING_SCALE = 1.2
 MIN_INTERACTION_PAUSE = 0.0
@@ -95,6 +98,10 @@ BLACK_SCREEN_BRIGHT_PIXEL_COUNT = 300
 FAST_TEMPLATE_SAMPLE_LIMIT = 64
 FAST_TEMPLATE_CANDIDATE_LIMIT = 5000
 FAST_TEMPLATE_ANCHOR_TOLERANCE = 45
+DIRECT_KEY_TAP_DURATION = 0.01
+DIRECT_QUICK_PICK_TAP_DURATION = 0.002
+DIRECT_ACTION_KEY_MIN_TAP_DURATION = 0.05
+DIRECT_ACTION_KEYS = {"space", "lshift", "shift"}
 ENABLE_FAST_COLOR_RECO = True
 FAST_TEMPLATE_RECO_NODES = {
     "PinkPawHeist_Core3_CheckInteractTemplateOnce",
@@ -414,11 +421,142 @@ def _fast_recognize_node(node_name, image):
     return None
 
 
+ULONG_PTR = (
+    ctypes.c_ulonglong if ctypes.sizeof(ctypes.c_void_p) == 8 else ctypes.c_ulong
+)
+
+
+class _KEYBDINPUT(ctypes.Structure):
+    _fields_ = [
+        ("wVk", wintypes.WORD),
+        ("wScan", wintypes.WORD),
+        ("dwFlags", wintypes.DWORD),
+        ("time", wintypes.DWORD),
+        ("dwExtraInfo", ULONG_PTR),
+    ]
+
+
+class _MOUSEINPUT(ctypes.Structure):
+    _fields_ = [
+        ("dx", wintypes.LONG),
+        ("dy", wintypes.LONG),
+        ("mouseData", wintypes.DWORD),
+        ("dwFlags", wintypes.DWORD),
+        ("time", wintypes.DWORD),
+        ("dwExtraInfo", ULONG_PTR),
+    ]
+
+
+class _INPUT_UNION(ctypes.Union):
+    _fields_ = [("ki", _KEYBDINPUT), ("mi", _MOUSEINPUT)]
+
+
+class _INPUT(ctypes.Structure):
+    _fields_ = [("type", wintypes.DWORD), ("u", _INPUT_UNION)]
+
+
+class DirectInputSender:
+    INPUT_MOUSE = 0
+    INPUT_KEYBOARD = 1
+    KEYEVENTF_KEYUP = 0x0002
+    KEYEVENTF_SCANCODE = 0x0008
+    MAPVK_VK_TO_VSC = 0
+    MOUSE_FLAGS = {
+        "left": (0x0002, 0x0004),
+        "right": (0x0008, 0x0010),
+        "middle": (0x0020, 0x0040),
+    }
+
+    def __init__(self, enabled=True):
+        self.enabled = bool(enabled)
+        self.available = False
+        self.user32 = None
+        if not self.enabled:
+            return
+        try:
+            self.user32 = ctypes.windll.user32
+            self.user32.SendInput.argtypes = [
+                wintypes.UINT,
+                ctypes.POINTER(_INPUT),
+                ctypes.c_int,
+            ]
+            self.user32.SendInput.restype = wintypes.UINT
+            self.available = True
+        except Exception as exc:
+            print(f"[PinkPawHeist/Core3][WARN] direct input unavailable: {exc}")
+
+    def _send(self, input_obj):
+        if not self.available or self.user32 is None:
+            return False
+        sent = self.user32.SendInput(
+            1, ctypes.byref(input_obj), ctypes.sizeof(input_obj)
+        )
+        return sent == 1
+
+    def _keyboard_input(self, vk, is_up=False):
+        scan = int(self.user32.MapVirtualKeyW(int(vk), self.MAPVK_VK_TO_VSC))
+        flags = self.KEYEVENTF_KEYUP if is_up else 0
+        w_vk = int(vk)
+        if scan:
+            flags |= self.KEYEVENTF_SCANCODE
+            w_vk = 0
+        input_obj = _INPUT()
+        input_obj.type = self.INPUT_KEYBOARD
+        input_obj.u.ki = _KEYBDINPUT(
+            wVk=w_vk,
+            wScan=scan,
+            dwFlags=flags,
+            time=0,
+            dwExtraInfo=0,
+        )
+        return input_obj
+
+    def key_down(self, vk):
+        return self._send(self._keyboard_input(vk, is_up=False))
+
+    def key_up(self, vk):
+        return self._send(self._keyboard_input(vk, is_up=True))
+
+    def click_key(self, vk, duration=DIRECT_KEY_TAP_DURATION):
+        if not self.key_down(vk):
+            return False
+        released = False
+        try:
+            time.sleep(max(float(duration), 0.0))
+            released = self.key_up(vk)
+            return released
+        finally:
+            if not released:
+                self.key_up(vk)
+
+    def _mouse_input(self, flags):
+        input_obj = _INPUT()
+        input_obj.type = self.INPUT_MOUSE
+        input_obj.u.mi = _MOUSEINPUT(
+            dx=0,
+            dy=0,
+            mouseData=0,
+            dwFlags=flags,
+            time=0,
+            dwExtraInfo=0,
+        )
+        return input_obj
+
+    def mouse_down(self, key="left"):
+        flags = self.MOUSE_FLAGS.get(key, self.MOUSE_FLAGS["left"])[0]
+        return self._send(self._mouse_input(flags))
+
+    def mouse_up(self, key="left"):
+        flags = self.MOUSE_FLAGS.get(key, self.MOUSE_FLAGS["left"])[1]
+        return self._send(self._mouse_input(flags))
+
+
 class Core3ActionHelper:
-    def __init__(self, ctx: Context):
+    def __init__(self, ctx: Context, direct_input=True):
         """保存 MAA 上下文，并初始化鼠标当前位置缓存。"""
         self.ctx = ctx
         self.mx, self.my = DEFAULT_WIDTH // 2, DEFAULT_HEIGHT // 2
+        self.direct_input = DirectInputSender(enabled=direct_input)
 
     @property
     def controller(self):
@@ -459,6 +597,22 @@ class Core3ActionHelper:
         vk = VK.get(_norm_key(key_str))
         if vk is None:
             return False
+        direct = self.direct_input
+        key_name = _norm_key(key_str)
+        if direct.available:
+            if node_type == "KeyDown" and direct.key_down(vk):
+                if node_type != "KeyUp":
+                    self.raise_if_stopped()
+                return True
+            if node_type == "KeyUp" and direct.key_up(vk):
+                return True
+            if node_type == "ClickKey":
+                duration = DIRECT_KEY_TAP_DURATION
+                if extra and "direct_duration" in extra:
+                    duration = float(extra["direct_duration"])
+                if direct.click_key(vk, duration=duration):
+                    self.raise_if_stopped()
+                    return True
         controller = self.controller
         if controller is not None:
             if node_type == "KeyDown":
@@ -477,7 +631,9 @@ class Core3ActionHelper:
             return True
         param = {"key": vk}
         if extra:
-            param.update(extra)
+            param.update(
+                {key: value for key, value in extra.items() if key != "direct_duration"}
+            )
         node_name = f"PinkPawHeist_{node_type}"
         override = {node_name: {"action": {"type": node_type, "param": param}}}
         ret = self.ctx.run_task(node_name, pipeline_override=override) is not None
@@ -485,9 +641,19 @@ class Core3ActionHelper:
             self.raise_if_stopped()
         return ret
 
-    def click_key(self, key_str):
+    def click_key(self, key_str, duration=None):
         """发送一次按键点击。"""
-        return self._call_key("ClickKey", key_str)
+        key = _norm_key(key_str)
+        if duration is None:
+            duration = (
+                DIRECT_QUICK_PICK_TAP_DURATION
+                if key == "f"
+                else DIRECT_KEY_TAP_DURATION
+            )
+        extra = None
+        if duration is not None:
+            extra = {"direct_duration": max(float(duration), 0.0)}
+        return self._call_key("ClickKey", key_str, extra=extra)
 
     def key_down(self, key_str):
         """发送按键按下事件。"""
@@ -548,8 +714,25 @@ class Core3ActionHelper:
         self.raise_if_stopped()
         return ret
 
+    def focus_window(self, x=None, y=None):
+        """Use a controller click to bring the game window to foreground."""
+        self.raise_if_stopped()
+        px = DEFAULT_WIDTH // 2 if x is None else int(x)
+        py = DEFAULT_HEIGHT // 2 if y is None else int(y)
+        controller = self.controller
+        if controller is not None and hasattr(controller, "post_click"):
+            ret = controller.post_click(px, py)
+            if hasattr(ret, "wait"):
+                ret.wait()
+            self.mx, self.my = px, py
+            self.raise_if_stopped()
+            return True
+        return self.click(px, py)
+
     def mouse_down(self, key="left"):
         """发送鼠标按下事件，主要用于长按攻击或鼠标键操作。"""
+        if self.direct_input.mouse_down(key=key):
+            return
         vk = MOUSE_VK.get(key, MOUSE_VK["left"])
         controller = self.controller
         if controller is not None:
@@ -557,6 +740,8 @@ class Core3ActionHelper:
 
     def mouse_up(self, key="left"):
         """发送鼠标抬起事件，配合 mouse_down 结束长按。"""
+        if self.direct_input.mouse_up(key=key):
+            return
         vk = MOUSE_VK.get(key, MOUSE_VK["left"])
         controller = self.controller
         if controller is not None:
@@ -569,6 +754,13 @@ class Core3ActionHelper:
                 self.key_up(key)
             except Exception as exc:
                 print(f"[PinkPawHeist/Core3] failed to release {key}: {exc}")
+        for key in MOUSE_VK:
+            try:
+                self.direct_input.mouse_up(key)
+            except Exception as exc:
+                print(
+                    f"[PinkPawHeist/Core3] failed to release direct mouse {key}: {exc}"
+                )
         controller = self.controller
         if controller is None:
             return
@@ -597,23 +789,25 @@ class PinkPawHeistCore3Path:
 
     def __init__(self, ctx: Context, params: dict | None = None):
         """读取 Core3 配置，初始化路线状态、切人状态、拾取状态和撤离策略。"""
+        params = params or {}
         self.ctx = ctx
-        self.ah = Core3ActionHelper(ctx)
+        direct_input = _parse_bool(params.get("direct_input"), DEFAULT_DIRECT_INPUT)
+        self.ah = Core3ActionHelper(ctx, direct_input=direct_input)
         self.exit_state = {1: False, 2: False, 3: False, 4: False}
         self.avoid_methods = [self.AVOID_METHOD_DASH, self.AVOID_METHOD_ATTACK]
-        avoid_method = (params or {}).get(self.CONF_AVOID_MTH, self.AVOID_METHOD_DASH)
+        avoid_method = params.get(self.CONF_AVOID_MTH, self.AVOID_METHOD_DASH)
         if avoid_method not in self.avoid_methods:
             self.log_warning(f"unknown avoid_method {avoid_method!r}, fallback to dash")
             avoid_method = self.AVOID_METHOD_DASH
         self.route_timing_scale = _parse_timing_scale(
-            (params or {}).get("timing_scale", DEFAULT_ROUTE_TIMING_SCALE)
+            params.get("timing_scale", DEFAULT_ROUTE_TIMING_SCALE)
         )
         self.interaction_pause = _parse_interaction_pause(
-            (params or {}).get("interaction_pause", DEFAULT_INTERACTION_PAUSE)
+            params.get("interaction_pause", DEFAULT_INTERACTION_PAUSE)
         )
         self.early_extract_exit = {
-            1: _parse_bool((params or {}).get(self.CONF_EARLY_EXTRACT_EXIT1), False),
-            2: _parse_bool((params or {}).get(self.CONF_EARLY_EXTRACT_EXIT2), False),
+            1: _parse_bool(params.get(self.CONF_EARLY_EXTRACT_EXIT1), False),
+            2: _parse_bool(params.get(self.CONF_EARLY_EXTRACT_EXIT2), False),
         }
         self.config = {
             self.CONF_FIGHTER: ["4", "1"],
@@ -783,7 +977,7 @@ class PinkPawHeistCore3Path:
         if not self._check_interval(name, interval):
             return False
         if key == "f":
-            self.ah.click_key(key)
+            self.ah.click_key(key, duration=DIRECT_QUICK_PICK_TAP_DURATION)
             if down_time and down_time > 0.06:
                 self.sleep(down_time)
             if after_sleep:
@@ -794,7 +988,10 @@ class PinkPawHeistCore3Path:
             self.sleep(down_time)
             self.send_key_up(key)
         else:
-            self.ah.click_key(key)
+            tap_duration = max(float(down_time or 0.0), DIRECT_KEY_TAP_DURATION)
+            if key in DIRECT_ACTION_KEYS:
+                tap_duration = max(tap_duration, DIRECT_ACTION_KEY_MIN_TAP_DURATION)
+            self.ah.click_key(key, duration=tap_duration)
         if after_sleep:
             self.sleep(after_sleep)
         return True
@@ -2206,7 +2403,7 @@ class PinkPawHeistCore3Path:
         """第一个撤离点不可直接撤时，继续执行 LG2 WP1 剩余搜刮路线。"""
         self.log_round_info("LG2 WP1剩余路线")
         self.send_key_down("w")
-        self.sleep(2.05)
+        self.sleep(2.14)
         self.send_key_up("w")
         self.sleep(0.11)
         self.send_key_down("f")  # start pick
@@ -2216,7 +2413,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("a")
         self.sleep(0.30)
         self.send_key_down("w")
-        self.sleep(3.00)
+        self.sleep(0.80)
         self.send_key_up("w")
         self.sleep(0.11)
         self.send_key_down("d")
@@ -2230,13 +2427,13 @@ class PinkPawHeistCore3Path:
         self.switch_to_runner()
         self.sleep(0.11)
         self.send_key_down("a")
-        self.sleep(5.41)
+        self.sleep(0.81)
         self.send_key_up("a")
         self.sleep(0.30)
         self.send_key_down("d")
         self.sleep(0.2)
         self.send_key("lshift")
-        self.sleep(1.37)
+        self.sleep(1.40)
         self.send_key_up("d")
         self.switch_to_runner()
         self.sleep(0.11)
@@ -2649,11 +2846,11 @@ class PinkPawHeistCore3Path:
         self.send_key_up("a")
         self.sleep(0.11)
         self.send_key_down("s")
-        self.sleep(0.66)
+        self.sleep(0.64)
         self.send_key_up("s")
         self.sleep(0.11)
         self.send_key_down("a")
-        self.sleep(0.54)
+        self.sleep(0.53)
         self.send_key_up("a")
         self.sleep(0.13)
         self.send_key_down("s")
@@ -2721,7 +2918,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("w")
         self.sleep(0.22)
         self.send_key_down("d")
-        self.sleep(0.60)
+        self.sleep(0.58)
         self.send_key_up("d")
         self.sleep(0.31)
         self.send_key_down("s")
@@ -2888,8 +3085,8 @@ class PinkPawHeistCore3Path:
             self.lg1_wp4_buster()
             self.lg1_wp5_buster()
         elif idx == 1:
-            self.lg1_wp4()
-            self.lg1_wp5_avoid_combat_03()
+            self.lg1_wp4_buster()
+            self.lg1_wp5_buster2()
         self.wait_team_ui_settle()
         self.lg2_wp1_to_exit1()  # self.lg2_wp1_to_exit1_safer(False)
         self.lg2_wp1_remains()
@@ -3053,45 +3250,35 @@ class PinkPawHeistCore3Path:
         self.send_key_down("d")
         self.sleep(0.64)
         self.send_key("lshift", down_time=0.24)
-        self.sleep(0.64)
+        self.sleep(0.60)
         self.send_key_up("d")
         self.sleep(0.10)
         self.send_key_down("w")
         self.sleep(0.24)
         self.send_key("lshift", down_time=0.24)
         self.sleep(0.60)
+        self.switch_to_fighter(
+            check_switched=True, mode=1
+        )  # 切到狗哥潜行避免碰到怪改变路径
         self.wait_and_interact(direction="w", is_lock=True, time_out=5.2)
-        self.click(down_time=0.64)
-        self.sleep(0.10)
-        self.send_key_down("d")
-        self.sleep(0.32)
         self.send_key_down("w")
+        self.sleep(0.15)
+        self.send_key_down("lshift")
         self.sleep(0.24)
-        self.send_key_up("d")
-        self.sleep(0.24)
-        self.send_key("space", down_time=0.24)
+        self.send_key("d", down_time=0.30)
+        self.sleep(1.28)
+        self.send_key_up("lshift")
         self.sleep(0.64)
-        self.send_key("space", down_time=0.24)
-        self.sleep(0.64)
-        self.send_key("space", down_time=0.24)
-        self.sleep(0.64)
-        self.send_key("space", down_time=0.24)
-        self.sleep(0.64)
-        self.send_key("space", down_time=0.24)
-        self.sleep(0.64)
-        self.send_key("space", down_time=0.24)
-        self.sleep(0.64)
-        self.send_key("space", down_time=0.24)
-        self.sleep(0.64)
-        self.send_key("space", down_time=0.24)
-        self.sleep(0.64)
-        self.send_key("space", down_time=0.24)
-        self.sleep(0.84)
-        self.send_key("lshift", down_time=0.24)
-        self.sleep(0.84)
+        self.send_key("d", down_time=0.12)
+        self.sleep(0.32)
+        self.send_key("a", down_time=0.32)
+        self.sleep(1.14)
         self.send_key_up("w")
         self.sleep(0.10)
-        self.click(down_time=0.64)
+        self.switch_to_avoider(check_switched=True)
+        self.sleep(0.10)
+        self.send_key("a", down_time=0.23)
+        self.sleep(0.10)
         self.send_key_down("w")
         self.wait_and_interact(direction="w", is_lock=True, time_out=6.4)
         if self.find_interac():
@@ -3110,11 +3297,9 @@ class PinkPawHeistCore3Path:
         self.send_key_down("a")
         self.sleep(0.20)
         self.send_key("lshift", down_time=0.20)
-        self.sleep(0.20)
+        self.sleep(0.50)
         self.send_key("lshift", down_time=0.20)
-        self.sleep(0.20)
-        self.send_key("lshift", down_time=0.20)
-        self.sleep(1.20)
+        self.sleep(2.30)
         self.send_key_up("a")
         self.sleep(0.10)
         self.send_key("a", down_time=0.10)
@@ -3152,7 +3337,7 @@ class PinkPawHeistCore3Path:
         self.send_key("lshift", down_time=0.24)
         self.sleep(0.42)
         self.send_key_down("d")
-        self.sleep(0.42)
+        self.sleep(0.32)
         self.send_key_up("d")
         self.sleep(0.42)
         self.send_key("lshift", down_time=0.24)
@@ -3162,11 +3347,18 @@ class PinkPawHeistCore3Path:
         self.click(down_time=0.64)
         self.sleep(0.10)
         self.send_key_down("w")
-        self.wait_and_interact(direction="w", is_lock=True, time_out=7.64)
         self.sleep(0.10)
+        self.send_key_down("d")
+        self.wait_and_interact(direction="d", is_lock=True, time_out=7.64)
+        self.sleep(0.10)
+        self.send_key_up("w")
+        if self.wait_door_open(time_out=1.14):
+            self.sleep(0.10)
+            self.send_key("f", down_time=0.10)
+            self.sleep(0.10)
         self.send_key_down("w")
         self.sleep(0.24)
-        self.send_key("a", down_time=0.42)
+        self.send_key("a", down_time=0.36)
         self.wait_and_interact(direction="w", is_lock=False, time_out=3.65)
         self.sleep(0.30)
 
@@ -3228,7 +3420,7 @@ class PinkPawHeistCore3Path:
         self.send_key_up("d")
         self.sleep(0.06)
         self.send_key_down("w")
-        self.sleep(2.00)
+        self.sleep(1.98)
         self.send_key_up("w")
         self.sleep(0.11)
         self.send_key_down("d")
@@ -3370,6 +3562,37 @@ class PinkPawHeistCore3Path:
         self.sleep(0.10)
         self.wait_and_interact(direction="w")
 
+    def lg1_wp5_buster2(self):
+        """浔/翳分支使用的 LG1 WP5 避战与进门路线。"""
+        self.log_round_info("LG1 WP5 Buster 开始避战路线")
+        self.switch_to_fighter(check_switched=True, mode=1)
+        self.sleep(0.50)
+        self.send_key_down("w")
+        self.sleep(0.1)
+        self.send_key_down("lshift")
+        self.sleep(1.0)
+        self.send_key_up("lshift")
+        self.sleep(0.1)
+        self.send_key_up("w")
+        self.sleep(0.10)
+        self.send_key_down("w")
+        self.sleep(6.00)
+        self.send_key_up("w")
+        self.switch_to_runner(check_switched=True)
+        self.sleep(0.32)
+        self.send_key_down("d")
+        self.sleep(0.30)
+        self.send_key_up("d")
+        self.wait_and_interact(is_lock=True)
+        self.sleep(0.10)
+        self.send_key_down("a")
+        self.sleep(0.25)
+        self.send_key_up("a")
+        self.sleep(0.10)
+        self.send_key_down("w")
+        self.sleep(0.10)
+        self.wait_and_interact(direction="w")
+
     def lg2_wp2_to_exit2_safer(self):
         """更稳的 LG2 WP2 路线：调整前半段走位后再尝试第二撤离点。"""
         self.log_round_info("LG2 WP2 Safer 尝试出口2")
@@ -3418,15 +3641,19 @@ class PinkPawHeistCore3Path:
         self.switch_to_runner()
         self.sleep(0.20)
         self.send_key_down("a")
-        self.sleep(0.72)
+        self.sleep(0.70)
         self.send_key_up("a")
         self.sleep(1.26)
         self.send_key_down("w")
-        self.sleep(2.60)
+        self.sleep(2.62)
         self.send_key_up("w")
         self.sleep(0.11)
         self.send_key_down("d")
-        self.sleep(2.31)
+        self.sleep(0.13)
+        self.send_key("lshift", down_time=0.10)
+        self.sleep(0.21)
+        self.send_key("lshift", down_time=0.10)
+        self.sleep(1.01)
         self.send_key_up("d")
         self.sleep(0.11)
         self.send_key_down("w")
@@ -3510,8 +3737,9 @@ class PinkPawHeistScheme3Action(CustomAction):
                 )
         path = PinkPawHeistCore3Path(context, params=params)
         try:
+            input_mode = "direct" if path.ah.direct_input.available else "maa"
             path.log_round_info(
-                f"Start, method {path.config[path.CONF_AVOID_MTH]}, timing x{path.route_timing_scale:.2f}"
+                f"Start, method {path.config[path.CONF_AVOID_MTH]}, timing x{path.route_timing_scale:.2f}, input {input_mode}"
             )
             path.run_path()
             path._release_held_keys()
