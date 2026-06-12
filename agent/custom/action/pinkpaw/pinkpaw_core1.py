@@ -3,6 +3,7 @@ from maa.custom_action import CustomAction
 from maa.context import Context
 from maa.define import Status
 from datetime import datetime
+from utils import screen
 
 VK = {
     "W": 0x57,
@@ -29,7 +30,7 @@ def _is_hit(result) -> bool:
 class ActionHelper:
     def __init__(self, ctx: Context):
         self.ctx = ctx
-        self.mx, self.my = 640, 360
+        self.mx, self.my = screen.map_point_to_input(640, 360)
 
     # ---------- 按键类操作 ----------
     def _call_key(self, node_type, key_str, extra=None):
@@ -53,7 +54,7 @@ class ActionHelper:
         return self._call_key("KeyUp", key_str)
 
     # ---------- 鼠标操作 ----------
-    def move_to(self, x, y, duration_ms=None):
+    def _move_to_input(self, x, y, duration_ms=None):
         dx, dy = x - self.mx, y - self.my
         if dx * dx + dy * dy < 4:
             self.mx, self.my = x, y
@@ -78,8 +79,13 @@ class ActionHelper:
             self.mx, self.my = x, y
         return ret
 
+    def move_to(self, x, y, duration_ms=None):
+        x, y = screen.map_point_to_input(x, y)
+        return self._move_to_input(x, y, duration_ms)
+
     def click(self, x, y):
-        self.move_to(x, y)
+        x, y = screen.map_point_to_input(x, y)
+        self._move_to_input(x, y)
         override = {
             "PinkPawHeist_Click": {
                 "action": {"type": "Click", "param": {"target": [x, y]}}

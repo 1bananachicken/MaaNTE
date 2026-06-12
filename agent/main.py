@@ -542,14 +542,17 @@ def _check_game_resolution():
 
     w, h = size
     screen.update_screen_size(w, h)
+    screen.update_frame_size(w, h)
     scale_x, scale_y = screen.scaling_factors()
 
-    if (w, h) == (screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT):
-        logger.info(f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})")
+    if screen.is_baseline_size(w, h):
+        logger.info(f"当前窗口分辨率: {w}x{h} [720p 基准], scale=({scale_x:.3f}, {scale_y:.3f})")
+    elif screen.is_supported_16_9(w, h):
+        logger.info(f"当前窗口分辨率: {w}x{h} [已启用 16:9 动态缩放], scale=({scale_x:.3f}, {scale_y:.3f})")
     else:
         logger.warning(
             f"当前窗口分辨率: {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
-            "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。"
+            "已启用非 16:9 兜底匹配，但固定点击仍建议使用 1280x720、1600x900、1920x1080 等 16:9 分辨率。"
         )
 
 

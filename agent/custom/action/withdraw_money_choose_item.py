@@ -3,13 +3,12 @@ import re
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+from .Common.utils import click_rect, get_image
 from utils.logger import logger
 
 
 def _screencap(controller):
-    job = controller.post_screencap()
-    job.wait()
-    return controller.cached_image
+    return get_image(controller)
 
 
 def _filtered_boxes(result):
@@ -30,12 +29,7 @@ def _box_to_rect(box):
 
 
 def _click_rect(controller, rect):
-    cx = rect[0] + rect[2] // 2
-    cy = rect[1] + rect[3] // 2
-    controller.post_touch_move(cx, cy).wait()  # 先移动再点击，防止误滑动
-    controller.post_touch_down(cx, cy).wait()
-    time.sleep(0.05)  # 间隔太短概率失效
-    controller.post_touch_up().wait()
+    click_rect(controller, rect, delay=0.05, move=True)  # 先移动再点击，防止误滑动
     time.sleep(0.05)
 
 

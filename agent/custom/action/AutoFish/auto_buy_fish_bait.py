@@ -3,7 +3,7 @@ import time
 import json
 
 from pathlib import Path
-from ..Common.utils import get_image, match_template_in_region, click_rect
+from ..Common.utils import get_image, match_template_in_region_720, click_rect, click_rect_720
 from utils import screen
 
 from maa.agent.agent_server import AgentServer
@@ -38,26 +38,20 @@ class AutoBuyFishBait(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
+        controller = context.tasker.controller
+        get_image(controller)
+
         fish_shop_region = [35, 88, 410, 475]
         find_bait_success_region = [1044, 131, 68, 23]
         select_max_region = [1202, 620, 33, 32]
         buy_region = [1050, 674, 50, 25]
         buy_confirm_region = [749, 462, 47, 25]
         buy_success_region = [569, 629, 145, 19]
-        not_enough_shell_region = [1170, 585, 18, 16]
-        shell_count_region = [961, 31, 70, 21]
 
-        fish_shop_region = screen.map_rect(fish_shop_region)
-        find_bait_success_region = screen.map_rect(find_bait_success_region)
-        select_max_region = screen.map_rect(select_max_region)
-        buy_region = screen.map_rect(buy_region)
-        buy_confirm_region = screen.map_rect(buy_confirm_region)
-        buy_success_region = screen.map_rect(buy_success_region)
-        not_enough_shell_region = screen.map_rect(not_enough_shell_region)
-        shell_count_region = screen.map_rect(shell_count_region)
+        click_w, click_h = screen.map_point_to_frame(30, 10)
+
         KEY_R = 82
         KEY_ESC = 27
-        controller = context.tasker.controller
 
         found_bait_threshold = 0.7
         if argv.custom_action_param:
@@ -72,7 +66,7 @@ class AutoBuyFishBait(CustomAction):
         match_threshold = 0.7
         while True:
             img = get_image(controller)
-            found_bait, prob, x, y = match_template_in_region(
+            found_bait, prob, x, y = match_template_in_region_720(
                 img, fish_shop_region, self.bait_template, found_bait_threshold
             )
             if found_bait:
@@ -80,12 +74,12 @@ class AutoBuyFishBait(CustomAction):
                     x, y
                 )  # 先移动到指定位置再进行点击，否则可能会触发滑动买到别的东东
                 for _ in range(3):
-                    click_rect(controller, [x, y, 30, 10])
+                    click_rect(controller, [x, y, click_w, click_h])
                     time.sleep(0.1)
 
                 time.sleep(1)  # 120hz下可能会过快地出现触发检测。适当的延时
                 img = get_image(controller)
-                found_bait_success, _, _, _ = match_template_in_region(
+                found_bait_success, _, _, _ = match_template_in_region_720(
                     img,
                     find_bait_success_region,
                     self.find_bait_success_template,
@@ -105,13 +99,13 @@ class AutoBuyFishBait(CustomAction):
 
         while True:
             img = get_image(controller)
-            found_select_max, prob, _, _ = match_template_in_region(
+            found_select_max, prob, _, _ = match_template_in_region_720(
                 img, select_max_region, self.select_max_template, match_threshold
             )
             if found_select_max:
                 PrintT(context, "autofish.select_max_found")
                 for _ in range(5):
-                    click_rect(controller, select_max_region, 0.3)
+                    click_rect_720(controller, select_max_region, 0.3)
                     time.sleep(0.1)
                 time.sleep(1)
                 break
@@ -121,13 +115,13 @@ class AutoBuyFishBait(CustomAction):
 
         while True:
             img = get_image(controller)
-            found_buy, _, _, _ = match_template_in_region(
+            found_buy, _, _, _ = match_template_in_region_720(
                 img, buy_region, self.buy_template, match_threshold
             )
             if found_buy:
                 PrintT(context, "autofish.buy_button_click")
                 for _ in range(3):
-                    click_rect(controller, buy_region, 0.3)
+                    click_rect_720(controller, buy_region, 0.3)
                     time.sleep(0.1)
                 time.sleep(0.5)
                 break
@@ -137,13 +131,13 @@ class AutoBuyFishBait(CustomAction):
 
         for _ in range(5):
             img = get_image(controller)
-            found_buy_confirm, _, _, _ = match_template_in_region(
+            found_buy_confirm, _, _, _ = match_template_in_region_720(
                 img, buy_confirm_region, self.buy_confirm_template, match_threshold
             )
             if found_buy_confirm:
                 PrintT(context, "autofish.buy_confirm_click")
                 for _ in range(3):
-                    click_rect(controller, buy_confirm_region)
+                    click_rect_720(controller, buy_confirm_region)
                     time.sleep(0.1)
                 time.sleep(0.5)
                 break
@@ -153,7 +147,7 @@ class AutoBuyFishBait(CustomAction):
 
         while True:
             img = get_image(controller)
-            found_buy_success, _, _, _ = match_template_in_region(
+            found_buy_success, _, _, _ = match_template_in_region_720(
                 img, buy_success_region, self.buy_success_template, match_threshold
             )
             if found_buy_success:
