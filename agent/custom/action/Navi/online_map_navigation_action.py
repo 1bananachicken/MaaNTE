@@ -5,7 +5,7 @@ from maa.context import Context
 from maa.custom_action import CustomAction
 
 from ..Common.logger import get_logger
-from .waypoint_navigator import load_params, parse_bool
+from .waypoint_navigator import load_params
 from .route_websocket_service import RouteWebSocketService
 from .route_runner import RouteRunner
 from .route_model import RouteSession
@@ -13,8 +13,8 @@ from .route_model import RouteSession
 logger = get_logger(__name__)
 
 
-@AgentServer.custom_action("online_route")
-class OnlineRouteAction(CustomAction):
+@AgentServer.custom_action("online_map_navigation")
+class OnlineMapNavigationAction(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
@@ -24,10 +24,11 @@ class OnlineRouteAction(CustomAction):
             host = str(params.get("host", "0.0.0.0"))
             port = int(params.get("port", 14514))
             tolerance = float(params.get("tolerance", 5.0))
+            frame_interval = max(0.05, float(params.get("frame_interval", 0.1)))
             angle_backend = str(params.get("angle_backend", "auto"))
-            debug = parse_bool(params.get("debug", False))
+            debug = bool(params.get("debug", False))
         except ValueError as exc:
-            logger.error("OnlineRoute param invalid: %s", exc)
+            logger.error("OnlineMapNavigation param invalid: %s", exc)
             return CustomAction.RunResult(success=False)
 
         route = RouteSession()
@@ -36,6 +37,7 @@ class OnlineRouteAction(CustomAction):
             route,
             angle_backend=angle_backend,
             tolerance=tolerance,
+            frame_interval=frame_interval,
             debug=debug,
         )
         network = RouteWebSocketService(
@@ -50,11 +52,11 @@ class OnlineRouteAction(CustomAction):
         try:
             network.start()
             runner.start()
-            logger.info("OnlineRoute service started: ws://%s:%s", host, port)
+            logger.info("OnlineMapNavigation service started: ws://%s:%s", host, port)
             runner.run_until_stopped(on_tick=network.publish_route)
             return CustomAction.RunResult(success=False)
         except Exception as exc:
-            logger.error("OnlineRoute failed: %s", exc)
+            logger.error("OnlineMapNavigation failed: %s", exc)
             return CustomAction.RunResult(success=False)
         finally:
             runner.close()
@@ -64,7 +66,7 @@ class OnlineRouteAction(CustomAction):
     def load_option_params(context: Context) -> dict[str, Any]:
         params: dict[str, Any] = {}
 
-        node_data = context.get_node_data("OnlineRouteAngleBackendConfig") or {}
+        node_data = context.get_node_data("OnlineMapNavigationAngleBackendConfig") or {}
         attach = node_data.get("attach")
         if isinstance(attach, dict) and attach.get("angle_backend") in {
             "auto",
@@ -73,7 +75,7 @@ class OnlineRouteAction(CustomAction):
         }:
             params["angle_backend"] = attach["angle_backend"]
 
-        node_data = context.get_node_data("OnlineRouteDebugConfig") or {}
+        node_data = context.get_node_data("OnlineMapNavigationDebugConfig") or {}
         attach = node_data.get("attach")
         if isinstance(attach, dict) and "debug" in attach:
             params["debug"] = attach["debug"]

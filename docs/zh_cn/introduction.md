@@ -7,13 +7,13 @@
 - 自动剧情
 - 自动传送
 
-## 在线地图实时定位
+## 在线地图实时定位&寻路
 
-详情见[在线地图实时定位 README](introduction/MapWebViewLocator.md)
+详情见[Navi 本地 WebSocket](introduction/NaviWebSocket.md)
 
 - NCC 实时定位
-- Leaflet 坐标标定
-- 网页地图方向指针
+- 在线地图方向广播
+- 在线地图路径点寻路
 
 ## 领取奖励
 

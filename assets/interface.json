@@ -115,8 +115,7 @@
         "resource/tasks/BagelSpam.json",
         // group:RealTimeAssist
         "resource/tasks/RealTime.json",
-        "resource/tasks/PositionStream.json",
-        "resource/tasks/OnlineRoute.json",
+        "resource/tasks/OnlineMapNavigation.json",
         "resource/tasks/SoundDodge.json",
         "resource/tasks/AutoFScroll.json",
         // group:others

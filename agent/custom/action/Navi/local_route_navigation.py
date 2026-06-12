@@ -91,11 +91,11 @@ def run_route_from_json(
             target_size=runner.source_size(),
         )
         if not waypoints:
-            logger.warning("OnlineRoute local route is empty: path=%s", json_path)
+            logger.warning("OnlineMapNavigation local route is empty: path=%s", json_path)
             return False
         route.reset(waypoints, True, runner.current_point())
         logger.info(
-            "OnlineRoute local route loaded: path=%s route=%s segment=%s waypoints=%s",
+            "OnlineMapNavigation local route loaded: path=%s route=%s segment=%s waypoints=%s",
             resolve_route_json_path(json_path),
             route_name,
             segment_index,

@@ -48,9 +48,7 @@ class AnglePidController:
         else:
             dt = max(1e-3, min(self.max_dt, now - self._last_time))
             derivative = (
-                0.0
-                if self._last_error is None
-                else (error - self._last_error) / dt
+                0.0 if self._last_error is None else (error - self._last_error) / dt
             )
 
         if self._last_error is not None and error * self._last_error < 0:
@@ -79,6 +77,7 @@ class WaypointNavigator:
         angle_backend: str = "auto",
         tolerance: float = 80.0,
         max_duration: float | None = None,
+        frame_interval: float = 0.1,
         debug: bool = False,
         on_frame: Callable[[Any, Any], None] | None = None,
         should_cancel: Callable[[], bool] | None = None,
@@ -90,7 +89,7 @@ class WaypointNavigator:
         self.debug = debug
         self.on_frame = on_frame
         self.should_cancel = should_cancel
-        self.frame_interval = 0.1
+        self.frame_interval = max(0.05, float(frame_interval))
         self.turn_pixels_per_degree = 10.0
         self.max_turn_degrees = 35.0
         self.align_threshold = 4.0
@@ -242,11 +241,3 @@ def load_params(custom_action_param: Any) -> dict[str, Any]:
         logger.warning("Parse custom_action_param failed: %s", exc)
         return {}
     return params if isinstance(params, dict) else {}
-
-
-def parse_bool(value: Any) -> bool:
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, str):
-        return value.strip().lower() in ("1", "true", "yes", "on")
-    return bool(value)

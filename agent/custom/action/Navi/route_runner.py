@@ -19,6 +19,7 @@ class RouteRunner:
         *,
         angle_backend: str = "auto",
         tolerance: float = 80.0,
+        frame_interval: float = 0.1,
         debug: bool = False,
         on_frame: Callable[[Any, Any], None] | None = None,
     ) -> None:
@@ -26,6 +27,7 @@ class RouteRunner:
         self.route = route
         self.angle_backend = angle_backend
         self.tolerance = tolerance
+        self.frame_interval = max(0.05, float(frame_interval))
         self.debug = debug
         self.on_frame = on_frame
         self.navigator: WaypointNavigator | None = None
@@ -41,6 +43,7 @@ class RouteRunner:
             self.context,
             angle_backend=self.angle_backend,
             tolerance=self.tolerance,
+            frame_interval=self.frame_interval,
             debug=self.debug,
             on_frame=self._on_frame,
             should_cancel=self._should_cancel,
