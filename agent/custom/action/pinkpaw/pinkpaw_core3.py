@@ -714,6 +714,21 @@ class Core3ActionHelper:
         self.raise_if_stopped()
         return ret
 
+    def focus_window(self, x=None, y=None):
+        """Use a controller click to bring the game window to foreground."""
+        self.raise_if_stopped()
+        px = DEFAULT_WIDTH // 2 if x is None else int(x)
+        py = DEFAULT_HEIGHT // 2 if y is None else int(y)
+        controller = self.controller
+        if controller is not None and hasattr(controller, "post_click"):
+            ret = controller.post_click(px, py)
+            if hasattr(ret, "wait"):
+                ret.wait()
+            self.mx, self.my = px, py
+            self.raise_if_stopped()
+            return True
+        return self.click(px, py)
+
     def mouse_down(self, key="left"):
         """发送鼠标按下事件，主要用于长按攻击或鼠标键操作。"""
         if self.direct_input.mouse_down(key=key):
