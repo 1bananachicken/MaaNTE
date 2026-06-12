@@ -6,15 +6,16 @@
             "description": "$preset.RealtimeAssist.description",
             "task": [
                 {
-                    "name": "NaviWebSocket",
+                    "name": "OnlineMapNavigation",
                     "option": {
-                        "NaviWebSocketSettings": {
+                        "OnlineMapNavigationSettings": {
                             "host": "0.0.0.0",
                             "port": "14514",
-                            "frame_interval": "0.1",
-                            "angle_backend": "auto",
-                            "debug": "false"
-                        }
+                            "tolerance": "5",
+                            "frame_interval": "0.1"
+                        },
+                        "OnlineMapNavigationAngleBackend": "auto",
+                        "OnlineMapNavigationDebug": "No"
                     },
                     "enabled": true
                 },

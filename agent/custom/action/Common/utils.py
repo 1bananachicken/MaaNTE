@@ -9,6 +9,7 @@ def get_image(controller):
     img = controller.cached_image
     return img
 
+
 def click_rect(controller, rect, delay=0.001):
     x, y, w, h = rect
     cx = x + w // 2
@@ -16,6 +17,7 @@ def click_rect(controller, rect, delay=0.001):
     controller.post_touch_down(cx, cy).wait()
     time.sleep(delay)
     controller.post_touch_up().wait()
+
 
 def click_rect_multiple(controller, rect, repeat=3):
     """点击多次以确保可靠性"""
@@ -27,25 +29,28 @@ def click_rect_multiple(controller, rect, repeat=3):
         time.sleep(0.05)
         controller.post_touch_up().wait()
 
-def match_template_in_region(img, region, template, min_similarity=0.8, green_mask=False):
+
+def match_template_in_region(
+    img, region, template, min_similarity=0.8, green_mask=False
+):
     if img is None or not isinstance(img, np.ndarray):
         return False, 0.0, 0, 0
-    
+
     x1, y1, w, h = region
     x2, y2 = x1 + w, y1 + h
-    
+
     h, w = img.shape[:2]
     x1, y1 = max(0, x1), max(0, y1)
     x2, y2 = min(w, x2), min(h, y2)
-    
+
     if x2 <= x1 or y2 <= y1:
         return False, 0.0, 0, 0
-        
+
     roi = img[y1:y2, x1:x2]
-    
+
     if len(roi.shape) == 3 and roi.shape[2] == 4:
         roi = cv2.cvtColor(roi, cv2.COLOR_BGRA2BGR)
-    
+
     if green_mask:
         lower_green = np.array([0, 255, 0], dtype=np.uint8)
         upper_green = np.array([0, 255, 0], dtype=np.uint8)
@@ -54,8 +59,12 @@ def match_template_in_region(img, region, template, min_similarity=0.8, green_ma
 
     else:
         res = cv2.matchTemplate(roi, template, cv2.TM_CCOEFF_NORMED)
+
+    res = np.nan_to_num(res, nan=-1.0, posinf=-1.0, neginf=-1.0)
+    res[(res < -1e-6) | (res > 1.0 + 1e-6)] = -1.0
+    np.clip(res, 0.0, 1.0, out=res)
     min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(res)
-    
+
     if max_val >= min_similarity:
         return True, max_val, x1 + max_loc[0], y1 + max_loc[1]
     return False, max_val, 0, 0
