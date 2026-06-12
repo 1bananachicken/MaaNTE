@@ -1,21 +1,6 @@
 {
-    "AutoMakeCoffee": {
-        "action": "Custom",
-        "custom_action": "auto_make_coffee",
-        "custom_action_param": {
-            "count": 1,
-            "freq": 2
-        }
-    },
-    "MakeCoffeeScrollToTop": {
-        "action": "Scroll",
-        "target": [
-            120,
-            400
-        ],
-        "dy": 3600
-    },
     "MakeCoffeeStart": {
+        "desc": "识别开始营业按钮",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -37,6 +22,7 @@
         }
     },
     "MakeCoffeeTargetCoffeeMaster": {
+        "desc": "识别新品练习关卡",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -58,6 +44,7 @@
         }
     },
     "MakeCoffeeStar": {
+        "desc": "识别达标星星图标",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -73,6 +60,7 @@
         }
     },
     "MakeCoffeeClaim": {
+        "desc": "识别领取按钮",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -89,6 +77,24 @@
                     "受け取る",
                     "수령"
                 ]
+            }
+        }
+    },
+    "MakeCoffeeShopMaster": {
+        "desc": "识别店长特供标识",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    768,
+                    352,
+                    108,
+                    43
+                ],
+                "expected": [
+                    "店长特供"
+                ],
+                "threshold": 0.75
             }
         }
     }

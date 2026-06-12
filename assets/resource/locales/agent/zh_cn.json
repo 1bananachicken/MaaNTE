@@ -33,6 +33,7 @@
     "coffee.step_select_level": "点击选择关卡...",
     "coffee.step_wait_start": "等待开始营业按钮...",
     "coffee.step_start_click": "找到开始按钮，点击中...",
+    "coffee.step_making_dishes": "开始制作三道菜...",
     "coffee.step_wait_star": "等待达成营业额目标...",
     "coffee.step_star_click": "找到目标，点击退出...",
     "coffee.step_wait_claim": "等待领取奖励...",
