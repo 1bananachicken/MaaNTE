@@ -19,6 +19,17 @@ def click_rect(controller, rect, delay=0.001):
     controller.post_touch_up().wait()
 
 
+def click_rect_multiple(controller, rect, repeat=3):
+    """点击多次以确保可靠性"""
+    x, y, w, h = rect
+    cx = x + w // 2
+    cy = y + h // 2
+    for _ in range(repeat):
+        controller.post_touch_down(cx, cy).wait()
+        time.sleep(0.05)
+        controller.post_touch_up().wait()
+
+
 def match_template_in_region(
     img, region, template, min_similarity=0.8, green_mask=False
 ):

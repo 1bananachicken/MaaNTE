@@ -1,6 +1,5 @@
 import time
 import json
-import random
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -8,26 +7,13 @@ from maa.context import Context
 
 from utils.maafocus import PrintT
 
-
-def get_image(controller):
-    job = controller.post_screencap()
-    job.wait()
-    img = controller.cached_image
-    return img
+from ..Common.utils import get_image, click_rect_multiple
+from .utils import wait_and_claim, press_key_f, make_croissant, make_cake, make_bread
 
 
-def click_rect(controller, rect):
-    x, y, w, h = rect
-    cx = x + w // 2
-    cy = y + h // 2
-    for _ in range(3):
-        controller.post_touch_down(cx, cy).wait()
-        time.sleep(0.05)
-        controller.post_touch_up().wait()
 
-
-@AgentServer.custom_action("auto_make_coffee")
-class AutoMakeCoffee(CustomAction):
+@AgentServer.custom_action("auto_make_coffee_lite")
+class AutoMakeCoffeeLite(CustomAction):
 
     def run(
         self, context: Context, argv: CustomAction.RunArg
@@ -36,18 +22,18 @@ class AutoMakeCoffee(CustomAction):
         controller = context.tasker.controller
         make_count = 10
         check_freq = 0.5
+        timeout = 5
         if argv.custom_action_param:
             try:
                 params = json.loads(argv.custom_action_param)
                 make_count = params.get("count", 10)
                 check_freq = params.get("freq", 0.5)
-            except:
-                pass
-
-        KEY_F = 70
-
-        click_roi = [28, 272, 65, 56]
-        exit_roi = [11, 12, 38, 37]
+                timeout = params.get("timeout", 5)
+            except json.JSONDecodeError as e:  
+                PrintT(context,  
+                    f"[AutoCoffeeLite] Failed to parse custom_action_param as JSON: {e}. "  
+                    f"Raw value: {argv.custom_action_param!r}"  
+                )  
 
         for count in range(make_count):
             if context.tasker.stopping:
@@ -74,7 +60,7 @@ class AutoMakeCoffee(CustomAction):
                         if target_result and target_result.hit:
                             break
 
-                    click_rect(
+                    click_rect_multiple(
                         controller,
                         [
                             target_result.box.x,
@@ -90,7 +76,7 @@ class AutoMakeCoffee(CustomAction):
                         continue
 
                     PrintT(context, "coffee.step_start_click")
-                    click_rect(
+                    click_rect_multiple(
                         controller,
                         [
                             start_result.box.x,
@@ -102,48 +88,39 @@ class AutoMakeCoffee(CustomAction):
                     time.sleep(3)
                     break
                 time.sleep(check_freq)
+            
 
-            # Step 2: 达成营业额
+            # Step 2: 制作三道菜
+            PrintT(context, "coffee.step_making_dishes")
+
+            make_croissant(context)
+            make_cake(context)
+            make_bread(context)
+
+            # Step 3: 达成营业额
             PrintT(context, "coffee.step_wait_star")
+            start_time = time.time()
+            exit_roi = [11, 12, 38, 37]
             while True:
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
-                click_rect(controller, click_roi)
+                if time.time() - start_time > timeout:
+                    return CustomAction.RunResult(success=False)
                 img = get_image(controller)
                 star_result = context.run_recognition("MakeCoffeeStar", img)
                 if star_result and star_result.hit:
                     PrintT(context, "coffee.step_star_click")
-                    click_rect(controller, exit_roi)
+                    click_rect_multiple(controller, exit_roi)
                     time.sleep(1)
                     break
                 time.sleep(2)
 
-            # Step 3: 点击领取
+            # Step 4: 点击领取
             PrintT(context, "coffee.step_wait_claim")
-            while True:
-                if context.tasker.stopping:
-                    return CustomAction.RunResult(success=False)
-                img = get_image(controller)
-                claim_result = context.run_recognition("MakeCoffeeClaim", img)
-                if claim_result and claim_result.hit:
-                    PrintT(context, "coffee.step_claim_click")
-                    click_rect(
-                        controller,
-                        [
-                            claim_result.box.x,
-                            claim_result.box.y,
-                            claim_result.box.w,
-                            claim_result.box.h,
-                        ],
-                    )
-                    time.sleep(1)
-                    break
-                time.sleep(check_freq)
+            wait_and_claim(context, controller, check_freq)
 
             PrintT(context, "coffee.round_finished")
-            controller.post_key_down(KEY_F)
-            time.sleep(0.1)
-            controller.post_key_up(KEY_F)
+            press_key_f(controller)
 
             time.sleep(2)
             PrintT(context, "coffee.iteration_done")
