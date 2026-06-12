@@ -157,6 +157,26 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
             )
             self.sleep(0.1, check_reward=False, scaled=False)
 
+    def _close_f5_menu_with_esc(self, menu_was_confirmed=False, world_timeout=3):
+        """Close the F5 menu after using it as a world-state fallback."""
+        if not menu_was_confirmed:
+            return False
+        self.send_key(
+            "esc",
+            down_time=0.08,
+            action_name="recovery_f5_esc",
+            interval=-1,
+        )
+        self.sleep(0.8, check_reward=False, scaled=False)
+        if self.wait_until(self._is_in_world_by_node, time_out=world_timeout):
+            return True
+        if not self._is_in_city_tycoon_menu():
+            return True
+        self._clear_recovery_menu_blockers()
+        if self.wait_until(self._is_in_world_by_node, time_out=1.5):
+            return True
+        return not self._is_in_city_tycoon_menu()
+
     def _ensure_world_or_city_tycoon_menu(self, world_timeout=5, city_timeout=10):
         """确认当前可操作大世界；InWorld 识别失败时尝试打开都市大亨兜底。"""
         if self.wait_until(self._is_in_world_by_node, time_out=world_timeout):
@@ -165,20 +185,37 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
         self._clear_recovery_menu_blockers()
         self.ah.click_key("f5")
         self.sleep(0.5, check_reward=False, scaled=False)
-        return self.wait_until(self._is_in_city_tycoon_menu, time_out=city_timeout)
+        menu_found = self.wait_until(
+            self._is_in_city_tycoon_menu,
+            time_out=city_timeout,
+        )
+        if not menu_found:
+            self.log_warning("F5 后未确认都市大亨菜单，不按 Esc，等待后续重试")
+        return self._close_f5_menu_with_esc(menu_was_confirmed=menu_found)
 
     def _confirm_world_after_teleport(self):
         """传送后确认回到可操作大世界；必要时用 F5 打开都市大亨再 Esc 返回。"""
         if self.wait_until(self._is_in_world_by_node, time_out=30):
             return True
         self.log_warning("传送后未识别到大世界图标，尝试 F5 兜底确认")
-        self.ah.click_key("f5")
-        self.sleep(0.5, check_reward=False, scaled=False)
-        if not self.wait_until(self._is_in_city_tycoon_menu, time_out=10):
-            return False
-        self.send_key("esc")
-        self.sleep(1.0, check_reward=False, scaled=False)
-        return True
+        for attempt in range(1, 3):
+            if attempt > 1:
+                self.log_warning(f"传送后大世界确认重试 {attempt}/2")
+                self._clear_recovery_menu_blockers()
+                if self.wait_until(self._is_in_world_by_node, time_out=3):
+                    return True
+            self.ah.click_key("f5")
+            self.sleep(0.5, check_reward=False, scaled=False)
+            menu_found = self.wait_until(self._is_in_city_tycoon_menu, time_out=5)
+            if not menu_found:
+                self.log_warning("F5 后未确认都市大亨菜单，不按 Esc，等待后续重试")
+            if self._close_f5_menu_with_esc(
+                menu_was_confirmed=menu_found,
+                world_timeout=3,
+            ):
+                return True
+
+        return self.wait_until(self._is_in_world_by_node, time_out=5)
 
     def _enter_recovery_hethereau_hobbies_menu(self):
         """稳定进入都市闲趣，避免公共跳转节点停在都市大亨菜单就继续执行。"""
@@ -300,11 +337,19 @@ class PinkPawHeistEntranceRecoveryPath(PinkPawHeistCore3Path):
         if after_sleep:
             self.sleep(after_sleep, check_reward=False, scaled=False)
 
+    def _focus_game_window(self, after_sleep=0.08):
+        """Focus the game before recovery sends direct keyboard input."""
+        if self.ah.focus_window():
+            self.sleep(after_sleep, check_reward=False, scaled=False)
+            return True
+        return False
+
     def _leave_unexpected_heist_round(self):
         """恢复入口发现仍在局内时，先退出本局，避免在局内误开大世界恢复。"""
         if not self._is_in_heist_round():
             return False
         self.log_round_info("检测到仍在粉爪局内，先退出本局")
+        self._focus_game_window()
         self._release_held_keys()
         self.ah.release_controls()
         for _ in range(4):
