@@ -8,6 +8,7 @@ import numpy as np
 import onnxruntime
 
 from ..Common.logger import get_logger
+from .debug_windows import pump_debug_windows
 from .resource_paths import resource_base_path
 
 logger = get_logger(__name__)
@@ -146,6 +147,7 @@ class AnglePredictor:
                 cv2.LINE_AA,
             )
         cv2.imshow("Angle Predictor", display_img)
+        pump_debug_windows()
 
     def close_debug(self) -> None:
         if self.debug:

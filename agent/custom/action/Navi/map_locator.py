@@ -6,6 +6,7 @@ import numpy as np
 
 from ..Common.logger import get_logger
 from ..Common.utils import match_template_in_region
+from .debug_windows import pump_debug_windows
 from .resource_paths import resource_base_path
 
 logger = get_logger(__name__)
@@ -581,3 +582,4 @@ class MapLocator:
             zoom_view = zoom_view[:target_h]
         panels.append(zoom_view)
         cv2.imshow(self.DEBUG_WIN, np.concatenate(panels, axis=1))
+        pump_debug_windows()

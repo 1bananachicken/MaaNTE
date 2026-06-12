@@ -4,12 +4,11 @@ import time
 from dataclasses import dataclass
 from typing import Any, Callable
 
-import cv2
-
 from maa.context import Context
 
 from ..Common.logger import get_logger
 from .angle_predictor import AnglePredictor
+from .debug_windows import close_debug_windows, pump_debug_windows
 from .map_locator import MapLocator
 
 logger = get_logger(__name__)
@@ -110,6 +109,8 @@ class WaypointNavigator:
     def update(self) -> tuple[Any, Any] | None:
         frame = self.controller.post_screencap().wait().get()
         if frame is None:
+            if self.debug:
+                pump_debug_windows()
             return None
         location = self.locator.locate(frame)
         angle = self.predictor.predict(frame)
@@ -195,9 +196,6 @@ class WaypointNavigator:
                 )
                 last_log_time = now
 
-            if self.debug and (cv2.waitKey(1) & 0xFF == ord("q")):
-                self.release()
-                return False
             self.sleep_remaining(started)
 
         self.release()
@@ -214,18 +212,28 @@ class WaypointNavigator:
             self.release()
         finally:
             if self.debug:
-                cv2.destroyAllWindows()
+                close_debug_windows()
 
     def sleep_remaining(self, started: float) -> None:
         sleep_time = self.frame_interval - (time.perf_counter() - started)
-        if sleep_time > 0:
+        if sleep_time <= 0:
+            return
+        if not self.debug:
             time.sleep(sleep_time)
+            return
+
+        deadline = time.monotonic() + sleep_time
+        while time.monotonic() < deadline:
+            pump_debug_windows()
+            time.sleep(min(0.05, abs(deadline - time.monotonic())))
 
     def sleep_interruptible(self, duration: float) -> bool:
         deadline = time.monotonic() + duration
         while time.monotonic() < deadline:
             if self.context.tasker.stopping:
                 return False
+            if self.debug:
+                pump_debug_windows()
             time.sleep(min(0.05, abs(deadline - time.monotonic())))
         return True
 
