@@ -163,7 +163,7 @@
                 "target": "WitchDivinationMoveToWitchHouse" // 鼠标已在目标位置，直接点击
             }
         },
-        "post_wait_freezes": 50, // 点击后等待全屏稳定 
+        "post_wait_freezes": 500, // 点击后等待全屏稳定 
         "next": [
             "WitchDivinationVerifyWitchHouse",
             "WitchDivinationEntrance"
