@@ -1,7 +1,7 @@
 {
     "FishNewEntrance": {
         "desc": "钓鱼(新)功能入口",
-        "anchor": "FishNewRestart",
+        "anchor": "FishNewErrorRestart",
         "next": [
             "FishNewStart",
             "[JumpBack]FishSceneAnyEnterFishGame"
@@ -45,7 +45,10 @@
             "FishNewBaitLack",
             "FishNewFishFull",
             "FishNewCast",
-            "[JumpBack]FishNewFishHooked"
+            "FishNewFishHooked"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishHooked": {
@@ -79,6 +82,9 @@
         "next": [
             "[Anchor]FishNewRestart",
             "[JumpBack]SceneClickBlankToExit"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewGameResult": {
@@ -173,8 +179,7 @@
                     "Your fish hold is full",
                     "生け簀が一杯です",
                     "저장고가 가득 찼습니다. 일부 어획물을 판매한 뒤 다시 시도해 주세요"
-                ]
-            ,
+                ],
                 "roi_offset": [
                     0,
                     0,
@@ -288,7 +293,7 @@
         },
         "action": "ClickKey",
         "key": [
-            27
+            27 //ESC
         ],
         "focus": {
             "Node.Action.Succeeded": "未开启自动买鱼饵，尝试前往卖鱼"
@@ -383,6 +388,9 @@
         "next": [
             "FishNewStoreChooseGeneralBait"
             // "[JumpBack]FishNewStoreScrollMouse"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewUseBait": {
@@ -543,6 +551,9 @@
         "next": [
             "FishNewConfirmBuyBait",
             "FishNewSellFishEntrance"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewConfirmBuyBait": {
@@ -582,6 +593,9 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewExitStore"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewExitStore": {
@@ -604,6 +618,9 @@
         },
         "next": [
             "[Anchor]FishNewRestart"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewSellFishEntrance": {
@@ -666,7 +683,7 @@
         ],
         "action": "ClickKey",
         "key": [
-            81
+            81 // Q
         ],
         "post_wait_freezes": 200,
         "next": [
@@ -700,6 +717,9 @@
         ],
         "next": [
             "FishNewFishingMasterPage1Sell1"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage1Sell1": {
@@ -743,6 +763,9 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell2"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage1Sell2": {
@@ -786,6 +809,9 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell3"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage1Sell3": {
@@ -829,6 +855,9 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterSwitchToPage2"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterSwitchToPage2": {
@@ -849,6 +878,9 @@
         "next": [
             "FishNewFishingMasterPage2Submit",
             "FishNewSellFishNoFish"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage2Submit": {
@@ -870,6 +902,9 @@
         "post_wait_freezes": 1000,
         "next": [
             "FishNewConfirmSellFish"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewConfirmSellFish": {
@@ -907,6 +942,9 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterExit"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewSellFishNoFish": {
@@ -930,6 +968,9 @@
         },
         "next": [
             "FishNewTaskExit"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterExit": {
@@ -950,6 +991,9 @@
         ],
         "next": [
             "[Anchor]FishNewRestart"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     }
 }

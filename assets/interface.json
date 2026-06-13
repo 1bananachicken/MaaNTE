@@ -115,12 +115,13 @@
         "resource/tasks/Fish.json",
         "resource/tasks/PinkPawHeist.json",
         "resource/tasks/MakeCoffee.json",
+        "resource/tasks/MakeCoffeeLite.json",
         "resource/tasks/Rhythm.json",
         "resource/tasks/Tetris.json",
         "resource/tasks/BagelSpam.json",
         // group:RealTimeAssist
         "resource/tasks/RealTime.json",
-        "resource/tasks/NaviWebSocket.json",
+        "resource/tasks/OnlineMapNavigation.json",
         "resource/tasks/SoundDodge.json",
         "resource/tasks/AutoFScroll.json",
         // group:others

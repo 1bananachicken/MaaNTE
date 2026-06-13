@@ -1,0 +1,137 @@
+{
+    "task": [
+        {
+            "name": "OnlineMapNavigation",
+            "label": "$task_online_map_navigation_label",
+            "description": "$task_online_map_navigation_desc",
+            "entry": "OnlineMapNavigation",
+            "option": [
+                "OnlineMapNavigationSettings",
+                "OnlineMapNavigationAngleBackend",
+                "OnlineMapNavigationDebug"
+            ],
+            "group": [
+                "RealTimeAssist"
+            ]
+        }
+    ],
+    "option": {
+        "OnlineMapNavigationSettings": {
+            "type": "input",
+            "label": "$task_online_map_navigation_option_settings",
+            "description": "$task_online_map_navigation_option_settings_desc",
+            "inputs": [
+                {
+                    "name": "host",
+                    "label": "$task_online_map_navigation_input_host",
+                    "default": "0.0.0.0",
+                    "pipeline_type": "string",
+                    "verify": "^.+$"
+                },
+                {
+                    "name": "port",
+                    "label": "$task_online_map_navigation_input_port",
+                    "default": "14514",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                },
+                {
+                    "name": "tolerance",
+                    "label": "$task_navi_move_to_input_tolerance",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                },
+                {
+                    "name": "frame_interval",
+                    "label": "$task_online_map_navigation_input_frame_interval",
+                    "description": "$task_online_map_navigation_input_frame_interval_desc",
+                    "default": "0.1",
+                    "pipeline_type": "string",
+                    "verify": "^\\d+(\\.\\d+)?$"
+                }
+            ],
+            "pipeline_override": {
+                "OnlineMapNavigation": {
+                    "custom_action_param": {
+                        "host": "{host}",
+                        "port": "{port}",
+                        "tolerance": "{tolerance}",
+                        "frame_interval": "{frame_interval}"
+                    }
+                }
+            }
+        },
+        "OnlineMapNavigationAngleBackend": {
+            "type": "select",
+            "label": "$task_online_map_navigation_option_angle_backend",
+            "description": "$task_online_map_navigation_option_angle_backend_desc",
+            "cases": [
+                {
+                    "name": "auto",
+                    "label": "Auto",
+                    "pipeline_override": {
+                        "OnlineMapNavigationAngleBackendConfig": {
+                            "attach": {
+                                "angle_backend": "auto"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "directml",
+                    "label": "DirectML",
+                    "pipeline_override": {
+                        "OnlineMapNavigationAngleBackendConfig": {
+                            "attach": {
+                                "angle_backend": "directml"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "cpu",
+                    "label": "CPU",
+                    "pipeline_override": {
+                        "OnlineMapNavigationAngleBackendConfig": {
+                            "attach": {
+                                "angle_backend": "cpu"
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "auto"
+        },
+        "OnlineMapNavigationDebug": {
+            "type": "switch",
+            "label": "$task_online_map_navigation_option_debug",
+            "description": "$task_online_map_navigation_option_debug_desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "OnlineMapNavigationDebugConfig": {
+                            "attach": {
+                                "debug": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "OnlineMapNavigationDebugConfig": {
+                            "attach": {
+                                "debug": false
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "No"
+        }
+    }
+}

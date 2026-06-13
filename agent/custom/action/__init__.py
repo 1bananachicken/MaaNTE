@@ -1,7 +1,8 @@
 from .AutoFish.auto_fish import *
 from .AutoFish.auto_buy_fish_bait import *
 from .AutoFish.auto_sell_fish import *
-from .auto_make_coffee import *
+from .AutoCoffee.auto_make_coffee import *
+from .AutoCoffee.auto_make_coffee_lite import *
 from .rhythm.feats.play import *
 from .rhythm.feats.repeat_decision import *
 from .rhythm.feats.select_song import *
@@ -26,9 +27,11 @@ from .auto_piano.action import *
 from .withdraw_money_choose_item import *
 from .SyncCharacterAbilityCityAbility import *
 from .DatasetCollection.autonomous_driving_dataset_recorder import *
+from .BagelSpam import *
 
 __all__ = [
     "AutoMakeCoffee",
+    "AutoMakeCoffeeLite",
     "AutoFish",
     "AutoBuyFishBait",
     "AutoSellFish",
@@ -38,7 +41,12 @@ __all__ = [
     "AutoRhythmRepeatDecision",
     "AutoRhythmSelectSong",
     "RealTimeTaskAction",
-    "NaviWebSocketAction",
+    "OnlineMapNavigationAction",
+    "LocalRouteNavigation",
+    "LocalRouteNavigationAction",
+    "LocalRouteNavigationUnitTestAction",
+    "parse_route_waypoints",
+    "resolve_route_json_path",
     "PinkPawHeistScheme1Action",
     "PinkPawHeistScheme2Action",
     "PinkPawHeistScheme3Action",
@@ -55,4 +63,7 @@ __all__ = [
     "WithdrawMoneyChooseItem",
     "AutonomousDrivingDatasetRecorder",
     "SyncCharacterAbilityCityAbilityMainAction",
+    "BagelSpamPickIndex",
+    "BagelSpamOutputText",
+    "BagelSpamLLMGenerate",
 ]
