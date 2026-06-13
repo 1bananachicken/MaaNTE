@@ -16,8 +16,7 @@
                     "黑羽",
                     "(?i)Blackbird",
                     "クロバネ"
-                ]
-            ,
+                ],
                 "roi_offset": [
                     0,
                     0,
@@ -32,6 +31,7 @@
                 "key": 70 // 'F' 键与魔女交互
             }
         },
+        "timeout": 30000,
         "next": [
             "ShuffleStepTalkToWitch"
         ],
@@ -39,7 +39,7 @@
             "ShuffleStepWalk"
         ]
     },
-    "ShuffleStepWalk": {
+    "ShuffleStepWalkOld": {
         "desc": "按住W键向前走0.4秒",
         "action": {
             "type": "KeyDown",
@@ -83,8 +83,7 @@
                     "輕叩",
                     "(?i)Knock",
                     "軽ノックする"
-                ]
-            ,
+                ],
                 "roi_offset": [
                     0,
                     0,
