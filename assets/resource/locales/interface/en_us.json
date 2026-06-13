@@ -11,6 +11,7 @@
     "group.CityTycoon.label": "City Tycoon",
     "group.HethereauHobbies.label": "Hethereau Hobbies",
     "group.RealTimeAssist.label": "Real-time Assistance",
+    "group.UserInfo.label": "Player Info",
     "group.DatasetCollection.label": "DatasetCollection",
     "preset.AFK.label": "AFK Tasks",
     "preset.AFK.description": "Suitable for long-running AFK tasks",
@@ -207,5 +208,9 @@
     "task_online_map_navigation_input_host": "Listen Host",
     "task_online_map_navigation_input_port": "Listen Port",
     "task_online_map_navigation_input_frame_interval": "Sampling Interval (s)",
-    "task_online_map_navigation_input_frame_interval_desc": "Minimum interval between screenshot localization runs. The action clamps it to at least 0.05 seconds."
+    "task_online_map_navigation_input_frame_interval_desc": "Minimum interval between screenshot localization runs. The action clamps it to at least 0.05 seconds.",
+    "task.SyncCharacterAbilityCityAbility.label": "Record Character Life Skills",
+    "task.SyncCharacterAbilityCityAbility.description": "Automatically identify life skill levels of all characters and record them in the configuration file.",
+    "task.SyncCharacterAbilityCityAbility.option.fresh_record": "Fresh Record",
+    "task.SyncCharacterAbilityCityAbility.option.fresh_record.desc": "Overwrite existing character life skill records<br><span style='color:red'>Note: This will clear all previous records.</span><br><span style='color:orange'>Use this option to clear and overwrite previous content if you find issues with the existing records.</span>"
 }

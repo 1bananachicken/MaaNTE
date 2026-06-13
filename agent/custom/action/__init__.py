@@ -25,6 +25,7 @@ from .Furniture.furniture_claim import *
 from .Furniture.furniture_choose_property import *
 from .auto_piano.action import *
 from .withdraw_money_choose_item import *
+from .SyncCharacterAbilityCityAbility import *
 from .DatasetCollection.autonomous_driving_dataset_recorder import *
 from .BagelSpam import *
 
@@ -61,6 +62,7 @@ __all__ = [
     "AutoPlayPiano",
     "WithdrawMoneyChooseItem",
     "AutonomousDrivingDatasetRecorder",
+    "SyncCharacterAbilityCityAbilityMainAction",
     "BagelSpamPickIndex",
     "BagelSpamOutputText",
     "BagelSpamLLMGenerate",
