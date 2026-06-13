@@ -273,7 +273,7 @@
             "frame_interval": 0.1,
             "tolerance": 5,
             "angle_backend": "auto",
-            "debug": true
+            "debug": false
         },
         "next": [
             "ShuffleStepCheck"
