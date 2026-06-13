@@ -94,7 +94,7 @@
         }
     },
     "SyncCharacterAbilityCityAbilityMatchCharacter": {
-        "desc": "TemplateMatch识别角色（OCR失败时兜底）",
+        "desc": "TemplateMatch识别角色（优先于OCR，仅作为配置数据源被CustomAction读取）",
         "recognition": {
             "type": "TemplateMatch",
             "param": {

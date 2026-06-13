@@ -124,7 +124,7 @@ def _ocr_skills(context: Context) -> list[int]:
 
 
 # ---------------------------------------------------------------------------
-# 角色名识别 — OCR 为主，TemplateMatch 校验
+# 角色名识别 — TemplateMatch 优先，OCR 兜底
 # ---------------------------------------------------------------------------
 
 # 模板文件名 → 角色名 映射。key 为文件名（含扩展名）；未命中时取 stem。
@@ -136,7 +136,8 @@ _TEMPLATE_TO_NAME: dict[str, str] = {
 }
 
 
-# TemplateMatch 兜底配置 — 与 JSON 中 SyncCharacterAbilityCityAbilityMatchCharacter 保持同步
+# TemplateMatch 硬编码回退配置 — 仅在 get_node_data 读取 JSON 节点失败时使用。
+# 正常运行时 JSON 节点存在，此配置不生效。应与 SyncCharacterAbilityCityAbilityMatchCharacter 保持同步。
 _TM_CONFIG = {
     "templates": [
         "Character_UI/Character_Pic/Chiz.png",
@@ -219,12 +220,13 @@ def _ocr_name_with_retry(context: Context) -> str | None:
 
 
 def _get_character_name(context: Context) -> str | None:
-    """获取当前角色名：OCR → OpenAbilityPage → TemplateMatch 校验。
+    """获取当前角色名：OCR 先识别 → 技能页 TemplateMatch 优先采用。
 
     调用前需在信息页面；调用后停留在技能页面。
-    TM 置信度 ≥ 0.9 时覆盖 OCR 结果。
+    TM 置信度 ≥ 0.9 时直接返回 TM 结果（覆盖 OCR）。
     """
-    # 1. OCR 名字（信息页）
+
+    # 1. OCR 名字（信息页）— 先尝试
     name = _ocr_name_with_retry(context)
     if name is not None:
         logger.info("SyncCityAbility: OCR → %s", name)
@@ -232,7 +234,7 @@ def _get_character_name(context: Context) -> str | None:
     # 2. 进入技能页面
     context.run_task(_NODE_OPEN_ABILITY)
 
-    # 3. TemplateMatch 校验 — 置信度 ≥ 0.9 则覆盖 OCR 结果
+    # 3. TemplateMatch — 置信度 ≥ 0.9 则优先采用，否则回退 OCR
     tm_name = _tm_get_name(context)
     if tm_name is not None:
         return tm_name
@@ -297,7 +299,7 @@ class SyncCharacterAbilityCityAbilityMainAction(CustomAction):
                 logger.info("SyncCityAbility: 收到停止信号，退出")
                 break
 
-            # ---- 3. 识别角色名（信息页 OCR → 技能页 TemplateMatch 校验） ----
+            # ---- 3. 识别角色名（OCR → TM 优先覆盖） ----
             name = _get_character_name(context)
             # 调用后停留在技能页面
 
