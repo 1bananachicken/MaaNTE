@@ -99,12 +99,7 @@
             "default_expand": true
         }
     ],
-    "task": [
-        {
-            "name": "LocalRouteNavigationUnitTest",
-            "entry": "LocalRouteNavigationUnitTest"
-        }
-    ],
+    "task": [],
     "import": [
         // group:Daily
         "resource/tasks/ClaimRewards.json",
