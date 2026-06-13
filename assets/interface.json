@@ -97,6 +97,11 @@
             "name": "DatasetCollection",
             "label": "$group.DatasetCollection.label",
             "default_expand": true
+        },
+        {
+            "name": "UserInfo",
+            "label": "$group.UserInfo.label",
+            "default_expand": true
         }
     ],
     "task": [],
@@ -125,6 +130,8 @@
         "resource/tasks/WitchDivination.json",
         // group:DatasetCollection
         "resource/tasks/AutonomousDrivingDataset.json",
+        // group:UserInfo
+        "resource/tasks/SyncCharacterAbilityCityAbility.json",
         // group:others
         "resource/tasks/Touch.json",
         // preset
