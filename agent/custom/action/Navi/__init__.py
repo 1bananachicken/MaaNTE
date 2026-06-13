@@ -3,7 +3,9 @@ from .local_route_navigation import *
 
 __all__ = [
     "OnlineMapNavigationAction",
-    "load_route_waypoints",
+    "LocalRouteNavigation",
+    "LocalRouteNavigationAction",
+    "LocalRouteNavigationUnitTestAction",
+    "parse_route_waypoints",
     "resolve_route_json_path",
-    "run_route_from_json",
 ]

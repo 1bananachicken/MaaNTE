@@ -7,7 +7,9 @@ from typing import Any
 
 Waypoint = tuple[int, int]
 SourceSize = tuple[int, int]
-ONLINE_COORD_BOUNDS = (-128.0, -128.0, 128.0, 128.0)
+ONLINE_MAP_SIZE = (22528, 22528)
+ONLINE_WORLD_ORIGIN_PIXEL = (11264.0, 11264.0)
+ONLINE_PIXELS_PER_WORLD_UNIT = 44.0
 
 
 @dataclass
@@ -122,12 +124,16 @@ def parse_online_waypoint(
     value: dict[str, Any],
     target_size: SourceSize,
 ) -> Waypoint:
-    min_lng, min_lat, max_lng, max_lat = ONLINE_COORD_BOUNDS
-    lng = float(value["lng"])
-    lat = float(value["lat"])
+    # maante-map stores route points as world coordinates named lat/lng.
+    world_lat = float(value["lat"])
+    world_lng = float(value["lng"])
+    map_w, map_h = ONLINE_MAP_SIZE
+    origin_x, origin_y = ONLINE_WORLD_ORIGIN_PIXEL
     target_w, target_h = target_size
-    x = (lng - min_lng) * target_w / (max_lng - min_lng)
-    y = (max_lat - lat) * target_h / (max_lat - min_lat)
+    map_x = origin_x + world_lng * ONLINE_PIXELS_PER_WORLD_UNIT
+    map_y = origin_y - world_lat * ONLINE_PIXELS_PER_WORLD_UNIT
+    x = map_x * target_w / map_w
+    y = map_y * target_h / map_h
     return int(round(x)), int(round(y))
 
 

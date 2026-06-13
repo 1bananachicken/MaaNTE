@@ -1,0 +1,25 @@
+{
+    "LocalRouteNavigation": {
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "",
+            "route_name": "",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        }
+    },
+    "LocalRouteNavigationUnitTest": {
+        "action": "Custom",
+        "custom_action": "local_route_navigation_unit_test",
+        "custom_action_param": {
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        }
+    }
+}

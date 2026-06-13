@@ -104,6 +104,12 @@ class RouteRunner:
             self.navigator.close()
             self.navigator = None
 
+    def update_current_frame(self) -> Waypoint | None:
+        self.start()
+        assert self.navigator is not None
+        self.navigator.update()
+        return self.current_point()
+
     def source_size(self) -> SourceSize:
         return self._source_size
 
