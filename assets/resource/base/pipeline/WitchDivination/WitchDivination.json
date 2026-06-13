@@ -85,8 +85,7 @@
                     "今日指引",
                     "(?i)Daily\\s*Guide",
                     "デイリーガイド"
-                ]
-            ,
+                ],
                 "roi_offset": [
                     0,
                     0,
@@ -119,8 +118,7 @@
                     "魔女之家",
                     "(?i)The\\s*Witch\\s*'\\s*s\\s*House",
                     "魔女の家"
-                ]
-            ,
+                ],
                 "roi_offset": [
                     0,
                     0,
@@ -165,7 +163,7 @@
                 "target": "WitchDivinationMoveToWitchHouse" // 鼠标已在目标位置，直接点击
             }
         },
-        "post_wait_freezes": 50, // 点击后等待全屏稳定 
+        "post_wait_freezes": 500, // 点击后等待全屏稳定 
         "next": [
             "WitchDivinationVerifyWitchHouse",
             "WitchDivinationEntrance"
@@ -186,8 +184,7 @@
                     "魔女之家",
                     "(?i)The\\s*Witch\\s*'\\s*s\\s*House",
                     "魔女の家"
-                ]
-            ,
+                ],
                 "roi_offset": [
                     0,
                     0,
@@ -264,5 +261,26 @@
                 ]
             }
         }
+    },
+    "ShuffleStepWalk": {
+        "desc": "使用本地路线寻路从传送点移动到魔女之家",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "WitchDivinatNavigation",
+            "route_name": "WitchDivinatNavigation",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "ShuffleStepCheck"
+            // "ShuffleStepCheck2"
+        ],
+        "on_error": [
+            "WitchDivinationEntrance"
+        ]
     }
 }
