@@ -99,8 +99,19 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
+                    "Character_UI/Character_Pic/Adler.png",
+                    "Character_UI/Character_Pic/Aurelia.png",
                     "Character_UI/Character_Pic/Chiz.png",
+                    "Character_UI/Character_Pic/Daffodill.png",
+                    "Character_UI/Character_Pic/Edgar.png",
+                    "Character_UI/Character_Pic/Haniel.png",
+                    "Character_UI/Character_Pic/Hathor.png",
                     "Character_UI/Character_Pic/Hotori.png",
+                    "Character_UI/Character_Pic/Jiuyuan.png",
+                    "Character_UI/Character_Pic/Lacrimosa.png",
+                    "Character_UI/Character_Pic/Mint.png",
+                    "Character_UI/Character_Pic/Nanally.png",
+                    "Character_UI/Character_Pic/Sakiri.png",
                     "Character_UI/Character_Pic/Skia.png",
                     "Character_UI/Character_Pic/Zero.png"
                 ],

@@ -129,8 +129,22 @@ def _ocr_skills(context: Context) -> list[int]:
 
 # 模板文件名 → 角色名 映射。key 为文件名（含扩展名）；未命中时取 stem。
 _TEMPLATE_TO_NAME: dict[str, str] = {
+    "Adler.png": "阿德勒",
+    "Aurelia.png": "海月",
+    "Baicang.png": "白藏",  # 没抽到，没放图
+    "Chaos.png": "卡厄斯",  # 没开池子，放不了图
     "Chiz.png": "小吱",
+    "Daffodill.png": "达芙蒂尔",
+    "Edgar.png": "埃德嘉",
+    "Fadia.png": "法帝娅",  # 没抽到，没放图
+    "Haniel.png": "哈尼娅",
+    "Hathor.png": "哈索尔",
     "Hotori.png": "浔",
+    "Jiuyuan.png": "九原",
+    "Lacrimosa.png": "安魂曲",
+    "Mint.png": "薄荷",
+    "Nanally.png": "娜娜莉",
+    "Sakiri.png": "早雾",
     "Skia.png": "翳",
     "Zero.png": "零",
 }
@@ -140,8 +154,19 @@ _TEMPLATE_TO_NAME: dict[str, str] = {
 # 正常运行时 JSON 节点存在，此配置不生效。应与 SyncCharacterAbilityCityAbilityMatchCharacter 保持同步。
 _TM_CONFIG = {
     "templates": [
+        "Character_UI/Character_Pic/Adler.png",
+        "Character_UI/Character_Pic/Aurelia.png",
         "Character_UI/Character_Pic/Chiz.png",
+        "Character_UI/Character_Pic/Daffodill.png",
+        "Character_UI/Character_Pic/Edgar.png",
+        "Character_UI/Character_Pic/Haniel.png",
+        "Character_UI/Character_Pic/Hathor.png",
         "Character_UI/Character_Pic/Hotori.png",
+        "Character_UI/Character_Pic/Jiuyuan.png",
+        "Character_UI/Character_Pic/Lacrimosa.png",
+        "Character_UI/Character_Pic/Mint.png",
+        "Character_UI/Character_Pic/Nanally.png",
+        "Character_UI/Character_Pic/Sakiri.png",
         "Character_UI/Character_Pic/Skia.png",
         "Character_UI/Character_Pic/Zero.png",
     ],
