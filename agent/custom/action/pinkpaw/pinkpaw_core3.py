@@ -2384,9 +2384,9 @@ class PinkPawHeistCore3Path:
         self.send_key_down("f")  # start pick
         self.sleep(0.11)
         self.send_key_down("a")
-        self.sleep(3.00)
+        self.sleep(2.70)
         self.send_key("lshift")  # x0.6
-        self.sleep(3.10)
+        self.sleep(3.30)
         self.send_key_up("a")
         self.sleep(0.21)
         self.send_key_down("s")
