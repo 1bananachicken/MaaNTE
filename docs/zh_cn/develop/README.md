@@ -28,6 +28,7 @@
 | 文档 | 说明 |
 |------|------|
 | [自定义动作开发](./custom-action.md) | Python CustomAction 编写、Controller API、Pipeline 集成 |
+| [本地路线寻路接口](./local-route-navigation.md) | local_route_navigation Pipeline 入口、LocalRouteNavigation 类接口、路线 JSON 格式 |
 | [节点测试](./node-testing.md) | 如何编写和运行节点测试，验证识别是否稳定命中 |
 | [DMCA / Abuse 提报模板](./dmca-abuse-template.md) | 仿冒/搬运/带毒仓库的一键复用提报文案（AGPL-3.0） |
 | [DeepWiki — MaaNTE](https://deepwiki.com/1bananachicken/MaaNTE) | 带 AI 的在线项目文档速览 |
@@ -50,6 +51,7 @@
 | [InScene 场景识别](./in-scene.md) | 判断当前画面所在场景 | `Interface/Scene/Status.json` |
 | [通用按钮](./common-buttons.md) | 各场景入口按钮 | `Common/Button/` |
 | [Custom 动作与识别](./custom-action.md) | 通用 Python 工具：alt_click等 | `agent/custom/action/Common/` |
+| [本地路线寻路](./local-route-navigation.md) | 按路线 JSON 执行地图寻路 | `LocalRouteNavigation.json` |
 
 ## 高级组件参考
 
@@ -76,6 +78,7 @@
 | 准备提交 PR | [pull-request-guidelines.md](./pull-request-guidelines.md) |
 | 改 Pipeline 节点 | [pipeline-guide.md](./pipeline-guide.md) |
 | 写 Python 自定义逻辑 | [custom-action.md](./custom-action.md) |
+| 调用本地路线寻路 | [local-route-navigation.md](./local-route-navigation.md) |
 | 场景跳转/界面导航 | [scene-manager.md](./scene-manager.md) |
 | 调试单个节点 | [node-testing.md](./node-testing.md) |
 | 查阅编码规范 | [coding-standards.md](./coding-standards.md) |
