@@ -1,0 +1,87 @@
+{
+    "task": [
+        {
+            "name": "PinkPawHeistBG",
+            "label": "粉爪大劫案（后台）",
+            "entry": "PinkPawHeistBG_Main",
+            "description": "后台版自动刷取粉爪大劫案，使用<span style='color:green'>&ldquo;桌面端-后台&rdquo;</span>控制器。<br><span style='color:green'>建议启动后将游戏窗口最小化，避免鼠标干扰画面。</span><br><span style='color:orange'>注意：ALT键会中断WASD移动，运行期间请勿按ALT。</span>",
+            "option": [
+                "PinkPawHeistBG_Loop",
+                "PinkPawHeistBG_Scheme"
+            ],
+            "controller": [
+                "Win32-Background"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ]
+        }
+    ],
+    "option": {
+        "PinkPawHeistBG_Loop": {
+            "type": "switch",
+            "label": "无限循环",
+            "description": "无限循环，直到手动结束任务。",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启"
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "option": [
+                        "PinkPawHeistBG_LoopCount"
+                    ]
+                }
+            ]
+        },
+        "PinkPawHeistBG_LoopCount": {
+            "type": "input",
+            "label": "循环次数",
+            "inputs": [
+                {
+                    "name": "count",
+                    "label": "循环次数",
+                    "default": "10",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9]\\d{0,3}$"
+                }
+            ],
+            "pipeline_override": {
+                "PinkPawHeistBG_CoreSequence": {
+                    "max_hit": "{count}"
+                }
+            }
+        },
+        "PinkPawHeistBG_Scheme": {
+            "type": "select",
+            "label": "地图方案",
+            "description": "选择本次战斗的地图移动方案。",
+            "default_case": "Core2",
+            "cases": [
+                {
+                    "name": "Core2",
+                    "label": "方案二（推荐）",
+                    "pipeline_override": {
+                        "PinkPawHeistBG_ExecuteScheme": {
+                            "next": [
+                                "PinkPawHeist_Scheme2"
+                            ]
+                        }
+                    },
+                    "option": [
+                        "PinkPawHeistBG_Scheme_Core2_desc"
+                    ]
+                }
+            ]
+        },
+        "PinkPawHeistBG_Scheme_Core2_desc": {
+            "type": "input",
+            "label": "方案二说明",
+            "description": "<span style='color:orange'>后台版：请设置画质到性能档位，帧率设置120帧，关闭设置里的移动镜头修正！到小吱旁边启动！</span><br><span style='color:green'>配队要求：</span>1娜娜莉2任意位3早雾4狼（没有娜娜莉可换埃德加）<br><span style='color:green'>路线说明：</span>走藏品层路线撤离<br><span style='color:green'>启动建议：</span>启动后请将游戏窗口最小化，框架会自动以伪最小化方式继续截图，避免鼠标干扰",
+            "inputs": []
+        }
+    }
+}
