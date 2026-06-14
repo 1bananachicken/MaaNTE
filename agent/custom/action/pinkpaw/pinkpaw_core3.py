@@ -3355,7 +3355,7 @@ class PinkPawHeistCore3Path:
         self.send_key("lshift", down_time=0.24)
         self.sleep(0.42)
         self.send_key_down("d")
-        self.sleep(0.43)
+        self.sleep(0.40)
         self.send_key_up("d")
         self.sleep(0.70)
         self.send_key_up("w")
