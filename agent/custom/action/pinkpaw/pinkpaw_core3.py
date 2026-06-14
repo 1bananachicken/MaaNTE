@@ -3297,6 +3297,8 @@ class PinkPawHeistCore3Path:
         self.sleep(0.10)
         self.send_key_down("w")
         self.wait_and_interact(direction="w", is_lock=True, time_out=5.4)
+        if self.find_interac():
+            self.wait_and_interact(direction="w", is_lock=True, time_out=5.4)
         self.sleep(0.01)
         self.send_key_down("w")
         self.sleep(0.38)
