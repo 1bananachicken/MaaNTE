@@ -13,6 +13,7 @@ try:
         DEFAULT_WIDTH,
         PinkPawHeistCore3Path,
         TaskerStoppedException,
+        ensure_game_window_resolution,
         _parse_custom_action_param,
         _is_hit,
     )
@@ -23,6 +24,7 @@ except ImportError:
         DEFAULT_WIDTH,
         PinkPawHeistCore3Path,
         TaskerStoppedException,
+        ensure_game_window_resolution,
         _parse_custom_action_param,
         _is_hit,
     )
@@ -431,6 +433,8 @@ class PinkPawHeistReturnToEntranceAction(CustomAction):
         params = _parse_custom_action_param(argv)
         path = PinkPawHeistEntranceRecoveryPath(context, params=params)
         try:
+            if path.auto_resize_game_window and ensure_game_window_resolution:
+                ensure_game_window_resolution(DEFAULT_WIDTH, DEFAULT_HEIGHT)
             path.recover_to_heist_entrance()
             return CustomAction.RunResult(success=True)
         except TaskerStoppedException as exc:
@@ -454,6 +458,8 @@ class PinkPawHeistFindXiaoZhiAction(CustomAction):
         params = _parse_custom_action_param(argv)
         path = PinkPawHeistEntranceRecoveryPath(context, params=params)
         try:
+            if path.auto_resize_game_window and ensure_game_window_resolution:
+                ensure_game_window_resolution(DEFAULT_WIDTH, DEFAULT_HEIGHT)
             path.log_round_info("开始寻找小吱")
             path.ah.run_task("SceneAnyEnterWorld")
             if path._has_xiaozhi_prompt(time_out=10.0):

@@ -24,6 +24,14 @@ except ImportError:
     cv2 = None
 
 try:
+    try:
+        from agent.utils.win32_process import ensure_game_window_resolution
+    except ImportError:
+        from utils.win32_process import ensure_game_window_resolution
+except Exception:
+    ensure_game_window_resolution = None
+
+try:
     from agent.custom.action.pinkpaw.pinkpaw_reward_logger import notify_pinkpaw_reward
 except ImportError:
     from .pinkpaw_reward_logger import notify_pinkpaw_reward
@@ -60,6 +68,8 @@ DEFAULT_HEIGHT = 720
 DEFAULT_ROUTE_TIMING_SCALE = 1.0
 DEFAULT_INTERACTION_PAUSE = 0.7
 DEFAULT_DIRECT_INPUT = True
+DEFAULT_AUTO_RESIZE_GAME_WINDOW = True
+AUTO_RESIZE_CONFIG_NODE = "PinkPawHeist_AutoResizeGameWindowConfig"
 MIN_ROUTE_TIMING_SCALE = 0.25
 MAX_ROUTE_TIMING_SCALE = 1.2
 MIN_INTERACTION_PAUSE = 0.0
@@ -254,6 +264,17 @@ def _parse_bool(value, default=False) -> bool:
         return bool(value)
     if isinstance(value, str):
         return value.strip().lower() in {"1", "true", "yes", "on", "enable", "enabled"}
+    return bool(default)
+
+
+def _get_auto_resize_game_window(ctx: Context, default=DEFAULT_AUTO_RESIZE_GAME_WINDOW):
+    try:
+        node_data = ctx.get_node_data(AUTO_RESIZE_CONFIG_NODE) or {}
+    except Exception:
+        return bool(default)
+    attach = node_data.get("attach") if isinstance(node_data, dict) else None
+    if isinstance(attach, dict) and "auto_resize_game_window" in attach:
+        return _parse_bool(attach.get("auto_resize_game_window"), default)
     return bool(default)
 
 
@@ -817,6 +838,11 @@ class PinkPawHeistCore3Path:
         params = params or {}
         self.ctx = ctx
         direct_input = _parse_bool(params.get("direct_input"), DEFAULT_DIRECT_INPUT)
+        auto_resize_default = _get_auto_resize_game_window(ctx)
+        self.auto_resize_game_window = _parse_bool(
+            params.get("auto_resize_game_window"),
+            auto_resize_default,
+        )
         self.ah = Core3ActionHelper(ctx, direct_input=direct_input)
         self.exit_state = {1: False, 2: False, 3: False, 4: False}
         self.avoid_methods = [self.AVOID_METHOD_DASH, self.AVOID_METHOD_ATTACK]
@@ -3763,6 +3789,8 @@ class PinkPawHeistScheme3Action(CustomAction):
                 )
         path = PinkPawHeistCore3Path(context, params=params)
         try:
+            if path.auto_resize_game_window and ensure_game_window_resolution:
+                ensure_game_window_resolution(DEFAULT_WIDTH, DEFAULT_HEIGHT)
             input_mode = "direct" if path.ah.direct_input.available else "maa"
             path.log_round_info(
                 f"Start, method {path.config[path.CONF_AVOID_MTH]}, timing x{path.route_timing_scale:.2f}, input {input_mode}"

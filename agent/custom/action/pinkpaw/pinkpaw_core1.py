@@ -1,8 +1,22 @@
+import json
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 from maa.define import Status
 from datetime import datetime
+
+try:
+    try:
+        from agent.utils.win32_process import ensure_game_window_resolution
+    except ImportError:
+        from utils.win32_process import ensure_game_window_resolution
+except Exception:
+    ensure_game_window_resolution = None
+
+DEFAULT_WIDTH = 1280
+DEFAULT_HEIGHT = 720
+DEFAULT_AUTO_RESIZE_GAME_WINDOW = True
+AUTO_RESIZE_CONFIG_NODE = "PinkPawHeist_AutoResizeGameWindowConfig"
 
 VK = {
     "W": 0x57,
@@ -24,6 +38,45 @@ def _is_hit(result) -> bool:
     if result is None:
         return False
     return result.status == 0  # 0 = MaaStatus.Success
+
+
+def _parse_custom_action_param(argv: CustomAction.RunArg) -> dict:
+    value = getattr(argv, "custom_action_param", None)
+    if not value:
+        return {}
+    if isinstance(value, dict):
+        return value
+    try:
+        parsed = json.loads(value)
+    except Exception as exc:
+        print(
+            f"[PinkPawHeist/Core1] invalid custom_action_param: {value!r}, error: {exc}"
+        )
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def _parse_bool(value, default=False) -> bool:
+    if value is None:
+        return bool(default)
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)):
+        return bool(value)
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "on", "enable", "enabled"}
+    return bool(default)
+
+
+def _get_auto_resize_game_window(ctx: Context, default=DEFAULT_AUTO_RESIZE_GAME_WINDOW):
+    try:
+        node_data = ctx.get_node_data(AUTO_RESIZE_CONFIG_NODE) or {}
+    except Exception:
+        return bool(default)
+    attach = node_data.get("attach") if isinstance(node_data, dict) else None
+    if isinstance(attach, dict) and "auto_resize_game_window" in attach:
+        return _parse_bool(attach.get("auto_resize_game_window"), default)
+    return bool(default)
 
 
 class ActionHelper:
@@ -185,6 +238,14 @@ class PinkPawHeistScheme1Action(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
+        params = _parse_custom_action_param(argv)
+        auto_resize_default = _get_auto_resize_game_window(context)
+        auto_resize = _parse_bool(
+            params.get("auto_resize_game_window"),
+            auto_resize_default,
+        )
+        if auto_resize and ensure_game_window_resolution:
+            ensure_game_window_resolution(DEFAULT_WIDTH, DEFAULT_HEIGHT)
         ah = ActionHelper(context)
 
         # ----- 切换3号，前往铁门 -----

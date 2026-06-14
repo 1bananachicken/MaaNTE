@@ -7,7 +7,8 @@
             "description": "自动刷取粉爪大劫案，需要<span style='color:red'>“桌面端-前台”</span>控制器。",
             "option": [
                 "PinkPawHeist_Loop",
-                "PinkPawHeist_Scheme"
+                "PinkPawHeist_Scheme",
+                "PinkPawHeist_AutoResizeGameWindow"
             ],
             "controller": [
                 "Win32-Front"
@@ -54,6 +55,28 @@
                     "max_hit": "{count}"
                 }
             }
+        },
+        "PinkPawHeist_AutoResizeGameWindow": {
+            "type": "switch",
+            "label": "自动设置游戏分辨率",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "开启"
+                },
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "PinkPawHeist_AutoResizeGameWindowConfig": {
+                            "attach": {
+                                "auto_resize_game_window": false
+                            }
+                        }
+                    }
+                }
+            ]
         },
         "PinkPawHeist_Scheme": {
             "type": "select",

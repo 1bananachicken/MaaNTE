@@ -16,6 +16,12 @@
             }
         }
     },
+    "PinkPawHeist_AutoResizeGameWindowConfig": {
+        "enabled": false,
+        "attach": {
+            "auto_resize_game_window": true
+        }
+    },
     "PinkPawHeist_Loop": {
         "recognition": {
             "type": "DirectHit"
