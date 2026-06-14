@@ -14,7 +14,6 @@ try:
         PinkPawHeistCore3Path,
         TaskerStoppedException,
         ensure_game_window_resolution,
-        _parse_custom_action_param,
         _is_hit,
     )
 except ImportError:
@@ -25,9 +24,13 @@ except ImportError:
         PinkPawHeistCore3Path,
         TaskerStoppedException,
         ensure_game_window_resolution,
-        _parse_custom_action_param,
         _is_hit,
     )
+
+try:
+    from agent.custom.action.pinkpaw.pinkpaw_common import _parse_custom_action_param
+except ImportError:
+    from .pinkpaw_common import _parse_custom_action_param
 
 
 RECOVERY_ENTRANCE_ROUTE_MINT = [
@@ -430,7 +433,7 @@ class PinkPawHeistReturnToEntranceAction(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         """找不到小吱时的恢复入口：传送到粉爪大塔并跑回小吱位置。"""
-        params = _parse_custom_action_param(argv)
+        params = _parse_custom_action_param(argv, log_prefix="[PinkPawHeist/Recovery]")
         path = PinkPawHeistEntranceRecoveryPath(context, params=params)
         try:
             if path.auto_resize_game_window and ensure_game_window_resolution:
@@ -455,7 +458,7 @@ class PinkPawHeistFindXiaoZhiAction(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         """寻找小吱入口；找不到时先恢复到粉爪入口，再重新确认交互提示。"""
-        params = _parse_custom_action_param(argv)
+        params = _parse_custom_action_param(argv, log_prefix="[PinkPawHeist/Recovery]")
         path = PinkPawHeistEntranceRecoveryPath(context, params=params)
         try:
             if path.auto_resize_game_window and ensure_game_window_resolution:

@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ctypes
-import json
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -30,6 +29,19 @@ try:
         from utils.win32_process import ensure_game_window_resolution
 except Exception:
     ensure_game_window_resolution = None
+
+try:
+    from agent.custom.action.pinkpaw.pinkpaw_common import (
+        _get_auto_resize_game_window,
+        _parse_bool,
+        _parse_custom_action_param,
+    )
+except ImportError:
+    from .pinkpaw_common import (
+        _get_auto_resize_game_window,
+        _parse_bool,
+        _parse_custom_action_param,
+    )
 
 try:
     from agent.custom.action.pinkpaw.pinkpaw_reward_logger import notify_pinkpaw_reward
@@ -69,7 +81,6 @@ DEFAULT_ROUTE_TIMING_SCALE = 1.0
 DEFAULT_INTERACTION_PAUSE = 0.7
 DEFAULT_DIRECT_INPUT = True
 DEFAULT_AUTO_RESIZE_GAME_WINDOW = True
-AUTO_RESIZE_CONFIG_NODE = "PinkPawHeist_AutoResizeGameWindowConfig"
 MIN_ROUTE_TIMING_SCALE = 0.25
 MAX_ROUTE_TIMING_SCALE = 1.2
 MIN_INTERACTION_PAUSE = 0.0
@@ -228,23 +239,6 @@ def _normalize_key_sequence(value) -> list[str]:
     return result
 
 
-def _parse_custom_action_param(argv: CustomAction.RunArg) -> dict:
-    """解析节点传入的 custom_action_param，非法或空值时返回空配置。"""
-    value = getattr(argv, "custom_action_param", None)
-    if not value:
-        return {}
-    if isinstance(value, dict):
-        return value
-    try:
-        parsed = json.loads(value)
-    except Exception as exc:
-        print(
-            f"[PinkPawHeist/Core3] invalid custom_action_param: {value!r}, error: {exc}"
-        )
-        return {}
-    return parsed if isinstance(parsed, dict) else {}
-
-
 def _parse_timing_scale(value) -> float:
     """解析路线时间微调倍率，并限制在允许范围内。"""
     try:
@@ -252,30 +246,6 @@ def _parse_timing_scale(value) -> float:
     except (TypeError, ValueError):
         scale = DEFAULT_ROUTE_TIMING_SCALE
     return max(MIN_ROUTE_TIMING_SCALE, min(MAX_ROUTE_TIMING_SCALE, scale))
-
-
-def _parse_bool(value, default=False) -> bool:
-    """把开关配置解析为布尔值，兼容字符串、数字和 bool。"""
-    if value is None:
-        return bool(default)
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, (int, float)):
-        return bool(value)
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on", "enable", "enabled"}
-    return bool(default)
-
-
-def _get_auto_resize_game_window(ctx: Context, default=DEFAULT_AUTO_RESIZE_GAME_WINDOW):
-    try:
-        node_data = ctx.get_node_data(AUTO_RESIZE_CONFIG_NODE) or {}
-    except Exception:
-        return bool(default)
-    attach = node_data.get("attach") if isinstance(node_data, dict) else None
-    if isinstance(attach, dict) and "auto_resize_game_window" in attach:
-        return _parse_bool(attach.get("auto_resize_game_window"), default)
-    return bool(default)
 
 
 def _parse_interaction_pause(value) -> float:
@@ -3776,7 +3746,7 @@ class PinkPawHeistScheme3Action(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         """MAA 自定义动作入口：创建 Core3 路线对象，执行路线，并统一处理停止、提前撤离和异常恢复。"""
-        params = _parse_custom_action_param(argv)
+        params = _parse_custom_action_param(argv, log_prefix="[PinkPawHeist/Core3]")
         if PinkPawHeistCore3Path.CONF_AVOID_MTH not in params:
             node_name = getattr(argv, "node_name", "")
             if node_name.endswith("_Attack"):

@@ -73,7 +73,7 @@ WS_POPUP = 0x80000000
 SM_CXSCREEN = 0
 SM_CYSCREEN = 1
 SWP_NOSIZE = 0x0001
-SWP_NOREPOSITION = 0x0002
+SWP_NOREPOSITION = 0x0200
 SWP_NOZORDER = 0x0004
 SWP_NOACTIVATE = 0x0010
 SWP_NOMOVE = 0x0002
@@ -315,7 +315,7 @@ def resize_window(hwnd, width, height, center=True):
         return False
     width = int(width)
     height = int(height)
-    flags = SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOREPOSITION
+    flags = SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOMOVE
     if not user32.SetWindowPos(hwnd, None, 0, 0, width, height, flags):
         return False
     kernel32.Sleep(10)
@@ -418,9 +418,19 @@ def ensure_process_client_size(
     center=True,
     tolerance=2,
     settle_ms=300,
+    hwnd_class=None,
+    require_title=False,
+    selected_hwnd=0,
+    last_hwnd=0,
 ):
     """Find a process window and resize its client area to the target size."""
-    hwnd = find_window_by_process(process_name)
+    hwnd = find_window_by_process(
+        process_name,
+        hwnd_class=hwnd_class,
+        require_title=require_title,
+        selected_hwnd=selected_hwnd,
+        last_hwnd=last_hwnd,
+    )
     if not hwnd:
         return {
             "success": False,

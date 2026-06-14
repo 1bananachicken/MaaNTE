@@ -1,4 +1,3 @@
-import json
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
@@ -12,6 +11,19 @@ try:
         from utils.win32_process import ensure_game_window_resolution
 except Exception:
     ensure_game_window_resolution = None
+
+try:
+    from agent.custom.action.pinkpaw.pinkpaw_common import (
+        _get_auto_resize_game_window,
+        _parse_bool,
+        _parse_custom_action_param,
+    )
+except ImportError:
+    from .pinkpaw_common import (
+        _get_auto_resize_game_window,
+        _parse_bool,
+        _parse_custom_action_param,
+    )
 
 try:
     from agent.custom.action.pinkpaw.pinkpaw_reward_logger import notify_pinkpaw_reward
@@ -38,7 +50,6 @@ POST_REWARD_DELAY_MS = 7000
 DEFAULT_WIDTH = 1280
 DEFAULT_HEIGHT = 720
 DEFAULT_AUTO_RESIZE_GAME_WINDOW = True
-AUTO_RESIZE_CONFIG_NODE = "PinkPawHeist_AutoResizeGameWindowConfig"
 
 
 class StopActionException(Exception):
@@ -56,45 +67,6 @@ def _is_hit(result) -> bool:
     if result.status.succeeded is False:
         return False
     return True
-
-
-def _parse_custom_action_param(argv: CustomAction.RunArg) -> dict:
-    value = getattr(argv, "custom_action_param", None)
-    if not value:
-        return {}
-    if isinstance(value, dict):
-        return value
-    try:
-        parsed = json.loads(value)
-    except Exception as exc:
-        print(
-            f"[PinkPawHeist/Core2] invalid custom_action_param: {value!r}, error: {exc}"
-        )
-        return {}
-    return parsed if isinstance(parsed, dict) else {}
-
-
-def _parse_bool(value, default=False) -> bool:
-    if value is None:
-        return bool(default)
-    if isinstance(value, bool):
-        return value
-    if isinstance(value, (int, float)):
-        return bool(value)
-    if isinstance(value, str):
-        return value.strip().lower() in {"1", "true", "yes", "on", "enable", "enabled"}
-    return bool(default)
-
-
-def _get_auto_resize_game_window(ctx: Context, default=DEFAULT_AUTO_RESIZE_GAME_WINDOW):
-    try:
-        node_data = ctx.get_node_data(AUTO_RESIZE_CONFIG_NODE) or {}
-    except Exception:
-        return bool(default)
-    attach = node_data.get("attach") if isinstance(node_data, dict) else None
-    if isinstance(attach, dict) and "auto_resize_game_window" in attach:
-        return _parse_bool(attach.get("auto_resize_game_window"), default)
-    return bool(default)
 
 
 class ActionHelper:
@@ -378,7 +350,7 @@ class PinkPawHeistScheme2Action(CustomAction):
     ) -> CustomAction.RunResult:
         ah = ActionHelper(context)
         try:
-            params = _parse_custom_action_param(argv)
+            params = _parse_custom_action_param(argv, log_prefix="[PinkPawHeist/Core2]")
             auto_resize_default = _get_auto_resize_game_window(context)
             auto_resize = _parse_bool(
                 params.get("auto_resize_game_window"),
