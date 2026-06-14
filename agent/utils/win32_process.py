@@ -274,6 +274,18 @@ def _get_monitor_work_area(hwnd):
     return rect.left, rect.top, rect.right, rect.bottom
 
 
+def _get_window_work_area(hwnd):
+    work_area = _get_monitor_work_area(hwnd)
+    if work_area is not None:
+        return work_area
+    return (
+        0,
+        0,
+        user32.GetSystemMetrics(SM_CXSCREEN),
+        user32.GetSystemMetrics(SM_CYSCREEN),
+    )
+
+
 def show_title_bar(hwnd):
     """make sure the target window has a normal title bar."""
     try:
@@ -317,10 +329,13 @@ def resize_window(hwnd, width, height, center=True):
         left, top, right, bottom = rect
         window_width = right - left
         window_height = bottom - top
-        screen_width = user32.GetSystemMetrics(SM_CXSCREEN)
-        screen_height = user32.GetSystemMetrics(SM_CYSCREEN)
-        expected_left = (screen_width - window_width) // 2
-        expected_top = (screen_height - window_height) // 2
+        work_left, work_top, work_right, work_bottom = _get_window_work_area(hwnd)
+        work_width = work_right - work_left
+        work_height = work_bottom - work_top
+        if work_width < window_width or work_height < window_height:
+            return False
+        expected_left = work_left + (work_width - window_width) // 2
+        expected_top = work_top + (work_height - window_height) // 2
         if not user32.SetWindowPos(
             hwnd,
             None,
@@ -376,9 +391,10 @@ def resize_client_area(hwnd, width, height, center=True, tolerance=2):
     title_height = max(0, window_height - current_client[1])
     resized_width = target_width + border
     resized_height = target_height + title_height
-    screen_width = user32.GetSystemMetrics(SM_CXSCREEN)
-    screen_height = user32.GetSystemMetrics(SM_CYSCREEN)
-    if screen_width < resized_width or screen_height < resized_height:
+    work_left, work_top, work_right, work_bottom = _get_window_work_area(hwnd)
+    work_width = work_right - work_left
+    work_height = work_bottom - work_top
+    if work_width < resized_width or work_height < resized_height:
         return False
 
     if not resize_window(hwnd, resized_width, resized_height, center=center):
