@@ -1,12 +1,25 @@
 from __future__ import annotations
 
 import json
+import sys
 
 from maa.custom_action import CustomAction
 from maa.context import Context
 
 
+DEFAULT_AUTO_RESIZE_GAME_WINDOW = True
 AUTO_RESIZE_CONFIG_NODE = "PinkPawHeist_AutoResizeGameWindowConfig"
+
+if sys.platform == "win32":
+    try:
+        try:
+            from agent.utils.win32_process import ensure_game_window_resolution
+        except ImportError:
+            from utils.win32_process import ensure_game_window_resolution
+    except ImportError:
+        ensure_game_window_resolution = None
+else:
+    ensure_game_window_resolution = None
 
 
 def _parse_custom_action_param(
@@ -38,7 +51,10 @@ def _parse_bool(value, default=False) -> bool:
     return bool(default)
 
 
-def _get_auto_resize_game_window(ctx: Context, default=True) -> bool:
+def _get_auto_resize_game_window(
+    ctx: Context,
+    default=DEFAULT_AUTO_RESIZE_GAME_WINDOW,
+) -> bool:
     try:
         node_data = ctx.get_node_data(AUTO_RESIZE_CONFIG_NODE) or {}
     except Exception:

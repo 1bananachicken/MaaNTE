@@ -13,7 +13,6 @@ try:
         DEFAULT_WIDTH,
         PinkPawHeistCore3Path,
         TaskerStoppedException,
-        ensure_game_window_resolution,
         _is_hit,
     )
 except ImportError:
@@ -23,14 +22,16 @@ except ImportError:
         DEFAULT_WIDTH,
         PinkPawHeistCore3Path,
         TaskerStoppedException,
-        ensure_game_window_resolution,
         _is_hit,
     )
 
 try:
-    from agent.custom.action.pinkpaw.pinkpaw_common import _parse_custom_action_param
+    from agent.custom.action.pinkpaw.pinkpaw_common import (
+        _parse_custom_action_param,
+        ensure_game_window_resolution,
+    )
 except ImportError:
-    from .pinkpaw_common import _parse_custom_action_param
+    from .pinkpaw_common import _parse_custom_action_param, ensure_game_window_resolution
 
 
 RECOVERY_ENTRANCE_ROUTE_MINT = [

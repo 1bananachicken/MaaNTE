@@ -23,24 +23,18 @@ except ImportError:
     cv2 = None
 
 try:
-    try:
-        from agent.utils.win32_process import ensure_game_window_resolution
-    except ImportError:
-        from utils.win32_process import ensure_game_window_resolution
-except Exception:
-    ensure_game_window_resolution = None
-
-try:
     from agent.custom.action.pinkpaw.pinkpaw_common import (
         _get_auto_resize_game_window,
         _parse_bool,
         _parse_custom_action_param,
+        ensure_game_window_resolution,
     )
 except ImportError:
     from .pinkpaw_common import (
         _get_auto_resize_game_window,
         _parse_bool,
         _parse_custom_action_param,
+        ensure_game_window_resolution,
     )
 
 try:
@@ -80,7 +74,6 @@ DEFAULT_HEIGHT = 720
 DEFAULT_ROUTE_TIMING_SCALE = 1.0
 DEFAULT_INTERACTION_PAUSE = 0.7
 DEFAULT_DIRECT_INPUT = True
-DEFAULT_AUTO_RESIZE_GAME_WINDOW = True
 MIN_ROUTE_TIMING_SCALE = 0.25
 MAX_ROUTE_TIMING_SCALE = 1.2
 MIN_INTERACTION_PAUSE = 0.0

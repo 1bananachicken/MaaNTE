@@ -58,7 +58,7 @@
         },
         "PinkPawHeist_AutoResizeGameWindow": {
             "type": "switch",
-            "label": "自动设置游戏分辨率",
+            "label": "自动设置游戏分辨率到1280x720，如关闭请确保游戏分辨率为1280x720，否则可能会导致识图失败",
             "default_case": "Yes",
             "cases": [
                 {

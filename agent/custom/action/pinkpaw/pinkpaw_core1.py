@@ -5,29 +5,22 @@ from maa.define import Status
 from datetime import datetime
 
 try:
-    try:
-        from agent.utils.win32_process import ensure_game_window_resolution
-    except ImportError:
-        from utils.win32_process import ensure_game_window_resolution
-except Exception:
-    ensure_game_window_resolution = None
-
-try:
     from agent.custom.action.pinkpaw.pinkpaw_common import (
         _get_auto_resize_game_window,
         _parse_bool,
         _parse_custom_action_param,
+        ensure_game_window_resolution,
     )
 except ImportError:
     from .pinkpaw_common import (
         _get_auto_resize_game_window,
         _parse_bool,
         _parse_custom_action_param,
+        ensure_game_window_resolution,
     )
 
 DEFAULT_WIDTH = 1280
 DEFAULT_HEIGHT = 720
-DEFAULT_AUTO_RESIZE_GAME_WINDOW = True
 
 VK = {
     "W": 0x57,
