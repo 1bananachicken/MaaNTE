@@ -193,6 +193,31 @@ def _norm_key(key: str) -> str:
     return str(key).lower()
 
 
+def _normalize_key_sequence(value) -> list[str]:
+    """Normalize one key or a sequence of keys into a de-duplicated key list."""
+    if value is None:
+        return []
+    if isinstance(value, str):
+        text = value.strip()
+        if len(text) > 1 and all(char.lower() in {"w", "a", "s", "d"} for char in text):
+            keys = list(text)
+        else:
+            keys = text.replace("+", " ").replace(",", " ").split()
+    elif isinstance(value, (list, tuple, set)):
+        keys = []
+        for item in value:
+            keys.extend(_normalize_key_sequence(item))
+    else:
+        keys = [str(value)]
+
+    result = []
+    for key in keys:
+        normalized = _norm_key(key)
+        if normalized and normalized not in result:
+            result.append(normalized)
+    return result
+
+
 def _parse_custom_action_param(argv: CustomAction.RunArg) -> dict:
     """解析节点传入的 custom_action_param，非法或空值时返回空配置。"""
     value = getattr(argv, "custom_action_param", None)
@@ -1401,6 +1426,7 @@ class PinkPawHeistCore3Path:
         """等待交互点、按 F，并在锁类交互里确认撬锁开始/结束和保底等待。"""
         timeout = 10.0 if not time_out or time_out <= 0 else float(time_out)
         lock_min_done_at = 0.0
+        direction_keys = _normalize_key_sequence(direction)
 
         def start_lock_min_timer():
             """锁类交互首次按 F 时启动最短等待计时，避免识别过快导致提前离开。"""
@@ -1426,8 +1452,9 @@ class PinkPawHeistCore3Path:
             self.send_key("f", interval=0.5)
 
         ret = self.wait_for_interac(time_out=timeout)
-        if interact and direction is not None:
-            self.send_key_up(direction)
+        if interact and direction_keys:
+            for key in direction_keys:
+                self.send_key_up(key)
             if key_up_sleep is None:
                 key_up_sleep = self.interaction_pause
             self.sleep(key_up_sleep, check_reward=False, scaled=False)
@@ -2357,9 +2384,9 @@ class PinkPawHeistCore3Path:
         self.send_key_down("f")  # start pick
         self.sleep(0.11)
         self.send_key_down("a")
-        self.sleep(3.00)
+        self.sleep(2.70)
         self.send_key("lshift")  # x0.6
-        self.sleep(3.10)
+        self.sleep(3.30)
         self.send_key_up("a")
         self.sleep(0.21)
         self.send_key_down("s")
@@ -3150,7 +3177,7 @@ class PinkPawHeistCore3Path:
         self.send_key("a", down_time=0.23)
         self.sleep(0.10)
         self.send_key_down("w")
-        self.wait_and_interact(direction="w", is_lock=True, time_out=6.4)
+        self.wait_and_interact(direction="w", is_lock=True, time_out=5.4)
         if self.find_interac():
             self.send_key("s", down_time=0.10)
             self.sleep(0.25)
@@ -3160,11 +3187,11 @@ class PinkPawHeistCore3Path:
             self.sleep(0.10)
             self.send_key("e", down_time=2.40)
             self.send_key_down("w")
-            self.wait_and_interact(direction="w", is_lock=True, time_out=6.4)
+            self.wait_and_interact(direction="w", is_lock=True, time_out=5.4)
         self.send_key("s", down_time=0.10)
         self.switch_to_avoider(check_switched=True)  # 切到狗哥潜行避免碰到怪改变路径
         self.send_key_down("w")
-        self.sleep(0.32)
+        self.sleep(0.35)
         self.send_key("d", down_time=0.32)
         self.sleep(0.32)
         self.send_key("a", down_time=0.32)
@@ -3218,7 +3245,7 @@ class PinkPawHeistCore3Path:
         self.send_key_down("w")
         self.sleep(0.14)
         self.send_key_down("d")
-        self.wait_and_interact(direction="d", is_lock=True, time_out=7.64)
+        self.wait_and_interact(direction="wd", is_lock=True, time_out=7.64)
         self.sleep(0.10)
         self.send_key_up("w")
         if self.wait_door_open(time_out=1.14):
@@ -3226,7 +3253,7 @@ class PinkPawHeistCore3Path:
             self.send_key("f", down_time=0.10)
             self.sleep(0.10)
         self.send_key_down("w")
-        self.sleep(0.24)
+        self.sleep(0.40)
         self.send_key("a", down_time=0.36)
         self.wait_and_interact(direction="w", is_lock=False, time_out=3.65)
         self.sleep(0.30)
@@ -3277,15 +3304,13 @@ class PinkPawHeistCore3Path:
         self.sleep(0.10)
         self.switch_to_avoider(check_switched=True)
         self.sleep(0.10)
-        self.send_key("a", down_time=0.23)
+        self.send_key("a", down_time=0.22)
         self.sleep(0.10)
         self.send_key_down("w")
-        self.wait_and_interact(direction="w", is_lock=True, time_out=6.4)
-        if self.find_interac():
-            self.wait_and_interact(direction="w", is_lock=True, time_out=6.4)
-        self.sleep(0.10)
+        self.wait_and_interact(direction="w", is_lock=True, time_out=5.4)
+        self.sleep(0.01)
         self.send_key_down("w")
-        self.sleep(0.32)
+        self.sleep(0.38)
         self.send_key("d", down_time=0.32)
         self.sleep(0.32)
         self.send_key("a", down_time=0.32)
@@ -3314,11 +3339,11 @@ class PinkPawHeistCore3Path:
         self.sleep(0.10)
         self.send_key("s", down_time=0.10)
         self.sleep(0.10)
-        self.send_key("s", down_time=1.16)
+        self.send_key("s", down_time=1.26)
         self.sleep(0.10)
         self.send_key("d", down_time=0.10)
         self.sleep(0.10)
-        self.send_key("d", down_time=1.82)
+        self.send_key("d", down_time=1.88)
         self.sleep(0.10)
         self.send_key("s", down_time=0.10)
         self.sleep(0.10)
@@ -3336,20 +3361,21 @@ class PinkPawHeistCore3Path:
         self.sleep(0.42)
         self.send_key("lshift", down_time=0.24)
         self.sleep(0.42)
-        self.send_key_down("d")
-        self.sleep(0.32)
-        self.send_key_up("d")
-        self.sleep(0.42)
         self.send_key("lshift", down_time=0.24)
-        self.sleep(0.76)
+        self.sleep(0.42)
+        self.send_key_down("d")
+        self.sleep(0.43)
+        self.send_key_up("d")
+        self.sleep(0.70)
         self.send_key_up("w")
         self.sleep(0.10)
         self.click(down_time=0.64)
         self.sleep(0.10)
         self.send_key_down("w")
-        self.sleep(0.10)
+        self.sleep(1.50)
         self.send_key_down("d")
-        self.wait_and_interact(direction="d", is_lock=True, time_out=7.64)
+        self.sleep(0.10)
+        self.wait_and_interact(direction="wd", is_lock=True, time_out=7.64)
         self.sleep(0.10)
         self.send_key_up("w")
         if self.wait_door_open(time_out=1.14):
