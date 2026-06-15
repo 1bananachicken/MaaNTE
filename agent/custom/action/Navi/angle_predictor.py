@@ -1,5 +1,6 @@
 import math
 import os
+import threading
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -27,6 +28,14 @@ class AnglePredictionResult:
 
 
 class AnglePredictor:
+    _session_cache = {}
+    _session_cache_lock = threading.Lock()
+    _provider_name_map = {
+        "cpu": "CPUExecutionProvider",
+        "directml": "DmlExecutionProvider",
+        "dml": "DmlExecutionProvider",
+    }
+
     def __init__(
         self,
         backend: str | None = None,
@@ -39,12 +48,6 @@ class AnglePredictor:
         self.pointer_roi = [73, 60, 64, 64]
         self.threshold = threshold
         self.debug = debug
-        self._session_cache = {}
-        self._provider_name_map = {
-            "cpu": "CPUExecutionProvider",
-            "directml": "DmlExecutionProvider",
-            "dml": "DmlExecutionProvider",
-        }
 
     def predict(self, frame: np.ndarray) -> AnglePredictionResult:
         session, _ = self.get_session()
@@ -151,7 +154,13 @@ class AnglePredictor:
 
     def close_debug(self) -> None:
         if self.debug:
-            cv2.destroyWindow("Angle Predictor")
+            try:
+                cv2.destroyWindow("Angle Predictor")
+            except cv2.error as exc:
+                logger.debug("Angle predictor debug window close failed: %s", exc)
+
+    def close(self) -> None:
+        self.close_debug()
 
     def provider_name(self) -> str:
         _, provider_name = self.get_session()
@@ -178,31 +187,34 @@ class AnglePredictor:
         return backend
 
     def get_session(self):
-        backend = self.backend
-        if backend in self._session_cache:
-            return self._session_cache[backend]
+        with self._session_cache_lock:
+            backend = self.backend
+            if backend in self._session_cache:
+                return self._session_cache[backend]
 
-        if not self.model_path.exists():
-            raise FileNotFoundError(f"Angle model not found: {self.model_path}")
+            if not self.model_path.exists():
+                raise FileNotFoundError(f"Angle model not found: {self.model_path}")
 
-        provider_name = self._provider_name_map[backend]
-        available = onnxruntime.get_available_providers()
-        if provider_name not in available:
-            logger.warning(
-                f"Requested provider {provider_name} is unavailable, available providers: {available}; fallback to CPU"
-            )
-            backend = "cpu"
-            self.backend = backend
             provider_name = self._provider_name_map[backend]
+            available = onnxruntime.get_available_providers()
+            if provider_name not in available:
+                logger.warning(
+                    f"Requested provider {provider_name} is unavailable, available providers: {available}; fallback to CPU"
+                )
+                backend = "cpu"
+                self.backend = backend
+                provider_name = self._provider_name_map[backend]
+                if backend in self._session_cache:
+                    return self._session_cache[backend]
 
-        provider_options = (
-            [{"device_id": 0}] if provider_name == "DmlExecutionProvider" else None
-        )
-        session = onnxruntime.InferenceSession(
-            str(self.model_path),
-            sess_options=onnxruntime.SessionOptions(),
-            providers=[provider_name],
-            provider_options=provider_options,
-        )
-        self._session_cache[backend] = (session, provider_name)
-        return self._session_cache[backend]
+            provider_options = (
+                [{"device_id": 0}] if provider_name == "DmlExecutionProvider" else None
+            )
+            session = onnxruntime.InferenceSession(
+                str(self.model_path),
+                sess_options=onnxruntime.SessionOptions(),
+                providers=[provider_name],
+                provider_options=provider_options,
+            )
+            self._session_cache[backend] = (session, provider_name)
+            return self._session_cache[backend]
