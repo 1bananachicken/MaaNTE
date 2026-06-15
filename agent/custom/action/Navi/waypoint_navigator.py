@@ -211,8 +211,14 @@ class WaypointNavigator:
         try:
             self.release()
         finally:
-            if self.debug:
-                close_debug_windows()
+            try:
+                self.locator.close()
+            finally:
+                try:
+                    self.predictor.close()
+                finally:
+                    if self.debug:
+                        close_debug_windows()
 
     def sleep_remaining(self, started: float) -> None:
         sleep_time = self.frame_interval - (time.perf_counter() - started)
