@@ -1,0 +1,14 @@
+{
+    "task": [
+        {
+            "name": "LocalRouteNavigationMemoryTest",
+            "label": "[测试] 本地路线内存测试",
+            "description": "连续调用 local_route_navigation，使用 unittest 路线在 segment 1 和 segment 2 之间交替执行 10 轮。",
+            "entry": "LocalRouteNavigationMemoryTest",
+            "group": [
+                "RealTimeAssist"
+            ]
+        }
+    ],
+    "option": {}
+}

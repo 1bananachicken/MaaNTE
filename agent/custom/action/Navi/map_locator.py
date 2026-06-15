@@ -1,5 +1,7 @@
 import math
+import threading
 from dataclasses import dataclass
+from typing import Any
 
 import cv2
 import numpy as np
@@ -56,46 +58,31 @@ class MapLocator:
     DEBUG_ZOOM_RADIUS_DEFAULT = 400
     DEBUG_ZOOM_RADIUS_MAX = 2000
     DEBUG_WIN = "Map Locator"
+    _shared_assets: dict[str, Any] | None = None
+    _shared_assets_lock = threading.Lock()
 
     def __init__(self, debug: bool = False):
-        self.big_map_path = resource_base_path() / "image/map/bigworldmapSecond.png"
-        self.chat_button_path = (
-            resource_base_path() / "image/Common/Button/InWorld/Chat.png"
-        )
-
-        self.chat_template = cv2.imread(str(self.chat_button_path), cv2.IMREAD_COLOR)
+        self._closed = False
+        assets = self.shared_assets()
+        self.big_map_path = assets["big_map_path"]
+        self.chat_button_path = assets["chat_button_path"]
+        self.chat_template = assets["chat_template"]
         self.debug = debug
         self.last_center: tuple[int, int] | None = None
         self.smoothed_center: tuple[float, float] | None = None
         self._active_map_crop_index = 0
-
-        big_gray = cv2.imread(str(self.big_map_path), cv2.IMREAD_GRAYSCALE)
-        if big_gray is None:
-            raise ValueError(f"Failed to read big map: {self.big_map_path}")
-
-        self.origin_h, self.origin_w = big_gray.shape
-        if (self.origin_w, self.origin_h) != self.MAP_SIZE:
-            logger.warning(
-                f"Unexpected big map size: {self.origin_w}x{self.origin_h}, "
-                f"expected {self.MAP_SIZE[0]}x{self.MAP_SIZE[1]}"
-            )
+        self.origin_h = assets["origin_h"]
+        self.origin_w = assets["origin_w"]
 
         # 由于模板匹配对缩放敏感，需要预生成多尺度匹配模板，适配不同速度下的小地图尺寸
         # Fucking Neverness to Everness
-        self._match_maps: list[tuple[float, np.ndarray]] = []
-        for map_crop_size in self.MAP_CROP_SIZES:
-            scale = self.MINI_MAP_ROI[2] / map_crop_size
-            match_size = (
-                int(round(self.origin_w * scale)),
-                int(round(self.origin_h * scale)),
-            )
-            resized_gray = cv2.resize(
-                big_gray, match_size, interpolation=cv2.INTER_AREA
-            )
-            self._match_maps.append((scale, resized_gray))
+        self._match_maps = assets["match_maps"]
         self.activate_map_crop_size(0)
 
         if self.debug:
+            big_gray = cv2.imread(str(self.big_map_path), cv2.IMREAD_GRAYSCALE)
+            if big_gray is None:
+                raise ValueError(f"Failed to read big map: {self.big_map_path}")
             self.debug_scale = min(1.0, self.DEBUG_MAP_WIDTH / self.origin_w)
             debug_size = (
                 int(round(self.origin_w * self.debug_scale)),
@@ -129,6 +116,78 @@ class MapLocator:
             f"crop_sizes={self.MAP_CROP_SIZES}"
         )
 
+    @classmethod
+    def shared_assets(cls) -> dict[str, Any]:
+        with cls._shared_assets_lock:
+            if cls._shared_assets is None:
+                cls._shared_assets = cls.load_shared_assets()
+            return cls._shared_assets
+
+    @classmethod
+    def load_shared_assets(cls) -> dict[str, Any]:
+        big_map_path = resource_base_path() / "image/map/bigworldmapSecond.png"
+        chat_button_path = resource_base_path() / "image/Common/Button/InWorld/Chat.png"
+        chat_template = cv2.imread(str(chat_button_path), cv2.IMREAD_COLOR)
+        big_gray = cv2.imread(str(big_map_path), cv2.IMREAD_GRAYSCALE)
+        if big_gray is None:
+            raise ValueError(f"Failed to read big map: {big_map_path}")
+
+        origin_h, origin_w = big_gray.shape
+        if (origin_w, origin_h) != cls.MAP_SIZE:
+            logger.warning(
+                f"Unexpected big map size: {origin_w}x{origin_h}, "
+                f"expected {cls.MAP_SIZE[0]}x{cls.MAP_SIZE[1]}"
+            )
+
+        match_maps: list[tuple[float, np.ndarray]] = []
+        for map_crop_size in cls.MAP_CROP_SIZES:
+            scale = cls.MINI_MAP_ROI[2] / map_crop_size
+            match_size = (
+                int(round(origin_w * scale)),
+                int(round(origin_h * scale)),
+            )
+            resized_gray = cv2.resize(
+                big_gray,
+                match_size,
+                interpolation=cv2.INTER_AREA,
+            )
+            match_maps.append((scale, resized_gray))
+
+        logger.info(
+            f"NCC shared map assets loaded: origin={origin_w}x{origin_h}, "
+            f"crop_sizes={cls.MAP_CROP_SIZES}"
+        )
+        return {
+            "big_map_path": big_map_path,
+            "chat_button_path": chat_button_path,
+            "chat_template": chat_template,
+            "origin_h": origin_h,
+            "origin_w": origin_w,
+            "match_maps": match_maps,
+        }
+
+    def close(self) -> None:
+        if self._closed:
+            return
+        self._closed = True
+
+        if self.debug and getattr(self, "_debug_win_ready", False):
+            try:
+                cv2.destroyWindow(self.DEBUG_WIN)
+            except cv2.error as exc:
+                logger.debug("Map locator debug window close failed: %s", exc)
+            self._debug_win_ready = False
+
+        self.chat_template = None
+        self.last_center = None
+        self.smoothed_center = None
+        self._match_maps = []
+        self.big_match = None
+
+        if self.debug:
+            self.debug_map = None
+            self.zoom_map = None
+
     def activate_map_crop_size(self, index: int) -> None:
         previous_size = getattr(self, "map_crop_size", None)
         self._active_map_crop_index = index
@@ -160,6 +219,9 @@ class MapLocator:
         )
 
     def locate(self, frame: np.ndarray) -> MapLocationResult:
+        if self._closed:
+            raise RuntimeError("map locator is closed")
+
         x, y, w, h = self.MINI_MAP_ROI
         if frame is None or y + h > frame.shape[0] or x + w > frame.shape[1]:
             raise ValueError(
