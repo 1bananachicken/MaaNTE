@@ -28,7 +28,7 @@
                 }
             ],
             "pipeline_override": {
-                "AutoMakeCoffee": {
+                "MakeCoffeeRun": {
                     "custom_action_param": {
                         "count": "{LoopTime}"
                     }

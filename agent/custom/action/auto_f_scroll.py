@@ -33,9 +33,11 @@ class AutoFScroll(CustomAction):
                     # 参数: dwFlags, dx, dy, dwData(滚轮幅度), dwExtraInfo
                     # -120 代表向下滚动一格
                     ctypes.windll.user32.mouse_event(MOUSEEVENTF_WHEEL, 0, 0, -120, 0)
-                except Exception as e:
+                except Exception:
                     pass
 
                 time.sleep(0.1)
+            else:
+                time.sleep(0.05)  # 没按F时避免空转，避免日志爆炸
 
         return CustomAction.RunResult(success=True)

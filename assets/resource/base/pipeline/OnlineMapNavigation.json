@@ -1,0 +1,24 @@
+{
+    "OnlineMapNavigation": {
+        "action": "Custom",
+        "custom_action": "online_map_navigation",
+        "custom_action_param": {
+            "host": "0.0.0.0",
+            "port": 14514,
+            "tolerance": 5,
+            "frame_interval": "0.1"
+        }
+    },
+    "OnlineMapNavigationAngleBackendConfig": {
+        "enabled": false,
+        "attach": {
+            "angle_backend": "auto"
+        }
+    },
+    "OnlineMapNavigationDebugConfig": {
+        "enabled": false,
+        "attach": {
+            "debug": false
+        }
+    }
+}

@@ -56,8 +56,8 @@ body = """
     {%- if contributor.pr_number %} in \
       [#{{ contributor.pr_number }}]({{ self::remote_url() }}/pull/{{ contributor.pr_number }}) \
     {%- endif %}
-{%- endfor -%}
-{%- endif %}
+{% endfor %}
+{% endif %}
 """
 
 # 尾部

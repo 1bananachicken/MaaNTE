@@ -1,0 +1,165 @@
+{
+    "MakeCoffeeLiteDish1_SelectIngredient1": {
+        "desc": "制作牛角包步骤1",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    487,
+                    656
+                ]
+            }
+        },
+        "next": [
+            "MakeCoffeeLiteDish1_SelectIngredient2"
+        ],
+        "pre_delay": 3200,
+        "post_delay": 500,
+         "focus": {
+            "Node.Action.Starting": "开始执行制作牛角包"
+        }
+    },
+    "MakeCoffeeLiteDish1_SelectIngredient2": {
+        "desc": "制作牛角包步骤2",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    420,
+                    520
+                ]
+            }
+        },
+        "next": [
+            "MakeCoffeeLiteDish1_Confirm"
+        ],
+        "pre_delay": 1000,
+        "post_delay": 1200
+    },
+    "MakeCoffeeLiteDish1_Confirm": {
+        "desc": "制作牛角包步骤3",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    260,
+                    425
+                ]
+            }
+        },
+        "focus": {
+            "Node.Action.Succeeded": "牛角包制作成功"
+        },
+        "pre_delay": 1000,
+        "post_delay": 1200
+    },
+    "MakeCoffeeLiteDish2_SelectIngredient1": {
+        "desc": "制作小蛋糕步骤1",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    639,
+                    644
+                ]
+            }
+        },
+        "next": [
+            "MakeCoffeeLiteDish2_SelectIngredient2"
+        ],
+        "pre_delay": 800,
+        "post_delay": 1200,
+        "focus": {
+            "Node.Action.Starting": "开始制作小蛋糕"
+        }
+    },
+    "MakeCoffeeLiteDish2_SelectIngredient2": {
+        "desc": "制作小蛋糕步骤2",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    829,
+                    668
+                ]
+            }
+        },
+        "next": [
+            "MakeCoffeeLiteDish2_Confirm"
+        ],
+        "pre_delay": 800,
+        "post_delay": 1200
+    },
+    "MakeCoffeeLiteDish2_Confirm": {
+        "desc": "制作小蛋糕步骤3",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    677,
+                    410
+                ]
+            }
+        },
+        "focus": {
+            "Node.Action.Succeeded": "小蛋糕制作成功"
+        },
+        
+        "pre_delay": 800,
+        "post_delay": 1200
+    },
+    "MakeCoffeeLiteDish3_SelectIngredient1": {
+        "desc": "制作面包步骤1",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    83,
+                    647
+                ]
+            }
+        },
+        "next": [
+            "MakeCoffeeLiteDish3_SelectIngredient2"
+        ],
+        "pre_delay": 500,
+        "post_delay": 1000,
+         "focus": {
+            "Node.Action.Starting": "开始制作面包"
+        }
+    },
+    "MakeCoffeeLiteDish3_SelectIngredient2": {
+        "desc": "制作面包步骤2",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    60,
+                    513
+                ]
+            }
+        },
+        "next": [
+            "MakeCoffeeLiteDish3_Confirm"
+        ],
+        "pre_delay": 500,
+        "post_delay": 1000
+       
+    },
+    "MakeCoffeeLiteDish3_Confirm": {
+        "desc": "确认制作面包",
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    139,
+                    425
+                ]
+            }
+        },
+        "focus": {
+            "Node.Action.Succeeded": "面包制作成功"
+        },
+        "pre_delay": 1000
+    }
+}
