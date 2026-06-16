@@ -1,0 +1,28 @@
+{
+    "AutoCombat": {
+        "desc": "Combat loop: 1-2-3-4 cast E/Q, switch back to 1, short-click left attack for 10 seconds, then repeat.",
+        "action": "Custom",
+        "custom_action": "auto_combat",
+        "custom_action_param": {
+            "character_keys": [
+                "1",
+                "2",
+                "3",
+                "4"
+            ],
+            "skill_keys": [
+                "E",
+                "Q"
+            ],
+            "final_character_key": "1",
+            "key_down_time": 0.05,
+            "character_switch_delay": 0.35,
+            "skill_cast_delay": 0.65,
+            "basic_attack_duration": 10.0,
+            "basic_attack_click_down_time": 0.03,
+            "basic_attack_click_interval": 0.12,
+            "tick_interval": 0.05,
+            "round_count": 0
+        }
+    }
+}

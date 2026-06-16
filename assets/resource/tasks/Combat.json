@@ -1,0 +1,13 @@
+{
+    "task": [
+        {
+            "name": "AutoCombat",
+            "label": "自动战斗",
+            "entry": "AutoCombat",
+            "description": "依次切换 1/2/3/4，每个角色释放 E 和 Q，最后切回 1 并左键短按连点输出 10 秒，然后进入下一轮循环。",
+            "group": [
+                "RealTimeAssist"
+            ]
+        }
+    ]
+}
