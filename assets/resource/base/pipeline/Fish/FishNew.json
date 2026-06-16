@@ -422,7 +422,8 @@
         },
         "action": "Click",
         "next": [
-            "[Anchor]FishNewRestart"
+            "[Anchor]FishNewRestart",
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewStoreChooseGeneralBait": {
@@ -760,6 +761,7 @@
             "빠른 제출"
         ],
         "action": "Click",
+        "post_wait_freezes": 500,
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell2"
@@ -806,6 +808,7 @@
             "빠른 제출"
         ],
         "action": "Click",
+        "post_wait_freezes": 500,
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell3"
@@ -852,6 +855,7 @@
             "빠른 제출"
         ],
         "action": "Click",
+        "post_wait_freezes": 500,
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterSwitchToPage2"
