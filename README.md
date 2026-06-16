@@ -132,6 +132,8 @@
   《明日方舟》小助手，全日常一键长草！
 - [MaaEnd](https://github.com/MaaEnd/MaaEnd)
   基于视觉 AI 的「明日方舟：终末地」自动化工具
+- [OK-NTE](https://github.com/BnanZ0/ok-nte)
+  一款基于图像识别的《异环》自动化工具，支持后台运行。
 - [M9A](https://github.com/MAA1999/M9A)
   重返未来：1999 小助手
 - ~~[MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia)
