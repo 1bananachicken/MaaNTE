@@ -391,6 +391,27 @@
             }
         },
         "next": [
+            "BagelSpamClickFirstRow1"
+        ]
+    },
+    "BagelSpamClickFirstRow1": {
+        "desc": "点击第一行第1张",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    126,
+                    133,
+                    135,
+                    91
+                ]
+            }
+        },
+        "post_wait_freezes": 500,
+        "next": [
             "BagelSpamClickLastRow1"
         ]
     },
