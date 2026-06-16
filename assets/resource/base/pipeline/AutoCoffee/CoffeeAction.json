@@ -6,7 +6,7 @@
             120,
             400
         ],
-        "dy": 3600
+        "dy": 2800
     },
     "MakeCoffeeEnterShop": {
         "desc": "通过OCR识别店长特供并点击进入",
