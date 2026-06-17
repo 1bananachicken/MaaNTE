@@ -52,7 +52,7 @@ class AutoMakeCoffeeLite(CustomAction):
                         if context.tasker.stopping:
                             return CustomAction.RunResult(success=False)
                         context.run_action("MakeCoffeeScrollToTop")
-                        time.sleep(1)
+                        time.sleep(1.2)
                         img = get_image(controller)
                         target_result = context.run_recognition(
                             "MakeCoffeeTargetCoffeeMaster", img
