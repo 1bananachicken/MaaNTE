@@ -53,6 +53,7 @@
             "type": "DoNothing"
         },
         "next": [
+            "[JumpBack]PinkPawHeist_OCR_Join",
             "PinkPawHeist_FindXiaoZhi"
         ]
     },
@@ -144,6 +145,7 @@
         "action": "Custom",
         "custom_action": "PinkPawHeistReturnToEntranceAction",
         "next": [
+            "[JumpBack]PinkPawHeist_OCR_Join",
             "[JumpBack]PinkPawHeist_FindXiaoZhi"
         ],
         "on_error": [
@@ -302,7 +304,7 @@
     "PinkPawHeist_SkipStory_Join_Again": {
         "desc": "跳过详情页前的废话",
         "recognition": {
-            "type": "TamplateMatch",
+            "type": "TemplateMatch",
             "param": {
                 "template": "PinkPawHeist/PinkPawHeist_SkipStory.png",
                 "roi": [
@@ -313,12 +315,12 @@
                 ],
                 "threshold": 0.7,
                 "green_mask": true
-            },
-            "action": {
-                "type": "ClickKey",
-                "param": {
-                    "key": 32
-                }
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 32
             }
         }
     },
@@ -366,10 +368,10 @@
         },
         "post_delay": 2000,
         "next": [
-            "[JumpBack]PinkPawHeist_OCR_Join",
             "[JumpBack]RealTimeSkipStoryDialog",
             "[JumpBack]RealTimeSkipStory",
             "PinkPawHeist_AfterStory",
+            "[JumpBack]PinkPawHeist_OCR_Join",
             "[JumpBack]PinkPawHeist_FindXiaoZhi"
         ]
     },
