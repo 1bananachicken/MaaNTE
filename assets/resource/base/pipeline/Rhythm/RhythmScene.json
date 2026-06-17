@@ -48,8 +48,8 @@
                 "roi": [
                     0,
                     0,
-                    1280,
-                    720
+                    80,
+                    80
                 ],
                 "template": [
                     "auto_rhythm/scene_templates/song_select/logo.png"
@@ -65,10 +65,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    0,
-                    0,
-                    1280,
-                    720
+                    929,
+                    646,
+                    279,
+                    53
                 ],
                 "expected": [
                     "开始演奏",

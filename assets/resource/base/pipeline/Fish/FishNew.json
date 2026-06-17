@@ -1,7 +1,7 @@
 {
     "FishNewEntrance": {
         "desc": "钓鱼(新)功能入口",
-        "anchor": "FishNewRestart",
+        "anchor": "FishNewErrorRestart",
         "next": [
             "FishNewStart",
             "[JumpBack]FishSceneAnyEnterFishGame"
@@ -45,7 +45,10 @@
             "FishNewBaitLack",
             "FishNewFishFull",
             "FishNewCast",
-            "[JumpBack]FishNewFishHooked"
+            "FishNewFishHooked"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishHooked": {
@@ -79,6 +82,9 @@
         "next": [
             "[Anchor]FishNewRestart",
             "[JumpBack]SceneClickBlankToExit"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewGameResult": {
@@ -121,10 +127,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    520,
-                    340,
-                    240,
-                    40
+                    355,
+                    286,
+                    545,
+                    159
                 ],
                 "expected": [
                     "需要装备鱼饵才可以钓鱼",
@@ -136,7 +142,6 @@
                     "釣り餌を装着する必要",
                     "미끼를 장착해야 낚시할 수 있습니다"
                 ],
-                "threshold": 0.5,
                 "roi_offset": [
                     0,
                     0,
@@ -159,19 +164,28 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    520,
-                    340,
-                    240,
-                    40
+                    355,
+                    286,
+                    545,
+                    159
                 ],
                 "expected": [
+                    "鱼舱中渔获已满，请出售一些鱼获再尝试",
+                    "魚艙中漁獲已滿，請出售一些魚獲再嘗試",
+                    "(?i)Your\\s*fish\\s*hold\\s*is\\s*full\\s*\\.\\s*Sell\\s*some\\s*fish\\s*and\\s*try\\s*again\\s*\\.",
+                    "生け簀が一杯です、魚を売却後に再度お試しください",
                     "渔获已满",
                     "漁獲已滿",
                     "Your fish hold is full",
-                    "生け簀が一杯です", //生け簀が一杯です、魚を売却後に再度お試しください
+                    "生け簀が一杯です",
                     "저장고가 가득 찼습니다. 일부 어획물을 판매한 뒤 다시 시도해 주세요"
                 ],
-                "threshold": 0.8
+                "roi_offset": [
+                    0,
+                    0,
+                    182,
+                    0
+                ]
             }
         },
         "focus": {
@@ -274,13 +288,12 @@
                     "(?i)Purchase",
                     "購入",
                     "구매"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
         "action": "ClickKey",
         "key": [
-            27
+            27 //ESC
         ],
         "focus": {
             "Node.Action.Succeeded": "未开启自动买鱼饵，尝试前往卖鱼"
@@ -307,8 +320,7 @@
                     "(?i)Switch\\s*Bait",
                     "釣り餌交換",
                     "미끼 교체"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
         "pre_delay": 500,
@@ -338,8 +350,7 @@
                     "(?i)Purchase",
                     "購入",
                     "구매"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
         "action": "Click",
@@ -358,22 +369,18 @@
         ]
     },
     "FishNewOnStore": {
-        "desc": "到达商店界面商店界面",
+        "desc": "到达商店界面",
         "recognition": {
-            "type": "OCR",
+            "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    60,
-                    16,
-                    120,
-                    48
+                    0,
+                    0,
+                    80,
+                    80
                 ],
-                "expected": [
-                    "渔具商店",
-                    "漁具商店",
-                    "(?i)Fishing\\s*Tackle\\s*Shop",
-                    "釣具店",
-                    "낚시용품 상점"
+                "template": [
+                    "Fish/FishFishingTackleShop.png"
                 ],
                 "threshold": 0.8
             }
@@ -381,6 +388,9 @@
         "next": [
             "FishNewStoreChooseGeneralBait"
             // "[JumpBack]FishNewStoreScrollMouse"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewUseBait": {
@@ -412,7 +422,8 @@
         },
         "action": "Click",
         "next": [
-            "[Anchor]FishNewRestart"
+            "[Anchor]FishNewRestart",
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewStoreChooseGeneralBait": {
@@ -430,7 +441,6 @@
             "Fish/FishStoreGeneralBait.png"
         ],
         "green_mask": true,
-        "threshold": 0.5,
         // "threshold": 0.8, // 0.8 有点高了
         "order_by": "Score", // 默认似乎不是按置信度排的，需要显式声明
         "action": "Click",
@@ -442,22 +452,11 @@
     "FishNewStoreScrollMouse": {
         "desc": "滚动商店界面",
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "roi": [
-                    60,
-                    16,
-                    120,
-                    48
-                ],
-                "expected": [
-                    "渔具商店",
-                    "漁具商店",
-                    "(?i)Fishing\\s*Tackle\\s*Shop",
-                    "釣具店",
-                    "낚시용품 상점"
-                ],
-                "threshold": 0.8
+                "all_of": [
+                    "FishNewOnStore"
+                ]
             }
         },
         "pre_delay": 500,
@@ -511,15 +510,15 @@
             {
                 "recognition": "OCR",
                 "roi": [
-                    1031,
-                    119,
-                    94,
-                    48
+                    1029,
+                    115,
+                    164,
+                    60
                 ],
                 "expected": [
                     "万能鱼饵",
                     "萬能魚餌",
-                    "Universal Bait",
+                    "(?i)Universal\\s*Bait",
                     "万能釣り餌",
                     "만능 미끼"
                 ]
@@ -546,14 +545,16 @@
                     "(?i)Purchase",
                     "購入",
                     "구매"
-                ],
-                "threshold": 0.8
+                ]
             }
         },
         "action": "Click",
         "next": [
             "FishNewConfirmBuyBait",
             "FishNewSellFishEntrance"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewConfirmBuyBait": {
@@ -580,7 +581,6 @@
                     "CONFIRN",
                     "확인"
                 ],
-                "threshold": 0.8,
                 "roi_offset": [
                     0,
                     0,
@@ -594,27 +594,19 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewExitStore"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewExitStore": {
         "desc": "退出渔具商店重新开始钓鱼",
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "roi": [
-                    10,
-                    13,
-                    198,
-                    57
-                ],
-                "expected": [
-                    "渔具商店",
-                    "漁具商店",
-                    "(?i)Fishing\\s*Tackle\\s*Shop",
-                    "釣具店",
-                    "낚시용품 상점"
-                ],
-                "threshold": 0.8
+                "all_of": [
+                    "FishNewOnStore"
+                ]
             }
         },
         "action": {
@@ -627,16 +619,19 @@
         },
         "next": [
             "[Anchor]FishNewRestart"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewSellFishEntrance": {
         "desc": "卖鱼流程入口：识别到鱼鳞币不足，前往卖鱼流程",
         "recognition": "OCR",
         "roi": [
-            553,
-            340,
-            172,
-            38
+            489,
+            299,
+            294,
+            119
         ],
         "expected": [
             "货币不足无法购买",
@@ -659,22 +654,11 @@
     "FishNewExitStoreSellFish": {
         "desc": "退出渔具商店前往卖鱼",
         "recognition": {
-            "type": "OCR",
+            "type": "And",
             "param": {
-                "roi": [
-                    10,
-                    13,
-                    198,
-                    57
-                ],
-                "expected": [
-                    "渔具商店",
-                    "漁具商店",
-                    "(?i)Fishing\\s*Tackle\\s*Shop",
-                    "釣具店",
-                    "낚시용품 상점"
-                ],
-                "threshold": 0.8
+                "all_of": [
+                    "FishNewOnStore"
+                ]
             }
         },
         "action": {
@@ -700,7 +684,7 @@
         ],
         "action": "ClickKey",
         "key": [
-            81
+            81 // Q
         ],
         "post_wait_freezes": 200,
         "next": [
@@ -722,7 +706,7 @@
         "roi": [
             155,
             154,
-            136,
+            175,
             55
         ],
         "expected": [
@@ -734,6 +718,9 @@
         ],
         "next": [
             "FishNewFishingMasterPage1Sell1"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage1Sell1": {
@@ -762,10 +749,10 @@
         "desc": "渔获市场提交1",
         "recognition": "OCR",
         "roi": [
-            969,
-            622,
-            107,
-            37
+            861,
+            616,
+            327,
+            45
         ],
         "expected": [
             "快捷提交",
@@ -774,9 +761,13 @@
             "빠른 제출"
         ],
         "action": "Click",
+        "post_wait_freezes": 500,
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell2"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage1Sell2": {
@@ -805,10 +796,10 @@
         "desc": "渔获市场提交2",
         "recognition": "OCR",
         "roi": [
-            969,
-            622,
-            107,
-            37
+            861,
+            616,
+            327,
+            45
         ],
         "expected": [
             "快捷提交",
@@ -817,9 +808,13 @@
             "빠른 제출"
         ],
         "action": "Click",
+        "post_wait_freezes": 500,
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterPage1Sell3"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage1Sell3": {
@@ -848,10 +843,10 @@
         "desc": "渔获市场提交3",
         "recognition": "OCR",
         "roi": [
-            969,
-            622,
-            107,
-            37
+            861,
+            616,
+            327,
+            45
         ],
         "expected": [
             "快捷提交",
@@ -860,9 +855,13 @@
             "빠른 제출"
         ],
         "action": "Click",
+        "post_wait_freezes": 500,
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterSwitchToPage2"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterSwitchToPage2": {
@@ -883,6 +882,9 @@
         "next": [
             "FishNewFishingMasterPage2Submit",
             "FishNewSellFishNoFish"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterPage2Submit": {
@@ -904,6 +906,9 @@
         "post_wait_freezes": 1000,
         "next": [
             "FishNewConfirmSellFish"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewConfirmSellFish": {
@@ -912,10 +917,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    700,
-                    455,
-                    150,
-                    40
+                    665,
+                    448,
+                    230,
+                    48
                 ],
                 "expected": [
                     "确认记录",
@@ -927,10 +932,8 @@
                     "確定",
                     "确定",
                     "OK",
-                    "CONFIRN",
                     "확인"
                 ],
-                "threshold": 0.8,
                 "roi_offset": [
                     0,
                     0,
@@ -943,16 +946,19 @@
         "next": [
             "[JumpBack]SceneClickBlankToExit",
             "FishNewFishingMasterExit"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewSellFishNoFish": {
         "desc": "无鱼可卖",
         "recognition": "OCR",
         "roi": [
-            398,
-            404,
-            136,
-            36
+            264,
+            336,
+            406,
+            191
         ],
         "expected": [
             "暂未获得鱼",
@@ -966,23 +972,22 @@
         },
         "next": [
             "FishNewTaskExit"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewFishingMasterExit": {
         "desc": "从海上钓客退回钓鱼游戏界面",
-        "recognition": "OCR",
+        "recognition": "TemplateMatch",
         "roi": [
-            61,
-            16,
-            120,
-            48
+            0,
+            0,
+            80,
+            80
         ],
-        "expected": [
-            "海上钓客",
-            "海上釣客",
-            "(?i)Sea\\s*Angler",
-            "海釣り",
-            "바다 낚시꾼"
+        "template": [
+            "Fish/FishSeaAngler.png"
         ],
         "action": "ClickKey",
         "key": [
@@ -990,6 +995,9 @@
         ],
         "next": [
             "[Anchor]FishNewRestart"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     }
 }

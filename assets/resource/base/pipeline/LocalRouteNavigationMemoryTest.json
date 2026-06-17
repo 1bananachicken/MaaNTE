@@ -1,0 +1,347 @@
+{
+    "LocalRouteNavigationMemoryTest": {
+        "desc": "Memory test entry for repeated local_route_navigation custom actions.",
+        "action": "DoNothing",
+        "next": [
+            "LocalRouteNavigationMemoryTest01Segment1"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest01Segment1": {
+        "desc": "Memory test round 01, unittest segment 1.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest01Segment2"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest01Segment2": {
+        "desc": "Memory test round 01, unittest segment 2.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 2,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest02Segment1"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest02Segment1": {
+        "desc": "Memory test round 02, unittest segment 1.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest02Segment2"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest02Segment2": {
+        "desc": "Memory test round 02, unittest segment 2.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 2,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest03Segment1"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest03Segment1": {
+        "desc": "Memory test round 03, unittest segment 1.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest03Segment2"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest03Segment2": {
+        "desc": "Memory test round 03, unittest segment 2.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 2,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest04Segment1"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest04Segment1": {
+        "desc": "Memory test round 04, unittest segment 1.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest04Segment2"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest04Segment2": {
+        "desc": "Memory test round 04, unittest segment 2.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 2,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest05Segment1"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest05Segment1": {
+        "desc": "Memory test round 05, unittest segment 1.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest05Segment2"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest05Segment2": {
+        "desc": "Memory test round 05, unittest segment 2.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 2,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest06Segment1"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest06Segment1": {
+        "desc": "Memory test round 06, unittest segment 1.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest06Segment2"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest06Segment2": {
+        "desc": "Memory test round 06, unittest segment 2.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 2,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest07Segment1"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest07Segment1": {
+        "desc": "Memory test round 07, unittest segment 1.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest07Segment2"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest07Segment2": {
+        "desc": "Memory test round 07, unittest segment 2.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 2,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest08Segment1"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest08Segment1": {
+        "desc": "Memory test round 08, unittest segment 1.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest08Segment2"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest08Segment2": {
+        "desc": "Memory test round 08, unittest segment 2.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 2,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest09Segment1"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest09Segment1": {
+        "desc": "Memory test round 09, unittest segment 1.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest09Segment2"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest09Segment2": {
+        "desc": "Memory test round 09, unittest segment 2.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 2,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest10Segment1"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest10Segment1": {
+        "desc": "Memory test round 10, unittest segment 1.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "LocalRouteNavigationMemoryTest10Segment2"
+        ]
+    },
+    "LocalRouteNavigationMemoryTest10Segment2": {
+        "desc": "Memory test round 10, unittest segment 2.",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "unittest",
+            "route_name": "unittest",
+            "segment_index": 2,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "debug": false
+        },
+        "next": []
+    }
+}

@@ -84,7 +84,7 @@
                             "recognition": {
                                 "param": {
                                     "expected": [
-                                        "ShortVer"
+                                        "Short\\s*Ver"
                                     ]
                                 }
                             }
@@ -99,7 +99,7 @@
                             "recognition": {
                                 "param": {
                                     "expected": [
-                                        "EverlastingDazingSummer"
+                                        "Everlasting\\s*Dazing\\s*Summer\\s*$"
                                     ]
                                 }
                             }

@@ -11,17 +11,16 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    490,
-                    457,
-                    93,
-                    46
+                    473,
+                    434,
+                    123,
+                    101
                 ],
                 "expected": [
                     "一咖舍",
                     "(?i)The\\s*Cafe\\s*by\\s*Origen",
                     "壱のコーヒー",
-                    "咖舍",
-                    "별미 카페"
+                    "咖舍"
                 ]
             }
         },
@@ -75,23 +74,16 @@
                     "確定",
                     "确定",
                     "OK",
-                    "CONFIRN",
                     "확인"
-                ],
-                "threshold": 0.8,
-                "roi_offset": [
-                    0,
-                    0,
-                    29,
-                    0
                 ]
             }
         },
         "action": "Click",
         "next": [
             "[JumpBack]SceneClickBlankToExit",
-            "WithdrawMoneyEnterItemList",
-            "点击补货"
+            "[JumpBack]WithdrawMoneyEnterItemList",
+            "点击补货",
+            "WithdrawMoneyExit"
         ]
     },
     "WithdrawMoneyEnterItemList": {
@@ -110,8 +102,7 @@
                     "累計營業時間",
                     "(?i)Total\\s*Operating\\s*Time",
                     "累計営業時間"
-                ]
-            ,
+                ],
                 "roi_offset": [
                     0,
                     0,
@@ -153,8 +144,7 @@
                     "商品列表",
                     "(?i)Item\\s*List",
                     "商品リスト"
-                ]
-            ,
+                ],
                 "roi_offset": [
                     0,
                     0,
@@ -191,21 +181,17 @@
                 ]
             }
         },
-        "action": "Click",
-        "next": [
-            "点击补货",
-            "WithdrawMoneyExit"
-        ]
+        "action": "Click"
     },
     "点击补货": {
         "recognition": {
             "type": "OCR",
             "param": {
                 "roi": [
-                    177,
-                    393,
-                    42,
-                    22
+                    134,
+                    342,
+                    103,
+                    87
                 ],
                 "expected": [
                     "补货",
@@ -275,10 +261,10 @@
             "type": "OCR",
             "param": {
                 "roi": [
-                    506,
-                    344,
-                    265,
-                    34
+                    243,
+                    220,
+                    803,
+                    355
                 ],
                 "expected": [
                     "库存已满无法存入更多材料",
@@ -289,12 +275,6 @@
                     "庫存已滿",
                     "Inventory full",
                     "재고가 가득 차서"
-                ],
-                "roi_offset": [
-                    0,
-                    0,
-                    381,
-                    0
                 ]
             }
         },
@@ -360,7 +340,6 @@
                     "確定",
                     "确定",
                     "OK",
-                    "CONFIRN",
                     "확인"
                 ],
                 "threshold": 0.8,

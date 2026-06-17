@@ -5,6 +5,21 @@ from maa.define import Status
 from datetime import datetime
 
 try:
+    from agent.custom.action.pinkpaw.pinkpaw_common import (
+        _get_auto_resize_game_window,
+        _parse_bool,
+        _parse_custom_action_param,
+        ensure_game_window_resolution,
+    )
+except ImportError:
+    from .pinkpaw_common import (
+        _get_auto_resize_game_window,
+        _parse_bool,
+        _parse_custom_action_param,
+        ensure_game_window_resolution,
+    )
+
+try:
     from agent.custom.action.pinkpaw.pinkpaw_reward_logger import notify_pinkpaw_reward
 except ImportError:
     from .pinkpaw_reward_logger import notify_pinkpaw_reward
@@ -26,6 +41,8 @@ VK = {
 
 REWARD_OCR_DELAY_MS = 3000
 POST_REWARD_DELAY_MS = 7000
+DEFAULT_WIDTH = 1280
+DEFAULT_HEIGHT = 720
 
 
 class StopActionException(Exception):
@@ -326,6 +343,14 @@ class PinkPawHeistScheme2Action(CustomAction):
     ) -> CustomAction.RunResult:
         ah = ActionHelper(context)
         try:
+            params = _parse_custom_action_param(argv, log_prefix="[PinkPawHeist/Core2]")
+            auto_resize_default = _get_auto_resize_game_window(context)
+            auto_resize = _parse_bool(
+                params.get("auto_resize_game_window"),
+                auto_resize_default,
+            )
+            if auto_resize and ensure_game_window_resolution:
+                ensure_game_window_resolution(DEFAULT_WIDTH, DEFAULT_HEIGHT)
             current_ctrl = ah.ctx.tasker.controller
             for _ in range(3):
                 ah.click_key("1")

@@ -1,0 +1,17 @@
+{
+    "ResizeGameWindow": {
+        "desc": "调整游戏窗口客户区分辨率，默认 1280x720",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "resize_game_window"
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0
+    }
+}

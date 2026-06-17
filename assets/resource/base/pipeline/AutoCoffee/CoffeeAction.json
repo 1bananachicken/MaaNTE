@@ -1,0 +1,61 @@
+{
+    "MakeCoffeeScrollToTop": {
+        "desc": "向上滚动到顶部",
+        "action": "Scroll",
+        "target": [
+            120,
+            400
+        ],
+        "dy": 2800
+    },
+    "MakeCoffeeEnterShop": {
+        "desc": "通过OCR识别店长特供并点击进入",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    800,
+                    359,
+                    65,
+                    26
+                ],
+                "expected": [
+                    "店长特供"
+                ],
+                "threshold": 0.75
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "alt_click"
+            }
+        },
+        "post_wait_freezes": 1000
+    },
+    "MakeCoffeeEnterShopTemplate": {
+        "desc": "模板匹配店长特供作为备用方案",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    800,
+                    359,
+                    65,
+                    26
+                ],
+                "template": [
+                    "auto_make_coffee/mgr_special.png",
+                    "auto_make_coffee/mgr_special_2.png"
+                ],
+                "threshold": 0.75
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "alt_click"
+            }
+        }
+    }
+}
