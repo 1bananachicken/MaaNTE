@@ -2,69 +2,8 @@
     "BagelSpamEntrance": {
         "desc": "贝果灌水任务入口",
         "next": [
-            "BagelSpamEnsureEscButton",
-            "BagelSpamPressEscRetry"
-        ]
-    },
-    "BagelSpamEnsureEscButton": {
-        "desc": "识别并点击菜单按钮",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    1185,
-                    0,
-                    95,
-                    127
-                ],
-                "template": [
-                    "BagelSpam/esc_red_greenmask.png",
-                    "BagelSpam/esc.png"
-                ],
-                "threshold": 0.65,
-                "green_mask": true,
-                "order_by": "Score"
-            }
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": 27
-            }
-        },
-        "post_wait_freezes": {
-            "target": [
-                893,
-                43,
-                359,
-                649
-            ],
-            "time": 500
-        },
-        "post_delay": 500,
-        "timeout": 1000,
-        "rate_limit": 0,
-        "next": [
-            "BagelSpamOpenCamera"
-        ]
-    },
-    "BagelSpamPressEscRetry": {
-        "desc": "未识别到菜单时，按 Esc 后重试，用来逐层返回大世界",
-        "max_hit": 10,
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": 27
-            }
-        },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
-        "next": [
-            "BagelSpamEnsureEscButton",
-            "BagelSpamPressEscRetry"
+            "BagelSpamOpenCamera",
+            "[JumpBack]SceneAnyEnterEscMenu"
         ]
     },
     "BagelSpamOpenCamera": {

@@ -97,9 +97,10 @@
                     "name": "No",
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
-                        "BagelSpamEnsureEscButton": {
+                        "BagelSpamEntrance": {
                             "next": [
-                                "BagelSpamOpenBagel"
+                                "BagelSpamOpenBagel",
+                                "[JumpBack]SceneAnyEnterEscMenu"
                             ]
                         }
                     }
