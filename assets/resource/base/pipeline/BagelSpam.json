@@ -174,7 +174,8 @@
         "post_delay": 500,
         "next": [
             "BagelSpamCheckDailyPublishCount",
-            "BagelSpamClickPublishContent"
+            "BagelSpamClickPublishContent",
+            "BagelSpamExitTask"
         ]
     },
     "BagelSpamCheckDailyPublishCount": {
@@ -198,11 +199,12 @@
         "timeout": 100,
         "rate_limit": 0,
         "next": [
-            "SceneAnyEnterWorld"
+            "BagelSpamExitTask"
         ]
     },
     "BagelSpamClickPublishContent": {
         "desc": "点击发布内容",
+        "max_hit": 5,
         "recognition": {
             "type": "DirectHit"
         },
@@ -712,6 +714,12 @@
         "post_delay": 500,
         "next": [
             "BagelSpamClickRelease"
+        ]
+    },
+    "BagelSpamExitTask": {
+        "desc": "退出任务，返回大世界",
+        "next": [
+            "SceneAnyEnterWorld"
         ]
     }
 }
