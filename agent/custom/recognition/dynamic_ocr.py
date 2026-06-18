@@ -21,7 +21,6 @@ context.run_recognition_direct()。
 from __future__ import annotations
 
 import json
-import logging
 from typing import Optional
 
 from maa.agent.agent_server import AgentServer
@@ -30,8 +29,7 @@ from maa.custom_recognition import CustomRecognition
 from maa.pipeline import JOCR, JRecognitionType
 
 from utils.i18n_ocr_data import I18N_OCR, TL
-
-logger = logging.getLogger("maante.dynamic_ocr")
+from utils.logger import logger
 
 
 @AgentServer.custom_recognition("dynamic_ocr")
