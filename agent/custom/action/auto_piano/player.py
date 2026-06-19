@@ -73,7 +73,6 @@ class AutoPianoPlayer:
             len(notes),
             settings.speed,
             effective_transpose,
-            settings.sustain,
         )
         if parsed.get("track_count", 1) > 1:
             PrintT(

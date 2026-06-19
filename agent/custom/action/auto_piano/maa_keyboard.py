@@ -86,7 +86,7 @@ class MaaKeyboardBridge:
 
         if self.controller is not None:
             logger.info(
-                "自动钢琴使用 Maa controller 发送按键（延音模式: {}, 补发间隔: {:.0f}ms）",
+                "自动钢琴使用 Maa controller 发送按键（延音模式: %s, 补发间隔: %.0fms）",
                 self.sustain_mode,
                 self.repeat_interval * 1000,
             )
@@ -97,11 +97,11 @@ class MaaKeyboardBridge:
                 hwnd = user32.FindWindowW(None, title)
                 if hwnd:
                     self.hwnd = hwnd
-                    logger.info("已连接到游戏窗口: '{}' (HWND: {})", title, self.hwnd)
+                    logger.info("已连接到游戏窗口: '%s' (HWND: %s)", title, self.hwnd)
                     break  # 找到了就立刻停止搜索
 
             if not self.hwnd:
-                logger.warning("未找到列表中的任何窗口，请检查游戏是否运行！列表: {}", WINDOW_TITLES)
+                logger.warning("未找到列表中的任何窗口，请检查游戏是否运行！列表: %s", WINDOW_TITLES)
 
     # ------------------------------------------------------------------
     # 底层发送
