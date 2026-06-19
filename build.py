@@ -31,7 +31,7 @@ from pathlib import Path
 # 可配置常量
 # ---------------------------------------------------------------------------
 
-MAA_FRAMEWORK_VERSION = "v5.10.4"
+MAA_FRAMEWORK_VERSION = "v5.10.5"
 MFAA_VERSION = "v2.12.1"
 MXU_VERSION = "v2.1.3"
 PYTHON_VERSION_TARGET = "3.12.10"
