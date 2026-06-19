@@ -40,7 +40,7 @@
                 "window_regex": "^\\s*(异环|NTE)\\s*$",
                 "screencap": "PrintWindow",
                 "mouse": "Seize",
-                "keyboard": "PostMessage"
+                "keyboard": "Seize"
             }
         },
         {
