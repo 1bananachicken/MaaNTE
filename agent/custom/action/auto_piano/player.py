@@ -14,9 +14,7 @@ from . import key_mapping
 DEFAULT_SPEED = 1.0
 DEFAULT_TRANSPOSE = 0
 DEFAULT_COUNTDOWN = 1
-
-# 定时精度阈值：大于此值用 sleep，小于此值忙等待（保证精度同时降低 CPU）
-_WAIT_THRESHOLD = 0.003
+DEFAULT_CHORD_WINDOW = 0.005
 
 
 class AutoPianoStopped(RuntimeError):
@@ -31,9 +29,6 @@ class AutoPianoSettings:
     key_mode: str = "36"
     tracks: str = "all"  # "all" | "melody" | 轨道索引列表由 action 处理
     out_of_range_mode: str = "fold"  # "fold" | "shift" | "cut"
-    sustain: bool = True  # True = 按 MIDI 时长延音; False = 短触键（调试模式）
-    sustain_mode: str = "repeat"  # "repeat" = 高频补发; "hold" = 按住到音符结束
-    sustain_repeat_rate: str = "fast"  # slow | normal | fast | turbo
 
 
 class AutoPianoPlayer:
@@ -82,33 +77,27 @@ class AutoPianoPlayer:
                 parsed.get("parsed_tracks", []),
             )
 
-        # 生成按键事件列表
+        # 转换到游戏可用音域，再按原版逻辑分组成短和弦。
         mapping = key_mapping.get_mapping(settings.key_mode)
-        events = self._build_events(
-            notes, mapping, settings.speed, effective_transpose, settings.key_mode, settings.out_of_range_mode, settings.sustain
+        playable_notes = self._build_playable_notes(
+            notes,
+            mapping,
+            effective_transpose,
+            settings.key_mode,
+            settings.out_of_range_mode,
         )
-        if not events:
+        if not playable_notes:
             PrintT(context, "auto_piano.no_playable_notes")
             return 0
 
         self.sleep_interruptibly(context, DEFAULT_COUNTDOWN)
-        sustain_mode = (
-            settings.sustain_mode if settings.sustain_mode in ("repeat", "hold") else "repeat"
+        bridge = MaaKeyboardBridge(mapping=mapping)
+        played = self.play_notes(
+            context,
+            playable_notes,
+            bridge,
+            settings.speed,
         )
-        repeat_interval = self._parse_repeat_interval(settings.sustain_repeat_rate)
-        bridge = MaaKeyboardBridge(
-            self.get_controller(context),
-            wait_jobs=True,
-            mapping=mapping,
-            sustain_mode=sustain_mode,
-            repeat_interval=repeat_interval,
-        )
-
-        try:
-            played = self._play_events(context, events, bridge, len(notes))
-        finally:
-            # 无论成功失败，确保所有键都被释放
-            bridge.release_all()
 
         PrintT(context, "auto_piano.finished", played)
         return played
@@ -128,35 +117,11 @@ class AutoPianoPlayer:
             pass
         return "all"
 
-    @staticmethod
-    def _parse_repeat_interval(rate_raw: str) -> float:
-        rate = str(rate_raw).strip().lower()
-        rate_to_interval = {
-            "slow": 0.09,
-            "normal": 0.06,
-            "fast": 0.045,
-            "turbo": 0.03,
-        }
-        return rate_to_interval.get(rate, rate_to_interval["fast"])
-
     def resolve_song_path(self, song: str) -> Path:
         path = Path(song).expanduser()
         if path.is_absolute():
             return path
         return self.project_root / path
-
-    @staticmethod
-    def get_controller(context: Context):
-        controller = getattr(context, "controller", None)
-        if controller is not None:
-            return controller
-
-        tasker = getattr(context, "tasker", None)
-        controller = getattr(tasker, "controller", None)
-        if controller is not None:
-            return controller
-
-        raise RuntimeError("Maa controller is unavailable in custom action context.")
 
     @staticmethod
     def is_stop_requested(context: Context) -> bool:
@@ -240,132 +205,76 @@ class AutoPianoPlayer:
             midi_pitch -= 12
         return midi_pitch
 
-    # ------------------------------------------------------------------
-    # 事件生成
-    # ------------------------------------------------------------------
-    # 非延音模式下的固定触键时长（秒）
-    _STACCATO_DURATION = 0.05
-    _MIN_NOTE_DURATION = 0.01
-
     @classmethod
-    def _build_events(
+    def _build_playable_notes(
         cls,
         notes: list[dict],
         mapping: dict[int, str],
-        speed: float,
         transpose: int,
         key_mode: str,
         range_mode: str = "fold",
-        sustain: bool = True,
-    ) -> list[tuple[float, int, bool]]:
-        """
-        将音符列表转换为按键事件列表。
-        每个事件: (时间点, midi_pitch, is_press)
-        """
-        events = []
+    ) -> list[dict]:
+        """将音符转换到当前键位模式可播放的音高。"""
+        playable_notes = []
         for note in notes:
-            raw_pitch = int(note["p"])
+            pitch = int(note["p"])
             if range_mode == "fold":
-                raw_pitch += transpose
-                pitch = cls.adjust_pitch(raw_pitch, key_mode)
-            else:
-                # shift / cut 模式下，音符已在 _apply_range_mode 中处理并过滤
-                pitch = raw_pitch
-                if key_mode == "21":
-                    pitch = key_mapping.snap_to_white_key(pitch)
+                pitch = cls.adjust_pitch(pitch + transpose, key_mode)
+            elif key_mode == "21":
+                pitch = key_mapping.snap_to_white_key(pitch)
 
-            if pitch is None or pitch not in mapping:
-                continue
+            if pitch in mapping:
+                playable_notes.append({**note, "p": pitch})
 
-            start = float(note["t"]) / speed
-            if sustain:
-                duration = max(float(note.get("d", 0.05)) / speed, cls._MIN_NOTE_DURATION)
-            else:
-                # 非延音模式：固定短触键，方便调试
-                duration = max(cls._STACCATO_DURATION / speed, cls._MIN_NOTE_DURATION)
-            end = start + duration
+        return playable_notes
 
-            events.append((start, pitch, True))   # press
-            events.append((end, pitch, False))    # release
+    @staticmethod
+    def collect_chord(
+        notes: list[dict], start_index: int, window: float
+    ) -> tuple[list[int], int]:
+        """收集指定时间窗口内开始的音符。"""
+        base_time = notes[start_index]["t"]
+        chord = []
+        index = start_index
 
-        # 排序：时间升序；同一时刻，release (False=0) 排在 press (True=1) 前面
-        events.sort(key=lambda e: (e[0], e[2]))
-        return events
+        while index < len(notes) and abs(notes[index]["t"] - base_time) <= window:
+            chord.append(int(notes[index]["p"]))
+            index += 1
 
-    # ------------------------------------------------------------------
-    # 事件播放（核心）
-    # ------------------------------------------------------------------
+        return chord, index
+
     @classmethod
-    def _play_events(
+    def play_notes(
         cls,
         context: Context,
-        events: list[tuple[float, int, bool]],
+        notes: list[dict],
         bridge: MaaKeyboardBridge,
-        total_notes: int,
+        speed: float,
     ) -> int:
+        """按原版节奏将音符分组成短和弦播放。"""
         start_time = time.perf_counter()
+        elapsed = 0.0
+        index = 0
         played = 0
-        report_interval = max(1, total_notes // 10)
-        next_report = report_interval
 
-        for evt_time, pitch, is_press in events:
+        while index < len(notes):
             cls.raise_if_stopped(context)
-            cls._wait_until(context, start_time + evt_time, bridge)
+            target_time = float(notes[index]["t"]) / speed
+            chord, next_index = cls.collect_chord(
+                notes, index, DEFAULT_CHORD_WINDOW
+            )
 
-            if is_press:
-                bridge.press_note(pitch)
-                played += 1
-                if played >= next_report:
-                    PrintT(
-                        context,
-                        "auto_piano.progress",
-                        played,
-                        total_notes,
-                        int(played * 100 / total_notes),
-                    )
-                    next_report += report_interval
-            else:
-                bridge.release_note(pitch)
+            while elapsed < target_time:
+                cls.raise_if_stopped(context)
+                elapsed = time.perf_counter() - start_time
+                remaining = target_time - elapsed
+                if remaining > 0:
+                    time.sleep(min(0.002, remaining))
+
+            cls.raise_if_stopped(context)
+            bridge.execute_chord(chord)
+            elapsed = time.perf_counter() - start_time
+            played += len(chord)
+            index = next_index
 
         return played
-
-    # ------------------------------------------------------------------
-    # 低 CPU 高精度等待
-    # ------------------------------------------------------------------
-    @classmethod
-    def _wait_until(
-        cls, context: Context, deadline: float, bridge: MaaKeyboardBridge | None = None
-    ) -> None:
-        """
-        混合等待策略：
-        - 剩余时间较大时，用 time.sleep() 让出 CPU；
-        - 长等待分段睡，每 0.1 秒检查一次停止信号；
-        - 接近目标时，小范围忙等待保证按键时序精度。
-        """
-        while True:
-            cls.raise_if_stopped(context)
-            if bridge is not None:
-                bridge.refresh_active_keys()
-            now = time.perf_counter()
-            remaining = deadline - now
-            if remaining <= 0:
-                if bridge is not None:
-                    bridge.refresh_active_keys(force=True)
-                return
-
-            if bridge is not None and getattr(bridge, "_active_counts", None):
-                if getattr(bridge, "sustain_mode", "hold") == "repeat":
-                    active_step = min(max(bridge.repeat_interval / 2, 0.005), 0.02)
-                else:
-                    active_step = 0.05
-                time.sleep(min(active_step, remaining))
-            elif remaining > 0.5:
-                # 长等待分段睡，防止 sleep 期间无法响应停止
-                time.sleep(0.1)
-            elif remaining > _WAIT_THRESHOLD:
-                # 提前 _WAIT_THRESHOLD 秒唤醒，再进入忙等待收尾
-                time.sleep(remaining - _WAIT_THRESHOLD)
-            elif remaining > 0.0003:
-                # 最后 0.3ms 用更细粒度 sleep（避免完全忙等待吃满 CPU）
-                time.sleep(0.0002)
-            # 最后几百微秒自然循环收尾，保证精度
