@@ -81,33 +81,6 @@
           "pipeline_type": "string",
           "verify": "^(fold|shift|cut)$",
           "pattern_msg": "$task_auto_piano_input_range_mode_pattern_msg"
-        },
-        {
-          "name": "Sustain",
-          "label": "$task_auto_piano_input_sustain_label",
-          "description": "$task_auto_piano_input_sustain_desc",
-          "default": "true",
-          "pipeline_type": "string",
-          "verify": "^(true|false)$",
-          "pattern_msg": "$task_auto_piano_input_sustain_pattern_msg"
-        },
-        {
-          "name": "SustainMode",
-          "label": "$task_auto_piano_input_sustain_mode_label",
-          "description": "$task_auto_piano_input_sustain_mode_desc",
-          "default": "repeat",
-          "pipeline_type": "string",
-          "verify": "^(repeat|hold)$",
-          "pattern_msg": "$task_auto_piano_input_sustain_mode_pattern_msg"
-        },
-        {
-          "name": "SustainRepeatRate",
-          "label": "$task_auto_piano_input_sustain_repeat_rate_label",
-          "description": "$task_auto_piano_input_sustain_repeat_rate_desc",
-          "default": "fast",
-          "pipeline_type": "string",
-          "verify": "^(slow|normal|fast|turbo)$",
-          "pattern_msg": "$task_auto_piano_input_sustain_repeat_rate_pattern_msg"
         }
       ],
       "pipeline_override": {
@@ -118,10 +91,7 @@
             "transpose": "{Transpose}",
             "key_mode": "{KeyMode}",
             "tracks": "{Tracks}",
-            "out_of_range_mode": "{OutOfRangeMode}",
-            "sustain": "{Sustain}",
-            "sustain_mode": "{SustainMode}",
-            "sustain_repeat_rate": "{SustainRepeatRate}"
+            "out_of_range_mode": "{OutOfRangeMode}"
           }
         }
       }

@@ -36,20 +36,23 @@ class MidiProcessor:
         tempo = 500000  # 默认 120 BPM
         last_tick = 0
         current_sec = 0.0
-        active_notes: dict[tuple[int, int, int], float] = {}
+        active_notes: dict[tuple[int, int, int], tuple[float, int]] = {}
         pending_note_offs: set[tuple[int, int, int]] = set()
         sustain_pedals: dict[tuple[int, int], bool] = {}
         notes = []
+        note_sequence = 0
 
         def close_note(key: tuple[int, int, int], end_sec: float) -> None:
-            start = active_notes.pop(key, None)
+            active_note = active_notes.pop(key, None)
             pending_note_offs.discard(key)
-            if start is None:
+            if active_note is None:
                 return
+            start, order = active_note
             notes.append({
                 "t": start,
                 "p": key[2],
                 "d": max(0.0, end_sec - start),
+                "_order": order,
             })
 
         for abs_tick, idx, msg in all_events:
@@ -75,7 +78,8 @@ class MidiProcessor:
                 # 如果同轨道同名音符已激活，先结束它（处理重叠）
                 if key in active_notes:
                     close_note(key, current_sec)
-                active_notes[key] = current_sec
+                active_notes[key] = (current_sec, note_sequence)
+                note_sequence += 1
 
             elif msg.type == "note_off" or (msg.type == "note_on" and msg.velocity == 0):
                 ch = getattr(msg, "channel", 0)
@@ -103,14 +107,17 @@ class MidiProcessor:
                             close_note(key, current_sec)
 
         # 处理文件末尾仍未关闭的音符
-        for key, start in list(active_notes.items()):
+        for key, (start, order) in list(active_notes.items()):
             notes.append({
                 "t": start,
                 "p": key[2],
                 "d": max(0.05, current_sec - start),
+                "_order": order,
             })
 
-        notes.sort(key=lambda n: n["t"])
+        notes.sort(key=lambda note: (note["t"], note["_order"]))
+        for note in notes:
+            note.pop("_order")
 
         return {
             "title": os.path.basename(file_path),
