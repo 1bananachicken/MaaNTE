@@ -87,6 +87,7 @@ class LocalRouteNavigation:
         *,
         tolerance: float = DEFAULT_TOLERANCE,
         angle_backend: str = "auto",
+        position_backend: str = "map",
         frame_interval: float = DEFAULT_FRAME_INTERVAL,
         debug: bool = False,
     ) -> None:
@@ -98,6 +99,7 @@ class LocalRouteNavigation:
             context,
             self.route,
             angle_backend=angle_backend,
+            position_backend=position_backend,
             tolerance=tolerance,
             frame_interval=frame_interval,
             debug=debug,
@@ -210,6 +212,9 @@ class LocalRouteNavigationAction(CustomAction):
                 float(params.get("frame_interval", DEFAULT_FRAME_INTERVAL)),
             )
             angle_backend = str(params.get("angle_backend", "auto")).strip() or "auto"
+            position_backend = (
+                str(params.get("position_backend", "map")).strip() or "map"
+            )
             debug = bool(params.get("debug", False))
         except ValueError as exc:
             logger.error("LocalRouteNavigation param invalid: %s", exc)
@@ -222,6 +227,7 @@ class LocalRouteNavigationAction(CustomAction):
                 tolerance=tolerance,
                 frame_interval=frame_interval,
                 angle_backend=angle_backend,
+                position_backend=position_backend,
                 debug=debug,
             ) as navigator:
                 success = navigator.run_route(
@@ -247,6 +253,9 @@ class LocalRouteNavigationUnitTestAction(CustomAction):
                 float(params.get("frame_interval", DEFAULT_FRAME_INTERVAL)),
             )
             angle_backend = str(params.get("angle_backend", "auto")).strip() or "auto"
+            position_backend = (
+                str(params.get("position_backend", "map")).strip() or "map"
+            )
             debug = bool(params.get("debug", False))
         except ValueError as exc:
             logger.error("LocalRouteNavigationUnitTest param invalid: %s", exc)
@@ -259,6 +268,7 @@ class LocalRouteNavigationUnitTestAction(CustomAction):
                 tolerance=tolerance,
                 frame_interval=frame_interval,
                 angle_backend=angle_backend,
+                position_backend=position_backend,
                 debug=debug,
             ) as navigator:
                 success = navigator.run_route(

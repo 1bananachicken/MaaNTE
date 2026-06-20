@@ -7,6 +7,7 @@
             "entry": "OnlineMapNavigation",
             "option": [
                 "OnlineMapNavigationSettings",
+                "OnlineMapNavigationPositionBackend",
                 "OnlineMapNavigationAngleBackend",
                 "OnlineMapNavigationDebug"
             ],
@@ -21,13 +22,6 @@
             "label": "$task_online_map_navigation_option_settings",
             "description": "$task_online_map_navigation_option_settings_desc",
             "inputs": [
-                {
-                    "name": "host",
-                    "label": "$task_online_map_navigation_input_host",
-                    "default": "0.0.0.0",
-                    "pipeline_type": "string",
-                    "verify": "^.+$"
-                },
                 {
                     "name": "port",
                     "label": "$task_online_map_navigation_input_port",
@@ -54,13 +48,53 @@
             "pipeline_override": {
                 "OnlineMapNavigation": {
                     "custom_action_param": {
-                        "host": "{host}",
                         "port": "{port}",
                         "tolerance": "{tolerance}",
                         "frame_interval": "{frame_interval}"
                     }
                 }
             }
+        },
+        "OnlineMapNavigationPositionBackend": {
+            "type": "select",
+            "label": "$task_online_map_navigation_option_position_backend",
+            "description": "$task_online_map_navigation_option_position_backend_desc",
+            "cases": [
+                {
+                    "name": "auto",
+                    "label": "$task_online_map_navigation_position_backend_auto",
+                    "pipeline_override": {
+                        "OnlineMapNavigation": {
+                            "custom_action_param": {
+                                "position_backend": "auto"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "coordinate",
+                    "label": "$task_online_map_navigation_position_backend_coordinate",
+                    "pipeline_override": {
+                        "OnlineMapNavigation": {
+                            "custom_action_param": {
+                                "position_backend": "coordinate"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "map",
+                    "label": "$task_online_map_navigation_position_backend_map",
+                    "pipeline_override": {
+                        "OnlineMapNavigation": {
+                            "custom_action_param": {
+                                "position_backend": "map"
+                            }
+                        }
+                    }
+                }
+            ],
+            "default_case": "auto"
         },
         "OnlineMapNavigationAngleBackend": {
             "type": "select",

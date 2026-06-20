@@ -18,6 +18,7 @@ class RouteRunner:
         route: RouteSession,
         *,
         angle_backend: str = "auto",
+        position_backend: str = "map",
         tolerance: float = 80.0,
         frame_interval: float = 0.1,
         debug: bool = False,
@@ -26,6 +27,7 @@ class RouteRunner:
         self.context = context
         self.route = route
         self.angle_backend = angle_backend
+        self.position_backend = position_backend
         self.tolerance = tolerance
         self.frame_interval = max(0.05, float(frame_interval))
         self.debug = debug
@@ -42,16 +44,20 @@ class RouteRunner:
         self.navigator = WaypointNavigator(
             self.context,
             angle_backend=self.angle_backend,
+            position_backend=self.position_backend,
             tolerance=self.tolerance,
             frame_interval=self.frame_interval,
             debug=self.debug,
             on_frame=self._on_frame,
             should_cancel=self._should_cancel,
         )
-        self._source_size = (
-            self.navigator.locator.origin_w,
-            self.navigator.locator.origin_h,
-        )
+        if self.navigator.locator is None:
+            self._source_size = MapLocator.MAP_SIZE
+        else:
+            self._source_size = (
+                self.navigator.locator.origin_w,
+                self.navigator.locator.origin_h,
+            )
 
     def run_until_stopped(
         self,

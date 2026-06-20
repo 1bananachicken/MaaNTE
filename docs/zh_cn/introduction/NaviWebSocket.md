@@ -8,10 +8,10 @@
     "action": "Custom",
     "custom_action": "online_map_navigation",
     "custom_action_param": {
-      "host": "0.0.0.0",
       "port": 14514,
       "tolerance": 5,
       "frame_interval": "0.1",
+      "position_backend": "auto",
       "debug": false,
       "angle_backend": "auto"
     }
@@ -21,13 +21,13 @@
 
 该入口位于 `assets/resource/base/pipeline/OnlineMapNavigation.json`，任务设置位于 `assets/resource/tasks/OnlineMapNavigation.json`。
 
-默认监听地址：
+服务固定监听 `0.0.0.0`，不可通过任务设置或 Pipeline 参数修改。客户端连接地址：
 
 ```text
 ws://127.0.0.1:14514
 ```
 
-可在任务设置中覆盖监听地址、端口、采样间隔、到达容差、调试模式，并在 `auto`、`cpu` 和 `directml` 三个方向推理后端之间选择。采样间隔单位为秒，最低限制为 `0.05` 秒。
+可在任务设置中覆盖端口、采样间隔、到达容差和调试模式。定位方式支持 `auto`、`coordinate`、`map`，默认 `auto`；方向推理后端支持 `auto`、`cpu`、`directml`。采样间隔单位为秒，最低限制为 `0.05` 秒。
 
 消息格式：
 
@@ -36,12 +36,15 @@ ws://127.0.0.1:14514
   "type": "navi-state",
   "version": 1,
   "position": {
-    "pixelX": 5788,
-    "pixelY": 8902,
-    "score": 0.82,
-    "mode": "local",
+    "x": -134394.56,
+    "y": 199913.53,
+    "z": 11416.17,
+    "pixelX": 4090,
+    "pixelY": 6750,
     "sourceWidth": 11264,
-    "sourceHeight": 11264
+    "sourceHeight": 11264,
+    "score": 1.0,
+    "mode": "coordinate"
   },
   "angle": 123.4,
   "angleConfidence": 0.96,
@@ -49,6 +52,12 @@ ws://127.0.0.1:14514
 }
 ```
 
-当某一帧没有识别到位置或方向时，对应字段为 `null`。WebSocket 服务启动后页面会自动重连；未收到路径点时，该任务仍会持续广播实时定位状态。
+`position` 使用游戏原始世界坐标：
 
-`sourceWidth` 和 `sourceHeight` 表示 NCC 底图尺寸。前端会按自身在线地图尺寸缩放坐标，例如 `11264 x 11264` 的 NCC 底图坐标映射到 `22528 x 22528` 在线地图时会放大 2 倍。
+- 网络定位直接发送 `x`、`y`、`z`。
+- 视觉定位通过标定变换逆算并发送 `x`、`y`，不发送 `z`。
+- 为兼容旧版网页，定位成功时同时发送 `pixelX`、`pixelY`、`sourceWidth`、`sourceHeight`。新客户端应使用原始坐标字段。
+- 网络坐标暂时中断时保留并发送最后一次坐标，`mode` 为 `coordinate_stale`。
+- 没有可转换的位置时 `position` 为 `null`。
+
+方向未识别时 `angle` 为 `null`。WebSocket 服务启动后页面会自动重连；未收到路径点时，该任务仍会持续广播实时定位状态。

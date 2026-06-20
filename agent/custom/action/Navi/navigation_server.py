@@ -10,6 +10,8 @@ from ..Common.logger import get_logger
 
 logger = get_logger(__name__)
 
+_NAVIGATION_HOST = "0.0.0.0"
+
 get_logger("websockets").setLevel(logging.WARNING)
 get_logger("websockets.server").setLevel(logging.WARNING)
 get_logger("websockets.client").setLevel(logging.WARNING)
@@ -17,8 +19,8 @@ get_logger("websockets.protocol").setLevel(logging.WARNING)
 
 
 class NavigationWebSocketServer:
-    def __init__(self, host="0.0.0.0", port="14514", message_handler=None) -> None:
-        self._host = str(host)
+    def __init__(self, port="14514", message_handler=None) -> None:
+        self._host = _NAVIGATION_HOST
         self._port = int(port)
         self._message_handler = message_handler
         self._state_lock = threading.Lock()
@@ -107,8 +109,9 @@ class NavigationWebSocketServer:
 
     def publish_state(
         self,
-        point: tuple[int, int] | None,
+        coordinate: tuple[float, float] | tuple[float, float, float] | None,
         *,
+        map_point: tuple[int, int] | None = None,
         score: float,
         mode: str,
         source_size: tuple[int, int] = (11264, 11264),
@@ -117,18 +120,27 @@ class NavigationWebSocketServer:
     ) -> None:
         self.start()
         with self._state_lock:
-            self._state["position"] = (
-                {
-                    "pixelX": int(point[0]),
-                    "pixelY": int(point[1]),
+            if coordinate is not None:
+                position = {
+                    "x": float(coordinate[0]),
+                    "y": float(coordinate[1]),
                     "score": float(score),
                     "mode": mode,
-                    "sourceWidth": int(source_size[0]),
-                    "sourceHeight": int(source_size[1]),
                 }
-                if point is not None
-                else None
-            )
+                if len(coordinate) >= 3:
+                    position["z"] = float(coordinate[2])
+                if map_point is not None:
+                    position.update(
+                        {
+                            "pixelX": int(map_point[0]),
+                            "pixelY": int(map_point[1]),
+                            "sourceWidth": int(source_size[0]),
+                            "sourceHeight": int(source_size[1]),
+                        }
+                    )
+                self._state["position"] = position
+            else:
+                self._state["position"] = None
             self._state["angle"] = float(angle) if angle is not None else None
             self._state["angleConfidence"] = float(angle_confidence)
             self._state["timestamp"] = time.time()

@@ -51,6 +51,7 @@
 | [InScene 场景识别](./in-scene.md) | 判断当前画面所在场景 | `Interface/Scene/Status.json` |
 | [通用按钮](./common-buttons.md) | 各场景入口按钮 | `Common/Button/` |
 | [Custom 动作与识别](./custom-action.md) | 通用 Python 工具：alt_click等 | `agent/custom/action/Common/` |
+| [网络坐标 API](./coordinate-capture-api.md) | 网络坐标捕获接口、参数、返回值与生命周期 | `nte_coordinate_api` |
 | [本地路线寻路](./local-route-navigation.md) | 按路线 JSON 执行地图寻路 | `LocalRouteNavigation.json` |
 
 ## 高级组件参考
