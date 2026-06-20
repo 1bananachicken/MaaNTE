@@ -7,7 +7,7 @@
             "port": 14514,
             "tolerance": 5,
             "frame_interval": "0.1",
-            "position_backend": "map"
+            "position_backend": "auto"
         }
     },
     "OnlineMapNavigationAngleBackendConfig": {

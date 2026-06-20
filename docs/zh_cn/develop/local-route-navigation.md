@@ -78,7 +78,7 @@
 | `tolerance` | float | `5.0` | 到达判定距离。当前位置到目标点距离小于等于该值时认为到达。 |
 | `frame_interval` | float | `0.1` | 截图、定位和方向推理的采样间隔，最低会限制为 `0.05` 秒。 |
 | `angle_backend` | string | `"auto"` | 方向模型推理后端。常用值：`auto`、`directml`、`cpu`。 |
-| `position_backend` | string | `"map"` | 位置来源。`map` 使用小地图匹配；`auto` 在网络核心或标定文件无法启用时回退地图；`coordinate` 严格要求网络核心和标定文件可用。网络定位成功启用后不会再执行位置视觉匹配。 |
+| `position_backend` | string | `"auto"` | 位置来源。`map` 使用小地图匹配；`auto` 优先使用网络定位，网络核心无法启用时回退地图；`coordinate` 严格要求网络核心可用。网络定位成功启用后不会再执行位置视觉匹配。 |
 | `debug` | bool | `false` | 是否打开定位和方向预测调试窗口，并输出原始网络坐标、映射坐标及定位来源日志。 |
 
 CustomAction 返回 `success=True` 表示该 segment 跑到终点；参数错误、路线为空、运行异常或任务停止会返回失败。
@@ -218,8 +218,9 @@ navigator.close()
 
 - 长路线拆成多个 segment 时，Pipeline 入口适合一次跑一个 segment；Python 内部连续跑多个 segment 时用 `LocalRouteNavigation` 类复用资源。
 - `tolerance` 太小会导致角色在目标点附近反复调整；地图定位误差较大时应适当增大。
-- `position_backend=coordinate` 依赖 Scapy、系统抓包驱动和有效的标定文件。网络定位成功启用后，位置计算完全不再调用小地图视觉定位；网络样本暂时中断时位置状态为 `coordinate_unavailable`，不会回退视觉。方向角推理仍然使用截图。`auto` 模式仅在网络核心或标定文件启动失败时使用地图定位。
-- 网络定位启动前必须存在 `config/navi_coordinate_calibration.json`。可以保留此前自动生成的系数文件，也可以使用下面的手动标定点格式；删除文件后网络定位不会自动进行视觉标定。
+- `position_backend=coordinate` 依赖 Scapy 和系统抓包驱动。网络定位成功启用后，位置计算完全不再调用小地图视觉定位；网络样本暂时中断时位置状态为 `coordinate_stale`，不会回退视觉。方向角推理仍然使用截图。`auto` 模式仅在网络核心启动失败时使用地图定位。
+- WebSocket 位置统一使用游戏原始坐标。网络定位发送 `x/y/z`；视觉定位通过标定逆变换发送 `x/y`，不发送无法可靠推导的高度 `z`。网络样本短暂中断时会保留最后一次位置用于地图展示，但该位置不会被导航逻辑视为有效实时位置。
+- `config/navi_coordinate_calibration.json` 仅用于本地调试计算，不会在运行时读取。修改标定点后执行 `python scripts/update_navi_coordinate_transform.py`，脚本会计算最佳变换并更新 `coordinate_position.py` 中的常量。
 - 需要手动标定时，可把该文件改为标定点格式。开启 `debug=true` 从 `Navi coordinate position/validation` 日志读取 `raw` 网络坐标，并在地图上取得对应的 11264×11264 像素坐标。至少填写 3 个相距较远且不共线的点：
 
 ```json

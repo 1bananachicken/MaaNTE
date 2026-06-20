@@ -107,8 +107,9 @@ class NavigationWebSocketServer:
 
     def publish_state(
         self,
-        point: tuple[int, int] | None,
+        coordinate: tuple[float, float] | tuple[float, float, float] | None,
         *,
+        map_point: tuple[int, int] | None = None,
         score: float,
         mode: str,
         source_size: tuple[int, int] = (11264, 11264),
@@ -117,18 +118,27 @@ class NavigationWebSocketServer:
     ) -> None:
         self.start()
         with self._state_lock:
-            self._state["position"] = (
-                {
-                    "pixelX": int(point[0]),
-                    "pixelY": int(point[1]),
+            if coordinate is not None:
+                position = {
+                    "x": float(coordinate[0]),
+                    "y": float(coordinate[1]),
                     "score": float(score),
                     "mode": mode,
-                    "sourceWidth": int(source_size[0]),
-                    "sourceHeight": int(source_size[1]),
                 }
-                if point is not None
-                else None
-            )
+                if len(coordinate) >= 3:
+                    position["z"] = float(coordinate[2])
+                if map_point is not None:
+                    position.update(
+                        {
+                            "pixelX": int(map_point[0]),
+                            "pixelY": int(map_point[1]),
+                            "sourceWidth": int(source_size[0]),
+                            "sourceHeight": int(source_size[1]),
+                        }
+                    )
+                self._state["position"] = position
+            else:
+                self._state["position"] = None
             self._state["angle"] = float(angle) if angle is not None else None
             self._state["angleConfidence"] = float(angle_confidence)
             self._state["timestamp"] = time.time()

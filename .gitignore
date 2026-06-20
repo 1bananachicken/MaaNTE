@@ -471,7 +471,7 @@ test/
 output/
 thirdparty/
 agent/custom/action/temp/
-scripts
-
+scripts/*
+!scripts/update_navi_coordinate_transform.py
 # Models
 assets/resource/base/model/*

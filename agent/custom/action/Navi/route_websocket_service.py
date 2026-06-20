@@ -31,7 +31,8 @@ class RouteWebSocketService:
 
     def publish_frame(self, location: Any, angle: Any) -> None:
         self.websocket.publish_state(
-            location.point,
+            location.raw_coordinate,
+            map_point=location.point,
             score=location.score,
             mode=location.mode,
             source_size=self.get_source_size(),
