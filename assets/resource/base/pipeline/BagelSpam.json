@@ -2,69 +2,8 @@
     "BagelSpamEntrance": {
         "desc": "贝果灌水任务入口",
         "next": [
-            "BagelSpamEnsureEscButton",
-            "BagelSpamPressEscRetry"
-        ]
-    },
-    "BagelSpamEnsureEscButton": {
-        "desc": "识别并点击菜单按钮",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    1185,
-                    0,
-                    95,
-                    127
-                ],
-                "template": [
-                    "BagelSpam/esc_red_greenmask.png",
-                    "BagelSpam/esc.png"
-                ],
-                "threshold": 0.65,
-                "green_mask": true,
-                "order_by": "Score"
-            }
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": 27
-            }
-        },
-        "post_wait_freezes": {
-            "target": [
-                893,
-                43,
-                359,
-                649
-            ],
-            "time": 500
-        },
-        "post_delay": 500,
-        "timeout": 1000,
-        "rate_limit": 0,
-        "next": [
-            "BagelSpamOpenCamera"
-        ]
-    },
-    "BagelSpamPressEscRetry": {
-        "desc": "未识别到菜单时，按 Esc 后重试，用来逐层返回大世界",
-        "max_hit": 10,
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": 27
-            }
-        },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
-        "next": [
-            "BagelSpamEnsureEscButton",
-            "BagelSpamPressEscRetry"
+            "BagelSpamOpenCamera",
+            "[JumpBack]SceneAnyEnterEscMenu"
         ]
     },
     "BagelSpamOpenCamera": {
@@ -175,96 +114,8 @@
         "timeout": 2000,
         "rate_limit": 0,
         "next": [
-            "BagelSpamCloseSavedPhoto",
-            "BagelSpamPressEscUntilCamera"
-        ]
-    },
-    "BagelSpamCloseSavedPhoto": {
-        "desc": "识别关闭按钮后按 Esc 退出保存照片界面",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    1160,
-                    0,
-                    120,
-                    122
-                ],
-                "template": "BagelSpam/close_greenmask.png",
-                "green_mask": true,
-                "order_by": "Score"
-            }
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": 27
-            }
-        },
-        "post_wait_freezes": {
-            "target": [
-                893,
-                43,
-                359,
-                649
-            ],
-            "time": 500
-        },
-        "post_delay": 500,
-        "timeout": 1000,
-        "next": [
-            "BagelSpamWaitCameraAfterClose",
-            "BagelSpamPressEscUntilCamera"
-        ]
-    },
-    "BagelSpamPressEscUntilCamera": {
-        "desc": "持续按 Esc 直到回到可见相机入口的界面",
-        "max_hit": 10,
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": 27
-            }
-        },
-        "post_wait_freezes": {
-            "target": [
-                893,
-                43,
-                359,
-                649
-            ],
-            "time": 1000
-        },
-        "post_delay": 500,
-        "next": [
-            "BagelSpamWaitCameraAfterClose",
-            "BagelSpamPressEscUntilCamera"
-        ]
-    },
-    "BagelSpamWaitCameraAfterClose": {
-        "desc": "等待相机入口重新出现",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    910,
-                    581,
-                    95,
-                    98
-                ],
-                "template": "BagelSpam/camera_greenmask.png",
-                "threshold": 0.7,
-                "green_mask": true,
-                "order_by": "Score"
-            }
-        },
-        "timeout": 500,
-        "rate_limit": 0,
-        "next": [
-            "BagelSpamOpenBagel"
+            "BagelSpamOpenBagel",
+            "[JumpBack]SceneAnyEnterEscMenu"
         ]
     },
     "BagelSpamOpenBagel": {
@@ -323,7 +174,8 @@
         "post_delay": 500,
         "next": [
             "BagelSpamCheckDailyPublishCount",
-            "BagelSpamClickPublishContent"
+            "BagelSpamClickPublishContent",
+            "BagelSpamExitTask"
         ]
     },
     "BagelSpamCheckDailyPublishCount": {
@@ -347,11 +199,12 @@
         "timeout": 100,
         "rate_limit": 0,
         "next": [
-            "BagelSpamCloseBagelToFinish"
+            "BagelSpamExitTask"
         ]
     },
     "BagelSpamClickPublishContent": {
         "desc": "点击发布内容",
+        "max_hit": 5,
         "recognition": {
             "type": "DirectHit"
         },
@@ -863,97 +716,10 @@
             "BagelSpamClickRelease"
         ]
     },
-    "BagelSpamCloseBagelToFinish": {
-        "desc": "发布次数已达上限后关闭贝果页面",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    1167,
-                    0,
-                    108,
-                    117
-                ],
-                "template": "BagelSpam/bagel_close.png",
-                "green_mask": true,
-                "order_by": "Score"
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "post_wait_freezes": {
-            "target": [
-                893,
-                43,
-                359,
-                649
-            ],
-            "time": 500
-        },
-        "post_delay": 500,
-        "pre_delay": 0,
-        "rate_limit": 0,
+    "BagelSpamExitTask": {
+        "desc": "退出任务，返回大世界",
         "next": [
-            "BagelSpamWaitEscButtonToFinish",
-            "BagelSpamPressEscToFinish"
+            "SceneAnyEnterWorld"
         ]
-    },
-    "BagelSpamPressEscToFinish": {
-        "desc": "关闭贝果页面后按 Esc 继续退出",
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "ClickKey",
-            "param": {
-                "key": 27
-            }
-        },
-        "post_wait_freezes": {
-            "target": [
-                893,
-                43,
-                359,
-                649
-            ],
-            "time": 500
-        },
-        "post_delay": 500,
-        "pre_delay": 0,
-
-        "rate_limit": 0,
-        "next": [
-            "BagelSpamWaitEscButtonToFinish",
-            "BagelSpamPressEscToFinish"
-        ]
-    },
-    "BagelSpamWaitEscButtonToFinish": {
-        "desc": "等待大世界 Esc 标识出现后结束任务",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    1185,
-                    0,
-                    95,
-                    127
-                ],
-                "template": "BagelSpam/esc_red_greenmask.png",
-                "threshold": 0.65,
-                "green_mask": true,
-                "order_by": "Score"
-            }
-        },
-        "pre_delay": 0,
-        "post_delay": 0,
-        "timeout": 1000,
-        "rate_limit": 0,
-        "next": [
-            "BagelSpamExit"
-        ]
-    },
-    "BagelSpamExit": {
-        "desc": "贝果灌水任务出口"
     }
 }
