@@ -9,7 +9,7 @@
             "frame_interval": 0.1,
             "tolerance": 5,
             "angle_backend": "auto",
-            "position_backend": "map",
+            "position_backend": "auto",
             "debug": false
         }
     },
@@ -20,7 +20,7 @@
             "frame_interval": 0.1,
             "tolerance": 5,
             "angle_backend": "auto",
-            "position_backend": "map",
+            "position_backend": "auto",
             "debug": false
         }
     }
