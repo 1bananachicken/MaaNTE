@@ -31,7 +31,10 @@ try:
         ensure_game_window_resolution,
     )
 except ImportError:
-    from .pinkpaw_common import _parse_custom_action_param, ensure_game_window_resolution
+    from .pinkpaw_common import (
+        _parse_custom_action_param,
+        ensure_game_window_resolution,
+    )
 
 
 RECOVERY_ENTRANCE_ROUTE_MINT = [
@@ -465,9 +468,23 @@ class PinkPawHeistFindXiaoZhiAction(CustomAction):
             if path.auto_resize_game_window and ensure_game_window_resolution:
                 ensure_game_window_resolution(DEFAULT_WIDTH, DEFAULT_HEIGHT)
             path.log_round_info("开始寻找小吱")
+
+            # 先尝试识别"我要参加"（仅OCR检查，不执行节点动作）
+            if path._recognize_once("PinkPawHeist_OCR_Join"):
+                path.log_round_info(
+                    "未找到小吱，但识别到'我要参加'，视为已完成寻找小吱并按F"
+                )
+                return CustomAction.RunResult(success=True)
             path.ah.run_task("SceneAnyEnterWorld")
             if path._has_xiaozhi_prompt(time_out=10.0):
                 path.log_round_info("成功找到小吱，开始任务")
+                return CustomAction.RunResult(success=True)
+
+            # 先尝试识别"我要参加"（仅OCR检查，不执行节点动作）
+            if path._recognize_once("PinkPawHeist_OCR_Join"):
+                path.log_round_info(
+                    "未找到小吱，但识别到'我要参加'，视为已完成寻找小吱并按F"
+                )
                 return CustomAction.RunResult(success=True)
 
             for attempt in range(1, FIND_XIAOZHI_RECOVERY_ATTEMPTS + 1):

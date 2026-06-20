@@ -53,6 +53,7 @@
             "type": "DoNothing"
         },
         "next": [
+            "[JumpBack]PinkPawHeist_OCR_Join",
             "PinkPawHeist_FindXiaoZhi"
         ]
     },
@@ -64,6 +65,7 @@
         "action": "Custom",
         "custom_action": "PinkPawHeistFindXiaoZhiAction",
         "next": [
+            "PinkPawHeist_OCR_Join",
             "PinkPawHeist_PressF"
         ],
         "on_error": [
@@ -143,6 +145,7 @@
         "action": "Custom",
         "custom_action": "PinkPawHeistReturnToEntranceAction",
         "next": [
+            "[JumpBack]PinkPawHeist_OCR_Join",
             "[JumpBack]PinkPawHeist_FindXiaoZhi"
         ],
         "on_error": [
@@ -262,14 +265,17 @@
         },
         "pre_delay": 500,
         "action": {
-            "type": "Click"
+            "type": "ClickKey",
+            "param": {
+                "key": 70
+            }
         },
         "next": [
-            "PinkPawHeist_SkipStory"
+            "PinkPawHeist_SkipStory_Join"
         ]
     },
-    "PinkPawHeist_SkipStory": {
-        "desc": "跳过废话",
+    "PinkPawHeist_SkipStory_Join": {
+        "desc": "跳过详情页前的废话",
         "recognition": {
             "type": "DirectHit"
         },
@@ -286,6 +292,7 @@
         },
         "pre_delay": 2000,
         "next": [
+            "[JumpBack]PinkPawHeist_SkipStory_Join_Again",
             "PinkPawHeist_AfterStory",
             "[JumpBack]RealTimeSkipStoryDialog",
             "[JumpBack]RealTimeSkipStory"
@@ -293,6 +300,29 @@
         "on_error": [
             "PinkPawHeist_AfterStory_Recover"
         ]
+    },
+    "PinkPawHeist_SkipStory_Join_Again": {
+        "desc": "跳过详情页前的废话",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "PinkPawHeist/PinkPawHeist_SkipStory.png",
+                "roi": [
+                    625,
+                    665,
+                    30,
+                    25
+                ],
+                "threshold": 0.7,
+                "green_mask": true
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 32
+            }
+        }
     },
     "PinkPawHeist_AfterStory": {
         "desc": "详情页，点进入按钮",
@@ -338,10 +368,10 @@
         },
         "post_delay": 2000,
         "next": [
-            "[JumpBack]PinkPawHeist_OCR_Join",
             "[JumpBack]RealTimeSkipStoryDialog",
             "[JumpBack]RealTimeSkipStory",
             "PinkPawHeist_AfterStory",
+            "[JumpBack]PinkPawHeist_OCR_Join",
             "[JumpBack]PinkPawHeist_FindXiaoZhi"
         ]
     },
