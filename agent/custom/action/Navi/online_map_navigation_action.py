@@ -26,6 +26,7 @@ class OnlineMapNavigationAction(CustomAction):
             tolerance = float(params.get("tolerance", 5.0))
             frame_interval = max(0.05, float(params.get("frame_interval", 0.1)))
             angle_backend = str(params.get("angle_backend", "auto"))
+            position_backend = str(params.get("position_backend", "coordinate"))
             debug = bool(params.get("debug", False))
         except ValueError as exc:
             logger.error("OnlineMapNavigation param invalid: %s", exc)
@@ -36,6 +37,7 @@ class OnlineMapNavigationAction(CustomAction):
             context,
             route,
             angle_backend=angle_backend,
+            position_backend=position_backend,
             tolerance=tolerance,
             frame_interval=frame_interval,
             debug=debug,

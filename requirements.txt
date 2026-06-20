@@ -11,4 +11,5 @@ scipy
 scikit-learn
 soundcard
 mido
+scapy
 websockets>=14.0,<17.0

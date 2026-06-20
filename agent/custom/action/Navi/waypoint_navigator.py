@@ -8,6 +8,7 @@ from maa.context import Context
 
 from ..Common.logger import get_logger
 from .angle_predictor import AnglePredictor
+from .coordinate_position import CoordinatePositionProvider
 from .debug_windows import close_debug_windows, pump_debug_windows
 from .map_locator import MapLocator
 
@@ -74,6 +75,7 @@ class WaypointNavigator:
         context: Context,
         *,
         angle_backend: str = "auto",
+        position_backend: str = "map",
         tolerance: float = 80.0,
         max_duration: float | None = None,
         frame_interval: float = 0.1,
@@ -99,12 +101,24 @@ class WaypointNavigator:
         )
         self.w_down = False
         self.current_point: tuple[int, int] | None = None
-        self.locator = MapLocator(debug=debug)
-        self.predictor = AnglePredictor(
-            backend=angle_backend,
-            threshold=0.0,
-            debug=debug,
-        )
+        self.locator: MapLocator | None = None
+        self.position_provider: CoordinatePositionProvider | None = None
+        self.predictor: AnglePredictor | None = None
+        try:
+            self.position_provider = CoordinatePositionProvider(
+                position_backend,
+                debug=debug,
+            )
+            if self.position_provider.uses_visual_positioning():
+                self.locator = MapLocator(debug=debug)
+            self.predictor = AnglePredictor(
+                backend=angle_backend,
+                threshold=0.0,
+                debug=debug,
+            )
+        except Exception:
+            self.close()
+            raise
 
     def update(self) -> tuple[Any, Any] | None:
         frame = self.controller.post_screencap().wait().get()
@@ -112,7 +126,9 @@ class WaypointNavigator:
             if self.debug:
                 pump_debug_windows()
             return None
-        location = self.locator.locate(frame)
+        assert self.position_provider is not None
+        assert self.predictor is not None
+        location = self.position_provider.locate(self.locator, frame)
         angle = self.predictor.predict(frame)
         if location.found and location.point is not None:
             self.current_point = location.point
@@ -212,13 +228,22 @@ class WaypointNavigator:
             self.release()
         finally:
             try:
-                self.locator.close()
+                if self.position_provider is not None:
+                    self.position_provider.close()
+                    self.position_provider = None
             finally:
                 try:
-                    self.predictor.close()
+                    if self.locator is not None:
+                        self.locator.close()
+                        self.locator = None
                 finally:
-                    if self.debug:
-                        close_debug_windows()
+                    try:
+                        if self.predictor is not None:
+                            self.predictor.close()
+                            self.predictor = None
+                    finally:
+                        if self.debug:
+                            close_debug_windows()
 
     def sleep_remaining(self, started: float) -> None:
         sleep_time = self.frame_interval - (time.perf_counter() - started)

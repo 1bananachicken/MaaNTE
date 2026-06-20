@@ -6,7 +6,8 @@
             "host": "0.0.0.0",
             "port": 14514,
             "tolerance": 5,
-            "frame_interval": "0.1"
+            "frame_interval": "0.1",
+            "position_backend": "map"
         }
     },
     "OnlineMapNavigationAngleBackendConfig": {
