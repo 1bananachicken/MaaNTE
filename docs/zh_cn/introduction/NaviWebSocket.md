@@ -8,7 +8,6 @@
     "action": "Custom",
     "custom_action": "online_map_navigation",
     "custom_action_param": {
-      "host": "0.0.0.0",
       "port": 14514,
       "tolerance": 5,
       "frame_interval": "0.1",
@@ -22,13 +21,13 @@
 
 该入口位于 `assets/resource/base/pipeline/OnlineMapNavigation.json`，任务设置位于 `assets/resource/tasks/OnlineMapNavigation.json`。
 
-默认监听地址：
+服务固定监听 `0.0.0.0`，不可通过任务设置或 Pipeline 参数修改。客户端连接地址：
 
 ```text
 ws://127.0.0.1:14514
 ```
 
-可在任务设置中覆盖监听地址、端口、采样间隔、到达容差和调试模式。定位方式支持 `auto`、`coordinate`、`map`，默认 `auto`；方向推理后端支持 `auto`、`cpu`、`directml`。采样间隔单位为秒，最低限制为 `0.05` 秒。
+可在任务设置中覆盖端口、采样间隔、到达容差和调试模式。定位方式支持 `auto`、`coordinate`、`map`，默认 `auto`；方向推理后端支持 `auto`、`cpu`、`directml`。采样间隔单位为秒，最低限制为 `0.05` 秒。
 
 消息格式：
 

@@ -213,7 +213,6 @@
     "task_online_map_navigation_option_angle_backend_desc": "Choose the inference backend used by the angle model. Auto is the default.",
     "task_online_map_navigation_option_debug": "Debug Mode",
     "task_online_map_navigation_option_debug_desc": "Show positioning and angle prediction debug windows when enabled.",
-    "task_online_map_navigation_input_host": "Listen Host",
     "task_online_map_navigation_input_port": "Listen Port",
     "task_online_map_navigation_input_frame_interval": "Sampling Interval (s)",
     "task_online_map_navigation_input_frame_interval_desc": "Minimum interval between screenshot localization runs. The action clamps it to at least 0.05 seconds.",

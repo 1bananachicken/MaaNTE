@@ -95,11 +95,13 @@ class WaypointNavigator:
         self.max_turn_degrees = 35.0
         self.align_threshold = 4.0
         self.move_pulse = 0.12
+        self.key_refresh_interval = 0.5
         self.turn_pid = AnglePidController(
             output_limit=self.max_turn_degrees,
             deadband=self.align_threshold,
         )
         self.w_down = False
+        self._last_w_down_at = 0.0
         self.current_point: tuple[int, int] | None = None
         self.locator: MapLocator | None = None
         self.position_provider: CoordinatePositionProvider | None = None
@@ -168,6 +170,7 @@ class WaypointNavigator:
                 or angle.angle is None
             ):
                 self.turn_pid.reset()
+                self.release()
                 self.sleep_remaining(started)
                 continue
 
@@ -190,9 +193,7 @@ class WaypointNavigator:
             turn_degrees = self.turn_pid.update(angle_delta, time.monotonic())
             turn_dx = int(round(turn_degrees * self.turn_pixels_per_degree))
 
-            if not self.w_down:
-                self.controller.post_key_down(_KEY_W).wait()
-                self.w_down = True
+            self.press_forward()
             if turn_dx != 0:
                 self.controller.post_relative_move(turn_dx, 0).wait()
             if not self.sleep_interruptible(self.move_pulse):
@@ -217,11 +218,23 @@ class WaypointNavigator:
         self.release()
         return False
 
+    def press_forward(self) -> None:
+        now = time.monotonic()
+        if (
+            self.w_down
+            and now - self._last_w_down_at < self.key_refresh_interval
+        ):
+            return
+        self.controller.post_key_down(_KEY_W).wait()
+        self.w_down = True
+        self._last_w_down_at = now
+
     def release(self) -> None:
         self.turn_pid.reset()
         if self.w_down:
             self.controller.post_key_up(_KEY_W).wait()
             self.w_down = False
+        self._last_w_down_at = 0.0
 
     def close(self) -> None:
         try:

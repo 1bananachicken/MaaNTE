@@ -217,7 +217,6 @@
     "task_online_map_navigation_option_angle_backend_desc": "選擇方向模型使用的推理後端，預設自動選擇。",
     "task_online_map_navigation_option_debug": "除錯模式",
     "task_online_map_navigation_option_debug_desc": "啟用後顯示定位和方向預測除錯視窗。",
-    "task_online_map_navigation_input_host": "監聽位址",
     "task_online_map_navigation_input_port": "監聽連接埠",
     "task_online_map_navigation_input_frame_interval": "取樣間隔 (秒)",
     "task_online_map_navigation_input_frame_interval_desc": "每次截圖定位之間的最小間隔，最低會限制為 0.05 秒。"

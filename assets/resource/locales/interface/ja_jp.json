@@ -217,7 +217,6 @@
     "task_online_map_navigation_option_angle_backend_desc": "方向モデルで使用する推論バックエンドを選択します。既定では自動選択します。",
     "task_online_map_navigation_option_debug": "デバッグモード",
     "task_online_map_navigation_option_debug_desc": "有効にすると、測位と方向予測のデバッグウィンドウを表示します。",
-    "task_online_map_navigation_input_host": "待ち受けアドレス",
     "task_online_map_navigation_input_port": "待ち受けポート",
     "task_online_map_navigation_input_frame_interval": "サンプリング間隔 (秒)",
     "task_online_map_navigation_input_frame_interval_desc": "スクリーンショット測位の最小間隔です。処理側で最低 0.05 秒に制限されます。"

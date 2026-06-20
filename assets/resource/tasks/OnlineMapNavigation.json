@@ -23,13 +23,6 @@
             "description": "$task_online_map_navigation_option_settings_desc",
             "inputs": [
                 {
-                    "name": "host",
-                    "label": "$task_online_map_navigation_input_host",
-                    "default": "0.0.0.0",
-                    "pipeline_type": "string",
-                    "verify": "^.+$"
-                },
-                {
                     "name": "port",
                     "label": "$task_online_map_navigation_input_port",
                     "default": "14514",
@@ -55,7 +48,6 @@
             "pipeline_override": {
                 "OnlineMapNavigation": {
                     "custom_action_param": {
-                        "host": "{host}",
                         "port": "{port}",
                         "tolerance": "{tolerance}",
                         "frame_interval": "{frame_interval}"

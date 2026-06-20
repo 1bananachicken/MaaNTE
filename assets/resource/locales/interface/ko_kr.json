@@ -217,7 +217,6 @@
     "task_online_map_navigation_option_angle_backend_desc": "방향 모델에서 사용할 추론 백엔드를 선택합니다. 기본값은 자동 선택입니다.",
     "task_online_map_navigation_option_debug": "디버그 모드",
     "task_online_map_navigation_option_debug_desc": "활성화하면 위치 확인 및 방향 예측 디버그 창을 표시합니다.",
-    "task_online_map_navigation_input_host": "수신 주소",
     "task_online_map_navigation_input_port": "수신 포트",
     "task_online_map_navigation_input_frame_interval": "샘플링 간격 (초)",
     "task_online_map_navigation_input_frame_interval_desc": "스크린샷 위치 확인 사이의 최소 간격입니다. 작업에서 최소 0.05초로 제한됩니다."
