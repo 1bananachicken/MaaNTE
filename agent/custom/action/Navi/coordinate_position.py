@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib
+import importlib.util
 import math
 import sys
 from dataclasses import dataclass
@@ -43,22 +44,44 @@ def _create_capture() -> _CoordinateCapture:
     if thirdparty_path not in sys.path:
         sys.path.insert(0, thirdparty_path)
 
+    module: Any
     try:
         module = importlib.import_module(_CORE_MODULE)
-    except Exception as exc:
-        raise RuntimeError(
-            "coordinate core import failed: module=%s path=%s "
-            "python=%s.%s executable=%s error=%s: %s"
-            % (
-                _CORE_MODULE,
-                _THIRDPARTY_DIR,
-                sys.version_info.major,
-                sys.version_info.minor,
-                sys.executable,
-                type(exc).__name__,
-                exc,
-            )
-        ) from exc
+    except Exception as import_exc:
+        candidates = sorted(_THIRDPARTY_DIR.glob("%s*.pyd" % _CORE_MODULE))
+        module = None
+        load_error: Exception | None = None
+        for candidate in candidates:
+            spec = importlib.util.spec_from_file_location(_CORE_MODULE, candidate)
+            if spec is None or spec.loader is None:
+                continue
+            loaded = importlib.util.module_from_spec(spec)
+            sys.modules[_CORE_MODULE] = loaded
+            try:
+                spec.loader.exec_module(loaded)
+            except Exception as exc:
+                if sys.modules.get(_CORE_MODULE) is loaded:
+                    sys.modules.pop(_CORE_MODULE, None)
+                load_error = exc
+                continue
+            module = loaded
+            break
+
+        if module is None:
+            exc = load_error or import_exc
+            raise RuntimeError(
+                "coordinate core import failed: module=%s path=%s "
+                "python=%s.%s executable=%s error=%s: %s"
+                % (
+                    _CORE_MODULE,
+                    _THIRDPARTY_DIR,
+                    sys.version_info.major,
+                    sys.version_info.minor,
+                    sys.executable,
+                    type(exc).__name__,
+                    exc,
+                )
+            ) from exc
 
     try:
         capture_type: Any = getattr(module, "CoordinateCapture")

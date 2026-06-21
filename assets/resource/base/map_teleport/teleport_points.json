@@ -1,0 +1,14 @@
+{
+    "version": 1,
+    "teleport_points": [
+        {
+            "id": "fountain",
+            "name": "喷泉传送点",
+            "pixelX": 3793,
+            "pixelY": 5580,
+            "areaName": "绘空町",
+            "areaIndex": 3,
+            "description": "传送点表样例；areaIndex 表示该传送点在所属区域列表中的序号。"
+        }
+    ]
+}
