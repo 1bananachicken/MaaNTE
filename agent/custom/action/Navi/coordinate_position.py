@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import importlib
 import importlib.util
 import math
 import sys
@@ -17,6 +16,7 @@ _RawPoint = tuple[float, float, float]
 _MapPoint = tuple[int, int]
 COORDINATE_MAP_SIZE = (11264, 11264)
 _CORE_MODULE = "nte_coordinate_api"
+_CORE_FILENAME = "nte_coordinate_api.cp312-win_amd64.pyd"
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
 _THIRDPARTY_DIR = _PROJECT_ROOT / "thirdparty"
 
@@ -45,37 +45,31 @@ def _create_capture() -> _CoordinateCapture:
     if thirdparty_path not in sys.path:
         sys.path.insert(0, thirdparty_path)
 
-    module: Any
-    try:
-        module = importlib.import_module(_CORE_MODULE)
-    except Exception as import_exc:
-        candidates = sorted(_THIRDPARTY_DIR.glob("%s*.pyd" % _CORE_MODULE))
-        module = None
-        load_error: Exception | None = None
-        for candidate in candidates:
-            spec = importlib.util.spec_from_file_location(_CORE_MODULE, candidate)
-            if spec is None or spec.loader is None:
-                continue
-            loaded = importlib.util.module_from_spec(spec)
-            sys.modules[_CORE_MODULE] = loaded
-            try:
-                spec.loader.exec_module(loaded)
-            except Exception as exc:
-                if sys.modules.get(_CORE_MODULE) is loaded:
-                    sys.modules.pop(_CORE_MODULE, None)
-                load_error = exc
-                continue
-            module = loaded
-            break
-
-        if module is None:
-            exc = load_error or import_exc
+    candidate = _THIRDPARTY_DIR / _CORE_FILENAME
+    loaded_module = sys.modules.get(_CORE_MODULE)
+    if loaded_module is not None and Path(
+        str(getattr(loaded_module, "__file__", ""))
+    ) == candidate:
+        module = loaded_module
+    else:
+        if not candidate.exists():
+            raise RuntimeError("coordinate core file not found: %s" % candidate)
+        spec = importlib.util.spec_from_file_location(_CORE_MODULE, candidate)
+        if spec is None or spec.loader is None:
+            raise RuntimeError("coordinate core spec unavailable: %s" % candidate)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[_CORE_MODULE] = module
+        try:
+            spec.loader.exec_module(module)
+        except Exception as exc:
+            if sys.modules.get(_CORE_MODULE) is module:
+                sys.modules.pop(_CORE_MODULE, None)
             raise RuntimeError(
-                "coordinate core import failed: module=%s path=%s "
+                "coordinate core import failed: module=%s file=%s "
                 "python=%s.%s executable=%s error=%s: %s"
                 % (
                     _CORE_MODULE,
-                    _THIRDPARTY_DIR,
+                    candidate,
                     sys.version_info.major,
                     sys.version_info.minor,
                     sys.executable,

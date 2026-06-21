@@ -4,8 +4,9 @@
         {
             "id": "fountain",
             "name": "喷泉",
-            "pixelX": 3807,
-            "pixelY": 5951,
+            "coordinateType": "world",
+            "worldX": -151702,
+            "worldY": 151178,
             "threshold": 200,
             "description": "用于判断当前位置距离喷泉目标点是否过远。"
         }

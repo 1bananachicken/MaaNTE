@@ -10,6 +10,10 @@
                 "custom_action": "check_teleport_required",
                 "custom_action_param": {
                     "point_id": "fountain",
+                    "teleport_point_id": "fountain",
+                    "position_backend": "auto",
+                    "coordinate_type": "world",
+                    "coordinate_timeout": 1.5,
                     "debug": true
                 }
             }

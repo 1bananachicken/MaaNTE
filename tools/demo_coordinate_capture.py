@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import importlib
 import importlib.util
 import sys
 import time
@@ -11,6 +10,7 @@ from typing import Any
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 THIRDPARTY_DIR = PROJECT_ROOT / "thirdparty"
 MODULE_NAME = "nte_coordinate_api"
+MODULE_FILENAME = "nte_coordinate_api.cp312-win_amd64.pyd"
 CALIBRATION_AXES = (0, 1)
 CALIBRATION_A = 0.016394586684750773
 CALIBRATION_B = 5.693519256055879e-08
@@ -27,37 +27,31 @@ def _ensure_project_paths() -> None:
 
 def load_coordinate_module() -> Any:
     _ensure_project_paths()
-    try:
-        return importlib.import_module(MODULE_NAME)
-    except ModuleNotFoundError:
-        pass
+    candidate = THIRDPARTY_DIR / MODULE_FILENAME
+    loaded_module = sys.modules.get(MODULE_NAME)
+    if loaded_module is not None and Path(
+        str(getattr(loaded_module, "__file__", ""))
+    ) == candidate:
+        return loaded_module
 
-    candidates = sorted(THIRDPARTY_DIR.glob("%s*.pyd" % MODULE_NAME))
-    if not candidates:
+    if not candidate.exists():
         raise FileNotFoundError(
-            "No coordinate module found under %s" % THIRDPARTY_DIR
+            "No coordinate module found: %s" % candidate
         )
 
-    last_error: Exception | None = None
-    for candidate in candidates:
-        spec = importlib.util.spec_from_file_location(MODULE_NAME, candidate)
-        if spec is None or spec.loader is None:
-            continue
-        module = importlib.util.module_from_spec(spec)
-        sys.modules[MODULE_NAME] = module
-        try:
-            spec.loader.exec_module(module)
-        except Exception as exc:
-            if sys.modules.get(MODULE_NAME) is module:
-                sys.modules.pop(MODULE_NAME, None)
-            last_error = exc
-            continue
-        setattr(module, "_coordinate_demo_origin", str(candidate))
-        return module
-
-    if last_error is not None:
-        raise last_error
-    raise ImportError("Unable to load %s from %s" % (MODULE_NAME, THIRDPARTY_DIR))
+    spec = importlib.util.spec_from_file_location(MODULE_NAME, candidate)
+    if spec is None or spec.loader is None:
+        raise ImportError("Unable to load %s from %s" % (MODULE_NAME, candidate))
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[MODULE_NAME] = module
+    try:
+        spec.loader.exec_module(module)
+    except Exception:
+        if sys.modules.get(MODULE_NAME) is module:
+            sys.modules.pop(MODULE_NAME, None)
+        raise
+    setattr(module, "_coordinate_demo_origin", str(candidate))
+    return module
 
 
 def map_point_from_raw(raw: tuple[float, float, float]) -> tuple[int, int] | None:
