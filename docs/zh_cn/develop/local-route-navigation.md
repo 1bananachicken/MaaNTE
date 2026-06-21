@@ -184,11 +184,9 @@ navigator.close()
 
 ```jsonc
 {
-    "sourceWidth": 11264,
-    "sourceHeight": 11264,
     "points": [
-        { "x": 1000, "y": 2000 },
-        { "x": 1200, "y": 2300 }
+        { "x": -152876.6246, "y": 129507.0442 },
+        { "x": -152419.1692, "y": 130437.4820 }
     ]
 }
 ```
@@ -199,10 +197,12 @@ navigator.close()
 |------|------|
 | `pixelX` / `pixelY` | 像素坐标。 |
 | `target_x` / `target_y` | 像素坐标别名。 |
-| `x` / `y` | 像素坐标。`coordinate` 不是 `online` 时生效。 |
+| `x` / `y`（可选 `z`） | 游戏原始世界坐标，使用网络定位相同的标定变换转换为当前地图像素坐标。 |
 | `lat` / `lng` | maante-map 路线保存的 world 坐标，会转换为当前地图像素坐标。 |
 
 `lat/lng` 的转换与 maante-map 保持一致：`worldOriginPixel=(11264,11264)`，`pixelsPerWorldUnit=44`，在线地图尺寸为 `22528 x 22528`，再缩放到当前 NCC 底图尺寸。像素坐标的缩放由 `sourceWidth/sourceHeight` 或 `sourceSize` 控制；如果没有提供，默认按 `11264 x 11264` 地图尺寸解析。
+
+`x/y/z` 使用 `coordinate_position.py` 中与实时网络定位相同的标定参数转换。`x/y` 始终表示游戏原始世界坐标；像素坐标必须使用 `pixelX/pixelY` 或 `target_x/target_y`。
 
 ## 运行机制
 

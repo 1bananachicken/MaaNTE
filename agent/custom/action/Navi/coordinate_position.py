@@ -15,6 +15,7 @@ logger = get_logger(__name__)
 
 _RawPoint = tuple[float, float, float]
 _MapPoint = tuple[int, int]
+COORDINATE_MAP_SIZE = (11264, 11264)
 _CORE_MODULE = "nte_coordinate_api"
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
 _THIRDPARTY_DIR = _PROJECT_ROOT / "thirdparty"
@@ -141,11 +142,22 @@ _COORDINATE_TRANSFORM = _Transform(
 )
 
 
-def _map_from_raw(raw: _RawPoint) -> _MapPoint | None:
-    x, y = _COORDINATE_TRANSFORM.apply(raw)
-    if not math.isfinite(x) or not math.isfinite(y):
+def raw_coordinate_to_map(
+    x: float,
+    y: float,
+    z: float | None = None,
+) -> _MapPoint | None:
+    if 2 in _COORDINATE_TRANSFORM.axes and z is None:
+        raise ValueError("raw coordinate z is required by the current calibration")
+    point = (float(x), float(y), 0.0 if z is None else float(z))
+    map_x, map_y = _COORDINATE_TRANSFORM.apply(point)
+    if not math.isfinite(map_x) or not math.isfinite(map_y):
         return None
-    return int(round(x)), int(round(y))
+    return int(round(map_x)), int(round(map_y))
+
+
+def _map_from_raw(raw: _RawPoint) -> _MapPoint | None:
+    return raw_coordinate_to_map(raw[0], raw[1], raw[2])
 
 
 def _raw_xy_from_map(point: tuple[float, float]) -> tuple[float, float] | None:

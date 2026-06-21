@@ -3,8 +3,8 @@
         "action": "Custom",
         "custom_action": "local_route_navigation",
         "custom_action_param": {
-            "json_path": "",
-            "route_name": "",
+            "json_path": "penquan",
+            "route_name": "penquan",
             "segment_index": 1,
             "frame_interval": 0.1,
             "tolerance": 5,
