@@ -40,6 +40,8 @@ def _parse_params(value):
     if isinstance(value, dict):
         return value
     parsed = json.loads(value)
+    if parsed is None:
+        return {}
     if not isinstance(parsed, dict):
         raise TypeError("custom_action_param must be a JSON object")
     return parsed
