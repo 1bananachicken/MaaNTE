@@ -7,7 +7,7 @@ from typing import Any, Callable
 from maa.context import Context
 
 from ..Common.logger import get_logger
-from .angle_predictor import AnglePredictor
+from .angle_predictor import AnglePredictionResult, AnglePredictor
 from .coordinate_position import CoordinatePositionProvider
 from .debug_windows import close_debug_windows, pump_debug_windows
 from .map_locator import MapLocator
@@ -15,6 +15,7 @@ from .map_locator import MapLocator
 logger = get_logger(__name__)
 
 _KEY_W = 87
+_NETWORK_FRAME_INTERVAL = 1.0 / 60.0
 
 
 @dataclass
@@ -113,25 +114,39 @@ class WaypointNavigator:
             )
             if self.position_provider.uses_visual_positioning():
                 self.locator = MapLocator(debug=debug)
-            self.predictor = AnglePredictor(
-                backend=angle_backend,
-                threshold=0.0,
-                debug=debug,
-            )
+                self.predictor = AnglePredictor(
+                    backend=angle_backend,
+                    threshold=0.0,
+                    debug=debug,
+                )
+            else:
+                self.frame_interval = _NETWORK_FRAME_INTERVAL
+                logger.info(
+                    "Navi network pose active: visual angle predictor disabled, "
+                    "control_rate=60Hz"
+                )
         except Exception:
             self.close()
             raise
 
     def update(self) -> tuple[Any, Any] | None:
-        frame = self.controller.post_screencap().wait().get()
-        if frame is None:
-            if self.debug:
-                pump_debug_windows()
-            return None
         assert self.position_provider is not None
-        assert self.predictor is not None
-        location = self.position_provider.locate(self.locator, frame)
-        angle = self.predictor.predict(frame)
+        if self.position_provider.uses_visual_positioning():
+            frame = self.controller.post_screencap().wait().get()
+            if frame is None:
+                if self.debug:
+                    pump_debug_windows()
+                return None
+            assert self.predictor is not None
+            location = self.position_provider.locate(self.locator, frame)
+            angle = self.predictor.predict(frame)
+        else:
+            location = self.position_provider.locate(None, None)
+            angle = AnglePredictionResult(
+                found=location.found and location.camera_heading is not None,
+                angle=location.camera_heading,
+                confidence=1.0 if location.camera_heading is not None else 0.0,
+            )
         if location.found and location.point is not None:
             self.current_point = location.point
         if self.on_frame is not None:

@@ -37,6 +37,7 @@ class NavigationWebSocketServer:
             "version": 1,
             "position": None,
             "angle": None,
+            "pitch": None,
             "angleConfidence": 0.0,
             "route": {
                 "waypoints": [],
@@ -117,6 +118,7 @@ class NavigationWebSocketServer:
         source_size: tuple[int, int] = (11264, 11264),
         angle: float | None,
         angle_confidence: float,
+        pitch: float | None = None,
     ) -> None:
         self.start()
         with self._state_lock:
@@ -142,6 +144,7 @@ class NavigationWebSocketServer:
             else:
                 self._state["position"] = None
             self._state["angle"] = float(angle) if angle is not None else None
+            self._state["pitch"] = float(pitch) if pitch is not None else None
             self._state["angleConfidence"] = float(angle_confidence)
             self._state["timestamp"] = time.time()
         self._schedule_broadcast()
