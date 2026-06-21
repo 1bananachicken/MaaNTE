@@ -35,6 +35,7 @@ class RouteWebSocketService:
             mode=location.mode,
             source_size=self.get_source_size(),
             angle=angle.angle if angle.found else None,
+            pitch=location.camera_pitch,
             angle_confidence=angle.confidence,
         )
 

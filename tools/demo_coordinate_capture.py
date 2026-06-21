@@ -82,8 +82,15 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
     module = load_coordinate_module()
+    api_version = getattr(module, "API_VERSION", None)
+    if api_version != "1.1.0":
+        print(
+            "coordinate core API 1.1.0 is required, got %s"
+            % (api_version or "<unknown>")
+        )
+        return 1
     capture_type = getattr(module, "CoordinateCapture")
-    capture = capture_type()
+    capture = capture_type(refresh_rate=0)
 
     origin = getattr(module, "_coordinate_demo_origin", None)
     if origin is None:
@@ -113,21 +120,33 @@ def main(argv: list[str] | None = None) -> int:
                 print("[%.2fs] no coordinate sample" % elapsed)
             else:
                 samples += 1
-                raw_tuple = tuple(float(value) for value in raw)
+                raw_tuple = tuple(float(value) for value in raw[:3])
+                pitch = float(raw[3]) if len(raw) >= 4 else float("nan")
+                heading = float(raw[4]) if len(raw) >= 5 else float("nan")
                 map_point = map_point_from_raw(raw_tuple)
                 if map_point is None:
                     print(
-                        "[%.2fs] raw=(%.3f, %.3f, %.3f)"
-                        % (elapsed, raw_tuple[0], raw_tuple[1], raw_tuple[2])
-                    )
-                else:
-                    print(
-                        "[%.2fs] raw=(%.3f, %.3f, %.3f) map=(%d, %d)"
+                        "[%.2fs] raw=(%.3f, %.3f, %.3f) pitch=%.3f heading=%.3f"
                         % (
                             elapsed,
                             raw_tuple[0],
                             raw_tuple[1],
                             raw_tuple[2],
+                            pitch,
+                            heading,
+                        )
+                    )
+                else:
+                    print(
+                        "[%.2fs] raw=(%.3f, %.3f, %.3f) pitch=%.3f "
+                        "heading=%.3f map=(%d, %d)"
+                        % (
+                            elapsed,
+                            raw_tuple[0],
+                            raw_tuple[1],
+                            raw_tuple[2],
+                            pitch,
+                            heading,
                             map_point[0],
                             map_point[1],
                         )
