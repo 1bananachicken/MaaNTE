@@ -13,6 +13,7 @@ from .map_locator import MapLocationResult
 logger = get_logger(__name__)
 
 _RawPoint = tuple[float, float, float]
+_RawPose = tuple[float, float, float, float, float]
 _MapPoint = tuple[int, int]
 COORDINATE_MAP_SIZE = (11264, 11264)
 _CORE_MODULE = "nte_coordinate_api"
@@ -32,7 +33,7 @@ _CALIBRATION_ERROR = 0.22031967781665318
 class _CoordinateCapture(Protocol):
     def start(self) -> None: ...
 
-    def read(self, max_age: float = 1.0) -> _RawPoint | None: ...
+    def read(self, max_age: float = 1.0) -> _RawPose | None: ...
 
     def close(self) -> None: ...
 
@@ -69,7 +70,14 @@ def _create_capture() -> _CoordinateCapture:
             % getattr(module, "__file__", "<unknown>")
         ) from exc
 
-    capture = capture_type()
+    api_version = getattr(module, "API_VERSION", None)
+    if api_version != "1.1.0":
+        raise RuntimeError(
+            "coordinate core API 1.1.0 is required, got %s"
+            % (api_version or "<unknown>")
+        )
+
+    capture = capture_type(refresh_rate=0)
     for method_name in ("start", "read", "close"):
         if not callable(getattr(capture, method_name, None)):
             raise RuntimeError(
@@ -158,6 +166,8 @@ class CoordinatePositionProvider:
         self._debug = bool(debug)
         self._last_map_point: _MapPoint | None = None
         self._last_raw_coordinate: _RawPoint | None = None
+        self._last_camera_pitch: float | None = None
+        self._last_camera_heading: float | None = None
 
         if normalized == "map":
             return
@@ -192,8 +202,8 @@ class CoordinatePositionProvider:
                 result.raw_coordinate = _raw_xy_from_map(result.point)
             return result
 
-        raw = capture.read()
-        if raw is None:
+        pose = capture.read()
+        if pose is None:
             if self._debug:
                 logger.debug("Navi coordinate unavailable; source=coordinate")
             return MapLocationResult(
@@ -204,10 +214,19 @@ class CoordinatePositionProvider:
                 mode="coordinate_stale",
                 polygon=None,
                 raw_coordinate=self._last_raw_coordinate,
+                camera_pitch=self._last_camera_pitch,
+                camera_heading=self._last_camera_heading,
             )
 
+        raw = pose[0], pose[1], pose[2]
+        camera_pitch = float(pose[3])
+        camera_heading = float(pose[4])
         point = _map_from_raw(raw)
-        if point is None:
+        if (
+            point is None
+            or not math.isfinite(camera_pitch)
+            or not math.isfinite(camera_heading)
+        ):
             self._coordinate_active = False
             if self._debug:
                 logger.debug(
@@ -225,6 +244,8 @@ class CoordinatePositionProvider:
                 mode="coordinate_invalid",
                 polygon=None,
                 raw_coordinate=self._last_raw_coordinate,
+                camera_pitch=self._last_camera_pitch,
+                camera_heading=self._last_camera_heading,
             )
 
         if not self._coordinate_active:
@@ -232,15 +253,19 @@ class CoordinatePositionProvider:
             self._coordinate_active = True
         self._last_map_point = point
         self._last_raw_coordinate = raw
+        self._last_camera_pitch = camera_pitch
+        self._last_camera_heading = camera_heading % 360.0
         if self._debug:
             logger.debug(
                 "Navi coordinate position: raw=(%.2f, %.2f, %.2f) "
-                "map=(%d, %d) source=coordinate",
+                "map=(%d, %d) pitch=%.2f heading=%.2f source=coordinate",
                 raw[0],
                 raw[1],
                 raw[2],
                 point[0],
                 point[1],
+                self._last_camera_pitch,
+                self._last_camera_heading,
             )
         return MapLocationResult(
             found=True,
@@ -250,6 +275,8 @@ class CoordinatePositionProvider:
             mode="coordinate",
             polygon=None,
             raw_coordinate=raw,
+            camera_pitch=self._last_camera_pitch,
+            camera_heading=self._last_camera_heading,
         )
 
     def uses_visual_positioning(self) -> bool:
