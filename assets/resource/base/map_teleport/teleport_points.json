@@ -7,9 +7,9 @@
             "coordinateType": "world",
             "worldX": -152904.578,
             "worldY": 129793.907,
-            "areaName": "绘空町",
-            "areaIndex": 3,
-            "description": "传送点表样例；areaIndex 表示该传送点在所属区域列表中的序号。"
+            "areaName": "绘空",
+            "areaIndex": 2,
+            "description": "地图索引中使用的传送点；areaName 用于切换地区，areaIndex 表示该区域推荐地点列表中的第几个传送图标。"
         }
     ]
 }
