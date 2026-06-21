@@ -4,6 +4,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
+from .coordinate_position import COORDINATE_MAP_SIZE, raw_coordinate_to_map
+
 
 Waypoint = tuple[int, int]
 SourceSize = tuple[int, int]
@@ -106,11 +108,12 @@ def parse_waypoint(
         y = float(value["target_y"])
     elif "lat" in value and "lng" in value:
         return parse_online_waypoint(value, target_size)
-    elif "x" in value and "y" in value and value.get("coordinate") != "online":
-        x = float(value["x"])
-        y = float(value["y"])
+    elif "x" in value and "y" in value:
+        return parse_raw_coordinate_waypoint(value, target_size)
     else:
-        raise ValueError("waypoint needs pixelX/pixelY or x/y")
+        raise ValueError(
+            "waypoint needs pixelX/pixelY, target_x/target_y, x/y, or lat/lng"
+        )
 
     source_size = parse_source_size(value, source_size)
     source_w, source_h = source_size
@@ -135,6 +138,26 @@ def parse_online_waypoint(
     x = map_x * target_w / map_w
     y = map_y * target_h / map_h
     return int(round(x)), int(round(y))
+
+
+def parse_raw_coordinate_waypoint(
+    value: dict[str, Any],
+    target_size: SourceSize,
+) -> Waypoint:
+    point = raw_coordinate_to_map(
+        float(value["x"]),
+        float(value["y"]),
+        float(value["z"]) if "z" in value else None,
+    )
+    if point is None:
+        raise ValueError("raw coordinate waypoint is not finite")
+
+    map_w, map_h = COORDINATE_MAP_SIZE
+    target_w, target_h = target_size
+    return (
+        int(round(point[0] * target_w / map_w)),
+        int(round(point[1] * target_h / map_h)),
+    )
 
 
 def parse_source_size(value: dict[str, Any], default: SourceSize) -> SourceSize:
