@@ -21,11 +21,11 @@ class OnlineMapNavigationAction(CustomAction):
         try:
             params = load_params(argv.custom_action_param)
             params.update(self.load_option_params(context))
-            host = str(params.get("host", "0.0.0.0"))
             port = int(params.get("port", 14514))
             tolerance = float(params.get("tolerance", 5.0))
             frame_interval = max(0.05, float(params.get("frame_interval", 0.1)))
             angle_backend = str(params.get("angle_backend", "auto"))
+            position_backend = str(params.get("position_backend", "auto"))
             debug = bool(params.get("debug", False))
         except ValueError as exc:
             logger.error("OnlineMapNavigation param invalid: %s", exc)
@@ -36,13 +36,13 @@ class OnlineMapNavigationAction(CustomAction):
             context,
             route,
             angle_backend=angle_backend,
+            position_backend=position_backend,
             tolerance=tolerance,
             frame_interval=frame_interval,
             debug=debug,
         )
         network = RouteWebSocketService(
             route,
-            host=host,
             port=port,
             get_source_size=runner.source_size,
             get_current_point=runner.current_point,
@@ -52,7 +52,9 @@ class OnlineMapNavigationAction(CustomAction):
         try:
             network.start()
             runner.start()
-            logger.info("OnlineMapNavigation service started: ws://%s:%s", host, port)
+            logger.info(
+                "OnlineMapNavigation service started: ws://0.0.0.0:%s", port
+            )
             runner.run_until_stopped(on_tick=network.publish_route)
             return CustomAction.RunResult(success=False)
         except Exception as exc:

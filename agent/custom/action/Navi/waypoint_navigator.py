@@ -7,13 +7,15 @@ from typing import Any, Callable
 from maa.context import Context
 
 from ..Common.logger import get_logger
-from .angle_predictor import AnglePredictor
+from .angle_predictor import AnglePredictionResult, AnglePredictor
+from .coordinate_position import CoordinatePositionProvider
 from .debug_windows import close_debug_windows, pump_debug_windows
 from .map_locator import MapLocator
 
 logger = get_logger(__name__)
 
 _KEY_W = 87
+_NETWORK_FRAME_INTERVAL = 1.0 / 60.0
 
 
 @dataclass
@@ -74,6 +76,7 @@ class WaypointNavigator:
         context: Context,
         *,
         angle_backend: str = "auto",
+        position_backend: str = "map",
         tolerance: float = 80.0,
         max_duration: float | None = None,
         frame_interval: float = 0.1,
@@ -93,27 +96,57 @@ class WaypointNavigator:
         self.max_turn_degrees = 35.0
         self.align_threshold = 4.0
         self.move_pulse = 0.12
+        self.key_refresh_interval = 0.5
         self.turn_pid = AnglePidController(
             output_limit=self.max_turn_degrees,
             deadband=self.align_threshold,
         )
         self.w_down = False
+        self._last_w_down_at = 0.0
         self.current_point: tuple[int, int] | None = None
-        self.locator = MapLocator(debug=debug)
-        self.predictor = AnglePredictor(
-            backend=angle_backend,
-            threshold=0.0,
-            debug=debug,
-        )
+        self.locator: MapLocator | None = None
+        self.position_provider: CoordinatePositionProvider | None = None
+        self.predictor: AnglePredictor | None = None
+        try:
+            self.position_provider = CoordinatePositionProvider(
+                position_backend,
+                debug=debug,
+            )
+            if self.position_provider.uses_visual_positioning():
+                self.locator = MapLocator(debug=debug)
+                self.predictor = AnglePredictor(
+                    backend=angle_backend,
+                    threshold=0.0,
+                    debug=debug,
+                )
+            else:
+                self.frame_interval = _NETWORK_FRAME_INTERVAL
+                logger.info(
+                    "Navi network pose active: visual angle predictor disabled, "
+                    "control_rate=60Hz"
+                )
+        except Exception:
+            self.close()
+            raise
 
     def update(self) -> tuple[Any, Any] | None:
-        frame = self.controller.post_screencap().wait().get()
-        if frame is None:
-            if self.debug:
-                pump_debug_windows()
-            return None
-        location = self.locator.locate(frame)
-        angle = self.predictor.predict(frame)
+        assert self.position_provider is not None
+        if self.position_provider.uses_visual_positioning():
+            frame = self.controller.post_screencap().wait().get()
+            if frame is None:
+                if self.debug:
+                    pump_debug_windows()
+                return None
+            assert self.predictor is not None
+            location = self.position_provider.locate(self.locator, frame)
+            angle = self.predictor.predict(frame)
+        else:
+            location = self.position_provider.locate(None, None)
+            angle = AnglePredictionResult(
+                found=location.found and location.camera_heading is not None,
+                angle=location.camera_heading,
+                confidence=1.0 if location.camera_heading is not None else 0.0,
+            )
         if location.found and location.point is not None:
             self.current_point = location.point
         if self.on_frame is not None:
@@ -152,6 +185,7 @@ class WaypointNavigator:
                 or angle.angle is None
             ):
                 self.turn_pid.reset()
+                self.release()
                 self.sleep_remaining(started)
                 continue
 
@@ -174,9 +208,7 @@ class WaypointNavigator:
             turn_degrees = self.turn_pid.update(angle_delta, time.monotonic())
             turn_dx = int(round(turn_degrees * self.turn_pixels_per_degree))
 
-            if not self.w_down:
-                self.controller.post_key_down(_KEY_W).wait()
-                self.w_down = True
+            self.press_forward()
             if turn_dx != 0:
                 self.controller.post_relative_move(turn_dx, 0).wait()
             if not self.sleep_interruptible(self.move_pulse):
@@ -201,24 +233,45 @@ class WaypointNavigator:
         self.release()
         return False
 
+    def press_forward(self) -> None:
+        now = time.monotonic()
+        if (
+            self.w_down
+            and now - self._last_w_down_at < self.key_refresh_interval
+        ):
+            return
+        self.controller.post_key_down(_KEY_W).wait()
+        self.w_down = True
+        self._last_w_down_at = now
+
     def release(self) -> None:
         self.turn_pid.reset()
         if self.w_down:
             self.controller.post_key_up(_KEY_W).wait()
             self.w_down = False
+        self._last_w_down_at = 0.0
 
     def close(self) -> None:
         try:
             self.release()
         finally:
             try:
-                self.locator.close()
+                if self.position_provider is not None:
+                    self.position_provider.close()
+                    self.position_provider = None
             finally:
                 try:
-                    self.predictor.close()
+                    if self.locator is not None:
+                        self.locator.close()
+                        self.locator = None
                 finally:
-                    if self.debug:
-                        close_debug_windows()
+                    try:
+                        if self.predictor is not None:
+                            self.predictor.close()
+                            self.predictor = None
+                    finally:
+                        if self.debug:
+                            close_debug_windows()
 
     def sleep_remaining(self, started: float) -> None:
         sleep_time = self.frame_interval - (time.perf_counter() - started)

@@ -9,7 +9,6 @@ class RouteWebSocketService:
         self,
         route: RouteSession,
         *,
-        host: str,
         port: int,
         get_source_size: Callable[[], SourceSize],
         get_current_point: Callable[[], Waypoint | None],
@@ -18,8 +17,7 @@ class RouteWebSocketService:
         self.get_source_size = get_source_size
         self.get_current_point = get_current_point
         self.websocket = NavigationWebSocketServer(
-            host,
-            port,
+            port=port,
             message_handler=self.handle_message,
         )
 
@@ -31,11 +29,13 @@ class RouteWebSocketService:
 
     def publish_frame(self, location: Any, angle: Any) -> None:
         self.websocket.publish_state(
-            location.point,
+            location.raw_coordinate,
+            map_point=location.point,
             score=location.score,
             mode=location.mode,
             source_size=self.get_source_size(),
             angle=angle.angle if angle.found else None,
+            pitch=location.camera_pitch,
             angle_confidence=angle.confidence,
         )
 

@@ -22,6 +22,9 @@ class MapLocationResult:
     score: float
     mode: str
     polygon: np.ndarray | None = None
+    raw_coordinate: tuple[float, float] | tuple[float, float, float] | None = None
+    camera_pitch: float | None = None
+    camera_heading: float | None = None
 
 
 class MapLocator:
