@@ -8,7 +8,7 @@
 流程:
     Pipeline: 确认ESC菜单 → 找羁遇按钮 → 进界面 → 找赠礼按钮
     Python:   滑动找角色 → 滑动找礼物 → 点赠送按钮 → 检查上限 → 循环
-    点击:     Common/utils (click_rect / post_swipe)
+    点击:     MAA context.run_task (pipeline_override 动态指定坐标 / BondGiftClickGive)
 """
 
 from __future__ import annotations
@@ -24,7 +24,7 @@ from maa.pipeline import JRecognitionType, JTemplateMatch
 
 from utils.logger import logger
 from utils.maafocus import Print
-from agent.custom.action.Common.utils import click_rect, get_image
+from agent.custom.action.Common.utils import get_image
 from wrap import task_action
 
 
@@ -56,7 +56,8 @@ CHAR_SWIPE_END = (1195, 280)
 GIFT_SWIPE_BEGIN = (810, 420)
 GIFT_SWIPE_END = (810, 320)
 
-GIFT_LIMIT_ROI = [154, 338, 972, 36]
+# GIFT_LIMIT_ROI = [154, 338, 972, 36]
+GIFT_LIMIT_ROI = [0, 0, 1280, 720]
 GIFT_LIMIT_TEMPLATE = "BondGift/gift_to_limit.png"
 GIFT_LIMIT_THRESHOLD = 0.7
 
@@ -165,7 +166,6 @@ def _find_and_click_in_list(
     post_delay_ms: int = FIND_POST_DELAY_MS,
 ) -> bool:
     """边滚边识别：截图 → TemplateMatch。命中 → click → return True。未命中 → 检测到尽头 → swipe → 继续。"""
-    controller = context.tasker.controller
     prev_gray = None
     for i in range(max_scrolls):
         if context.tasker.stopping:
@@ -189,7 +189,11 @@ def _find_and_click_in_list(
                 "_find_click: 命中 '%s' scroll=%d box=(%d,%d,%d,%d)",
                 label, i, box.x, box.y, box.w, box.h,
             )
-            click_rect(controller, [box.x, box.y, box.w, box.h])
+            context.run_task("_BondGiftClick", pipeline_override={
+                "_BondGiftClick": {
+                    "action": {"type": "Click", "param": {"target": [box.x, box.y, box.w, box.h]}}
+                }
+            })
             time.sleep(post_delay_ms / 1000.0)
             return True
 
@@ -221,7 +225,7 @@ def _check_char_limit(context: Context) -> bool:
         image,
     )
     if result and result.hit:
-        logger.info("BondGift: 识别到单角色上限标记")
+        logger.info("BondGift: 识别到单角色上限标记" + str(result.box))
         return True
     return False
 
@@ -290,47 +294,57 @@ class AutoBondingGift(CustomAction):
                 Print(context, f"羁绊送礼: 未找到 '{char_name}', 跳过")
                 continue
 
-            # ── 步骤5-6: 遍历礼物，找礼物→点赠送→检查上限 ──
+            # ── 步骤5-6: 按礼物类型依次赠送，每种送满再换下一种 ──
+            char_full = False
             for gift_name in target.gifts:
                 if context.tasker.stopping:
                     break
                 if total_given >= cfg.max_total:
                     break
-                if per_char_given.get(char_name, 0) >= cfg.max_per_char:
+                if char_full:
                     break
 
                 gift_template = BOND_GIFT_PRESETS[char_name]["gifts"][gift_name]
-
-                # 步骤5: 滑动找礼物并点击
                 _swipe_to_top(context, ItemListROI, GIFT_SWIPE_BEGIN, GIFT_SWIPE_END)
-                found = _find_and_click_in_list(
-                    context,
-                    roi=ItemListROI,
-                    template=gift_template,
-                    swipe_begin=GIFT_SWIPE_BEGIN,
-                    swipe_end=GIFT_SWIPE_END,
-                    label=gift_name,
-                )
-                if not found:
-                    Print(context, f"羁绊送礼: 未找到礼物 '{gift_name}'")
-                    continue
 
-                # 步骤6: 点赠送按钮（pipeline 节点）
-                ret = context.run_task("BondGiftClickGive")
-                if not ret:
-                    Print(context, f"羁绊送礼: 赠送按钮未找到, 跳过 '{gift_name}'")
-                    continue
+                while per_char_given.get(char_name, 0) < cfg.max_per_char:
+                    if context.tasker.stopping:
+                        break
+                    if total_given >= cfg.max_total:
+                        break
 
-                # 步骤6: 计数 + 检查上限
-                total_given += 1
-                per_char_given[char_name] = per_char_given.get(char_name, 0) + 1
-                Print(context, f"'{char_name}' ← '{gift_name}' ✓ ({total_given}/{cfg.max_total})")
+                    found = _find_and_click_in_list(
+                        context,
+                        roi=ItemListROI,
+                        template=gift_template,
+                        swipe_begin=GIFT_SWIPE_BEGIN,
+                        swipe_end=GIFT_SWIPE_END,
+                        label=gift_name,
+                        post_delay_ms=10,
+                    )
+                    if not found:
+                        Print(context, f"羁绊送礼: 未找到礼物 '{gift_name}'")
+                        break
 
-                # B: TemplateMatch 检查单角色上限
-                if _check_char_limit(context):
-                    Print(context, f"羁绊送礼: '{char_name}' 已达单角色上限")
-                    per_char_given[char_name] = cfg.max_per_char
-                    break
+                    # 步骤6: 点赠送按钮（pipeline 节点）
+                    ret = context.run_task("BondGiftClickGive")
+                    if not ret:
+                        Print(context, f"羁绊送礼: 赠送按钮未找到, 跳过 '{gift_name}'")
+                        continue
+
+                    total_given += 1
+                    per_char_given[char_name] = per_char_given.get(char_name, 0) + 1
+                    Print(context, f"'{char_name}' ← '{gift_name}' ✓ ({total_given}/{cfg.max_total})")
+
+                    # 检查 game UI：角色上限 0/3 等
+                    if _check_char_limit(context):
+                        Print(context, f"羁绊送礼: '{char_name}' 已达单角色上限")
+                        per_char_given[char_name] = cfg.max_per_char
+                        char_full = True
+                        break
+
+                    if per_char_given.get(char_name, 0) >= cfg.max_per_char:
+                        break
 
         elapsed = time.perf_counter() - t_start
         logger.info("BondGift: 完成, 送出%d个, %.1fs", total_given, elapsed)

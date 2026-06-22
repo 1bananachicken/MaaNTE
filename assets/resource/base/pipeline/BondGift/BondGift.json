@@ -25,7 +25,13 @@
             "param": {
                 "template": "BondGift/jiyu.png",
                 "threshold": 0.65,
-                "order_by": "Score"
+                "order_by": "Score",
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ]
             }
         },
         "action": {
@@ -37,10 +43,10 @@
         "pre_delay": 200,
         "post_delay": 1500,
         "rate_limit": 0,
-        "focus": {
-            "Node.Recognition.Succeeded": "羁绊送礼: 找到羁遇按钮 ✓",
-            "Node.Recognition.Failed": "羁绊送礼: 未找到羁遇按钮 ✗"
-        },
+        // "focus": {
+        //     "Node.Recognition.Succeeded": "羁绊送礼: 找到羁遇按钮 ✓",
+        //     "Node.Recognition.Failed": "羁绊送礼: 未找到羁遇按钮 ✗"
+        // },
         "next": [
             "BondGiftClickZengli",
             "BondGiftAction"
@@ -64,12 +70,12 @@
             "timeout": 2000
         },
         "pre_delay": 0,
-        "post_delay": 0,
+        "post_delay": 200,
         "rate_limit": 0,
-        "focus": {
-            "Node.Recognition.Succeeded": "羁绊送礼: 找到赠礼按钮 ✓",
-            "Node.Recognition.Failed": "羁绊送礼: 未找到赠礼按钮（可能已展开）"
-        },
+        // "focus": {
+        //     "Node.Recognition.Succeeded": "羁绊送礼: 找到赠礼按钮 ✓",
+        //     "Node.Recognition.Failed": "羁绊送礼: 未找到赠礼按钮（可能已展开）"
+        // },
         "next": [
             "BondGiftAction"
         ]
@@ -81,10 +87,10 @@
             "param": {
                 "template": "BondGift/btn_send.png",
                 "roi": [
-                    1024,
-                    619,
-                    180,
-                    36
+                    0,
+                    0,
+                    1280,
+                    720
                 ],
                 "threshold": 0.7,
                 "order_by": "Score"
@@ -93,13 +99,13 @@
         "action": {
             "type": "Click"
         },
-        "post_wait_freezes": {
-            "time": 500,
-            "timeout": 2000
-        },
-        "pre_delay": 0,
+        "pre_delay": 500,
         "post_delay": 0,
         "rate_limit": 0
+        // "focus": {
+        //     "Node.Recognition.Succeeded": "点击赠送按钮: 找到赠礼按钮 ✓",
+        //     "Node.Recognition.Failed": "点击赠送按钮: 未找到赠礼按钮（可能已展开）"
+        // },
     },
     "BondGiftAction": {
         "desc": "羁绊送礼 — Python 负责找角色、送礼",
@@ -115,8 +121,8 @@
         "pre_delay": 0,
         "post_delay": 0,
         "rate_limit": 0,
-        "focus": {
-            "Node.Action.Starting": "羁绊送礼: Python 开始执行"
-        }
+        // "focus": {
+        //     "Node.Action.Starting": "羁绊送礼: Python 开始执行"
+        // }
     }
 }
