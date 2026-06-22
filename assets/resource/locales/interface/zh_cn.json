@@ -230,5 +230,17 @@
     "task_online_map_navigation_input_host": "监听地址",
     "task_online_map_navigation_input_port": "监听端口",
     "task_online_map_navigation_input_frame_interval": "采样间隔 (秒)",
-    "task_online_map_navigation_input_frame_interval_desc": "每次截图定位之间的最小间隔，最低会限制为 0.05 秒。"
+    "task_online_map_navigation_input_frame_interval_desc": "每次截图定位之间的最小间隔，最低会限制为 0.05 秒。",
+    "task_dev_hot_reload_label": "开发热更",
+    "task_dev_hot_reload_desc": "仅限开发使用：热更新已修改的 Python 脚本，无需重启 MAA。",
+    "task_bonding_gifts_label": "羁绊送礼",
+    "task_bonding_gifts_desc": "自动给指定角色送指定礼物。格式：角色名:礼物1,礼物2;角色名:礼物3。用冒号分隔角色与礼物，逗号分隔多个礼物，分号分隔不同角色。",
+    "task_bonding_gifts_option_config_label": "送礼配置",
+    "task_bonding_gifts_option_config_desc": "填写要送的角色和礼物。",
+    "task_bonding_gifts_option_config_input_label": "送礼列表",
+    "task_bonding_gifts_option_config_input_desc": "格式: 角色名:礼物1,礼物2;角色名:礼物3。例如: 星见雅:巧克力,花束",
+    "task_bonding_gifts_option_max_per_char_input_label": "单角色上限",
+    "task_bonding_gifts_option_max_per_char_desc": "每个角色最多送多少次（游戏默认3次）。",
+    "task_bonding_gifts_option_max_total_input_label": "全局上限",
+    "task_bonding_gifts_option_max_total_desc": "总共最多送多少次（游戏默认10次）。"
 }
