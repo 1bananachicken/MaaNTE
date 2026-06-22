@@ -1,2 +1,2 @@
-# from .action import *
+from .action import *
 from .autofight import *
