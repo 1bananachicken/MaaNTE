@@ -45,6 +45,7 @@ MAP_INDEX_TITLE_ROI = [907, 66, 121, 36]
 AREA_NAME_ROI = [958, 127, 235, 40]
 AREA_NEXT_BTN_ROI = [1203, 126, 44, 42]
 RECOMMENDED_PLACE_ROI = [894, 175, 369, 468]
+NEW_HERLAND_RECOMMENDED_PLACE_SWIPE_ROI = [897, 195, 351, 429]
 TELEPORT_ICON_ROI = [894, 175, 369, 468]
 TELEPORT_CONFIRM_POINT = [639, 361]
 TELEPORT_BUTTON_ROI = [933, 620, 332, 45]
@@ -62,6 +63,7 @@ DEFAULT_STILL_MAX_WAIT = 8.0
 DEFAULT_STILL_INTERVAL = 0.25
 DEFAULT_STILL_CONSECUTIVE = 2
 DEFAULT_STILL_DIFF_THRESHOLD = 1.5
+DEFAULT_SWIPE_DURATION_MS = 500
 
 
 @dataclass(frozen=True)
@@ -208,6 +210,26 @@ def _click_rect_action(context: Context, rect: list[int]) -> bool:
         logger.error("MapTeleport click failed: rect=%s error=%s", rect, exc)
         return False
     return result is not None
+
+
+def _swipe_up_in_roi(context: Context, roi: list[int], *, duration: int) -> bool:
+    x, y, w, h = roi
+    start_x = int(x + w / 2)
+    start_y = int(y + h * 0.82)
+    end_x = start_x
+    end_y = int(y + h * 0.18)
+    try:
+        context.tasker.controller.post_swipe(
+            start_x,
+            start_y,
+            end_x,
+            end_y,
+            duration=duration,
+        ).wait()
+    except Exception as exc:
+        logger.error("MapTeleport swipe failed: roi=%s error=%s", roi, exc)
+        return False
+    return True
 
 
 def _box_to_rect(box: Any) -> list[int] | None:
@@ -489,6 +511,26 @@ def _click_recommended_place(
     return True
 
 
+def _adjust_recommended_place_list(
+    context: Context,
+    teleport_point: TeleportPoint,
+    *,
+    action_delay: float,
+) -> bool:
+    if teleport_point.area_name != "新赫兰德":
+        return True
+
+    # 新赫兰德的推荐地点列表需要先向上滚动，目标传送点才会进入后续图标匹配区域。
+    if not _swipe_up_in_roi(
+        context,
+        NEW_HERLAND_RECOMMENDED_PLACE_SWIPE_ROI,
+        duration=DEFAULT_SWIPE_DURATION_MS,
+    ):
+        return False
+    time.sleep(action_delay)
+    return True
+
+
 def _click_teleport_icon(
     context: Context,
     teleport_point: TeleportPoint,
@@ -624,6 +666,14 @@ def run_map_teleport_flow(
         return False
 
     time.sleep(action_delay)
+    if not _adjust_recommended_place_list(
+        context,
+        teleport_point,
+        action_delay=action_delay,
+    ):
+        _notify(context, "地图传送失败：推荐地点列表滑动失败")
+        return False
+
     if not _click_teleport_icon(
         context,
         teleport_point,
