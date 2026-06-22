@@ -116,6 +116,8 @@
         "resource/tasks/PinkPawHeist.json",
         "resource/tasks/MakeCoffee.json",
         "resource/tasks/MakeCoffeeLite.json",
+        "resource/tasks/NanallyPro.json",
+        "resource/tasks/LacrimosaPro.json",
         "resource/tasks/Rhythm.json",
         "resource/tasks/Tetris.json",
         "resource/tasks/BagelSpam.json",

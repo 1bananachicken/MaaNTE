@@ -1,0 +1,59 @@
+{
+    "LacrimosaProEntry": {
+        "desc": "Lacrimosa 番茄汁服务模式入口",
+        "next": [
+            "LacrimosaProRun",
+            "[JumpBack]SceneAnyEnterWorld"
+        ]
+    },
+    "LacrimosaProRun": {
+        "desc": "执行 Lacrimosa 番茄汁检测服务模式",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "lacrimosa_pro",
+                "custom_action_param": {
+                    "max_services": 10,
+                    "max_loop_seconds": 300,
+                    "idle_sleep": 0.15,
+                    "juice_recognition_node": "LacrimosaProCheckJuice",
+                    "glasses_recognition_node": "LacrimosaProCheckGlasses",
+                    "tomato_recognition_node": "LacrimosaProCheckTomato"
+                }
+            }
+        }
+    },
+    "LacrimosaProCheckJuice": {
+        "desc": "识别顾客头上番茄汁需求图标",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [0, 0, 1280, 720],
+                "template": "auto_coffee_pro/juice.png",
+                "threshold": 0.8
+            }
+        }
+    },
+    "LacrimosaProCheckGlasses": {
+        "desc": "识别 glasses 工具",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [0, 0, 1280, 720],
+                "template": "auto_coffee_pro/glasses.png",
+                "threshold": 0.8
+            }
+        }
+    },
+    "LacrimosaProCheckTomato": {
+        "desc": "识别 tomato 工具",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [0, 0, 1280, 720],
+                "template": "auto_coffee_pro/tomato.png",
+                "threshold": 0.8
+            }
+        }
+    }
+}
