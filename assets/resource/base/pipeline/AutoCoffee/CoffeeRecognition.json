@@ -1,0 +1,101 @@
+{
+    "MakeCoffeeStart": {
+        "desc": "识别开始营业按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1057,
+                    648,
+                    178,
+                    44
+                ],
+                "expected": [
+                    "开始营业",
+                    "開始營業",
+                    "(?i)Open\\s*Shop",
+                    "営業開始",
+                    "영업 개시"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "MakeCoffeeTargetCoffeeMaster": {
+        "desc": "识别新品练习关卡",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    16,
+                    230,
+                    196,
+                    33
+                ],
+                "expected": [
+                    "新品",
+                    "新品",
+                    "(?i)New\\s*Product",
+                    "新作",
+                    "신제품"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "MakeCoffeeStar": {
+        "desc": "识别达标星星图标",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1204,
+                    109,
+                    29,
+                    27
+                ],
+                "template": "auto_make_coffee/star.png",
+                "threshold": 0.9
+            }
+        }
+    },
+    "MakeCoffeeClaim": {
+        "desc": "识别领取按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    681,
+                    539,
+                    187,
+                    38
+                ],
+                "expected": [
+                    "领取",
+                    "領取",
+                    "(?i)Claim",
+                    "受け取る",
+                    "수령"
+                ]
+            }
+        }
+    },
+    "MakeCoffeeShopMaster": {
+        "desc": "识别店长特供标识",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    768,
+                    352,
+                    108,
+                    43
+                ],
+                "expected": [
+                    "店长特供"
+                ],
+                "threshold": 0.75
+            }
+        }
+    }
+}

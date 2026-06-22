@@ -201,7 +201,13 @@ switch 的 case 中可嵌套 `"option"` 数组，实现"启用某功能后才显
 
 ## i18n
 
-- task/option 的 `label`、`description` 使用 `$key` 格式引用 `assets/resource/locales/interface/<lang>.json` 中的翻译
+- task/option 的 `label`、`description` 使用 `$key` 格式引用翻译，key 定义在 `assets/resource/locales/interface/` 下五种语言文件中：
+  - `zh_cn.json` — 简体中文
+  - `zh_tw.json` — 繁体中文
+  - `en_us.json` — 英语
+  - `ja_jp.json` — 日语
+  - `ko_kr.json` — 韩语
+- Pipeline 中 OCR 节点的 `expected` 只需填写**完整的中文文本**，多语言同步由 `.github/workflows/i18n-sync.yml` 工作流自动完成。需要跳过时添加 `// @i18n-skip` 标记
 - `option_switch_case_yes` / `option_switch_case_no` 是全局 switch case 默认标签，所有语言文件都需定义。一般 switch 直接复用即可；若有特殊需求（如文案不应是简单的"启用/禁用"），可将 case 的 `label` 替换为自定义 `$key`
 - 纯文本（不加 `$`）直接显示，不走翻译
 
@@ -285,7 +291,8 @@ switch 的 case 中可嵌套 `"option"` 数组，实现"启用某功能后才显
 - [ ] 任务 `name` 使用 PascalCase
 - [ ] `entry` 节点名在对应 Pipeline JSON 中存在
 - [ ] task 文件已注册到 `assets/interface.json` 的 `import` 数组
-- [ ] `label` / `description` 的 `$i18n_key` 在所有语言文件中已定义
+- [ ] `label` / `description` 的 `$i18n_key` 在所有五种语言文件中已定义
+- [ ] OCR `expected` 写完整文本，无需手动维护多语言（CI 自动同步）
 - [ ] switch option 有 `default_case`
 - [ ] `pipeline_override` 中的节点名在 Pipeline JSON 中存在
 - [ ] `custom_action_param` 参数名与 Python CustomAction 解析一致

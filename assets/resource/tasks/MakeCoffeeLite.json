@@ -1,0 +1,58 @@
+{
+    "task": [
+        {
+            "name": "MakeCoffeeLite",
+            "label": "$task_make_coffee_lite_label",
+            "desc": "$task_make_coffee_lite_desc",
+            "entry": "AutoMakeCoffeeLiteEntrance",
+            "option": [
+                "MakeCoffeeLoopTimeLite",
+                "MakeCoffeeTimeoutLite"
+            ],
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ]
+        }
+    ],
+    "option": {
+        "MakeCoffeeLoopTimeLite": {
+            "label": "$task_make_coffee_lite_option_loop_time",
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "LoopTime",
+                    "default": "10",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "MakeCoffeeLiteRun": {
+                    "custom_action_param": {
+                        "count": "{LoopTime}"
+                    }
+                }
+            }
+        },
+        "MakeCoffeeTimeoutLite": {
+            "label": "$task_make_coffee_lite_option_timeout",
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "Timeout",
+                    "default": "5",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "MakeCoffeeLiteRun": {
+                    "custom_action_param": {
+                        "timeout": "{Timeout}"
+                    }
+                }
+            }
+        }
+    }
+}

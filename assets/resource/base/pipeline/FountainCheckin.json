@@ -85,8 +85,7 @@
                 ],
                 "template": [
                     "realtime_assist/skip_story_btn.png"
-                ],
-                "threshold": 0.7
+                ]
             }
         },
         "action": {
@@ -116,8 +115,7 @@
                     275,
                     450,
                     50
-                ],
-                "threshold": 0.7
+                ]
             }
         },
         "action": "DoNothing",
@@ -151,8 +149,6 @@
                     250,
                     70
                 ],
-                "threshold": 0.7
-            ,
                 "roi_offset": [
                     0,
                     0,
@@ -210,8 +206,7 @@
                     "(?i)Nacupeda\\s*'\\s*s\\s*Pool",
                     "ナクペイダの池",
                     "나쿠펜다의 연못"
-                ],
-                "threshold": 0.7
+                ]
             }
         },
         "next": [

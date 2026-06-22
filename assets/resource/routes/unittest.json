@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "routes": [
+    {
+      "id": "route-1781405382525",
+      "name": "unittest",
+      "isHidden": false,
+      "segments": [
+        {
+          "id": "segment-1781405397659",
+          "name": "1",
+          "isHidden": false,
+          "points": [
+            {
+              "lat": 17.954545,
+              "lng": -96.681818
+            },
+            {
+              "lat": 18.772727,
+              "lng": -94.920455
+            }
+          ]
+        },
+        {
+          "id": "segment-1781405412378",
+          "name": "2",
+          "isHidden": false,
+          "points": [
+            {
+              "lat": 18.875,
+              "lng": -95.034091
+            },
+            {
+              "lat": 17.965909,
+              "lng": -96.795455
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
