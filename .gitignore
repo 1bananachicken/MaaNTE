@@ -472,3 +472,9 @@ output/
 
 # Models
 assets/resource/base/model/*
+# 测试文件（根目录）
+/agent/test_*.py
+
+# 压缩包
+*.7z
+*.zip
