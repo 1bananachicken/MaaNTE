@@ -30,7 +30,7 @@
                     "name": "config",
                     "label": "$task_bonding_gifts_option_config_input_label",
                     "description": "$task_bonding_gifts_option_config_input_desc",
-                    "default": "",
+                    "default": "nanali:test_gift,spicy_strip",
                     "pipeline_type": "string"
                 },
                 {

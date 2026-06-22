@@ -17,7 +17,7 @@ CustomAction 增强装饰器。
 
     @task_action("my_action", MyConfig)
     class MyAction(CustomAction):
-        def run(self, context, cfg: MyConfig):   # cfg 已解析+校验
+        def run(self, context, cfg: MyConfig, argv: CustomAction.RunArg):   # cfg 已解析+校验
             ...
             return True   # bool 自动转 RunResult(success=True)
 
@@ -32,7 +32,7 @@ from __future__ import annotations
 import dataclasses
 import json
 from functools import wraps
-from typing import Any, Callable, TypeVar
+from typing import Any, Callable, TypeVar, get_type_hints
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
@@ -46,6 +46,49 @@ _T = TypeVar("_T")
 # ------------------------------------------------------------------
 # 参数解析
 # ------------------------------------------------------------------
+
+
+def _coerce(value: Any, target_type: Any) -> Any:
+    """根据 dataclass 字段类型转换值，转换失败返回 None。"""
+    if value is None:
+        return value
+    if target_type is int:
+        if isinstance(value, bool):
+            return int(value)
+        if isinstance(value, str):
+            if not value.strip():
+                return None
+            try:
+                return int(value)
+            except ValueError:
+                return None
+        if isinstance(value, (int, float)):
+            return int(value)
+        return None
+    if target_type is float:
+        if isinstance(value, str):
+            if not value.strip():
+                return None
+            try:
+                return float(value)
+            except ValueError:
+                return None
+        if isinstance(value, (int, float)):
+            return float(value)
+        return None
+    if target_type is bool:
+        if isinstance(value, bool):
+            return value
+        if isinstance(value, str):
+            return value.strip().lower() in ("true", "1", "yes")
+        if isinstance(value, (int, float)):
+            return bool(value)
+        return None
+    if target_type is str:
+        if isinstance(value, str):
+            return value
+        return str(value)
+    return value
 
 
 def _parse_config(raw: Any, config_cls: type[_T] | None) -> Any:
@@ -62,17 +105,30 @@ def _parse_config(raw: Any, config_cls: type[_T] | None) -> Any:
     if config_cls is None:
         return raw
 
-    field_map = {f.name: f for f in dataclasses.fields(config_cls)}
+    fields = dataclasses.fields(config_cls)
+    type_hints = get_type_hints(config_cls)
     kwargs = {}
-    for name, field in field_map.items():
+    for field in fields:
+        name = field.name
         value = raw.get(name)
+        target_type = type_hints.get(name, str)
         if value is not None:
-            kwargs[name] = value
-        elif field.default is not dataclasses.MISSING:
-            kwargs[name] = field.default
-        elif field.default_factory is not dataclasses.MISSING:
-            kwargs[name] = field.default_factory()
+            coerced = _coerce(value, target_type)
+            if coerced is not None:
+                kwargs[name] = coerced
+            else:
+                _apply_default(kwargs, name, field)
+        else:
+            _apply_default(kwargs, name, field)
     return config_cls(**kwargs)
+
+
+def _apply_default(kwargs: dict, name: str, field: dataclasses.Field) -> None:
+    """从 dataclass 字段默认值填充 kwargs。"""
+    if field.default is not dataclasses.MISSING:
+        kwargs[name] = field.default
+    elif field.default_factory is not dataclasses.MISSING:
+        kwargs[name] = field.default_factory()
 
 
 # ------------------------------------------------------------------
@@ -98,7 +154,7 @@ def task_action(
 
         @task_action("auto_fish", FishConfig)
         class AutoFish(CustomAction):
-            def run(self, context, cfg: FishConfig):
+            def run(self, context, cfg: FishConfig, argv: CustomAction.RunArg):
                 ...
     """
 
@@ -112,7 +168,7 @@ def task_action(
             argv: CustomAction.RunArg,
         ) -> CustomAction.RunResult:
             config = _parse_config(argv.custom_action_param, config_cls)
-            result = original(self, context, config)
+            result = original(self, context, config, argv)
             return _normalize_result(result)
 
         action_cls.run = run

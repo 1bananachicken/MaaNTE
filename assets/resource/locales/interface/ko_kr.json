@@ -224,5 +224,15 @@
     "task_online_map_navigation_input_host": "수신 주소",
     "task_online_map_navigation_input_port": "수신 포트",
     "task_online_map_navigation_input_frame_interval": "샘플링 간격 (초)",
-    "task_online_map_navigation_input_frame_interval_desc": "스크린샷 위치 확인 사이의 최소 간격입니다. 작업에서 최소 0.05초로 제한됩니다."
+    "task_online_map_navigation_input_frame_interval_desc": "스크린샷 위치 확인 사이의 최소 간격입니다. 작업에서 최소 0.05초로 제한됩니다.",
+    "task_bonding_gifts_label": "인연 선물",
+    "task_bonding_gifts_desc": "지정한 캐릭터에게 지정한 선물을 자동으로 줍니다. 형식: 캐릭터명:선물1,선물2;캐릭터명:선물3.",
+    "task_bonding_gifts_option_config_label": "선물 설정",
+    "task_bonding_gifts_option_config_desc": "선물할 캐릭터와 선물을 입력하세요. 입력란 설명에서 사용 가능한 옵션을 확인하세요.",
+    "task_bonding_gifts_option_config_input_label": "선물 목록",
+    "task_bonding_gifts_option_config_input_desc": "사용 가능한 캐릭터와 선물:\n- nanali: test_gift, spicy_strip\n\n형식: 캐릭터ID:선물ID1,선물ID2;캐릭터ID:선물ID3",
+    "task_bonding_gifts_option_max_per_char_input_label": "캐릭터당 한도",
+    "task_bonding_gifts_option_max_per_char_desc": "캐릭터당 최대 선물 수 (게임 기본값: 3).",
+    "task_bonding_gifts_option_max_total_input_label": "전체 한도",
+    "task_bonding_gifts_option_max_total_desc": "전체 최대 선물 수 (게임 기본값: 10)."
 }

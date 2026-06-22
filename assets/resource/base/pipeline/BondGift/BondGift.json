@@ -1,6 +1,6 @@
 {
     "BondGiftEntrance": {
-        "desc": "羁绊送礼入口 — 确认有主页, 否则回到主页",
+        "desc": "羁绊送礼入口",
         "recognition": {
             "type": "DirectHit"
         },
@@ -14,50 +14,95 @@
             "Node.Action.Starting": "羁绊送礼: 开始"
         },
         "next": [
-            "BondGiftAction"
+            "BondGiftClickJiyu",
+            "[JumpBack]SceneAnyEnterEscMenu"
         ]
     },
-    "BondGiftInWorldPressEsc": {
-        "desc": "确认大世界 → 按ESC → 等菜单稳定",
+    "BondGiftClickJiyu": {
+        "desc": "识别羁遇按钮并长按进入界面",
         "recognition": {
-            "type": "And",
+            "type": "TemplateMatch",
             "param": {
-                "all_of": [
-                    "InWorld"
-                ]
+                "template": "BondGift/jiyu.png",
+                "threshold": 0.65,
+                "order_by": "Score"
             }
         },
         "action": {
-            "type": "ClickKey",
+            "type": "LongPress",
             "param": {
-                "key": [
-                    27
-                ]
+                "duration": 100
             }
         },
-        "post_wait_freezes": {
-            "target": [
-                918,
-                101,
-                312,
-                165
-            ],
-            "time": 800,
+        "pre_delay": 200,
+        "post_delay": 1500,
+        "rate_limit": 0,
+        "focus": {
+            "Node.Recognition.Succeeded": "羁绊送礼: 找到羁遇按钮 ✓",
+            "Node.Recognition.Failed": "羁绊送礼: 未找到羁遇按钮 ✗"
+        },
+        "next": [
+            "BondGiftClickZengli",
+            "BondGiftAction"
+        ]
+    },
+    "BondGiftClickZengli": {
+        "desc": "识别赠礼按钮并点击（识别不到则认为已点开）",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "BondGift/zengli.png",
+                "threshold": 0.7,
+                "order_by": "Score"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "pre_wait_freezes": {
+            "time": 500,
             "timeout": 2000
         },
         "pre_delay": 0,
         "post_delay": 0,
         "rate_limit": 0,
         "focus": {
-            "Node.Recognition.Succeeded": "羁绊送礼: 大世界 → ESC ✓",
-            "Node.Recognition.Failed": "羁绊送礼: 不在大世界 ✗"
+            "Node.Recognition.Succeeded": "羁绊送礼: 找到赠礼按钮 ✓",
+            "Node.Recognition.Failed": "羁绊送礼: 未找到赠礼按钮（可能已展开）"
         },
         "next": [
             "BondGiftAction"
         ]
     },
+    "BondGiftClickGive": {
+        "desc": "点击赠送按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "BondGift/btn_send.png",
+                "roi": [
+                    1024,
+                    619,
+                    180,
+                    36
+                ],
+                "threshold": 0.7,
+                "order_by": "Score"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": {
+            "time": 500,
+            "timeout": 2000
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
     "BondGiftAction": {
-        "desc": "羁绊送礼 — Python 负责找羁遇按钮、点击、进界面、送礼",
+        "desc": "羁绊送礼 — Python 负责找角色、送礼",
         "recognition": {
             "type": "DirectHit"
         },
