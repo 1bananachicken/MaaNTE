@@ -1,0 +1,286 @@
+{
+    "$__mpe_config_DeepDarkFantasy": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1779974753653,
+            "isModifiedExternally": false,
+            "filePath": "E:\\PyCharm\\Project\\GitMALostWord\\MaaNTE\\assets\\resource\\base\\pipeline\\AutoFight\\DeepDarkFantasy.json",
+            "isDeleted": true,
+            "savedViewport": {
+                "x": 52,
+                "y": 215,
+                "zoom": 0.43
+            },
+            "filename": "DeepDarkFantasy",
+            "version": "v1.5.3"
+        }
+    },
+    "DDF_Finish": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2374,
+                "y": 372
+            }
+        }
+    },
+    "DDF_Action": {
+        "focus": "开始黑暗赛车界",
+        "next": [
+            "DDF_GetIn"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": -89,
+                "y": 255
+            }
+        }
+    },
+    "DDF_GetIn": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    13,
+                    657,
+                    79,
+                    40
+                ],
+                "expected": [
+                    "Enter"
+                ]
+            }
+        },
+        "next": [
+            "DDF_GetIn_1_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 259
+            }
+        }
+    },
+    "DDF_GetIn_2_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    27,
+                    104,
+                    181,
+                    527
+                ],
+                "expected": [
+                    "黑暗赛车界"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "DDF_GetIn_3_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 972,
+                "y": 285
+            }
+        }
+    },
+    "DDF_GetIn_3_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1080,
+                    651,
+                    92,
+                    43
+                ],
+                "expected": [
+                    "开始比赛"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "DDF_Wait_副本5"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1305,
+                "y": 160
+            }
+        }
+    },
+    "DDF_Wait_2_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    984,
+                    646,
+                    217,
+                    56
+                ],
+                "expected": [
+                    "离开"
+                ]
+            }
+        },
+        "next": [
+            "DDF_Repeat",
+            "DDF_Finish"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1994,
+                "y": 302
+            }
+        }
+    },
+    "DDF_Wait_3_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    984,
+                    646,
+                    217,
+                    56
+                ],
+                "expected": [
+                    "离开"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "DDF_GetIn"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2701,
+                "y": 584
+            }
+        }
+    },
+    "DDF_Repeat": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    568,
+                    500,
+                    149,
+                    117
+                ],
+                "expected": [
+                    "黑铁螺钉"
+                ]
+            }
+        },
+        "focus": "完成",
+        "next": [
+            "DDF_Wait_3_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 2367,
+                "y": 610
+            }
+        }
+    },
+    "DDF_GetIn_1_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    13,
+                    657,
+                    79,
+                    40
+                ],
+                "expected": [
+                    "Enter"
+                ]
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    115
+                ]
+            }
+        },
+        "next": [
+            "DDF_GetIn_2_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 661,
+                "y": 267
+            }
+        }
+    },
+    "DDF_Wait_副本5": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1080,
+                    651,
+                    92,
+                    43
+                ],
+                "expected": [
+                    "开始比赛"
+                ]
+            }
+        },
+        "timeout": -1,
+        "next": [
+            "DDF_Wait_2_1",
+            "[JumpBack]DDF_Wait_1_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 1594,
+                "y": 167
+            }
+        }
+    },
+    "DDF_Wait_1_1": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1039,
+                    21,
+                    128,
+                    127
+                ],
+                "expected": [
+                    "进度",
+                    "0",
+                    "时间",
+                    "名次"
+                ]
+            }
+        },
+        "post_delay": 15000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1999,
+                "y": 9
+            }
+        }
+    }
+}

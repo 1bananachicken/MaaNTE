@@ -1,0 +1,118 @@
+[33mbb5def2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mddf[m[33m)[m 20260528 DDF
+[33m86a988d[m[33m ([m[1;31morigin/dev[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mdev[m[33m)[m Merge branch '1bananachicken:dev' into dev
+[33m5482bc0[m[33m ([m[1;31morigin/ddf[m[33m)[m Merge pull request #225 from 1bananachicken/chore/update-skills
+[33m21019bd[m chore: 更新 skill 内容，同步当前代码结构
+[33m8c31160[m 20260527 小改了下战斗，保证不会因为大招卡掉等待时间，优化下日常位置。
+[33m7aa8fee[m 20260527 小改了下战斗，保证不会因为大招卡掉等待时间，优化下日常位置。
+[33m31c1c6e[m Merge branch '1bananachicken:dev' into dev
+[33m70ca357[m Merge pull request #224 from 1bananachicken/chore/i18n-auto-sync
+[33ma5ead99[m 添加i18n-skip
+[33mf385b66[m chore: auto sync OCR i18n expected [skip changelog]
+[33m9ce9ad1[m fix: 这commit怎么看不见了
+[33mdf6a690[m 20260526 优化了兔子洞第一关，目标框选阈值
+[33m8dcfa15[m Merge remote-tracking branch 'origin/dev' into dev
+[33m5d45846[m 20260526 优化了兔子洞第一关，目标框选阈值
+[33ma461a8e[m Merge pull request #213 from Watanabehato/chore/update-readme-features
+[33mfc8b0c9[m chore: update README feature list with new tasks
+[33m55a281d[m fix: 当不存在deps文件夹时(已经预装whl)，直接跳过install
+[33m763f69f[m Merge pull request #211 from Watanabehato/fix/preinstall-deps-in-ci
+[33m7b15f70[m revert: 恢复 utils.time 的 try-except，保持原有逻辑
+[33m8f611a8[m perf: 删除 CI 产物中的 deps 目录，减小 47% 体积
+[33m18a0a51[m 修改了main的日志等级，能够在mxu中正确显示，移除了没必要的try except
+[33md5d512a[m fix: CI 预装所有依赖，解决首次启动慢问题
+[33mda6be0c[m fix: 修复了任务完成后显示任务失败的bug
+[33m444c733[m fix: 现在只有在第一次启动时会修改默认主题了
+[33m679d6e2[m 退回v4版本ocr
+[33m6bd3229[m feat: 一咖舍新增自动根据风向标替换商品功能 (#201)
+[33m9d75f8e[m feat: 添加数据集收集功能，用于自动驾驶模型训练 (#186)
+[33ma6d8a8a[m fix(SoundDodge): PEP 562 延迟加载 + CI 预装 patched soundcard (#207)
+[33m5d1a21a[m ci: update ocr model from ppocr_v4 to ppocr_v5
+[33md8f105f[m feat: 粉爪脚本方案二增加任务控制和收益统计功能，优化流程 (#193)
+[33mb1d4d58[m Improve/UX：任务分组、预设配置 (#188)
+[33m81e102b[m 20260525 兔子洞战斗优化2
+[33m4667d94[m 20260525 兔子洞战斗优化1
+[33m170f8bf[m 20260525 兔子洞战斗优化
+[33m1392738[m Merge pull request #209 from Watanabehato/chore/add-cyber-fortune-master-skill
+[33m977d565[m chore: add maante-cyber-fortune-master skill
+[33m3a26974[m Merge pull request #208 from EeeMaoY/fix/scene
+[33me551bcf[m update/scene:补充两个按钮带红点的识别
+[33m0807f4b[m Merge pull request #205 from EeeMaoY/fix/scene
+[33m3d0b0a7[m update/scene:更新都市大亨以及任务的带红点模板图 尚未更新：背包、斯卡布罗集市、角色的带红点模板图
+[33m0a93b21[m 20260524 战斗模型提交
+[33m3e85703[m 20260524修改战斗模型
+[33m60e4951[m 20260523修改interface
+[33me313173[m 20260523修改interface
+[33m51404d7[m Update interface.json
+[33m5e25c9c[m Merge branch 'dev' into dev
+[33m700daea[m Merge pull request #198 from 1bananachicken/chore/optimize-issue-log-analysis-skill
+[33mc188f91[m chore: reduce duplication and add code references
+[33m86af8cb[m chore: optimize maante-issue-log-analysis skill
+[33m1f32a5d[m Merge pull request #192 from 1bananachicken/chore/i18n-auto-sync
+[33m868e6aa[m 20260523优化刷日常本
+[33mfc1280f[m Merge branch 'dev' of https://github.com/1bananachicken/MaaNTE into dev
+[33m4277ea9[m chore: auto sync OCR i18n expected [skip changelog]
+[33m0d4c977[m Merge pull request #190 from 1bananachicken/chore/i18n-auto-sync
+[33m877a51e[m 20260522
+[33mce3b76d[m chore: auto sync OCR i18n expected [skip changelog]
+[33m085f098[m Merge pull request #189 from EeeMaoY/feat/i18n-ocr
+[33m4493e2e[m Merge branch 'dev' into feat/i18n-ocr
+[33mb49cf65[m Merge pull request #187 from Abino01/dev
+[33m10e9317[m 自己的仓库测试结束，更新到主仓库的版本
+[33m06cb402[m 更新ocr/i18n敘述0522*1900
+[33m415108c[m 1
+[33m1d6106f[m fix: resolve ambiguous OCR i18n expected by picking first candidate
+[33m2f864f5[m feat: add i18n OCR expected sync tool and CI workflow
+[33mfcf8fa5[m 更新i18n/ocr 0522*0804
+[33m1166d7b[m Merge branch '1bananachicken:dev' into dev
+[33m8a2e7f0[m fix: 修复变量名重复的bug
+[33m9c57616[m 本地化 welcoome 敘述 ja zhtw en (#185)
+[33m162adb8[m 本地化 welcoome 敘述 ja zhtw en
+[33m2e504af[m fix: 暂时把debug输出全部注释掉
+[33mb4b54bd[m Merge branch '1bananachicken:dev' into dev
+[33m226d809[m 修改多国语言公告
+[33m04772dd[m 修改中文弹窗公告内容
+[33m5e20cd8[m Feat:添加自动粉爪 (#166)
+[33ma23041e[m feat/i18n: UI国际化，agent里的消息国际化utils (#183)
+[33m2481966[m Merge pull request #182 from EeeMaoY/feat/skill
+[33md4f7c45[m Merge pull request #181 from MrGEFORCE/dev
+[33m92c6255[m fix:new-fish 考虑一开始鱼鳞币可能不在后续的位置，放宽ROI检测，使用置信度排序的方式防止识别到方斯的鱼饵
+[33m621fec9[m 添加cc用的skill文档，尚不完善，可做修改
+[33m8322cb4[m Merge branch 'dev' into dev
+[33m06cfcee[m Merge pull request #180 from HBLADEH/fix/newfish-blade
+[33mdaba5ea[m fix:重要修复1-之前对多分辨的理解有误，get到的image已经被缩放为720p，已经完成相关修正；重要修复2：钓鱼自动购买鱼饵界面，原本ROI太大导致方斯选项也被误识别从而无法推进，已缩小ROI；重要修复3：钓鱼自动买鱼饵选择最大数量的click没加延迟，实际无法生效，已经修改到可以自动推进；剩余为微小逻辑修复
+[33m082ef0a[m fix: approve ai suggestions
+[33mbfef3fc[m feat: 钓鱼适配任意16:9分辨率
+[33m1ac7e83[m fix(SoundDodge): 调整说明文本样式
+[33m901c269[m fix(FishNew): 撤销一点调整
+[33m9907d83[m fix(FishNew): 新钓鱼[点最大按钮点不动]和[买鱼饵]问题修复
+[33m427ae4e[m 更新readme (#176)
+[33m79143cb[m Merge pull request #177 from EeeMaoY/fix/fish-new
+[33m565d696[m fix/fish-new: 钓鱼优化，以及少量bug修复 调整FishNewGaming中wait freeze的target，原本的识别到了钓鱼黄指针的位置，导致钓鱼结束等待时间过长 暂时删去选中万能鱼饵的click，也无需处理可能出现的万能鱼饵界面 修改识别cursor与greenbar的roi，减少昼夜交替或天气变化误识别的可能性
+[33mf4f2460[m 更新0518*1115
+[33m4344dfe[m Merge branch '1bananachicken:dev' into dev
+[33m2dfd984[m fix(FountainCheckin): 调整喷泉打卡任务名称，检测失败提示 (#174)
+[33m1ef1767[m Merge pull request #132 from EeeMaoY/feat/furniture
+[33md32bd72[m 修改tasks中的controller配置
+[33med57036[m Merge branch '1bananachicken:dev' into dev
+[33m1a607da[m 合并原本的ocr识别 修改swipe参数 修改logger级别
+[33m6a7770e[m Merge branch 'dev' into feat/furniture
+[33mb0f4c79[m Update README.md
+[33m881a130[m 更新超連結問題 (#172)
+[33mda73cce[m 更新0516A3
+[33m7d05c2a[m 更新0516A2
+[33m99a056a[m 更新0516A1
+[33mc33dc18[m update0516.0010
+[33m4bd6144[m  U 2
+[33mc795109[m 更新超連結問題
+[33m75427f0[m Merge branch '1bananachicken:dev' into dev
+[33ma2019c9[m 敘述文件語言更新 (#170)
+[33m33a9f5b[m Feat: 泯除方块自动脚本 (#102)
+[33m05e613a[m 修復日語-me 語法問題
+[33m552f891[m 更新語言包
+[33mab1a9d5[m U2
+[33m448c9fb[m 新增 问题排查手册 的 英文與日文敘述文件
+[33m9bab221[m Update interface.json (#168)
+[33m37753ff[m Update README.md
+[33m4d59c2c[m 加入对config文件权限的修改，禁止mxu修改
+[33ma57069d[m 强制修改mxu的config文件
+[33m2cff9f3[m fix(Fish): 优化旧版本钓鱼，减少购买鱼饵和更换鱼
