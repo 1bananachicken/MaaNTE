@@ -249,17 +249,12 @@
     },
     "BagelSpamClickFirstRow1": {
         "desc": "点击第一行第1张",
-        "recognition": {
-            "type": "DirectHit"
-        },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    126,
-                    133,
-                    135,
-                    91
+                    193,
+                    178
                 ]
             }
         },
@@ -270,17 +265,12 @@
     },
     "BagelSpamClickLastRow1": {
         "desc": "点击最后一行第1张",
-        "recognition": {
-            "type": "DirectHit"
-        },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    70,
-                    454,
-                    200,
-                    120
+                    170,
+                    514
                 ]
             }
         },
@@ -291,17 +281,12 @@
     },
     "BagelSpamClickLastRow2": {
         "desc": "点击最后一行第2张",
-        "recognition": {
-            "type": "DirectHit"
-        },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    352,
                     452,
-                    200,
-                    120
+                    512
                 ]
             }
         },
@@ -312,17 +297,12 @@
     },
     "BagelSpamClickLastRow3": {
         "desc": "点击最后一行第3张",
-        "recognition": {
-            "type": "DirectHit"
-        },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    653,
-                    455,
-                    200,
-                    120
+                    753,
+                    515
                 ]
             }
         },
@@ -333,17 +313,12 @@
     },
     "BagelSpamClickLastRow4": {
         "desc": "点击最后一行第4张",
-        "recognition": {
-            "type": "DirectHit"
-        },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    951,
-                    444,
-                    200,
-                    120
+                    1051,
+                    504
                 ]
             }
         },
