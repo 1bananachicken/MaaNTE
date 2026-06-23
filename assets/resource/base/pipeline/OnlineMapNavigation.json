@@ -1,11 +1,19 @@
 {
     "OnlineMapNavigation": {
         "action": "Custom",
-        "custom_action": "online_map_navigation",
-        "custom_action_param": {
+        "custom_action": "online_map_navigation"
+    },
+    "OnlineMapNavigationSettingsConfig": {
+        "enabled": false,
+        "attach": {
             "port": 14514,
             "tolerance": 5,
-            "frame_interval": "0.1",
+            "frame_interval": "0.1"
+        }
+    },
+    "OnlineMapNavigationPositionBackendConfig": {
+        "enabled": false,
+        "attach": {
             "position_backend": "auto"
         }
     },
