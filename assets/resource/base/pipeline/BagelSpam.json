@@ -244,6 +244,21 @@
             }
         },
         "next": [
+            "BagelSpamTouchMoveFirstRow1"
+        ]
+    },
+    "BagelSpamTouchMoveFirstRow1": {
+        "desc": "移动到第一行第1张",
+        "action": {
+            "type": "TouchMove",
+            "param": {
+                "target": [
+                    193,
+                    178
+                ]
+            }
+        },
+        "next": [
             "BagelSpamClickFirstRow1"
         ]
     },
@@ -259,6 +274,21 @@
             }
         },
         "post_wait_freezes": 500,
+        "next": [
+            "BagelSpamTouchMoveLastRow1"
+        ]
+    },
+    "BagelSpamTouchMoveLastRow1": {
+        "desc": "移动到到最后一行第1张",
+        "action": {
+            "type": "TouchMove",
+            "param": {
+                "target": [
+                    170,
+                    514
+                ]
+            }
+        },
         "next": [
             "BagelSpamClickLastRow1"
         ]
@@ -276,6 +306,21 @@
         },
         "post_wait_freezes": 500,
         "next": [
+            "BagelSpamTouchMoveLastRow2"
+        ]
+    },
+    "BagelSpamTouchMoveLastRow2": {
+        "desc": "移动到最后一行第2张",
+        "action": {
+            "type": "TouchMove",
+            "param": {
+                "target": [
+                    452,
+                    512
+                ]
+            }
+        },
+        "next": [
             "BagelSpamClickLastRow2"
         ]
     },
@@ -292,6 +337,21 @@
         },
         "post_delay": 500,
         "next": [
+            "BagelSpamTouchMoveLastRow3"
+        ]
+    },
+    "BagelSpamTouchMoveLastRow3": {
+        "desc": "移动到最后一行第3张",
+        "action": {
+            "type": "TouchMove",
+            "param": {
+                "target": [
+                    753,
+                    515
+                ]
+            }
+        },
+        "next": [
             "BagelSpamClickLastRow3"
         ]
     },
@@ -307,6 +367,21 @@
             }
         },
         "post_delay": 500,
+        "next": [
+            "BagelSpamTouchMoveLastRow4"
+        ]
+    },
+    "BagelSpamTouchMoveLastRow4": {
+        "desc": "移动到最后一行第4张",
+        "action": {
+            "type": "TouchMove",
+            "param": {
+                "target": [
+                    1051,
+                    504
+                ]
+            }
+        },
         "next": [
             "BagelSpamClickLastRow4"
         ]
