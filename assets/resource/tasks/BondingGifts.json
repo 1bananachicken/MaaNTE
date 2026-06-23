@@ -8,8 +8,7 @@
             "controller": [
                 "Win32",
                 "Win32-Front",
-                "Win32-PostMsg",
-                "Win32-Legacy"
+                "Win32-Background"
             ],
             "group": [
                 "Daily",

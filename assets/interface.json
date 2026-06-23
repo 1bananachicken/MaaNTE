@@ -111,6 +111,7 @@
         // group:CityTycoon
         "resource/tasks/Furniture.json",
         "resource/tasks/WithdrawMoney.json",
+        "resource/tasks/BondingGifts.json",
         // group:HethereauHobbies
         "resource/tasks/Fish.json",
         "resource/tasks/PinkPawHeist.json",

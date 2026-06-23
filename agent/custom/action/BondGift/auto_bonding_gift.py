@@ -330,7 +330,7 @@ class AutoBondingGift(CustomAction):
                     ret = context.run_task("BondGiftClickGive")
                     if not ret:
                         Print(context, f"羁绊送礼: 赠送按钮未找到, 跳过 '{gift_name}'")
-                        continue
+                        break
 
                     total_given += 1
                     per_char_given[char_name] = per_char_given.get(char_name, 0) + 1
