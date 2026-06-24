@@ -20,7 +20,7 @@
                 "expected": [
                     "钓鱼",
                     "釣魚",
-                    "Fishing",
+                    "(?i)Fishing",
                     "釣り"
                 ]
             }
