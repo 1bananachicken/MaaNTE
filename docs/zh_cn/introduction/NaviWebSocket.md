@@ -4,18 +4,36 @@
 
 ```json
 {
-  "OnlineMapNavigation": {
-    "action": "Custom",
-    "custom_action": "online_map_navigation",
-    "custom_action_param": {
-      "port": 14514,
-      "tolerance": 5,
-      "frame_interval": "0.1",
-      "position_backend": "auto",
-      "debug": false,
-      "angle_backend": "auto"
+    "OnlineMapNavigation": {
+        "action": "Custom",
+        "custom_action": "online_map_navigation"
+    },
+    "OnlineMapNavigationSettingsConfig": {
+        "enabled": false,
+        "attach": {
+            "port": 14514,
+            "tolerance": 5,
+            "frame_interval": "0.1"
+        }
+    },
+    "OnlineMapNavigationPositionBackendConfig": {
+        "enabled": false,
+        "attach": {
+            "position_backend": "auto"
+        }
+    },
+    "OnlineMapNavigationAngleBackendConfig": {
+        "enabled": false,
+        "attach": {
+            "angle_backend": "auto"
+        }
+    },
+    "OnlineMapNavigationDebugConfig": {
+        "enabled": false,
+        "attach": {
+            "debug": false
+        }
     }
-  }
 }
 ```
 
@@ -33,22 +51,22 @@ ws://127.0.0.1:14514
 
 ```json
 {
-  "type": "navi-state",
-  "version": 1,
-  "position": {
-    "x": -134394.56,
-    "y": 199913.53,
-    "z": 11416.17,
-    "pixelX": 4090,
-    "pixelY": 6750,
-    "sourceWidth": 11264,
-    "sourceHeight": 11264,
-    "score": 1.0,
-    "mode": "coordinate"
-  },
-  "angle": 123.4,
-  "angleConfidence": 0.96,
-  "timestamp": 1770000000.0
+    "type": "navi-state",
+    "version": 1,
+    "position": {
+        "x": -134394.56,
+        "y": 199913.53,
+        "z": 11416.17,
+        "pixelX": 4090,
+        "pixelY": 6750,
+        "sourceWidth": 11264,
+        "sourceHeight": 11264,
+        "score": 1.0,
+        "mode": "coordinate"
+    },
+    "angle": 123.4,
+    "angleConfidence": 0.96,
+    "timestamp": 1770000000.0
 }
 ```
 

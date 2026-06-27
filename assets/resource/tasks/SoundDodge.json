@@ -34,8 +34,8 @@
                     "name": "No",
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
-                        "SoundDodgeMain": {
-                            "custom_action_param": {
+                        "SoundDodgeEnableConfig": {
+                            "attach": {
                                 "enable_sound_trigger": false
                             }
                         }
@@ -53,8 +53,8 @@
                     "name": "Yes",
                     "label": "$task_sound_dodge_option_dodge_only_case_yes",
                     "pipeline_override": {
-                        "SoundDodgeMain": {
-                            "custom_action_param": {
+                        "SoundDodgeModeConfig": {
+                            "attach": {
                                 "dodge_all_attacks": true
                             }
                         }
@@ -64,8 +64,8 @@
                     "name": "No",
                     "label": "$task_sound_dodge_option_dodge_only_case_no",
                     "pipeline_override": {
-                        "SoundDodgeMain": {
-                            "custom_action_param": {
+                        "SoundDodgeModeConfig": {
+                            "attach": {
                                 "dodge_all_attacks": false
                             }
                         }
@@ -87,8 +87,8 @@
                 }
             ],
             "pipeline_override": {
-                "SoundDodgeMain": {
-                    "custom_action_param": {
+                "SoundDodgeThresholdConfig": {
+                    "attach": {
                         "threshold": "{threshold}"
                     }
                 }
@@ -107,8 +107,8 @@
                 }
             ],
             "pipeline_override": {
-                "SoundDodgeMain": {
-                    "custom_action_param": {
+                "SoundCounterThresholdConfig": {
+                    "attach": {
                         "counter_attack_threshold": "{counter_threshold}"
                     }
                 }

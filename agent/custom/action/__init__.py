@@ -10,6 +10,7 @@ from .Common.click import *
 from .Common.resize_game_window import *
 from .realtime_task import *
 from .Navi import *
+from .MapTeleport import *
 from .pinkpaw.pinkpaw_core1 import *
 from .pinkpaw.pinkpaw_core2 import *
 from .pinkpaw.pinkpaw_core3 import *
@@ -49,6 +50,9 @@ __all__ = [
     "LocalRouteNavigationUnitTestAction",
     "parse_route_waypoints",
     "resolve_route_json_path",
+    "CheckTeleportRequiredAction",
+    "TeleportDecision",
+    "check_teleport_required",
     "PinkPawHeistScheme1Action",
     "PinkPawHeistScheme2Action",
     "PinkPawHeistScheme3Action",

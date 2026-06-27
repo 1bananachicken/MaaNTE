@@ -63,7 +63,11 @@
             70 // F
         ],
         "next": [
-            "FishNewGaming"
+            "FishNewGaming",
+            "FishNewFishHooked"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewGaming": {
@@ -226,6 +230,9 @@
         "next": [
             "FishNewChooseGeneralBait"
             // "[JumpBack]FishNewBaitScrollMouse"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewChooseGeneralBait": {
@@ -247,6 +254,9 @@
             "FishNewUseBait",
             "FishNewGotoBuyBait",
             "FishNewBaitExit"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewBaitDetail": {
@@ -366,6 +376,9 @@
         },
         "next": [
             "FishNewOnStore"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewOnStore": {
@@ -447,6 +460,9 @@
         "next": [
             "FishNewStoreChooseMaxSuccess",
             "[JumpBack]FishNewStoreChooseMax"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewStoreScrollMouse": {
@@ -526,6 +542,9 @@
         ],
         "next": [
             "FishNewStoreBuyBait"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
         ]
     },
     "FishNewStoreBuyBait": {
@@ -548,11 +567,14 @@
                 ]
             }
         },
+        "post_delay": 1000,
         "action": "Click",
         "next": [
+            "[JumpBack]SceneClickBlankToExit",
+            "FishNewSellFishEntrance",
             "FishNewConfirmBuyBait",
-            "FishNewSellFishEntrance"
-        ],
+            "FishNewExitStore"
+        ],//购买的鱼饵数量较少时不会弹出确认界面
         "on_error": [
             "[Anchor]FishNewErrorRestart"
         ]
