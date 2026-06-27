@@ -96,6 +96,15 @@ jobs:
             echo "tag=arm64" >> $GITHUB_OUTPUT
           fi
 
+      - name: Download PacketNTE thirdparty
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: 1pineappleduck/PacketNTE
+          fileName: "nte_coordinate_api-*.zip"
+          latest: true
+          out-file-path: "PacketNTE"
+          extract: true
+
       - name: Download MaaFramework
         uses: robinraju/release-downloader@v1
         with:
@@ -165,6 +174,19 @@ jobs:
           if [ -d "install/deps" ]; then
             cp -rpvn install/deps/. install-mxu/deps/
           fi
+
+      - name: Copy PacketNTE thirdparty to MXU version
+        shell: bash
+        run: |
+          if [ ! -d "PacketNTE/thirdparty" ]; then
+            echo "PacketNTE release did not extract to PacketNTE/thirdparty."
+            find PacketNTE -maxdepth 2 -type d -print
+            exit 1
+          fi
+
+          rm -rf install-mxu/thirdparty
+          cp -a PacketNTE/thirdparty install-mxu/thirdparty
+          echo "Added PacketNTE thirdparty to install-mxu/thirdparty"
       
       - name: Pre-install all dependencies
         shell: bash
@@ -230,67 +252,6 @@ jobs:
           echo "Removing deps directory to reduce package size..."
           rm -rf install-mxu/deps
           echo "Deps directory removed. Package size reduced by ~171MB."
-
-      - name: Download PacketNTE thirdparty
-        shell: bash
-        run: |
-          packetnte_dir="$PWD/packetnte-release"
-          extract_dir="$PWD/packetnte-extracted"
-          mkdir -p "$packetnte_dir" "$extract_dir"
-
-          release_json="$(gh api repos/1pineappleduck/PacketNTE/releases/latest)"
-          release_tag="$(jq -r '.tag_name' <<< "$release_json")"
-          mapfile -t asset_names < <(
-            jq -r '.assets[].name | select(test("\\.(zip|tar\\.gz|tgz|tar)$"))' <<< "$release_json"
-          )
-
-          if [[ ${#asset_names[@]} -ne 1 ]]; then
-            echo "Expected exactly one PacketNTE archive asset, found ${#asset_names[@]}."
-            jq -r '.assets[].name' <<< "$release_json"
-            exit 1
-          fi
-
-          gh release download "$release_tag" \
-            --repo 1pineappleduck/PacketNTE \
-            --pattern "${asset_names[0]}" \
-            --dir "$packetnte_dir" \
-            --clobber
-
-          mapfile -t archives < <(find "$packetnte_dir" -maxdepth 1 -type f | sort)
-          if [[ ${#archives[@]} -ne 1 ]]; then
-            echo "Expected exactly one PacketNTE release archive, found ${#archives[@]}."
-            printf '  %s\n' "${archives[@]}"
-            exit 1
-          fi
-
-          archive="${archives[0]}"
-          case "$archive" in
-            *.zip)
-              unzip -q "$archive" -d "$extract_dir"
-              ;;
-            *.tar.gz|*.tgz)
-              tar -xzf "$archive" -C "$extract_dir"
-              ;;
-            *.tar)
-              tar -xf "$archive" -C "$extract_dir"
-              ;;
-            *)
-              echo "Unsupported PacketNTE release archive: $archive"
-              exit 1
-              ;;
-          esac
-
-          if [[ ! -d "$extract_dir/thirdparty" ]]; then
-            echo "PacketNTE archive did not extract to a thirdparty directory."
-            find "$extract_dir" -maxdepth 2 -type d -print
-            exit 1
-          fi
-
-          rm -rf install-mxu/thirdparty
-          cp -a "$extract_dir/thirdparty" install-mxu/thirdparty
-          echo "Added PacketNTE thirdparty to install-mxu/thirdparty"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: actions/upload-artifact@v4
         with:
