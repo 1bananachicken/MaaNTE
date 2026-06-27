@@ -71,9 +71,9 @@ def _create_capture() -> _CoordinateCapture:
         ) from exc
 
     api_version = getattr(module, "API_VERSION", None)
-    if api_version != "1.1.0":
+    if api_version != "1.1.1":
         raise RuntimeError(
-            "coordinate core API 1.1.0 is required, got %s"
+            "coordinate core API 1.1.1 is required, got %s"
             % (api_version or "<unknown>")
         )
 
