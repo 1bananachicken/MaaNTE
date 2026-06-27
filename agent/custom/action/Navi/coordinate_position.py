@@ -19,6 +19,7 @@ COORDINATE_MAP_SIZE = (11264, 11264)
 _CORE_MODULE = "nte_coordinate_api"
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
 _THIRDPARTY_DIR = _PROJECT_ROOT / "thirdparty"
+_API_VERSION = "1.1.1"
 
 # BEGIN GENERATED NAVI COORDINATE TRANSFORM
 _CALIBRATION_AXES = (0, 1)
@@ -71,9 +72,9 @@ def _create_capture() -> _CoordinateCapture:
         ) from exc
 
     api_version = getattr(module, "API_VERSION", None)
-    if api_version != "1.1.1":
+    if api_version != _API_VERSION:
         raise RuntimeError(
-            "coordinate core API 1.1.1 is required, got %s"
+            f"coordinate core API {_API_VERSION} is required, got %s"
             % (api_version or "<unknown>")
         )
 
