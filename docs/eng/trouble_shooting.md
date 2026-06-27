@@ -11,7 +11,11 @@ This text was translated using a translation tool; please let me know if you spo
 2. Make sure you are running MaaNTE as an administrator.
 3. Set NTE to a resolution of `1280x720` and run it in windowed mode.
 
-:8870/home
+### Resource Issues
+If you encounter an issue similar to the one shown in the screenshot below, please delete and re-download.
+
+<img width="289" height="129" alt="image" src="https://github.com/user-attachments/assets/cb0bf39c-b94a-461f-b606-44affcdda48e" />
+
 ## Task Issues
 ### General
 1. I have fewer features than others
