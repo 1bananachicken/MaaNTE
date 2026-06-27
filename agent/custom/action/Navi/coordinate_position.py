@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import importlib
+import importlib.util
 import math
 import sys
 from dataclasses import dataclass
@@ -17,6 +17,7 @@ _RawPose = tuple[float, float, float, float, float]
 _MapPoint = tuple[int, int]
 COORDINATE_MAP_SIZE = (11264, 11264)
 _CORE_MODULE = "nte_coordinate_api"
+_CORE_FILENAME = "nte_coordinate_api.cp312-win_amd64.pyd"
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
 _THIRDPARTY_DIR = _PROJECT_ROOT / "thirdparty"
 
@@ -45,22 +46,38 @@ def _create_capture() -> _CoordinateCapture:
     if thirdparty_path not in sys.path:
         sys.path.insert(0, thirdparty_path)
 
-    try:
-        module = importlib.import_module(_CORE_MODULE)
-    except Exception as exc:
-        raise RuntimeError(
-            "coordinate core import failed: module=%s path=%s "
-            "python=%s.%s executable=%s error=%s: %s"
-            % (
-                _CORE_MODULE,
-                _THIRDPARTY_DIR,
-                sys.version_info.major,
-                sys.version_info.minor,
-                sys.executable,
-                type(exc).__name__,
-                exc,
-            )
-        ) from exc
+    candidate = _THIRDPARTY_DIR / _CORE_FILENAME
+    loaded_module = sys.modules.get(_CORE_MODULE)
+    if loaded_module is not None and Path(
+        str(getattr(loaded_module, "__file__", ""))
+    ) == candidate:
+        module = loaded_module
+    else:
+        if not candidate.exists():
+            raise RuntimeError("coordinate core file not found: %s" % candidate)
+        spec = importlib.util.spec_from_file_location(_CORE_MODULE, candidate)
+        if spec is None or spec.loader is None:
+            raise RuntimeError("coordinate core spec unavailable: %s" % candidate)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[_CORE_MODULE] = module
+        try:
+            spec.loader.exec_module(module)
+        except Exception as exc:
+            if sys.modules.get(_CORE_MODULE) is module:
+                sys.modules.pop(_CORE_MODULE, None)
+            raise RuntimeError(
+                "coordinate core import failed: module=%s file=%s "
+                "python=%s.%s executable=%s error=%s: %s"
+                % (
+                    _CORE_MODULE,
+                    candidate,
+                    sys.version_info.major,
+                    sys.version_info.minor,
+                    sys.executable,
+                    type(exc).__name__,
+                    exc,
+                )
+            ) from exc
 
     try:
         capture_type: Any = getattr(module, "CoordinateCapture")

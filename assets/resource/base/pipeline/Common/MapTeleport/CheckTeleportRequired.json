@@ -1,0 +1,25 @@
+{
+    "CheckTeleportRequired": {
+        "desc": "确认当前位置是否需要使用地图传送",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "check_teleport_required",
+                "custom_action_param": {
+                    "point_id": "fountain",
+                    "teleport_point_id": "test",
+                    "position_backend": "auto",
+                    "coordinate_type": "world",
+                    "coordinate_timeout": 1.5,
+                    "debug": true
+                }
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0
+    }
+}
