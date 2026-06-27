@@ -8,17 +8,28 @@
     },
     "FishSceneWorldToPrepare": {
         "desc": "从大世界进入钓鱼准备界面",
-        "recognition": "And",
-        "all_of": [
-            "FishSceneInWorldNextToFish"
-        ],
-        "post_delay": 1000,
-        "action": {
-            "type": "ClickKey",
+        "recognition": {
+            "type": "OCR",
             "param": {
-                "key": [
-                    70
+                "roi": [
+                    726,
+                    326,
+                    182,
+                    127
+                ],
+                "expected": [
+                    "钓鱼",
+                    "釣魚",
+                    "(?i)Fishing",
+                    "釣り"
                 ]
+            }
+        },//识别是否在大世界钓鱼点旁边
+        "post_delay": 500,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "alt_click"
             }
         }
     },
@@ -34,7 +45,7 @@
         "rate_limit": 0,
         "next": [
             "FishScenePrepareToStore",
-            "FishScenePrepareToFishGame"
+            "FishScenePrepareToFishGameGo"
         ]
     },
     "FishScenePrepareToFishGame": {
@@ -50,7 +61,7 @@
         ]
     },
     "FishScenePrepareToFishGameGo": {
-        "desc": "从钓鱼准备界面进入钓鱼游戏界面 (old钓鱼)",
+        "desc": "从钓鱼准备界面进入钓鱼游戏界面",
         "recognition": "And",
         "all_of": [
             "FishSceneOnFishPrepare",
@@ -282,8 +293,7 @@
         "action": "Click",
         "next": [
             "FishNewSeaAnglerToFishMarket"
-        ]
-    ,
+        ],
         "roi_offset": [
             0,
             0,
@@ -309,8 +319,7 @@
         "action": "Click",
         "next": [
             "FishNewSellFishStart"
-        ]
-    ,
+        ],
         "roi_offset": [
             0,
             0,

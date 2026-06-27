@@ -20,9 +20,19 @@
                     26
                 ],
                 "expected": [
-                    "店长特供"
+                    "店长特供",
+                    "店長精選",
+                    "(?i)Owner\\s*'\\s*s\\s*Selection",
+                    "店長スペシャル"
                 ],
                 "threshold": 0.75
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    65,
+                    0
+                ]
             }
         },
         "action": {

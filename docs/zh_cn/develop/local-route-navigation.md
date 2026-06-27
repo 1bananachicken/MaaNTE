@@ -76,9 +76,9 @@
 | `route_name` | string | `""` | 多 route 文件中的 route 名称或 id。为空时使用第一个 route。 |
 | `segment_index` | int | `1` | 要执行的 segment。对外按 1 开始编号，`1` 表示第一个 segment。 |
 | `tolerance` | float | `5.0` | 到达判定距离。当前位置到目标点距离小于等于该值时认为到达。 |
-| `frame_interval` | float | `0.1` | 截图、定位和方向推理的采样间隔，最低会限制为 `0.05` 秒。 |
+| `frame_interval` | float | `0.1` | 视觉模式的导航、截图、定位和方向推理间隔，最低会限制为 `0.05` 秒。网络姿态模式固定使用 60 Hz 控制循环。 |
 | `angle_backend` | string | `"auto"` | 方向模型推理后端。常用值：`auto`、`directml`、`cpu`。 |
-| `position_backend` | string | `"auto"` | 位置来源。`map` 使用小地图匹配；`auto` 优先使用网络定位，网络核心无法启用时回退地图；`coordinate` 严格要求网络核心可用。网络定位成功启用后不会再执行位置视觉匹配。 |
+| `position_backend` | string | `"auto"` | 位置来源。`map` 使用小地图匹配和视觉方向模型；`auto` 优先使用网络位置与摄像机朝向，网络核心无法启用时回退完整视觉方案；`coordinate` 严格要求 1.1 网络核心可用。 |
 | `debug` | bool | `false` | 是否打开定位和方向预测调试窗口，并输出原始网络坐标、映射坐标及定位来源日志。 |
 
 CustomAction 返回 `success=True` 表示该 segment 跑到终点；参数错误、路线为空、运行异常或任务停止会返回失败。
@@ -218,8 +218,8 @@ navigator.close()
 
 - 长路线拆成多个 segment 时，Pipeline 入口适合一次跑一个 segment；Python 内部连续跑多个 segment 时用 `LocalRouteNavigation` 类复用资源。
 - `tolerance` 太小会导致角色在目标点附近反复调整；地图定位误差较大时应适当增大。
-- `position_backend=coordinate` 依赖 Scapy 和系统抓包驱动。网络定位成功启用后，位置计算完全不再调用小地图视觉定位；网络样本暂时中断时位置状态为 `coordinate_stale`，不会回退视觉。方向角推理仍然使用截图。`auto` 模式仅在网络核心启动失败时使用地图定位。
-- WebSocket 位置统一使用游戏原始坐标。网络定位发送 `x/y/z`；视觉定位通过标定逆变换发送 `x/y`，不发送无法可靠推导的高度 `z`。网络样本短暂中断时会保留最后一次位置用于地图展示，但该位置不会被导航逻辑视为有效实时位置。
+- `position_backend=coordinate` 依赖 Scapy 和系统抓包驱动。网络定位成功启用后，位置与摄像机朝向均使用 1.1 核心 `read()` 的网络数据，不再初始化小地图视觉定位或 `AnglePredictor`，也不会为这两项功能额外截图。Navi 以 `CoordinateCapture(refresh_rate=0)` 启动核心，不限制样本发布刷新率，并以 60 Hz 运行导航控制循环。网络样本暂时中断时位置状态为 `coordinate_stale`，不会回退视觉。`auto` 模式仅在网络核心启动失败时使用完整视觉方案。
+- WebSocket 位置统一使用游戏原始坐标。网络定位发送 `x/y/z`，并通过顶层 `angle`、`pitch` 发送映射后的水平摄像机角和原始俯仰角；视觉定位通过标定逆变换发送 `x/y`，不发送无法可靠推导的高度 `z` 或俯仰角。网络样本短暂中断时会保留最后一次位置用于地图展示，但该位置不会被导航逻辑视为有效实时位置。
 - `config/navi_coordinate_calibration.json` 仅用于本地调试计算，不会在运行时读取。修改标定点后执行 `python scripts/update_navi_coordinate_transform.py`，脚本会计算最佳变换并更新 `coordinate_position.py` 中的常量。
 - 需要手动标定时，可把该文件改为标定点格式。开启 `debug=true` 从 `Navi coordinate position/validation` 日志读取 `raw` 网络坐标，并在地图上取得对应的 11264×11264 像素坐标。至少填写 3 个相距较远且不共线的点：
 
@@ -244,7 +244,7 @@ navigator.close()
 ```
 
 每个点可填写 `map: [pixelX, pixelY]`，也可直接填写在线地图坐标 `world: [lat, lng]`。启动时会自动选择原始三维坐标中的运动平面并拟合旋转、缩放和平移。建议使用 4～8 个覆盖路线区域的点；日志中的 `error` 是拟合后的地图像素均方根误差。
-- 坐标抓取核心不属于 Agent 源码。加密产物放在项目根目录 `thirdparty/`，并提供可导入的 `nte_coordinate_api` 模块。模块只需公开 `CoordinateCapture` 类及其 `start()`、`read(max_age=1.0)`、`close()` 方法；`read()` 返回原始 `(x, y, z)` 或 `None`。MXU 组装时会原样复制该目录。
+- 坐标抓取核心不属于 Agent 源码。加密产物放在项目根目录 `thirdparty/`，并提供可导入的 `nte_coordinate_api` 模块。模块公开 `CoordinateCapture` 类及其 `start()`、`read(max_age=1.0)`、`close()` 方法。`CoordinateCapture(refresh_rate=30.0)` 可设置每秒发布的最大样本数，默认 `30`，设为 `0` 时不限速。1.1 起 `read()` 返回同一数据包解析出的 `(x, y, z, pitch, heading)` 或 `None`，其中 `pitch` 为原始俯仰角，`heading` 为映射后的水平摄像机罗盘角（正北为 `0°`，范围 `[0, 360)`）；该返回值不兼容 1.0 的三元坐标。MXU 组装时会原样复制该目录。
 - PyArmor 的 `pyarmor_runtime.pyd` 与 Python ABI 绑定，必须使用最终运行环境相同的 Python 主次版本和架构生成。当前发布环境目标为 Python 3.12 x64，不能使用 Python 3.10、3.13 或 3.14 生成的 runtime。
 - `debug=true` 会打开 OpenCV 调试窗口，只用于本地调试。
 - 路线执行依赖实时截图、地图定位和方向模型，不能在没有 Maa `Context` 和控制器的普通单元测试里完整运行。
