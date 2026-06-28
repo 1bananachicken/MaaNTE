@@ -40,6 +40,23 @@ class _CoordinateCapture(Protocol):
     def close(self) -> None: ...
 
 
+def _ensure_packet_capture_provider_available() -> None:
+    try:
+        from scapy.config import conf
+    except ImportError as exc:
+        raise RuntimeError(
+            "Scapy is required for network coordinate capture"
+        ) from exc
+
+    conf.use_pcap = True
+    if conf.use_pcap:
+        return
+    raise RuntimeError(
+        "Scapy did not find a libpcap provider; "
+        "network coordinate capture is unavailable"
+    )
+
+
 def _create_capture() -> _CoordinateCapture:
     if not _THIRDPARTY_DIR.is_dir():
         raise RuntimeError("coordinate core directory not found: %s" % _THIRDPARTY_DIR)
@@ -192,6 +209,7 @@ class CoordinatePositionProvider:
 
         capture: _CoordinateCapture | None = None
         try:
+            _ensure_packet_capture_provider_available()
             capture = _create_capture()
             capture.start()
         except Exception as exc:
