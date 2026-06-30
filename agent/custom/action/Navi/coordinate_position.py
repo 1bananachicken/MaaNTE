@@ -20,7 +20,8 @@ _CORE_MODULE = "nte_coordinate_api"
 _CORE_FILENAME = "nte_coordinate_api.cp312-win_amd64.pyd"
 _PROJECT_ROOT = Path(__file__).resolve().parents[4]
 _THIRDPARTY_DIR = _PROJECT_ROOT / "thirdparty"
-_API_VERSION = "1.1.1"
+_API_VERSION = "1.2.0"
+_COORDINATE_SAMPLE_MAX_AGE = 1.0
 
 # BEGIN GENERATED NAVI COORDINATE TRANSFORM
 _CALIBRATION_AXES = (0, 1)
@@ -37,10 +38,12 @@ class _CoordinateCapture(Protocol):
 
     def read(self, max_age: float = 1.0) -> _RawPose | None: ...
 
+    def stats(self) -> dict[str, Any]: ...
+
     def close(self) -> None: ...
 
 
-def _create_capture() -> _CoordinateCapture:
+def _create_capture(capture_backend: str) -> _CoordinateCapture:
     if not _THIRDPARTY_DIR.is_dir():
         raise RuntimeError("coordinate core directory not found: %s" % _THIRDPARTY_DIR)
     thirdparty_path = str(_THIRDPARTY_DIR)
@@ -49,9 +52,9 @@ def _create_capture() -> _CoordinateCapture:
 
     candidate = _THIRDPARTY_DIR / _CORE_FILENAME
     loaded_module = sys.modules.get(_CORE_MODULE)
-    if loaded_module is not None and Path(
-        str(getattr(loaded_module, "__file__", ""))
-    ) == candidate:
+    if loaded_module is not None and callable(
+        getattr(loaded_module, "CoordinateCapture", None)
+    ):
         module = loaded_module
     else:
         if not candidate.exists():
@@ -95,7 +98,7 @@ def _create_capture() -> _CoordinateCapture:
             % (api_version or "<unknown>")
         )
 
-    capture = capture_type(refresh_rate=0)
+    capture = capture_type(refresh_rate=0, capture_backend=capture_backend)
     for method_name in ("start", "read", "close"):
         if not callable(getattr(capture, method_name, None)):
             raise RuntimeError(
@@ -180,6 +183,7 @@ class CoordinatePositionProvider:
         if normalized not in {"map", "auto", "coordinate"}:
             raise ValueError("position_backend must be map, auto, or coordinate")
         self._capture: _CoordinateCapture | None = None
+        self._capture_backend: str | None = None
         self._coordinate_active = False
         self._debug = bool(debug)
         self._last_map_point: _MapPoint | None = None
@@ -190,21 +194,42 @@ class CoordinatePositionProvider:
         if normalized == "map":
             return
 
-        capture: _CoordinateCapture | None = None
-        try:
-            capture = _create_capture()
-            capture.start()
-        except Exception as exc:
-            if capture is not None:
-                capture.close()
+        errors: list[tuple[str, str]] = []
+        for capture_backend in ("pcap", "pktmon"):
+            capture: _CoordinateCapture | None = None
+            try:
+                capture = _create_capture(capture_backend)
+                capture.start()
+            except Exception as exc:
+                if capture is not None:
+                    capture.close()
+                errors.append((capture_backend, str(exc)))
+                logger.warning(
+                    "Navi coordinate backend unavailable: backend=%s reason=%s",
+                    capture_backend,
+                    exc,
+                )
+                continue
+
+            self._capture = capture
+            self._capture_backend = capture_backend
+            break
+
+        if self._capture is None:
+            detail = (
+                "; ".join("%s: %s" % (name, reason) for name, reason in errors)
+                or "no coordinate capture backend attempted"
+            )
             if normalized == "coordinate":
-                raise
-            logger.warning("Navi coordinate capture unavailable, using map: %s", exc)
+                raise RuntimeError("Navi coordinate capture unavailable: %s" % detail)
+            logger.warning(
+                "Navi coordinate backends unavailable; using visual positioning"
+            )
             return
 
-        self._capture = capture
         logger.info(
-            "Navi coordinate capture started: axes=%s scale=%.9f error=%.2f",
+            "Navi coordinate capture started: backend=%s axes=%s scale=%.9f error=%.2f",
+            self._capture_backend,
             _COORDINATE_TRANSFORM.axes,
             math.hypot(_COORDINATE_TRANSFORM.a, _COORDINATE_TRANSFORM.b),
             _COORDINATE_TRANSFORM.error,
@@ -220,10 +245,17 @@ class CoordinatePositionProvider:
                 result.raw_coordinate = _raw_xy_from_map(result.point)
             return result
 
-        pose = capture.read()
+        pose = capture.read(max_age=_COORDINATE_SAMPLE_MAX_AGE)
         if pose is None:
             if self._debug:
-                logger.debug("Navi coordinate unavailable; source=coordinate")
+                logger.debug(
+                    "Navi coordinate unavailable; source=coordinate stats=%s",
+                    (
+                        capture.stats()
+                        if callable(getattr(capture, "stats", None))
+                        else {}
+                    ),
+                )
             return MapLocationResult(
                 found=False,
                 point=self._last_map_point,
