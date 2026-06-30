@@ -462,8 +462,6 @@ assets/resource/base/model/detect/limbo_stage_lightest.onnx
 assets/resource/base/model/detect/sos_nodes.onnx
 .claude/
 .nicegui/
-tools/pktmon_coordinate_backend
-tools/demo_coordinate_capture.py
 
 # local gui test
 MFA/
