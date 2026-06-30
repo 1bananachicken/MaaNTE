@@ -29,15 +29,14 @@ def load_coordinate_module() -> Any:
     _ensure_project_paths()
     candidate = THIRDPARTY_DIR / MODULE_FILENAME
     loaded_module = sys.modules.get(MODULE_NAME)
-    if loaded_module is not None and Path(
-        str(getattr(loaded_module, "__file__", ""))
-    ) == candidate:
+    if (
+        loaded_module is not None
+        and Path(str(getattr(loaded_module, "__file__", ""))) == candidate
+    ):
         return loaded_module
 
     if not candidate.exists():
-        raise FileNotFoundError(
-            "No coordinate module found: %s" % candidate
-        )
+        raise FileNotFoundError("No coordinate module found: %s" % candidate)
 
     spec = importlib.util.spec_from_file_location(MODULE_NAME, candidate)
     if spec is None or spec.loader is None:
@@ -108,8 +107,7 @@ def main(argv: list[str] | None = None) -> int:
             capture.start()
         except Exception as exc:
             print(
-                "failed to start coordinate capture: %s: %s"
-                % (type(exc).__name__, exc)
+                "failed to start coordinate capture: %s: %s" % (type(exc).__name__, exc)
             )
             return 1
         deadline = start + max(args.seconds, 0.0)
@@ -159,8 +157,7 @@ def main(argv: list[str] | None = None) -> int:
             capture.close()
         except Exception as exc:
             print(
-                "coordinate capture close warning: %s: %s"
-                % (type(exc).__name__, exc)
+                "coordinate capture close warning: %s: %s" % (type(exc).__name__, exc)
             )
 
     if samples == 0:
