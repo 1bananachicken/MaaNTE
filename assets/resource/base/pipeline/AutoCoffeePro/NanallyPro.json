@@ -1,0 +1,34 @@
+{
+    "NanallyProEntry": {
+        "desc": "Nanally 锤子模式入口",
+        "next": [
+            "NanallyProRun",
+            "[JumpBack]SceneAnyEnterWorld"
+        ]
+    },
+    "NanallyProRun": {
+        "desc": "执行 Nanally 锤子点击模式",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "nanally_pro",
+                "custom_action_param": {
+                    "max_loop_seconds": 300,
+                    "loop_interval": 0.2,
+                    "hammer_recognition_node": "NanallyProCheckHammer"
+                }
+            }
+        }
+    },
+    "NanallyProCheckHammer": {
+        "desc": "识别锤子道具",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [0, 0, 1280, 720],
+                "template": "auto_coffee_pro/hammer.png",
+                "threshold": 0.8
+            }
+        }
+    }
+}

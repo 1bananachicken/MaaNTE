@@ -1,0 +1,144 @@
+{
+    "AutoCoffeeProFindLevel": {
+        "desc": "模板匹配目标关卡入口",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
+                "template": "auto_coffee_pro/level_target.png",
+                "threshold": 0.8
+            }
+        }
+    },
+    "AutoCoffeeProCheckStart": {
+        "desc": "OCR识别开始营业按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1057,
+                    648,
+                    178,
+                    44
+                ],
+                "expected": [
+                    "开始营业",
+                    "開始營業",
+                    "(?i)Open\\s*Shop",
+                    "営業開始",
+                    "영업 개시"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "AutoCoffeeProCheckExit": {
+        "desc": "模板匹配退出按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
+                "template": "auto_coffee_pro/exit.png",
+                "threshold": 0.8
+            }
+        }
+    },
+    "AutoCoffeeProCheckSuccess": {
+        "desc": "OCR识别挑战成功",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
+                "expected": [
+                    "挑战成功",
+                    "挑戰成功",
+                    "(?i)Challenge\\s*Succeeded",
+                    "チャレンジ成功",
+                    "도전 성공"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "AutoCoffeeProCheckFail": {
+        "desc": "OCR识别挑战失败",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
+                "expected": [
+                    "挑战失败",
+                    "挑戰失敗",
+                    "(?i)Challenge\\s*Failed",
+                    "チャレンジ失敗",
+                    "도전 실패"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "AutoCoffeeProCheckRetry": {
+        "desc": "OCR识别重新挑战按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
+                "expected": [
+                    "重新挑战",
+                    "重新挑戰",
+                    "(?i)Retry",
+                    "リトライ",
+                    "재도전"
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "AutoCoffeeProCheckFinish": {
+        "desc": "OCR识别领取按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    720
+                ],
+                "expected": [
+                    "领取",
+                    "領取",
+                    "(?i)Claim",
+                    "受け取る",
+                    "수령"
+                ],
+                "threshold": 0.8
+            }
+        }
+    }
+}

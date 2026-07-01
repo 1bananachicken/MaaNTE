@@ -1,0 +1,33 @@
+{
+    "AutoCoffeeProEntry": {
+        "desc": "自动化游戏主入口",
+        "next": [
+            "AutoCoffeeProRun",
+            "[JumpBack]SceneAnyEnterWorld"
+        ]
+    },
+    "AutoCoffeeProRun": {
+        "desc": "执行自动化游戏主循环",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "auto_coffee_pro",
+                "custom_action_param": {
+                    "mode": "nanally",
+                    "max_rounds": 20,
+                    "level_search_timeout": 60,
+                    "start_button_timeout": 8,
+                    "exit_button_timeout": 8,
+                    "result_timeout": 4
+                }
+            }
+        },
+        "on_error": [
+            "AutoCoffeeProErrorScreencap"
+        ]
+    },
+    "AutoCoffeeProErrorScreencap": {
+        "desc": "出错时截图",
+        "action": "Screencap"
+    }
+}
