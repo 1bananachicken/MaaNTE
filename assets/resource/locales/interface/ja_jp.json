@@ -219,5 +219,15 @@
     "task_online_map_navigation_option_debug_desc": "有効にすると、測位と方向予測のデバッグウィンドウを表示します。",
     "task_online_map_navigation_input_port": "待ち受けポート",
     "task_online_map_navigation_input_frame_interval": "サンプリング間隔 (秒)",
-    "task_online_map_navigation_input_frame_interval_desc": "スクリーンショット測位の最小間隔です。処理側で最低 0.05 秒に制限されます。"
+    "task_online_map_navigation_input_frame_interval_desc": "スクリーンショット測位の最小間隔です。処理側で最低 0.05 秒に制限されます。",
+    "task_bonding_gifts_label": "絆贈り物",
+    "task_bonding_gifts_desc": "指定したキャラクターに指定した贈り物を自動で贈ります。形式：キャラ名:贈り物1,贈り物2;キャラ名:贈り物3。",
+    "task_bonding_gifts_option_config_label": "贈り物設定",
+    "task_bonding_gifts_option_config_desc": "贈るキャラクターと贈り物を入力してください。入力欄の説明に利用可能なオプションが記載されています。",
+    "task_bonding_gifts_option_config_input_label": "贈り物リスト",
+    "task_bonding_gifts_option_config_input_desc": "利用可能なキャラクターと贈り物：\n- nanali: test_gift, spicy_strip\n\n形式: キャラID:贈り物ID1,贈り物ID2;キャラID:贈り物ID3",
+    "task_bonding_gifts_option_max_per_char_input_label": "キャラ別上限",
+    "task_bonding_gifts_option_max_per_char_desc": "各キャラクターへの最大贈り物数（ゲーム初期値: 3）。",
+    "task_bonding_gifts_option_max_total_input_label": "全体上限",
+    "task_bonding_gifts_option_max_total_desc": "全体の最大贈り物数（ゲーム初期値: 10）。"
 }

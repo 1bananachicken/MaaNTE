@@ -219,5 +219,15 @@
     "task_online_map_navigation_option_debug_desc": "啟用後顯示定位和方向預測除錯視窗。",
     "task_online_map_navigation_input_port": "監聽連接埠",
     "task_online_map_navigation_input_frame_interval": "取樣間隔 (秒)",
-    "task_online_map_navigation_input_frame_interval_desc": "每次截圖定位之間的最小間隔，最低會限制為 0.05 秒。"
+    "task_online_map_navigation_input_frame_interval_desc": "每次截圖定位之間的最小間隔，最低會限制為 0.05 秒。",
+    "task_bonding_gifts_label": "羈絆送禮",
+    "task_bonding_gifts_desc": "自動給指定角色送指定禮物。格式：角色名:禮物1,禮物2;角色名:禮物3。",
+    "task_bonding_gifts_option_config_label": "送禮配置",
+    "task_bonding_gifts_option_config_desc": "填寫要送的角色和禮物。可選角色和禮物見輸入框說明。",
+    "task_bonding_gifts_option_config_input_label": "送禮列表",
+    "task_bonding_gifts_option_config_input_desc": "可選角色和禮物：\n- nanali: test_gift, spicy_strip\n\n格式: 角色ID:禮物ID1,禮物ID2;角色ID:禮物ID3",
+    "task_bonding_gifts_option_max_per_char_input_label": "單角色上限",
+    "task_bonding_gifts_option_max_per_char_desc": "每個角色最多送多少次（遊戲預設3次）。",
+    "task_bonding_gifts_option_max_total_input_label": "全域上限",
+    "task_bonding_gifts_option_max_total_desc": "總共最多送多少次（遊戲預設10次）。"
 }

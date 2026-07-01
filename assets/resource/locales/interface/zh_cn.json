@@ -225,5 +225,15 @@
     "task_online_map_navigation_option_debug_desc": "启用后显示定位和方向预测调试窗口。",
     "task_online_map_navigation_input_port": "监听端口",
     "task_online_map_navigation_input_frame_interval": "采样间隔 (秒)",
-    "task_online_map_navigation_input_frame_interval_desc": "每次截图定位之间的最小间隔，最低会限制为 0.05 秒。"
+    "task_online_map_navigation_input_frame_interval_desc": "每次截图定位之间的最小间隔，最低会限制为 0.05 秒。",
+    "task_bonding_gifts_label": "羁绊送礼",
+    "task_bonding_gifts_desc": "自动给指定角色送指定礼物。格式：角色名:礼物1,礼物2;角色名:礼物3。",
+    "task_bonding_gifts_option_config_label": "送礼配置",
+    "task_bonding_gifts_option_config_desc": "填写要送的角色和礼物。可选角色和礼物见输入框说明。",
+    "task_bonding_gifts_option_config_input_label": "送礼列表",
+    "task_bonding_gifts_option_config_input_desc": "可选角色和礼物：\n- nanali: test_gift, spicy_strip\n\n格式: 角色ID:礼物ID1,礼物ID2;角色ID:礼物ID3",
+    "task_bonding_gifts_option_max_per_char_input_label": "单角色上限",
+    "task_bonding_gifts_option_max_per_char_desc": "每个角色最多送多少次（游戏默认3次）。",
+    "task_bonding_gifts_option_max_total_input_label": "全局上限",
+    "task_bonding_gifts_option_max_total_desc": "总共最多送多少次（游戏默认10次）。"
 }

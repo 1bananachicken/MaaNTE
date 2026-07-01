@@ -1,0 +1,65 @@
+{
+    "task": [
+        {
+            "name": "BondingGifts",
+            "label": "$task_bonding_gifts_label",
+            "entry": "BondGiftEntrance",
+            "description": "$task_bonding_gifts_desc",
+            "controller": [
+                "Win32",
+                "Win32-Front",
+                "Win32-Background"
+            ],
+            "group": [
+                "Daily",
+                "CityTycoon"
+            ],
+            "option": [
+                "BondGiftSettings"
+            ]
+        }
+    ],
+    "option": {
+        "BondGiftSettings": {
+            "type": "input",
+            "label": "$task_bonding_gifts_option_config_label",
+            "description": "$task_bonding_gifts_option_config_desc",
+            "inputs": [
+                {
+                    "name": "config",
+                    "label": "$task_bonding_gifts_option_config_input_label",
+                    "description": "$task_bonding_gifts_option_config_input_desc",
+                    "default": "nanali:test_gift,spicy_strip",
+                    "pipeline_type": "string"
+                },
+                {
+                    "name": "max_per_char",
+                    "label": "$task_bonding_gifts_option_max_per_char_input_label",
+                    "description": "$task_bonding_gifts_option_max_per_char_desc",
+                    "default": "3",
+                    "pipeline_type": "string"
+                },
+                {
+                    "name": "max_total",
+                    "label": "$task_bonding_gifts_option_max_total_input_label",
+                    "description": "$task_bonding_gifts_option_max_total_desc",
+                    "default": "10",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "BondGiftAction": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "config": "{config}",
+                                "max_per_char": "{max_per_char}",
+                                "max_total": "{max_total}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

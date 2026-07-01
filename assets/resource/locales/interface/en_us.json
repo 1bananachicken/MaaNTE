@@ -219,5 +219,15 @@
     "task.SyncCharacterAbilityCityAbility.label": "Record Character Life Skills",
     "task.SyncCharacterAbilityCityAbility.description": "Automatically identify life skill levels of all characters and record them in the configuration file.",
     "task.SyncCharacterAbilityCityAbility.option.fresh_record": "Fresh Record",
-    "task.SyncCharacterAbilityCityAbility.option.fresh_record.desc": "Overwrite existing character life skill records<br><span style='color:red'>Note: This will clear all previous records.</span><br><span style='color:orange'>Use this option to clear and overwrite previous content if you find issues with the existing records.</span>"
+    "task.SyncCharacterAbilityCityAbility.option.fresh_record.desc": "Overwrite existing character life skill records<br><span style='color:red'>Note: This will clear all previous records.</span><br><span style='color:orange'>Use this option to clear and overwrite previous content if you find issues with the existing records.</span>",
+    "task_bonding_gifts_label": "Bonding Gifts",
+    "task_bonding_gifts_desc": "Automatically give specified gifts to specified characters. Format: Character:Gift1,Gift2;Character:Gift3.",
+    "task_bonding_gifts_option_config_label": "Gift Config",
+    "task_bonding_gifts_option_config_desc": "Enter characters and gifts. See input description for available options.",
+    "task_bonding_gifts_option_config_input_label": "Gift List",
+    "task_bonding_gifts_option_config_input_desc": "Available characters and gifts:\n- nanali: test_gift, spicy_strip\n\nFormat: CharacterID:GiftID1,GiftID2;CharacterID:GiftID3",
+    "task_bonding_gifts_option_max_per_char_input_label": "Per-Character Limit",
+    "task_bonding_gifts_option_max_per_char_desc": "Max gifts per character (game default: 3).",
+    "task_bonding_gifts_option_max_total_input_label": "Global Limit",
+    "task_bonding_gifts_option_max_total_desc": "Max total gifts (game default: 10)."
 }
