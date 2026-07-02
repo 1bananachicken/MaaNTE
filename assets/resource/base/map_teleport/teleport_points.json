@@ -12,6 +12,16 @@
             "description": "地图索引中使用的传送点；areaName 用于切换地区，areaIndex 表示该区域推荐地点列表中的第几个传送图标。"
         },
         {
+            "id": "inoritree_teleport",
+            "name": "祈愿树传送点",
+            "coordinateType": "world",
+            "worldX": 40671.397,
+            "worldY": 102892.816,
+            "areaName": "新赫兰德",
+            "areaIndex": 5,
+            "description": "地图索引中使用的传送点；areaName 用于切换地区，areaIndex 表示该区域推荐地点列表中的第几个传送图标。"
+        },
+        {
             "id": "test",
             "name": "测试传送点",
             "coordinateType": "world",

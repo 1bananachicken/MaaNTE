@@ -79,6 +79,8 @@
     "task_tetris_desc": "<font color='red'>이 작업에서 게임 내 보드는 화면 이미지를 캡처하지 않고 내부 AI가 자체적으로 관리합니다. AI 판단과 실제 게임 상태가 일치하지 않도록 작업 실행 중에는 게임 화면을 조작하지 마십시오.</font>",
     "task_fountain_label": "분수 체크인",
     "task_fountain_desc": "분수 체크인 버튼을 인식하고 클릭합니다.",
+    "task_inori_tree_label": "기원나무 일일 기원",
+    "task_inori_tree_desc": "기원나무로 자동 이동하여 일일 기원 흐름을 실행합니다.",
     "task_bagel_spam_label": "베이글 게시판 도배",
     "task_bagel_spam_desc": "사진 촬영, 저장, 베이글 게시를 자동으로 수행합니다. 포그라운드 컨트롤러만 지원합니다.",
     "task_bagel_spam_option_text_mode_label": "텍스트 모드",

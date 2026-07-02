@@ -1,0 +1,70 @@
+{
+    "InoriTreeEntrance": {
+        "desc": "祈愿树每日祈愿入口",
+        "next": [
+            "InoriTreeCheckTeleportRequired",
+            "InoriTreeRouteNavigation"
+        ]
+    },
+    // 先按世界坐标判断距离；距离远时会在 CustomAction 内完成地图传送，距离近则直接继续。
+    "InoriTreeCheckTeleportRequired": {
+        "desc": "确认是否需要先使用地图传送到祈愿树附近",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "check_teleport_required",
+                "custom_action_param": {
+                    "point_id": "inoritree",
+                    "teleport_point_id": "inoritree_teleport",
+                    "position_backend": "auto",
+                    "coordinate_type": "world",
+                    "coordinate_timeout": 1.5,
+                    "debug": true
+                }
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "InoriTreeRouteNavigation"
+        ],
+        "on_error": [
+            "InoriTreeCheckinNotFound"
+        ]
+    },
+    // 从传送点沿路线走到祈愿树
+    "InoriTreeRouteNavigation": {
+        "desc": "使用本地路线寻路从最近传送点移动到祈愿树",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "inoritree_path",
+            "route_name": "inoritree_path",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "position_backend": "auto",
+            "debug": false
+        },
+        "next": [
+            "InoriTreeCheckinNotFound"
+        ]
+    },
+    "InoriTreeCheckinNotFound": {
+        "desc": "未能找到祈愿树",
+        "next": [
+            "InoriTreeExit"
+        ],
+        "focus": {
+            "Node.Action.Succeeded": "❌ 很遗憾，未能找到祈愿树。"
+        }
+    },
+    "InoriTreeExit": {
+        "desc": "祈愿树任务出口"
+    }
+}

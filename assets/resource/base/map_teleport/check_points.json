@@ -9,6 +9,15 @@
             "worldY": 151178,
             "threshold": 7000,
             "description": "用于判断当前位置距离喷泉目标点是否过远；threshold 为小于该距离时直接使用本地路线。"
+        },
+        {
+            "id": "inoritree",
+            "name": "祈愿树",
+            "coordinateType": "world",
+            "worldX": 51686,
+            "worldY": 107382,
+            "threshold": 10000,
+            "description": "用于判断当前位置距离祈愿树目标点是否过远；threshold 为小于该距离时直接使用本地路线。"
         }
     ]
 }

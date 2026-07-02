@@ -1,0 +1,13 @@
+{
+    "task": [
+        {
+            "name": "InoriTree",
+            "label": "$task_inori_tree_label",
+            "entry": "InoriTreeEntrance",
+            "description": "$task_inori_tree_desc",
+            "controller": [
+                "Win32-Front"
+            ]
+        }
+    ]
+}

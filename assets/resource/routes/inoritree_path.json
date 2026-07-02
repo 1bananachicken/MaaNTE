@@ -1,0 +1,28 @@
+{
+    "version": 1,
+    "routes": [
+        {
+            "id": "route-1782958786600",
+            "name": "inoritree_path",
+            "isHidden": false,
+            "segments": [
+                {
+                    "id": "segment-1782958834864",
+                    "name": "inoritree_path",
+                    "isHidden": true,
+                    "points": [
+                        {
+                            "locationId": "phonebooth-001",
+                            "x": 40671.397,
+                            "y": 102892.816
+                        },
+                        {
+                            "x": 51746.988,
+                            "y": 106680.771
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

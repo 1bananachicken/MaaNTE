@@ -126,6 +126,7 @@
         "resource/tasks/AutoFScroll.json",
         // group:others
         "resource/tasks/FountainCheckin.json",
+        "resource/tasks/InoriTree.json",
         "resource/tasks/AutoPiano.json",
         "resource/tasks/WitchDivination.json",
         // group:DatasetCollection
