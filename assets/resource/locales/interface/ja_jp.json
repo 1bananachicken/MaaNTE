@@ -108,6 +108,8 @@
     "task_tetris_option_repeat_count_input": "ラウンド数",
     "task_fountain_label": "毎日のナクペンダの池チェックイン",
     "task_fountain_desc": "噴水のチェックイン位置を識別し、チェックインボタンタップしてください。",
+    "task_inori_tree_label": "祈願樹デイリー祈願",
+    "task_inori_tree_desc": "祈願樹へ自動で移動し、デイリー祈願フローを実行します。",
     "task_bagel_spam_label": "ベーグル掲示板書き込み",
     "task_bagel_spam_desc": "写真撮影、保存、ベーグル投稿を自動で実行します。フォアグラウンドコントローラーのみ対応。",
     "task_bagel_spam_option_text_mode_label": "テキストモード",

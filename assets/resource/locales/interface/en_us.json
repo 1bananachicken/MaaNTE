@@ -79,6 +79,8 @@
     "task_tetris_desc": "<font color='red'>In this task, the in-game board is managed entirely by the internal AI, rather than by capturing screenshots. Please do not interact with the game screen while running this task to ensure that the AI’s decisions align with the actual game state.</font>",
     "task_fountain_label": "Nacupeda's Pool Check-in",
     "task_fountain_desc": "Identify and click the Nacupeda's Pool Check-in button。",
+    "task_inori_tree_label": "Inori Tree Daily Prayer",
+    "task_inori_tree_desc": "Automatically navigates to the Inori Tree and runs the daily prayer flow.",
     "task_bagel_spam_label": "Bagel Forum Flood",
     "task_bagel_spam_desc": "Automatically takes a photo, saves it, and publishes Bagel content. Front controller only.",
     "task_bagel_spam_option_text_mode_label": "Text Mode",

@@ -108,6 +108,8 @@
     "task_tetris_option_repeat_count_input": "輪數",
     "task_fountain_label": "噴泉打卡",
     "task_fountain_desc": "識別並點擊噴泉打卡按鈕。",
+    "task_inori_tree_label": "祈願樹每日祈願",
+    "task_inori_tree_desc": "自動前往祈願樹並執行每日祈願流程。",
     "task_bagel_spam_label": "貝果灌水",
     "task_bagel_spam_desc": "自動完成拍照、儲存並發布貝果內容。僅支援前台控制器。",
     "task_bagel_spam_option_text_mode_label": "文本模式",

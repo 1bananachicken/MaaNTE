@@ -79,6 +79,8 @@
     "task_tetris_desc": "<font color='red'>该任务功能中游戏内棋盘完全由内部ai自主维护，而非获取屏幕图像，在运行该任务时请不要对游戏画面进行操作，以免ai决策与实际游戏状态不符</font>",
     "task_fountain_label": "喷泉打卡",
     "task_fountain_desc": "识别并点击喷泉打卡按钮。",
+    "task_inori_tree_label": "祈愿树每日祈愿",
+    "task_inori_tree_desc": "自动前往祈愿树并执行每日祈愿流程。",
     "task_bagel_spam_label": "贝果灌水",
     "task_bagel_spam_desc": "自动完成拍照、保存并发布贝果内容。仅支持前台控制器。",
     "task_bagel_spam_option_text_mode_label": "文本模式",
