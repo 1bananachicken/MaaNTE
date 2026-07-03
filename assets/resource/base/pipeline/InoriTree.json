@@ -18,10 +18,10 @@
                 "custom_action": "check_teleport_required",
                 "custom_action_param": {
                     "point_id": "inoritree",
-                    "teleport_point_id": "inoritree_teleport",
+                    "teleport_point_id": "inoritreeteleport",
                     "position_backend": "auto",
                     "coordinate_type": "world",
-                    "coordinate_timeout": 1.5,
+                    "coordinate_timeout": 2.5,
                     "debug": true
                 }
             }
@@ -54,6 +54,32 @@
         "next": [
             "InoriTreeCheckinNotFound"
         ]
+    },
+    "FindInoriButton": {
+        "desc": "识别祈愿按钮",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    765,
+                    373,
+                    210,
+                    40
+                ],
+                "expected": [
+                    "祈福（1/1）"
+                ]
+            }
+        },
+        "action": "ClickKey",
+        "key": 70,
+        "post_delay": 500,
+        "next": [
+            "InoriChoose"
+        ]
+    },
+    "InoriChoose": {
+        "desc": "祈愿道具选择"
     },
     "InoriTreeCheckinNotFound": {
         "desc": "未能找到祈愿树",
