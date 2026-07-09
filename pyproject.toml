@@ -1,0 +1,28 @@
+[project]
+name = "maante"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "librosa>=0.11.0",
+    "loguru>=0.7.3",
+    "maadebugger>=1.20.1",
+    "maafw==5.10.4",
+    "mido>=1.3.3",
+    "numpy==2.4.3",
+    "onnxruntime-directml>=1.24.4",
+    "opencv-python==4.13.0.92",
+    "pillow>=12.3.0",
+    "pytz>=2026.2",
+    "requests>=2.34.2",
+    "scapy>=2.7.0",
+    "scikit-learn>=1.9.0",
+    "scipy>=1.18.0",
+    "soundcard>=0.4.6",
+    "websockets>=14.0,<17.0",
+]
+
+
+[[index]]
+url = "https://pypi.tuna.tsinghua.edu.cn/simple/"
+default = true
