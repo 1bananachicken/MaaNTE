@@ -46,8 +46,8 @@
                 }
             ],
             "pipeline_override": {
-                "OnlineMapNavigation": {
-                    "custom_action_param": {
+                "OnlineMapNavigationSettingsConfig": {
+                    "attach": {
                         "port": "{port}",
                         "tolerance": "{tolerance}",
                         "frame_interval": "{frame_interval}"
@@ -64,8 +64,8 @@
                     "name": "auto",
                     "label": "$task_online_map_navigation_position_backend_auto",
                     "pipeline_override": {
-                        "OnlineMapNavigation": {
-                            "custom_action_param": {
+                        "OnlineMapNavigationPositionBackendConfig": {
+                            "attach": {
                                 "position_backend": "auto"
                             }
                         }
@@ -75,8 +75,8 @@
                     "name": "coordinate",
                     "label": "$task_online_map_navigation_position_backend_coordinate",
                     "pipeline_override": {
-                        "OnlineMapNavigation": {
-                            "custom_action_param": {
+                        "OnlineMapNavigationPositionBackendConfig": {
+                            "attach": {
                                 "position_backend": "coordinate"
                             }
                         }
@@ -86,8 +86,8 @@
                     "name": "map",
                     "label": "$task_online_map_navigation_position_backend_map",
                     "pipeline_override": {
-                        "OnlineMapNavigation": {
-                            "custom_action_param": {
+                        "OnlineMapNavigationPositionBackendConfig": {
+                            "attach": {
                                 "position_backend": "map"
                             }
                         }

@@ -14,11 +14,9 @@
         ],
         "post_delay": 1000,
         "action": {
-            "type": "ClickKey",
+            "type": "Custom",
             "param": {
-                "key": [
-                    70
-                ]
+                "custom_action": "enter_fishprepare"//用一种适配后台的方法进入钓鱼准备界面
             }
         }
     },
@@ -34,7 +32,7 @@
         "rate_limit": 0,
         "next": [
             "FishScenePrepareToStore",
-            "FishScenePrepareToFishGame"
+            "FishScenePrepareToFishGameGo"
         ]
     },
     "FishScenePrepareToFishGame": {
@@ -50,7 +48,7 @@
         ]
     },
     "FishScenePrepareToFishGameGo": {
-        "desc": "从钓鱼准备界面进入钓鱼游戏界面 (old钓鱼)",
+        "desc": "从钓鱼准备界面进入钓鱼游戏界面",
         "recognition": "And",
         "all_of": [
             "FishSceneOnFishPrepare",
@@ -282,8 +280,7 @@
         "action": "Click",
         "next": [
             "FishNewSeaAnglerToFishMarket"
-        ]
-    ,
+        ],
         "roi_offset": [
             0,
             0,
@@ -309,8 +306,7 @@
         "action": "Click",
         "next": [
             "FishNewSellFishStart"
-        ]
-    ,
+        ],
         "roi_offset": [
             0,
             0,

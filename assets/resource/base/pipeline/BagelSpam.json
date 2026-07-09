@@ -244,106 +244,156 @@
             }
         },
         "next": [
+            "BagelSpamTouchMoveFirstRow1"
+        ]
+    },
+    "BagelSpamTouchMoveFirstRow1": {
+        "desc": "移动到第一行第1张",
+        "action": {
+            "type": "TouchMove",
+            "param": {
+                "target": [
+                    193,
+                    178
+                ]
+            }
+        },
+        "next": [
             "BagelSpamClickFirstRow1"
         ]
     },
     "BagelSpamClickFirstRow1": {
         "desc": "点击第一行第1张",
-        "recognition": {
-            "type": "DirectHit"
-        },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    126,
-                    133,
-                    135,
-                    91
+                    193,
+                    178
                 ]
             }
         },
         "post_wait_freezes": 500,
+        "next": [
+            "BagelSpamTouchMoveLastRow1"
+        ]
+    },
+    "BagelSpamTouchMoveLastRow1": {
+        "desc": "移动到到最后一行第1张",
+        "action": {
+            "type": "TouchMove",
+            "param": {
+                "target": [
+                    170,
+                    514
+                ]
+            }
+        },
         "next": [
             "BagelSpamClickLastRow1"
         ]
     },
     "BagelSpamClickLastRow1": {
         "desc": "点击最后一行第1张",
-        "recognition": {
-            "type": "DirectHit"
-        },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    70,
-                    454,
-                    200,
-                    120
+                    170,
+                    514
                 ]
             }
         },
         "post_wait_freezes": 500,
+        "next": [
+            "BagelSpamTouchMoveLastRow2"
+        ]
+    },
+    "BagelSpamTouchMoveLastRow2": {
+        "desc": "移动到最后一行第2张",
+        "action": {
+            "type": "TouchMove",
+            "param": {
+                "target": [
+                    452,
+                    512
+                ]
+            }
+        },
         "next": [
             "BagelSpamClickLastRow2"
         ]
     },
     "BagelSpamClickLastRow2": {
         "desc": "点击最后一行第2张",
-        "recognition": {
-            "type": "DirectHit"
-        },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    352,
                     452,
-                    200,
-                    120
+                    512
                 ]
             }
         },
         "post_delay": 500,
+        "next": [
+            "BagelSpamTouchMoveLastRow3"
+        ]
+    },
+    "BagelSpamTouchMoveLastRow3": {
+        "desc": "移动到最后一行第3张",
+        "action": {
+            "type": "TouchMove",
+            "param": {
+                "target": [
+                    753,
+                    515
+                ]
+            }
+        },
         "next": [
             "BagelSpamClickLastRow3"
         ]
     },
     "BagelSpamClickLastRow3": {
         "desc": "点击最后一行第3张",
-        "recognition": {
-            "type": "DirectHit"
-        },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    653,
-                    455,
-                    200,
-                    120
+                    753,
+                    515
                 ]
             }
         },
         "post_delay": 500,
+        "next": [
+            "BagelSpamTouchMoveLastRow4"
+        ]
+    },
+    "BagelSpamTouchMoveLastRow4": {
+        "desc": "移动到最后一行第4张",
+        "action": {
+            "type": "TouchMove",
+            "param": {
+                "target": [
+                    1051,
+                    504
+                ]
+            }
+        },
         "next": [
             "BagelSpamClickLastRow4"
         ]
     },
     "BagelSpamClickLastRow4": {
         "desc": "点击最后一行第4张",
-        "recognition": {
-            "type": "DirectHit"
-        },
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    951,
-                    444,
-                    200,
-                    120
+                    1051,
+                    504
                 ]
             }
         },

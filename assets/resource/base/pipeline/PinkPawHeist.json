@@ -208,7 +208,16 @@
                 ],
                 "expected": [
                     "粉爪大劫案",
+                    "(?i)Pink\\s*Paws\\s*Heist",
+                    "にくきゅう大強盗",
                     "(?i)Pink\\s*Paw\\s*Heist"
+                ]
+            ,
+                "roi_offset": [
+                    0,
+                    0,
+                    92,
+                    0
                 ]
             }
         },

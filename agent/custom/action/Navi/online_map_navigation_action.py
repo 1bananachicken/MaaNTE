@@ -5,7 +5,6 @@ from maa.context import Context
 from maa.custom_action import CustomAction
 
 from ..Common.logger import get_logger
-from .waypoint_navigator import load_params
 from .route_websocket_service import RouteWebSocketService
 from .route_runner import RouteRunner
 from .route_model import RouteSession
@@ -19,8 +18,7 @@ class OnlineMapNavigationAction(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         try:
-            params = load_params(argv.custom_action_param)
-            params.update(self.load_option_params(context))
+            params = self.load_option_params(context)
             port = int(params.get("port", 14514))
             tolerance = float(params.get("tolerance", 5.0))
             frame_interval = max(0.05, float(params.get("frame_interval", 0.1)))
@@ -68,18 +66,39 @@ class OnlineMapNavigationAction(CustomAction):
     def load_option_params(context: Context) -> dict[str, Any]:
         params: dict[str, Any] = {}
 
-        node_data = context.get_node_data("OnlineMapNavigationAngleBackendConfig") or {}
-        attach = node_data.get("attach")
-        if isinstance(attach, dict) and attach.get("angle_backend") in {
+        settings = OnlineMapNavigationAction.load_config_attach(
+            context, "OnlineMapNavigationSettingsConfig"
+        )
+        for key in ("port", "tolerance", "frame_interval"):
+            if key in settings:
+                params[key] = settings[key]
+
+        position = OnlineMapNavigationAction.load_config_attach(
+            context, "OnlineMapNavigationPositionBackendConfig"
+        )
+        if position.get("position_backend") in {"auto", "coordinate", "map"}:
+            params["position_backend"] = position["position_backend"]
+
+        angle = OnlineMapNavigationAction.load_config_attach(
+            context, "OnlineMapNavigationAngleBackendConfig"
+        )
+        if angle.get("angle_backend") in {
             "auto",
             "directml",
             "cpu",
         }:
-            params["angle_backend"] = attach["angle_backend"]
+            params["angle_backend"] = angle["angle_backend"]
 
-        node_data = context.get_node_data("OnlineMapNavigationDebugConfig") or {}
-        attach = node_data.get("attach")
-        if isinstance(attach, dict) and "debug" in attach:
-            params["debug"] = attach["debug"]
+        debug = OnlineMapNavigationAction.load_config_attach(
+            context, "OnlineMapNavigationDebugConfig"
+        )
+        if "debug" in debug:
+            params["debug"] = debug["debug"]
 
         return params
+
+    @staticmethod
+    def load_config_attach(context: Context, node_name: str) -> dict[str, Any]:
+        node_data = context.get_node_data(node_name) or {}
+        attach = node_data.get("attach")
+        return attach if isinstance(attach, dict) else {}

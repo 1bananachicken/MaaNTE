@@ -96,6 +96,16 @@ jobs:
             echo "tag=arm64" >> $GITHUB_OUTPUT
           fi
 
+      - name: Download PacketNTE thirdparty
+        id: download_packetnte
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: 1pineappleduck/PacketNTE
+          fileName: "nte_coordinate_api-*.zip"
+          latest: true
+          out-file-path: "PacketNTE"
+          extract: false
+
       - name: Download MaaFramework
         uses: robinraju/release-downloader@v1
         with:
@@ -165,6 +175,45 @@ jobs:
           if [ -d "install/deps" ]; then
             cp -rpvn install/deps/. install-mxu/deps/
           fi
+
+      - name: Copy PacketNTE thirdparty to MXU version
+        shell: bash
+        run: |
+          archive_path="${{ fromJson(steps.download_packetnte.outputs.downloaded_files)[0] }}"
+          extract_dir="PacketNTE-extracted"
+          mkdir -p "$extract_dir"
+
+          python - "$archive_path" "$extract_dir" << 'PYEOF'
+          import sys
+          import zipfile
+          from pathlib import Path
+
+          archive = Path(sys.argv[1])
+          extract_dir = Path(sys.argv[2]).resolve()
+
+          with zipfile.ZipFile(archive) as zf:
+              for info in zf.infolist():
+                  name = info.filename.replace("\\", "/")
+                  target = (extract_dir / name).resolve()
+                  if extract_dir != target and extract_dir not in target.parents:
+                      raise RuntimeError(f"Unsafe PacketNTE archive entry: {info.filename}")
+                  if name.endswith("/"):
+                      target.mkdir(parents=True, exist_ok=True)
+                      continue
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  with zf.open(info) as src, target.open("wb") as dst:
+                      dst.write(src.read())
+          PYEOF
+
+          if [ ! -d "$extract_dir/thirdparty" ]; then
+            echo "PacketNTE release did not extract to $extract_dir/thirdparty."
+            find "$extract_dir" -maxdepth 2 -type d -print
+            exit 1
+          fi
+
+          rm -rf install-mxu/thirdparty
+          cp -a "$extract_dir/thirdparty" install-mxu/thirdparty
+          echo "Added PacketNTE thirdparty to install-mxu/thirdparty"
       
       - name: Pre-install all dependencies
         shell: bash

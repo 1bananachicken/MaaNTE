@@ -2,9 +2,62 @@
     "FountainCheckinEntrance": {
         "desc": "喷泉打卡入口",
         "next": [
+            "FountainCheckTeleportRequired",
+            "FountainRouteNavigation"
+        ]
+    },
+    // 先按世界坐标判断距离；距离远时会在 CustomAction 内完成地图传送，距离近则直接继续。
+    "FountainCheckTeleportRequired": {
+        "desc": "确认是否需要先使用地图传送到喷泉附近",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "check_teleport_required",
+                "custom_action_param": {
+                    "point_id": "fountain",
+                    "teleport_point_id": "fountain",
+                    "position_backend": "auto",
+                    "coordinate_type": "world",
+                    "coordinate_timeout": 1.5,
+                    "debug": true
+                }
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "FountainRouteNavigation"
+        ],
+        "on_error": [
+            "FountainCheckinNotFound"
+        ]
+    },
+    // 从喷泉传送点沿 penquan 路线走到喷泉，再进入原有打卡识别流程。
+    "FountainRouteNavigation": {
+        "desc": "使用本地路线寻路从喷泉传送点移动到喷泉",
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "penquan",
+            "route_name": "penquan",
+            "segment_index": 1,
+            "frame_interval": 0.1,
+            "tolerance": 5,
+            "angle_backend": "auto",
+            "position_backend": "auto",
+            "debug": false
+        },
+        "next": [
             "FountainFindButton",
             "FountainCheckinNotFound"
         ]
+        // "on_error": [
+        //     "FountainCheckinNotFound"
+        // ]
     },
     "FountainFindButton": {
         "desc": "识别喷泉打卡按钮",
