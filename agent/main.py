@@ -447,7 +447,11 @@ def _check_admin_privilege():
 
 
 def _check_game_resolution():
-    """连接控制器后检测游戏窗口分辨率（本地客户端 / GFN Chrome / GFN 原生客户端）"""
+    """连接控制器后检测游戏窗口分辨率（本地客户端 / GFN Chrome / GFN 原生客户端）。
+
+    分辨率与基准（1280x720）不符时先尝试自动调整窗口客户区，
+    调整失败才提示用户手动处理；无论成败都按最终实际尺寸更新缩放系数。
+    """
     if not sys.platform.startswith("win"):
         logger.debug("分辨率检测: 非 Windows 平台，跳过")
         return
@@ -456,6 +460,7 @@ def _check_game_resolution():
         GAME_WINDOW_MODE_GFN_APP,
         GAME_WINDOW_MODE_GFN_CHROME,
         GAME_WINDOW_MODE_NOT_FOUND,
+        ensure_game_window_resolution,
         get_client_size,
         refresh_game_window_mode,
     )
@@ -478,21 +483,47 @@ def _check_game_resolution():
         return
 
     w, h = size
+    baseline_w, baseline_h = screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT
+    tolerance = 2
+
+    if abs(w - baseline_w) > tolerance or abs(h - baseline_h) > tolerance:
+        logger.info(
+            f"当前窗口分辨率 {w}x{h} 与基准 {baseline_w}x{baseline_h} 不符，尝试自动调整"
+        )
+        try:
+            result = ensure_game_window_resolution(baseline_w, baseline_h)
+        except Exception:
+            logger.exception("自动调整窗口分辨率时发生异常")
+            result = None
+        if result is not None:
+            logger.debug(
+                f"窗口分辨率调整结果: mode={result.get('mode')}, "
+                f"reason={result.get('reason')}, "
+                f"before={result.get('before')}, after={result.get('after')}"
+            )
+            after = result.get("after")
+            if after is not None:
+                w, h = after
+        # 调整可能改变窗口尺寸，用最终实际值兜底刷新
+        final_size = get_client_size(hwnd)
+        if final_size is not None:
+            w, h = final_size
+
     screen.update_screen_size(w, h)
     scale_x, scale_y = screen.scaling_factors()
 
-    if (w, h) == (screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT):
+    if abs(w - baseline_w) <= tolerance and abs(h - baseline_h) <= tolerance:
         logger.info(
             f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})"
         )
     elif mode == GAME_WINDOW_MODE_GFN_APP:
         logger.warning(
-            f"当前窗口分辨率: {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
+            f"自动调整窗口分辨率未生效，当前 {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
             "请在 GeForce NOW 客户端设置中将串流分辨率设为 1280x720，否则部分功能可能异常。"
         )
     else:
         logger.warning(
-            f"当前窗口分辨率: {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
+            f"自动调整窗口分辨率未生效，当前 {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
             "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。"
         )
 
