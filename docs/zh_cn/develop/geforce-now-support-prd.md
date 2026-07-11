@@ -77,7 +77,7 @@ get_pids_by_name("HTGame.exe")          # 进程快照取 PID 集合
 | --- | --- | --- | --- | --- |
 | 本地客户端（现状） | `HTGame.exe` | `UnrealWindow` | `^\s*(异环\|NTE)\s*$` | `SetWindowPos` 正常生效 |
 | GFN Chrome 网页版 | `chrome.exe` | `Chrome_WidgetWin_1` | `NTE: Neverness to Everness on GeForce NOW`（已实测确认） | 外框可正常缩放，但窗口模式下页面自绘头部破坏帧几何（见 R8），实际要求 F11 全屏运行 |
-| GFN 原生客户端 | `GeForceNOW.exe` | `CEF-OSC-WIDGET`（社区文档，待运行日志确认；探测代码已记录 class 名） | `NTE: Neverness to Everness on GeForce NOW`（已实测确认，与 Chrome 版一致） | 接受标准 `MoveWindow`/`SetWindowPos` 外部缩放（GFNWindowMover 即用此方式），流窗口无边框、无页面头部；客户区调至 1280x720 可获得干净 720p 帧 |
+| GFN 原生客户端 | `GeForceNOW.exe` | `CEFCLIENT`（已实测确认，EnumWindows 运行时取证；社区旧文档的 `CEF-OSC-WIDGET` 为老版本客户端） | `NTE: Neverness to Everness on GeForce NOW`（已实测确认，与 Chrome 版一致） | 接受标准 `MoveWindow`/`SetWindowPos` 外部缩放（GFNWindowMover 即用此方式），流窗口无边框、无页面头部；客户区调至 1280x720 可获得干净 720p 帧 |
 
 > [!NOTE]
 > 关于"用 Chrome 进程找窗口是否可行"：**可行，但有前提。**
@@ -108,7 +108,7 @@ get_pids_by_name("HTGame.exe")          # 进程快照取 PID 集合
     "label": "$controller_gfn_app_label",
     "type": "Win32",
     "win32": {
-        "class_regex": "CEF-OSC-WIDGET",
+        "class_regex": "CEFCLIENT",
         "window_regex": "NTE.*on GeForce NOW",
         "screencap": "PrintWindow",
         "mouse": "Seize",
@@ -170,7 +170,7 @@ get_pids_by_name("HTGame.exe")          # 进程快照取 PID 集合
 | --- | --- | --- | --- |
 | R1 | Chrome/CEF 的 GPU 合成窗口对 `SendMessage`/`PostMessage` 后台注入普遍不可靠 | GFN 用户大概率**只能前台运行**，无法使用后台任务 | PRD 即明确 GFN 控制器为前台模式；文档与 UI 提示中声明该限制 |
 | R2 | 云端串流的压缩伪影/码率波动可能拉低 TemplateMatch 匹配分 | 识别节点在 GFN 下命中率下降 | 验收阶段用代表性任务实测；必要时对少量模板放宽 `threshold` 或补充 GFN 专用模板 |
-| R3 | GFN 原生客户端窗口类未运行时确认（标题已确认） | `GFN-App` 控制器 `class_regex` 以社区文档的 `CEF-OSC-WIDGET` 先行发布 | 探测代码已在日志中记录 `class=` 字段，用户下一份日志包即可确认；如不符，改一行 `class_regex` |
+| R3 | ~~GFN 原生客户端窗口类未确认~~ **已关闭**：运行时 EnumWindows 取证确认为 `CEFCLIENT`（`GeForceNOW.exe`，pid 级验证）。注意社区旧文档的 `CEF-OSC-WIDGET` 与 Electron 的 `Chrome_WidgetWin_1` 均不适用于当前客户端 | — | 探测代码保留 `class=` 日志字段，便于未来客户端更新后再次核对 |
 | R4 | 窗口标题可能随 GFN 客户端语言变化 | `window_regex` 漏匹配 | 优先匹配语言无关片段（游戏英文名 + `GeForce NOW`）；收集多语言标题样本 |
 | R5 | 用户同时开多个 Chrome 窗口（含多个 GFN 页签）的极端情况 | 选窗歧义 | FR2 的标题过滤 + 现有 `selected_hwnd`/滞回机制兜底；GUI 侧用户可手动选窗 |
 | R6 | GFN 自身的排队、闲置踢出、会话到期画面 | 任务流程外状态，Pipeline 无法恢复 | 非目标（§1.3）；提示用户保持会话活跃，长任务失败时日志可定位 |
