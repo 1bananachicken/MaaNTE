@@ -22,6 +22,8 @@ def load_json_with_comments(path):
 working_dir = Path(__file__).parent.parent.parent
 install_path = working_dir / Path("install-mxu")
 version = len(sys.argv) > 1 and sys.argv[1] or "v0.0.1"
+# argv[2]: 目标平台（win32/darwin/linux），交叉构建时由 build.py 传入；缺省为宿主平台
+target_platform = sys.argv[2] if len(sys.argv) > 2 else sys.platform
 
 
 def install_deps():
@@ -92,11 +94,11 @@ def install_agent():
 
     interface = load_json_with_comments(install_path / "interface.json")
 
-    if sys.platform.startswith("win"):
+    if target_platform.startswith("win"):
         interface["agent"]["child_exec"] = r"./python/python.exe"
-    elif sys.platform.startswith("darwin"):
+    elif target_platform.startswith("darwin"):
         interface["agent"]["child_exec"] = r"./python/bin/python3"
-    elif sys.platform.startswith("linux"):
+    elif target_platform.startswith("linux"):
         interface["agent"]["child_exec"] = r"python3"
 
     interface["agent"]["child_args"] = ["-u", r"./agent/main.py"]

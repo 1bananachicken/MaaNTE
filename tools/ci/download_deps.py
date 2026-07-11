@@ -66,8 +66,14 @@ def get_platform_tag():
     return platform_tag
 
 
-def download_dependencies(deps_dir, platform_tag):
-    """下载依赖到指定目录"""
+def download_dependencies(deps_dir, platform_tag, python_version=None, allow_fallback=True):
+    """下载依赖到指定目录
+
+    python_version: 目标 Python 版本（如 "3.12"）。交叉构建时宿主 Python 版本
+    与打包目标不同，必须显式传入以获取正确 ABI 的 wheel。
+    allow_fallback: 平台特定下载失败时是否回退到不限平台的通用下载。
+    交叉构建时必须禁用——回退会静默混入宿主平台的二进制 wheel。
+    """
     # 创建deps目录
     deps_path = Path(deps_dir)
     deps_path.mkdir(parents=True, exist_ok=True)
@@ -106,6 +112,8 @@ def download_dependencies(deps_dir, platform_tag):
             platform_tag,
             "--only-binary=:all:",
         ]
+        if python_version:
+            cmd += ["--python-version", python_version]
 
         print(f"执行命令: {' '.join(cmd)}")
         result = subprocess.run(cmd, check=True, capture_output=True, text=True)
@@ -126,6 +134,13 @@ def download_dependencies(deps_dir, platform_tag):
 
     except subprocess.CalledProcessError as e:
         print(f"平台特定下载失败: {e}")
+        if not allow_fallback:
+            print("交叉构建模式：禁用通用回退下载（会混入宿主平台 wheel），直接失败")
+            if e.stdout:
+                print("stdout:", e.stdout)
+            if e.stderr:
+                print("stderr:", e.stderr)
+            return False
         if e.stderr and (
             "Could not find a version" in e.stderr
             or "No matching distribution" in e.stderr
@@ -185,15 +200,34 @@ def download_dependencies(deps_dir, platform_tag):
 def main():
     parser = argparse.ArgumentParser(description="下载Python依赖到deps目录")
     parser.add_argument("--deps-dir", default="deps", help="依赖下载目录 (默认: deps)")
+    parser.add_argument(
+        "--platform-tag",
+        default=None,
+        help="pip 平台标签（如 win_amd64）。指定后跳过宿主平台自动探测，用于交叉构建",
+    )
+    parser.add_argument(
+        "--python-version",
+        default=None,
+        help='目标 Python 版本（如 "3.12"）。交叉构建时必须与打包的 Python 一致',
+    )
 
     args = parser.parse_args()
 
     try:
-        # 自动检测平台
-        platform_tag = get_platform_tag()
+        if args.platform_tag:
+            platform_tag = args.platform_tag
+            print(f"使用指定平台标签: {platform_tag}")
+        else:
+            # 自动检测平台
+            platform_tag = get_platform_tag()
 
         # 下载依赖
-        success = download_dependencies(args.deps_dir, platform_tag)
+        success = download_dependencies(
+            args.deps_dir,
+            platform_tag,
+            python_version=args.python_version,
+            allow_fallback=args.platform_tag is None,
+        )
 
         if success:
             print("✅ 依赖下载成功")

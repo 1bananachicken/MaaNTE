@@ -97,16 +97,28 @@ def download(url, dest):
         raise
 
 
-def get_platform():
-    """获取当前平台信息"""
+def get_platform(target_os="auto", target_arch="auto"):
+    """获取平台信息。
+
+    target_os/target_arch 为 "auto" 时返回宿主平台（原有行为）；
+    指定目标平台（如 --target-os windows）时返回目标平台元组，
+    用于在 Linux/macOS 宿主机上交叉组装 Windows 发行包。
+    """
     os_type = platform.system()
     os_arch = platform.machine()
 
+    if target_os != "auto":
+        os_type = {"windows": "Windows", "linux": "Linux", "darwin": "Darwin"}[target_os]
+    if target_arch != "auto":
+        os_arch = target_arch
+
     # Windows ARM64 detection via PROCESSOR_IDENTIFIER
     if os_type == "Windows":
-        proc_id = os.environ.get("PROCESSOR_IDENTIFIER", "")
-        if "ARMv8" in proc_id or "ARM64" in proc_id:
-            os_arch = "ARM64"
+        # PROCESSOR_IDENTIFIER 探测仅在真实 Windows 宿主机上有意义
+        if platform.system() == "Windows" and target_arch == "auto":
+            proc_id = os.environ.get("PROCESSOR_IDENTIFIER", "")
+            if "ARMv8" in proc_id or "ARM64" in proc_id:
+                os_arch = "ARM64"
         arch_map = {"AMD64": "AMD64", "x86_64": "AMD64", "ARM64": "ARM64", "aarch64": "ARM64"}
     elif os_type == "Darwin":
         arch_map = {"x86_64": "x86_64", "arm64": "arm64", "aarch64": "arm64"}
@@ -124,6 +136,35 @@ def get_platform():
 
 
 # ========== 各步骤 ==========
+
+def _bootstrap_pip_offline(python_dir):
+    """交叉构建时无法执行目标平台的 python.exe，改用宿主 pip 下载通用 wheel 并直接解压。
+
+    pip/setuptools 均为纯 Python 包（py3-none-any 通用 wheel），wheel 本质是 zip，
+    解压到 Lib/site-packages 即完成安装；运行期通过 `python.exe -m pip` 调用，
+    不依赖 Scripts/pip.exe 启动器。
+    """
+    site_packages = python_dir / "Lib" / "site-packages"
+    site_packages.mkdir(parents=True, exist_ok=True)
+    bootstrap_dir = python_dir / "_pip_bootstrap"
+    bootstrap_dir.mkdir(parents=True, exist_ok=True)
+    try:
+        run([
+            sys.executable, "-m", "pip", "download",
+            "pip", "setuptools",
+            "--only-binary=:all:",
+            "-d", str(bootstrap_dir),
+        ])
+        wheels = sorted(bootstrap_dir.glob("*.whl"))
+        if not wheels:
+            raise FileNotFoundError("pip bootstrap 失败：未下载到任何 whl 文件")
+        for whl in wheels:
+            print(f"  解压 {whl.name} -> {site_packages}")
+            with zipfile.ZipFile(whl) as zf:
+                zf.extractall(site_packages)
+    finally:
+        shutil.rmtree(bootstrap_dir, ignore_errors=True)
+
 
 def step_setup_python(os_type, os_arch):
     """步骤1: 安装嵌入式 Python + pip"""
@@ -222,24 +263,37 @@ def step_setup_python(os_type, os_arch):
 
     # 安装 pip
     print("  安装 pip...")
-    get_pip_url = "https://bootstrap.pypa.io/get-pip.py"
-    get_pip_path = PYTHON_DIR / "get-pip.py"
-    download(get_pip_url, get_pip_path)
-    run([str(python_exe), str(get_pip_path)])
-    get_pip_path.unlink()
+    if os_type == "Windows" and platform.system() != "Windows":
+        # 交叉构建：python.exe 无法在宿主机执行，走离线解压方式
+        _bootstrap_pip_offline(PYTHON_DIR)
+    else:
+        get_pip_url = "https://bootstrap.pypa.io/get-pip.py"
+        get_pip_path = PYTHON_DIR / "get-pip.py"
+        download(get_pip_url, get_pip_path)
+        run([str(python_exe), str(get_pip_path)])
+        get_pip_path.unlink()
 
     print(f"  Python 就绪: {python_exe}")
     return python_exe
 
 
-def step_download_python_deps(python_exe):
-    """步骤2: 下载 Python 依赖 wheel"""
+def step_download_python_deps(python_exe, pip_platform_tag=None, python_version=None):
+    """步骤2: 下载 Python 依赖 wheel
+
+    交叉构建时传入 pip_platform_tag（如 win_amd64）与目标 python_version，
+    覆盖 download_deps.py 的宿主平台自动探测。
+    """
     print("\n" + "=" * 60)
     print("[2/12] 下载 Python 依赖")
     print("=" * 60)
 
     download_script = TOOLS_DIR / "download_deps.py"
-    run([str(python_exe), str(download_script), "--deps-dir", str(PYTHON_DEPS_DIR)])
+    cmd = [str(python_exe), str(download_script), "--deps-dir", str(PYTHON_DEPS_DIR)]
+    if pip_platform_tag:
+        cmd += ["--platform-tag", pip_platform_tag]
+    if python_version:
+        cmd += ["--python-version", python_version]
+    run(cmd)
 
 
 def step_download_maa_framework(os_arch):
@@ -392,14 +446,21 @@ def step_install(python_exe, tag, platform_tag):
     # run([str(python_exe), str(install_script), tag, platform_tag])
 
 
-def step_install_mxu(python_exe, tag):
-    """步骤9: 运行 install_mxu.py 组装 MXU 安装目录"""
+def step_install_mxu(python_exe, tag, target_platform=None):
+    """步骤9: 运行 install_mxu.py 组装 MXU 安装目录
+
+    target_platform（win32/darwin/linux）用于交叉构建时指定发行包内
+    interface.json 的 child_exec 平台，缺省由 install_mxu.py 取宿主平台。
+    """
     print("\n" + "=" * 60)
     print("[9/12] 组装 MXU 安装目录")
     print("=" * 60)
 
     install_script = TOOLS_DIR / "install_mxu.py"
-    run([str(python_exe), str(install_script), tag])
+    cmd = [str(python_exe), str(install_script), tag]
+    if target_platform:
+        cmd.append(target_platform)
+    run(cmd)
 
     # 复制 Python 环境到 MXU 安装目录
     print("  复制 Python 到 install-mxu/...")
@@ -509,10 +570,11 @@ def step_package(platform_tag, tag, output_dir, mxu=False):
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    os_type = platform.system()
     pkg_name = f"MaaNTE-{platform_tag}-{tag}{variant}"
 
-    if os_type == "Windows":
+    # 压缩格式按目标平台决定（platform_tag 形如 win-x64 / linux-x64），
+    # 而非宿主平台——交叉构建时 Windows 包必须是 zip
+    if platform_tag.startswith("win"):
         pkg_path = output_dir / f"{pkg_name}.zip"
         print(f"  创建 ZIP: {pkg_path}")
         with zipfile.ZipFile(pkg_path, "w", zipfile.ZIP_DEFLATED) as zf:
@@ -552,6 +614,11 @@ def main():
                         help=f"MFAAvalonia 版本 (默认: {MFAA_VERSION})")
     parser.add_argument("--mxu-version", default=MXU_VERSION,
                         help=f"MXU 版本 (默认: {MXU_VERSION})")
+    parser.add_argument("--target-os", default="auto", choices=["auto", "windows"],
+                        help="目标操作系统 (默认: auto=宿主平台)。在 Linux/macOS 上"
+                             "指定 windows 可交叉组装 Windows 发行包")
+    parser.add_argument("--target-arch", default="auto", choices=["auto", "x86_64", "arm64"],
+                        help="目标架构 (默认: auto=宿主架构)")
 
     args = parser.parse_args()
     MAA_FRAMEWORK_VERSION = args.maa_version
@@ -571,9 +638,14 @@ def main():
         if r.returncode != 0:
             print("警告: git submodule 初始化失败，OCR 模型可能无法正确配置")
 
-    # 检测平台
-    os_type, os_arch, platform_tag = get_platform()
-    print(f"平台: {os_type} / {os_arch} / {platform_tag}")
+    # 检测平台（target-os/target-arch 非 auto 时为交叉构建目标）
+    os_type, os_arch, platform_tag = get_platform(args.target_os, args.target_arch)
+    is_cross = os_type != platform.system()
+    if is_cross and os_type != "Windows":
+        print(f"错误: 交叉构建仅支持 Windows 目标，当前目标: {os_type}")
+        sys.exit(1)
+    print(f"平台: {os_type} / {os_arch} / {platform_tag}"
+          + (f"  [交叉构建，宿主: {platform.system()}]" if is_cross else ""))
     print(f"版本: {args.tag}")
     print(f"输出: {args.output_dir}")
     print(f"MaaFramework: {MAA_FRAMEWORK_VERSION}")
@@ -585,8 +657,18 @@ def main():
         # 1. 嵌入式 Python
         python_exe = step_setup_python(os_type, os_arch)
 
+        # 交叉构建时目标 python.exe 无法在宿主机执行，工具脚本改用宿主 Python
+        tool_python = Path(sys.executable) if is_cross else python_exe
+
         # 2. Python 依赖
-        step_download_python_deps(python_exe)
+        if is_cross:
+            pip_tag = "win_amd64" if os_arch in ("AMD64", "x86_64") else "win_arm64"
+            py_ver = ".".join(PYTHON_VERSION_TARGET.split(".")[:2])
+            step_download_python_deps(
+                tool_python, pip_platform_tag=pip_tag, python_version=py_ver
+            )
+        else:
+            step_download_python_deps(python_exe)
 
         # 3. MaaFramework
         step_download_maa_framework(os_arch)
@@ -611,14 +693,19 @@ def main():
         if not python_exe.exists():
             print(f"Python 未安装: {python_exe}，请先运行 build.py (不带 --skip-download)")
             sys.exit(1)
+        tool_python = Path(sys.executable) if is_cross else python_exe
 
     # 8. 安装 (MFAA 版本)
     if not skip_mfa:
-        step_install(python_exe, args.tag, platform_tag)
+        step_install(tool_python, args.tag, platform_tag)
 
     # 9. 安装 (MXU 版本)
     if not skip_mxu:
-        step_install_mxu(python_exe, args.tag)
+        step_install_mxu(
+            tool_python,
+            args.tag,
+            target_platform="win32" if is_cross else None,
+        )
 
     # 10. 整合 MFA
     if not skip_mfa:
