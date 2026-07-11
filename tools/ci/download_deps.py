@@ -10,9 +10,18 @@ import sys
 import subprocess
 import argparse
 import platform
+import zipfile
 from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")  # type: ignore[attr-defined]
+
+# packaging 随 pip 一起分发（pip._vendor），保证运行本脚本的任何 Python 环境都可用
+try:
+    from pip._vendor.packaging.requirements import Requirement
+    from pip._vendor.packaging.utils import canonicalize_name
+except ImportError:
+    from packaging.requirements import Requirement
+    from packaging.utils import canonicalize_name
 
 
 def get_platform_tag():
@@ -64,6 +73,135 @@ def get_platform_tag():
 
     print(f"使用平台标签: {platform_tag}")
     return platform_tag
+
+
+def _target_marker_environment(platform_tag, python_version):
+    """构造目标平台的 PEP 508 marker 评估环境。
+
+    pip download --platform 只影响 wheel 标签选择，Requires-Dist 中的环境
+    marker（如 loguru 的 colorama; sys_platform=='win32'）仍按宿主环境评估。
+    交叉下载时这会静默漏掉目标平台的条件依赖，导致离线安装失败，
+    必须用目标环境重新评估依赖闭包。
+    """
+    if python_version:
+        parts = python_version.split(".")
+        py_ver = ".".join(parts[:2])
+        py_full = python_version if len(parts) >= 3 else f"{py_ver}.0"
+    else:
+        py_ver = ".".join(str(v) for v in sys.version_info[:2])
+        py_full = platform.python_version()
+
+    if platform_tag.startswith("win"):
+        env = {
+            "sys_platform": "win32",
+            "platform_system": "Windows",
+            "os_name": "nt",
+            "platform_machine": "ARM64" if "arm64" in platform_tag else "AMD64",
+        }
+    elif platform_tag.startswith("macosx"):
+        env = {
+            "sys_platform": "darwin",
+            "platform_system": "Darwin",
+            "os_name": "posix",
+            "platform_machine": "arm64" if "arm64" in platform_tag else "x86_64",
+        }
+    else:
+        env = {
+            "sys_platform": "linux",
+            "platform_system": "Linux",
+            "os_name": "posix",
+            "platform_machine": "aarch64" if "aarch64" in platform_tag else "x86_64",
+        }
+
+    env.update(
+        {
+            "python_version": py_ver,
+            "python_full_version": py_full,
+            "implementation_name": "cpython",
+            "platform_python_implementation": "CPython",
+            "platform_release": "",
+            "platform_version": "",
+            # extra 置空：不评估 extras 引入的可选依赖
+            "extra": "",
+        }
+    )
+    return env
+
+
+def _find_missing_requirements(deps_path, env):
+    """扫描已下载 wheel 的 Requires-Dist，按目标环境评估 marker，
+    返回缺失的依赖 {canonical_name: 不含 marker 的 requirement 字符串}。
+
+    只做包名级校验：版本一致性由 pip download 的初始解析保证，
+    缺失项均为 marker 评估差异导致的整包遗漏。
+    """
+    have = set()
+    all_requires = []
+    for whl in sorted(Path(deps_path).glob("*.whl")):
+        have.add(canonicalize_name(whl.name.split("-")[0]))
+        try:
+            with zipfile.ZipFile(whl) as zf:
+                meta_name = next(
+                    n for n in zf.namelist() if n.endswith(".dist-info/METADATA")
+                )
+                meta = zf.read(meta_name).decode("utf-8", errors="replace")
+        except (StopIteration, zipfile.BadZipFile, OSError) as e:
+            print(f"警告: 无法读取 wheel 元数据 {whl.name}: {e}")
+            continue
+        for line in meta.split("\n"):
+            if line.startswith("Requires-Dist:"):
+                all_requires.append(line.split(":", 1)[1].strip())
+
+    missing = {}
+    for req_str in all_requires:
+        try:
+            req = Requirement(req_str)
+        except Exception:
+            continue
+        if req.marker is not None and not req.marker.evaluate(environment=env):
+            continue
+        name = canonicalize_name(req.name)
+        if name not in have and name not in missing:
+            missing[name] = f"{req.name}{req.specifier}"
+    return missing
+
+
+def _complete_dependency_closure(deps_path, platform_tag, python_version, max_rounds=5):
+    """迭代补齐目标平台的依赖闭包。新下载的 wheel 可能引入新的条件依赖，
+    循环校验直至闭包完整；超过 max_rounds 视为失败。
+    """
+    env = _target_marker_environment(platform_tag, python_version)
+    for round_index in range(max_rounds):
+        missing = _find_missing_requirements(deps_path, env)
+        if not missing:
+            if round_index > 0:
+                print("目标平台依赖闭包已补齐")
+            return True
+
+        print(f"闭包校验第 {round_index + 1} 轮，发现宿主 marker 评估漏掉的依赖: "
+              f"{', '.join(sorted(missing))}")
+        cmd = [
+            sys.executable,
+            "-m",
+            "pip",
+            "download",
+            *sorted(missing.values()),
+            "-d",
+            str(deps_path),
+            "--platform",
+            platform_tag,
+            "--only-binary=:all:",
+        ]
+        if python_version:
+            cmd += ["--python-version", python_version]
+        print(f"执行命令: {' '.join(cmd)}")
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            print(f"补齐依赖闭包失败:\n{result.stdout}\n{result.stderr}")
+            return False
+
+    print(f"错误: 依赖闭包在 {max_rounds} 轮内未收敛")
+    return False
 
 
 def download_dependencies(deps_dir, platform_tag, python_version=None, allow_fallback=True):
@@ -122,6 +260,11 @@ def download_dependencies(deps_dir, platform_tag, python_version=None, allow_fal
         if result.stderr:
             print("警告信息:")
             print(result.stderr)
+
+        # 交叉下载模式：宿主评估 marker 会漏掉目标平台条件依赖，补齐闭包
+        if not allow_fallback:
+            if not _complete_dependency_closure(deps_path, platform_tag, python_version):
+                return False
 
         # 列出下载的文件
         whl_files = list(deps_path.glob("*.whl"))
