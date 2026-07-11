@@ -485,8 +485,10 @@ def _check_game_resolution():
     w, h = size
     baseline_w, baseline_h = screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT
     tolerance = 2
+    did_resize = False
 
     if abs(w - baseline_w) > tolerance or abs(h - baseline_h) > tolerance:
+        did_resize = True
         logger.info(
             f"当前窗口分辨率 {w}x{h} 与基准 {baseline_w}x{baseline_h} 不符，尝试自动调整"
         )
@@ -516,6 +518,16 @@ def _check_game_resolution():
         logger.info(
             f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})"
         )
+        if did_resize and mode == GAME_WINDOW_MODE_GFN_APP:
+            # GFN 串流渲染分辨率在会话建立时确定：窗口缩放只改变本地窗口，
+            # 已在串流中的会话仍按原分辨率（如 1920x1200）云端渲染后缩放显示，
+            # 画面内 UI 尺寸/位置与 1280x720 基准不符，模板匹配会系统性失败。
+            logger.warning(
+                "GFN 窗口已调整为 1280x720，但若游戏会话在调整前已开始串流，"
+                "云端仍按原分辨率渲染，识别可能失败。若任务无法识别画面，请在 "
+                "GeForce NOW 设置中将串流分辨率固定为 1280x720 后重启游戏会话，"
+                "或保持窗口为 1280x720 时再启动游戏。"
+            )
     elif mode == GAME_WINDOW_MODE_GFN_APP:
         logger.warning(
             f"自动调整窗口分辨率未生效，当前 {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
