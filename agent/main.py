@@ -447,13 +447,30 @@ def _check_admin_privilege():
 
 
 def _check_game_resolution():
-    """连接控制器后检测游戏窗口分辨率"""
-    from utils.win32_process import find_window_by_process, get_client_size
-
-    hwnd = find_window_by_process("HTGame.exe")
-    if hwnd is None:
-        logger.warning("分辨率检测: 未找到游戏窗口 (HTGame.exe)")
+    """连接控制器后检测游戏窗口分辨率（本地客户端 / GFN Chrome / GFN 原生客户端）"""
+    if not sys.platform.startswith("win"):
+        logger.debug("分辨率检测: 非 Windows 平台，跳过")
         return
+
+    from utils.win32_process import (
+        GAME_WINDOW_MODE_GFN_APP,
+        GAME_WINDOW_MODE_GFN_CHROME,
+        GAME_WINDOW_MODE_NOT_FOUND,
+        get_client_size,
+        refresh_game_window_mode,
+    )
+
+    mode, hwnd = refresh_game_window_mode()
+    if mode == GAME_WINDOW_MODE_NOT_FOUND or hwnd is None:
+        logger.warning(
+            "分辨率检测: 未找到游戏窗口 (HTGame.exe / GFN Chrome / GeForceNOW.exe)"
+        )
+        return
+
+    if mode == GAME_WINDOW_MODE_GFN_CHROME:
+        logger.info("检测到 GeForce NOW (Chrome 网页版) 窗口，仅支持前台模式运行")
+    elif mode == GAME_WINDOW_MODE_GFN_APP:
+        logger.info("检测到 GeForce NOW 原生客户端窗口，仅支持前台模式运行")
 
     size = get_client_size(hwnd)
     if size is None:
@@ -467,6 +484,11 @@ def _check_game_resolution():
     if (w, h) == (screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT):
         logger.info(
             f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})"
+        )
+    elif mode == GAME_WINDOW_MODE_GFN_APP:
+        logger.warning(
+            f"当前窗口分辨率: {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
+            "请在 GeForce NOW 客户端设置中将串流分辨率设为 1280x720，否则部分功能可能异常。"
         )
     else:
         logger.warning(

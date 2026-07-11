@@ -463,6 +463,9 @@ assets/resource/base/model/detect/sos_nodes.onnx
 .claude/
 .nicegui/
 
+# local screenshots
+screenshot/
+
 # local gui test
 MFA/
 MXU/

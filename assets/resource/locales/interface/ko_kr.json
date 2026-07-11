@@ -6,6 +6,7 @@
     "controller_default_label": "데스크톱 - 기본",
     "controller_front_label": "데스크톱 - 포그라운드",
     "controller_background_label": "데스크톱 - 백그라운드",
+    "controller_gfn_chrome_label": "클라우드 - GeForce NOW (Chrome)",
     "resource_official_label": "공식 서버",
     "group.Daily.label": "일상 작업",
     "group.CityTycoon.label": "도시 타이쿤",

@@ -66,6 +66,21 @@ user32.EnumWindows.restype = wintypes.BOOL
 TH32CS_SNAPPROCESS = 0x00000002
 DEFAULT_GAME_PROCESS_NAME = "HTGame.exe"
 DEFAULT_WINDOW_RESIZE_SETTLE_MS = 300
+
+# GeForce NOW 云游戏窗口特征
+# Chrome 网页版：标题已实测确认（screenshot/NTE window name.png）
+GFN_CHROME_PROCESS_NAME = "chrome.exe"
+GFN_CHROME_WINDOW_CLASS = "Chrome_WidgetWin_1"
+GFN_CHROME_TITLE_REGEX = r"NTE.*on GeForce NOW"
+# 原生客户端：窗口类未实测（PRD 风险 R3），仅按进程名 + 标题宽松匹配
+GFN_APP_PROCESS_NAME = "GeForceNOW.exe"
+GFN_APP_TITLE_REGEX = r"GeForce NOW"
+
+# 游戏窗口运行模式（detect_game_window 的探测结果）
+GAME_WINDOW_MODE_NATIVE = "native"
+GAME_WINDOW_MODE_GFN_CHROME = "gfn_chrome"
+GAME_WINDOW_MODE_GFN_APP = "gfn_app"
+GAME_WINDOW_MODE_NOT_FOUND = "not_found"
 SW_RESTORE = 9
 GWL_STYLE = -16
 WS_CAPTION = 0x00C00000
@@ -172,7 +187,21 @@ def _match_class_name(class_name, patterns):
     return False
 
 
-def find_windows_by_process(process_name, hwnd_class=None, require_title=False):
+def _match_title(title, patterns):
+    """标题正则过滤。None 表示不过滤；str 或 str 列表按 re.search 匹配。"""
+    if patterns is None:
+        return True
+    if isinstance(patterns, str):
+        patterns = [patterns]
+    for pattern in patterns:
+        if re.search(pattern, title):
+            return True
+    return False
+
+
+def find_windows_by_process(
+    process_name, hwnd_class=None, require_title=False, title_regex=None
+):
     pids = get_pids_by_name(process_name)
     if not pids:
         return []
@@ -193,6 +222,8 @@ def find_windows_by_process(process_name, hwnd_class=None, require_title=False):
             return True
         title = get_window_text(hwnd)
         if require_title and not title:
+            return True
+        if not _match_title(title, title_regex):
             return True
         client_size = get_client_size(hwnd)
         if client_size is None or client_size[0] <= 10 or client_size[1] <= 10:
@@ -222,6 +253,7 @@ def find_window_by_process(
     process_name,
     hwnd_class=None,
     require_title=False,
+    title_regex=None,
     selected_hwnd=0,
     last_hwnd=0,
 ):
@@ -229,6 +261,7 @@ def find_window_by_process(
         process_name,
         hwnd_class=hwnd_class,
         require_title=require_title,
+        title_regex=title_regex,
     )
     if not windows:
         return None
@@ -248,6 +281,74 @@ def find_window_by_process(
     if last is not None and biggest["client_area"] <= last["client_area"] * 1.1:
         return last["hwnd"]
     return biggest["hwnd"]
+
+
+def detect_game_window(selected_hwnd=0, last_hwnd=0):
+    """按优先级探测游戏窗口：本地客户端 → GFN Chrome 网页版 → GFN 原生客户端。
+
+    返回 (mode, hwnd)。mode 为 GAME_WINDOW_MODE_* 常量之一；
+    未找到任何窗口时返回 (GAME_WINDOW_MODE_NOT_FOUND, None)。
+    """
+    hwnd = find_window_by_process(
+        DEFAULT_GAME_PROCESS_NAME,
+        selected_hwnd=selected_hwnd,
+        last_hwnd=last_hwnd,
+    )
+    if hwnd:
+        return GAME_WINDOW_MODE_NATIVE, hwnd
+
+    hwnd = find_window_by_process(
+        GFN_CHROME_PROCESS_NAME,
+        hwnd_class=GFN_CHROME_WINDOW_CLASS,
+        require_title=True,
+        title_regex=GFN_CHROME_TITLE_REGEX,
+        selected_hwnd=selected_hwnd,
+        last_hwnd=last_hwnd,
+    )
+    if hwnd:
+        return GAME_WINDOW_MODE_GFN_CHROME, hwnd
+
+    hwnd = find_window_by_process(
+        GFN_APP_PROCESS_NAME,
+        require_title=True,
+        title_regex=GFN_APP_TITLE_REGEX,
+        selected_hwnd=selected_hwnd,
+        last_hwnd=last_hwnd,
+    )
+    if hwnd:
+        return GAME_WINDOW_MODE_GFN_APP, hwnd
+
+    return GAME_WINDOW_MODE_NOT_FOUND, None
+
+
+# 模块级探测状态（配合独立 reset，遵循仓库模块级状态约定）
+_detected_game_mode = None
+_detected_game_hwnd = None
+
+
+def refresh_game_window_mode(selected_hwnd=0, last_hwnd=0):
+    """重新探测游戏窗口模式并更新模块级状态。返回 (mode, hwnd)。"""
+    global _detected_game_mode, _detected_game_hwnd
+    mode, hwnd = detect_game_window(selected_hwnd=selected_hwnd, last_hwnd=last_hwnd)
+    _detected_game_mode = mode
+    _detected_game_hwnd = hwnd
+    _log(f"game window mode detected: {mode}, hwnd={hwnd}")
+    return mode, hwnd
+
+
+def get_game_window_mode(refresh_if_unknown=True):
+    """返回最近一次探测到的游戏窗口模式；尚未探测过时可触发一次探测。"""
+    if _detected_game_mode is None and refresh_if_unknown:
+        mode, _ = refresh_game_window_mode()
+        return mode
+    return _detected_game_mode
+
+
+def reset_game_window_mode():
+    """清空模块级探测状态，下次 get_game_window_mode 会重新探测。"""
+    global _detected_game_mode, _detected_game_hwnd
+    _detected_game_mode = None
+    _detected_game_hwnd = None
 
 
 def get_client_size(hwnd):
@@ -420,6 +521,7 @@ def ensure_process_client_size(
     settle_ms=300,
     hwnd_class=None,
     require_title=False,
+    title_regex=None,
     selected_hwnd=0,
     last_hwnd=0,
 ):
@@ -428,6 +530,7 @@ def ensure_process_client_size(
         process_name,
         hwnd_class=hwnd_class,
         require_title=require_title,
+        title_regex=title_regex,
         selected_hwnd=selected_hwnd,
         last_hwnd=last_hwnd,
     )
@@ -489,15 +592,93 @@ def ensure_process_client_size(
 def ensure_game_window_resolution(
     width,
     height,
-    process_name=DEFAULT_GAME_PROCESS_NAME,
+    process_name=None,
     settle_ms=DEFAULT_WINDOW_RESIZE_SETTLE_MS,
     **kwargs,
 ):
-    """Resize the game window client area to the target resolution."""
-    return ensure_process_client_size(
-        process_name,
+    """Resize the game window client area to the target resolution.
+
+    process_name 为 None 时自动探测运行模式（本地 / GFN Chrome / GFN 原生客户端）
+    并路由到对应窗口；显式传入 process_name 则维持旧行为直接按进程名查找。
+    返回 dict 额外携带 "mode" 键供调用方区分运行模式。
+    """
+    if process_name is not None:
+        result = ensure_process_client_size(
+            process_name,
+            width,
+            height,
+            settle_ms=settle_ms,
+            **kwargs,
+        )
+        result["mode"] = None
+        return result
+
+    mode, hwnd = refresh_game_window_mode(
+        selected_hwnd=kwargs.get("selected_hwnd", 0),
+        last_hwnd=kwargs.get("last_hwnd", 0),
+    )
+
+    if mode == GAME_WINDOW_MODE_NOT_FOUND:
+        return {
+            "success": False,
+            "reason": "window_not_found",
+            "mode": mode,
+            "hwnd": None,
+            "before": None,
+            "after": None,
+        }
+
+    if mode == GAME_WINDOW_MODE_GFN_APP:
+        # GFN 原生客户端会抵抗外部缩放（PRD FR4/R3）：仅校验当前客户区，
+        # 不匹配时跳过缩放并交由调用方引导用户在 GFN 设置中固定 720p。
+        tolerance = int(kwargs.get("tolerance", 2))
+        before = get_client_size(hwnd)
+        matched = before is not None and (
+            abs(before[0] - int(width)) <= tolerance
+            and abs(before[1] - int(height)) <= tolerance
+        )
+        if matched:
+            reason = "already_matched"
+        else:
+            reason = "gfn_app_resize_skipped"
+            _log(
+                f"GFN app window resize skipped, client size={before}, "
+                f"expected {int(width)}x{int(height)}"
+            )
+        return {
+            "success": True,
+            "reason": reason,
+            "mode": mode,
+            "hwnd": hwnd,
+            "before": before,
+            "after": before,
+        }
+
+    if mode == GAME_WINDOW_MODE_GFN_CHROME:
+        passthrough = {
+            k: v
+            for k, v in kwargs.items()
+            if k not in ("hwnd_class", "require_title", "title_regex")
+        }
+        result = ensure_process_client_size(
+            GFN_CHROME_PROCESS_NAME,
+            width,
+            height,
+            settle_ms=settle_ms,
+            hwnd_class=GFN_CHROME_WINDOW_CLASS,
+            require_title=True,
+            title_regex=GFN_CHROME_TITLE_REGEX,
+            **passthrough,
+        )
+        result["mode"] = mode
+        return result
+
+    result = ensure_process_client_size(
+        DEFAULT_GAME_PROCESS_NAME,
         width,
         height,
         settle_ms=settle_ms,
         **kwargs,
     )
+    result["mode"] = mode
+    return result
