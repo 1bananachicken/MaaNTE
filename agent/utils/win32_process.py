@@ -72,9 +72,10 @@ DEFAULT_WINDOW_RESIZE_SETTLE_MS = 300
 GFN_CHROME_PROCESS_NAME = "chrome.exe"
 GFN_CHROME_WINDOW_CLASS = "Chrome_WidgetWin_1"
 GFN_CHROME_TITLE_REGEX = r"NTE.*on GeForce NOW"
-# 原生客户端：窗口类未实测（PRD 风险 R3），仅按进程名 + 标题宽松匹配
+# 原生客户端：标题已实测确认（GFNWindowMover 进程选择器截图），与 Chrome 版一致；
+# 窗口类待运行时日志确认（PRD 风险 R3），探测时不过滤类名
 GFN_APP_PROCESS_NAME = "GeForceNOW.exe"
-GFN_APP_TITLE_REGEX = r"GeForce NOW"
+GFN_APP_TITLE_REGEX = r"NTE.*on GeForce NOW"
 
 # 游戏窗口运行模式（detect_game_window 的探测结果）
 GAME_WINDOW_MODE_NATIVE = "native"
@@ -332,7 +333,9 @@ def refresh_game_window_mode(selected_hwnd=0, last_hwnd=0):
     mode, hwnd = detect_game_window(selected_hwnd=selected_hwnd, last_hwnd=last_hwnd)
     _detected_game_mode = mode
     _detected_game_hwnd = hwnd
-    _log(f"game window mode detected: {mode}, hwnd={hwnd}")
+    # 记录窗口类名：用于确认 GFN 客户端等未实测窗口的 class_regex（PRD R3）
+    class_name = get_class_name(hwnd) if hwnd else None
+    _log(f"game window mode detected: {mode}, hwnd={hwnd}, class={class_name}")
     return mode, hwnd
 
 
@@ -464,8 +467,12 @@ def resize_window(hwnd, width, height, center=True):
     return True
 
 
-def resize_client_area(hwnd, width, height, center=True, tolerance=2):
-    """Resize a window so its client area matches the target size."""
+def resize_client_area(hwnd, width, height, center=True, tolerance=2, manage_title_bar=True):
+    """Resize a window so its client area matches the target size.
+
+    manage_title_bar=False 时不强制恢复 WS_CAPTION——GFN 客户端等
+    无边框 CEF 窗口按原样缩放（边框差值按实际 0 计算）。
+    """
     if not hwnd:
         return False
     target_width = int(width)
@@ -473,7 +480,8 @@ def resize_client_area(hwnd, width, height, center=True, tolerance=2):
     if user32.IsIconic(hwnd) or user32.IsZoomed(hwnd):
         user32.ShowWindow(hwnd, SW_RESTORE)
         kernel32.Sleep(100)
-    show_title_bar(hwnd)
+    if manage_title_bar:
+        show_title_bar(hwnd)
 
     current_client = get_client_size(hwnd)
     current_rect = get_window_rect(hwnd)
@@ -524,6 +532,7 @@ def ensure_process_client_size(
     title_regex=None,
     selected_hwnd=0,
     last_hwnd=0,
+    manage_title_bar=True,
 ):
     """Find a process window and resize its client area to the target size."""
     hwnd = find_window_by_process(
@@ -572,6 +581,7 @@ def ensure_process_client_size(
         target[1],
         center=center,
         tolerance=tolerance,
+        manage_title_bar=manage_title_bar,
     )
     if resized and settle_ms:
         kernel32.Sleep(int(settle_ms))
@@ -629,30 +639,34 @@ def ensure_game_window_resolution(
         }
 
     if mode == GAME_WINDOW_MODE_GFN_APP:
-        # GFN 原生客户端会抵抗外部缩放（PRD FR4/R3）：仅校验当前客户区，
-        # 不匹配时跳过缩放并交由调用方引导用户在 GFN 设置中固定 720p。
-        tolerance = int(kwargs.get("tolerance", 2))
-        before = get_client_size(hwnd)
-        matched = before is not None and (
-            abs(before[0] - int(width)) <= tolerance
-            and abs(before[1] - int(height)) <= tolerance
-        )
-        if matched:
-            reason = "already_matched"
-        else:
-            reason = "gfn_app_resize_skipped"
-            _log(
-                f"GFN app window resize skipped, client size={before}, "
-                f"expected {int(width)}x{int(height)}"
-            )
-        return {
-            "success": True,
-            "reason": reason,
-            "mode": mode,
-            "hwnd": hwnd,
-            "before": before,
-            "after": before,
+        # GFN 原生客户端流窗口为无边框 CEF 窗口，接受标准 MoveWindow/SetWindowPos
+        # 缩放（GFNWindowMover 即用此方式）。manage_title_bar=False 保持无边框。
+        passthrough = {
+            k: v
+            for k, v in kwargs.items()
+            if k not in ("hwnd_class", "require_title", "title_regex", "manage_title_bar")
         }
+        result = ensure_process_client_size(
+            GFN_APP_PROCESS_NAME,
+            width,
+            height,
+            settle_ms=settle_ms,
+            require_title=True,
+            title_regex=GFN_APP_TITLE_REGEX,
+            manage_title_bar=False,
+            **passthrough,
+        )
+        result["mode"] = mode
+        if not result.get("success"):
+            # 缩放未生效时优雅降级：任务继续运行，由调用方引导用户
+            # 在 GFN 设置中固定 720p 串流或使用外部工具调整窗口
+            _log(
+                f"GFN app window resize failed ({result.get('reason')}), "
+                f"client size={result.get('after')}, expected {int(width)}x{int(height)}"
+            )
+            result["success"] = True
+            result["reason"] = "gfn_app_resize_failed"
+        return result
 
     if mode == GAME_WINDOW_MODE_GFN_CHROME:
         passthrough = {

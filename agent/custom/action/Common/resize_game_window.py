@@ -131,5 +131,5 @@ class ResizeGameWindow(CustomAction):
             PrintT(context, "gfn.mode_chrome_detected")
         elif mode == GAME_WINDOW_MODE_GFN_APP:
             PrintT(context, "gfn.mode_app_detected")
-            if result.get("reason") == "gfn_app_resize_skipped":
-                PrintT(context, "gfn.app_resize_skipped", width, height)
+            if result.get("reason") == "gfn_app_resize_failed":
+                PrintT(context, "gfn.app_resize_failed", width, height)

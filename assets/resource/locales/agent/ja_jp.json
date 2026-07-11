@@ -90,5 +90,5 @@
     "tetris.vitality_exhausted": "[テトリス] スタミナ切れ、タスク完了",
     "gfn.mode_chrome_detected": "GeForce NOW（Chrome 版）ウィンドウを検出しました。フォアグラウンドモードのみ対応です",
     "gfn.mode_app_detected": "GeForce NOW クライアントウィンドウを検出しました。フォアグラウンドモードのみ対応です",
-    "gfn.app_resize_skipped": "GeForce NOW クライアントウィンドウは自動リサイズに対応していません。GFN の設定でストリーミング解像度を %dx%d に設定してください"
+    "gfn.app_resize_failed": "GeForce NOW クライアントウィンドウのリサイズが反映されませんでした。GFN の設定でストリーミング解像度を %dx%d に設定するか、ウィンドウツールでそのサイズに調整してください"
 }

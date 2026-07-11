@@ -76,8 +76,8 @@ get_pids_by_name("HTGame.exe")          # 进程快照取 PID 集合
 | 目标 | 进程名 | 窗口类 | 标题模式 | 缩放行为 |
 | --- | --- | --- | --- | --- |
 | 本地客户端（现状） | `HTGame.exe` | `UnrealWindow` | `^\s*(异环\|NTE)\s*$` | `SetWindowPos` 正常生效 |
-| GFN Chrome 网页版 | `chrome.exe` | `Chrome_WidgetWin_1` | `NTE: Neverness to Everness on GeForce NOW`（已实测确认） | 外框可正常缩放；Chrome 自绘边框的边距计算需实测校验 |
-| GFN 原生客户端 | `GeForceNOW.exe` | 待实测验证（疑似 `CEF-OSC-WIDGET`） | 待实测验证（疑似含游戏名或 `GeForce NOW`） | 应用会抵抗外部缩放；需引导用户在 GFN 设置中固定 720p 串流分辨率 |
+| GFN Chrome 网页版 | `chrome.exe` | `Chrome_WidgetWin_1` | `NTE: Neverness to Everness on GeForce NOW`（已实测确认） | 外框可正常缩放，但窗口模式下页面自绘头部破坏帧几何（见 R8），实际要求 F11 全屏运行 |
+| GFN 原生客户端 | `GeForceNOW.exe` | `CEF-OSC-WIDGET`（社区文档，待运行日志确认；探测代码已记录 class 名） | `NTE: Neverness to Everness on GeForce NOW`（已实测确认，与 Chrome 版一致） | 接受标准 `MoveWindow`/`SetWindowPos` 外部缩放（GFNWindowMover 即用此方式），流窗口无边框、无页面头部；客户区调至 1280x720 可获得干净 720p 帧 |
 
 > [!NOTE]
 > 关于"用 Chrome 进程找窗口是否可行"：**可行，但有前提。**
@@ -108,8 +108,8 @@ get_pids_by_name("HTGame.exe")          # 进程快照取 PID 集合
     "label": "$controller_gfn_app_label",
     "type": "Win32",
     "win32": {
-        "class_regex": "<待实测验证>",
-        "window_regex": "<待实测验证>",
+        "class_regex": "CEF-OSC-WIDGET",
+        "window_regex": "NTE.*on GeForce NOW",
         "screencap": "PrintWindow",
         "mouse": "Seize",
         "keyboard": "Seize"
@@ -144,8 +144,8 @@ get_pids_by_name("HTGame.exe")          # 进程快照取 PID 集合
 | 运行模式 | 行为 |
 | --- | --- |
 | 本地客户端 | 现状不变：`ensure_game_window_resolution()` 强制客户区 1280x720 |
-| GFN Chrome | 走 `resize_client_area()` 常规路径；Chrome 自绘标题栏的边框/标题高度差值计算需实测校验（`show_title_bar` 的 `WS_CAPTION` 处理对 Chrome 可能不适用，需要按实测调整或跳过） |
-| GFN 原生客户端 | 默认**跳过缩放并告警**，引导用户在 GFN 客户端设置中把串流分辨率固定为 1280x720；`SetWindowPos` 重试循环（GeForceNowWindowMover 思路）仅作为可选降级方案，标记为风险项 |
+| GFN Chrome | 走 `resize_client_area()` 常规路径；但窗口模式下页面头部仍破坏帧几何（R8），缩放无法根治，实际引导用户 F11 全屏 |
+| GFN 原生客户端 | **自动缩放**：走 `resize_client_area(manage_title_bar=False)`，保持无边框、不强制 `WS_CAPTION`（GFNWindowMover 源码证实 GFN 窗口接受标准 `MoveWindow` 缩放）。缩放未生效时优雅降级（`reason=gfn_app_resize_failed`，任务不中断），提示用户在 GFN 设置固定 720p 串流或用窗口工具调整 |
 
 ### FR5 — 用户可见提示（`utils/maafocus`）
 
@@ -170,11 +170,12 @@ get_pids_by_name("HTGame.exe")          # 进程快照取 PID 集合
 | --- | --- | --- | --- |
 | R1 | Chrome/CEF 的 GPU 合成窗口对 `SendMessage`/`PostMessage` 后台注入普遍不可靠 | GFN 用户大概率**只能前台运行**，无法使用后台任务 | PRD 即明确 GFN 控制器为前台模式；文档与 UI 提示中声明该限制 |
 | R2 | 云端串流的压缩伪影/码率波动可能拉低 TemplateMatch 匹配分 | 识别节点在 GFN 下命中率下降 | 验收阶段用代表性任务实测；必要时对少量模板放宽 `threshold` 或补充 GFN 专用模板 |
-| R3 | GFN 原生客户端窗口类/标题未实测 | `GFN-App` 控制器与 FR3 第 3 优先级无法定稿 | 实现前用 Spy++/`GetClassName` 实测并回填本文档 §3 表格 |
+| R3 | GFN 原生客户端窗口类未运行时确认（标题已确认） | `GFN-App` 控制器 `class_regex` 以社区文档的 `CEF-OSC-WIDGET` 先行发布 | 探测代码已在日志中记录 `class=` 字段，用户下一份日志包即可确认；如不符，改一行 `class_regex` |
 | R4 | 窗口标题可能随 GFN 客户端语言变化 | `window_regex` 漏匹配 | 优先匹配语言无关片段（游戏英文名 + `GeForce NOW`）；收集多语言标题样本 |
 | R5 | 用户同时开多个 Chrome 窗口（含多个 GFN 页签）的极端情况 | 选窗歧义 | FR2 的标题过滤 + 现有 `selected_hwnd`/滞回机制兜底；GUI 侧用户可手动选窗 |
 | R6 | GFN 自身的排队、闲置踢出、会话到期画面 | 任务流程外状态，Pipeline 无法恢复 | 非目标（§1.3）；提示用户保持会话活跃，长任务失败时日志可定位 |
 | R7 | 任务级控制器限制（`assets/resource/tasks/*.json` 中 `"controller": {"type": "Win32-Front"}`) 与新控制器名的兼容性 | 限定控制器的任务在 GFN 下不可见/不可用 | 实现时梳理各任务的控制器要求，明确 GFN 控制器允许运行的任务集合并在任务配置中声明 |
+| R8 | **（实测确认）** GFN Chrome 网页版窗口模式下，页面自绘头部（标题条）占据客户区顶部约 26px，游戏视频被下移且按比例缩放，所有固定 ROI 识别失败（实测 InWorld 失败 5563 次、SceneManager 连按 ESC 569 次死循环） | GFN Chrome 窗口模式完全不可用 | 运行前提：16:9 显示器 + F11 全屏（头部消失、视频铺满、帧缩放为干净 1280x720）+ Windows 缩放 100%；文档与 UI 提示中声明 |
 
 ## 7. 验收标准
 

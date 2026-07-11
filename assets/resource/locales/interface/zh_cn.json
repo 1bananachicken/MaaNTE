@@ -7,6 +7,7 @@
     "controller_front_label": "桌面端-前台",
     "controller_background_label": "桌面端-后台",
     "controller_gfn_chrome_label": "云游戏-GeForce NOW (Chrome)",
+    "controller_gfn_app_label": "云游戏-GeForce NOW (客户端)",
     "resource_official_label": "官服",
     "group.Daily.label": "日常任务",
     "group.CityTycoon.label": "都市大亨",

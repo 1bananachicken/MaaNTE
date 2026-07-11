@@ -7,6 +7,7 @@
     "controller_front_label": "Win32 - Front",
     "controller_background_label": "Win32 - Background",
     "controller_gfn_chrome_label": "Cloud - GeForce NOW (Chrome)",
+    "controller_gfn_app_label": "Cloud - GeForce NOW (App)",
     "resource_official_label": "Official Server",
     "group.Daily.label": "Daily Tasks",
     "group.CityTycoon.label": "City Tycoon",
