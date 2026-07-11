@@ -174,7 +174,7 @@ get_pids_by_name("HTGame.exe")          # 进程快照取 PID 集合
 | R4 | 窗口标题可能随 GFN 客户端语言变化 | `window_regex` 漏匹配 | 优先匹配语言无关片段（游戏英文名 + `GeForce NOW`）；收集多语言标题样本 |
 | R5 | 用户同时开多个 Chrome 窗口（含多个 GFN 页签）的极端情况 | 选窗歧义 | FR2 的标题过滤 + 现有 `selected_hwnd`/滞回机制兜底；GUI 侧用户可手动选窗 |
 | R6 | GFN 自身的排队、闲置踢出、会话到期画面 | 任务流程外状态，Pipeline 无法恢复 | 非目标（§1.3）；提示用户保持会话活跃，长任务失败时日志可定位 |
-| R7 | 任务级控制器限制（`assets/resource/tasks/*.json` 中 `"controller": {"type": "Win32-Front"}`) 与新控制器名的兼容性 | 限定控制器的任务在 GFN 下不可见/不可用 | 实现时梳理各任务的控制器要求，明确 GFN 控制器允许运行的任务集合并在任务配置中声明 |
+| R7 | ~~任务级控制器限制与新控制器名的兼容性~~ **已关闭**：已梳理全部 12 个限定控制器的任务。GFN 两控制器与 `Win32-Front` 模式一致（PrintWindow + Seize），10 个任务已在配置中放开 `GFN-Chrome`/`GFN-App`（PinkPawHeist、MakeCoffee、MakeCoffeeLite、Furniture、BagelSpam、SoundDodge、RealTime、SyncCharacterAbilityCityAbility、ClaimRewards、WithdrawMoney）；`FountainCheckin`、`WitchDivination` 保持仅 `Win32-Front`——两者依赖抓包定位坐标（`Navi/coordinate_position.py`，pcap/pktmon），GFN 场景下游戏运行在云端、本机无游戏流量，原理上不可用 | — | 新增任务时按 `.claude/skills/task-config/SKILL.md` 的控制器限制规则声明 |
 | R8 | **（实测确认）** GFN Chrome 网页版窗口模式下，页面自绘头部（标题条）占据客户区顶部约 26px，游戏视频被下移且按比例缩放，所有固定 ROI 识别失败（实测 InWorld 失败 5563 次、SceneManager 连按 ESC 569 次死循环） | GFN Chrome 窗口模式完全不可用 | 运行前提：16:9 显示器 + F11 全屏（头部消失、视频铺满、帧缩放为干净 1280x720）+ Windows 缩放 100%；文档与 UI 提示中声明 |
 
 ## 7. 验收标准
@@ -183,7 +183,7 @@ get_pids_by_name("HTGame.exe")          # 进程快照取 PID 集合
 - [ ] 控制器连接成功，截图分辨率为 1280x720，鼠标/键盘输入在串流中生效（含 WASD 长按）。
 - [ ] Agent 启动探测顺序正确：本地客户端优先，其次 GFN Chrome，最后 GFN 原生客户端；探测结果日志清晰。
 - [ ] `find_window_by_process` 增加 `title_regex` 后，现有调用方（`HTGame.exe` 路径）行为回归一致。
-- [ ] 代表性任务（如 `FountainCheckin`）在 GFN Chrome 下端到端跑通。
+- [ ] 代表性任务（如 `MakeCoffee`、`PinkPawHeist`）在 GFN 下端到端跑通。（原定的 `FountainCheckin` 依赖抓包定位坐标，GFN 下原理上不可用，见 R7）
 - [ ] GFN 原生客户端路径优雅降级：跳过缩放、输出明确的用户引导消息，任务不因缩放失败而崩溃。
 - [ ] 5 个 locale 文件的新增键完整同步，`pnpm exec prettier --check` 通过。
 

@@ -134,7 +134,7 @@
     "task_bagel_spam_option_publish_count_label": "發布次數",
     "task_bagel_spam_option_publish_count_desc": "設定要發布的次數",
     "task_sound_dodge_label": "音頻閃避",
-    "task_sound_dodge_desc": "基於音頻識別的自動閃避與反擊，需要<span style='color:red'>“桌面端-前台”</span>控制器",
+    "task_sound_dodge_desc": "基於音頻識別的自動閃避與反擊，需要<span style='color:red'>“桌面端-前台”或 GFN</span> 前台控制器",
     "task_sound_dodge_option_enable": "啟用音頻閃避",
     "task_sound_dodge_option_enable_desc": "開啟後通過識別遊戲音效自動觸發閃避",
     "task_sound_dodge_option_dodge_only": "僅閃避模式",
