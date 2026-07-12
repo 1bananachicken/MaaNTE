@@ -64,5 +64,7 @@
 # # 定义导出列表：包含所有函数和recognition_handler实例
 
 from .test_AF import AF_AutoFightClsTest
+from .test_AUF import UF_ActionLogger
 
-__all__ = ["AF_AutoFightClsTest"]
+
+__all__ = ["AF_AutoFightClsTest","UF_ActionLogger"]

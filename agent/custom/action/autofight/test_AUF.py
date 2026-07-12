@@ -3,10 +3,10 @@ import json
 
 from maa.context import Context
 from maa.custom_action import CustomAction
-
+from maa.agent.agent_server import AgentServer
 from .logger import logger
 
-
+@AgentServer.custom_action("UF_ActionLogger")
 class UF_ActionLogger(CustomAction):
     def run(
             self,
@@ -28,7 +28,7 @@ class UF_ActionLogger(CustomAction):
                 logger.debug(f'{debug_one}')
         return True
 
-
+@AgentServer.custom_action("UF_ActionMoveScreen")
 class UF_ActionMoveScreen(CustomAction):
     def run(
             self,

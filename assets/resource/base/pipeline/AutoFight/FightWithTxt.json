@@ -1,0 +1,383 @@
+{
+    "$__mpe_config_FightWithTxt": {
+        "$__mpe_code": {
+            "prefix": "",
+            "coordinateMode": "absolute-v1",
+            "lastSyncTime": 1783833782718,
+            "isModifiedExternally": false,
+            "filePath": "E:\\PyCharm\\Project\\MaaTest\\MaaNTE\\assets\\resource\\base\\pipeline\\AutoFight\\FightWithTxt.json",
+            "savedViewport": {
+                "x": -2097,
+                "y": 135,
+                "zoom": 0.53
+            },
+            "filename": "FightWithTxt",
+            "version": "v1.7.3"
+        }
+    },
+    "FT_Action": {
+        "pre_delay": 0,
+        "anchor": {
+            "FT_TargetNode": "FT_Character_1"
+        },
+        "post_delay": 0,
+        "next": [
+            "FT_StopFight",
+            "[JumpBack]FT_StartFight"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4384,
+                "y": -914
+            }
+        }
+    },
+    "FT_Character_1": {
+        "pre_delay": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "角色1"
+                    ]
+                }
+            }
+        },
+        "anchor": {
+            "FT_TargetNode": "FT_Character_2"
+        },
+        "post_delay": 0,
+        "next": [
+            "FT_CharacterChange_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4762,
+                "y": -484
+            }
+        }
+    },
+    "FT_ReadtTxt": {
+        "$__mpe_code": {
+            "position": {
+                "x": 5654,
+                "y": -976
+            }
+        }
+    },
+    "FT_StartFight": {
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "[Anchor]FT_TargetNode"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5758,
+                "y": -717
+            }
+        }
+    },
+    "FT_CharacterFight_1": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "AF_AutoFightClsTest",
+                "custom_recognition_param": {
+                    "model": "0710_1.onnx",
+                    "during_time": 20
+                }
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "FT_StartFight"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5424,
+                "y": -483
+            }
+        }
+    },
+    "FT_StopFight": {
+        "$__mpe_code": {
+            "position": {
+                "x": 4780,
+                "y": -1007
+            }
+        }
+    },
+    "新建节点12": {
+        "pre_delay": 0,
+        "post_delay": 0,
+        "$__mpe_code": {
+            "position": {
+                "x": 4214,
+                "y": -557
+            }
+        }
+    },
+    "FT_Action_副本10": {
+        "pre_delay": 0,
+        "anchor": {
+            "FT_TargetNode": "FT_Character_1"
+        },
+        "post_delay": 0,
+        "next": [
+            "FT_StartFight"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5195,
+                "y": -1052
+            }
+        }
+    },
+    "FT_Character_2": {
+        "pre_delay": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "角色2"
+                    ]
+                }
+            }
+        },
+        "anchor": {
+            "FT_TargetNode": "FT_Character_3"
+        },
+        "post_delay": 0,
+        "next": [
+            "FT_CharacterChange_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4771,
+                "y": -136
+            }
+        }
+    },
+    "FT_CharacterChange_1": {
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    49
+                ]
+            }
+        },
+        "repeat": 3,
+        "post_delay": 0,
+        "next": [
+            "FT_CharacterFight_1"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5084,
+                "y": -484
+            }
+        }
+    },
+    "FT_CharacterChange_2": {
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    50
+                ]
+            }
+        },
+        "repeat": 3,
+        "post_delay": 0,
+        "next": [
+            "FT_CharacterFight_2"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5053,
+                "y": -150
+            }
+        }
+    },
+    "FT_CharacterFight_2": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "AF_AutoFightClsTest",
+                "custom_recognition_param": {
+                    "model": "0710_1.onnx",
+                    "during_time": 20
+                }
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "FT_StartFight"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5427,
+                "y": -122
+            }
+        }
+    },
+    "FT_Character_3": {
+        "pre_delay": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "角色3"
+                    ]
+                }
+            }
+        },
+        "anchor": {
+            "FT_TargetNode": "FT_Character_4"
+        },
+        "post_delay": 0,
+        "next": [
+            "FT_CharacterChange_3"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4773,
+                "y": 211
+            }
+        }
+    },
+    "FT_CharacterChange_3": {
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    51
+                ]
+            }
+        },
+        "repeat": 3,
+        "post_delay": 0,
+        "next": [
+            "FT_CharacterFight_3"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5106,
+                "y": 205
+            }
+        }
+    },
+    "FT_CharacterFight_3": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "AF_AutoFightClsTest",
+                "custom_recognition_param": {
+                    "model": "0710_1.onnx",
+                    "during_time": 20
+                }
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "FT_StartFight"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5441,
+                "y": 210
+            }
+        }
+    },
+    "FT_Character_4": {
+        "pre_delay": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "UF_ActionLogger",
+                "custom_action_param": {
+                    "debug": [
+                        "角色4"
+                    ]
+                }
+            }
+        },
+        "anchor": {
+            "FT_TargetNode": "FT_Character_1"
+        },
+        "post_delay": 0,
+        "next": [
+            "FT_CharacterChange_4"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 4770,
+                "y": 568
+            }
+        }
+    },
+    "FT_CharacterChange_4": {
+        "pre_delay": 0,
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    52
+                ]
+            }
+        },
+        "repeat": 3,
+        "post_delay": 0,
+        "next": [
+            "FT_CharacterFight_4"
+        ],
+        "$__mpe_code": {
+            "position": {
+                "x": 5100,
+                "y": 568
+            }
+        }
+    },
+    "FT_CharacterFight_4": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "AF_AutoFightClsTest",
+                "custom_recognition_param": {
+                    "model": "0710_1.onnx",
+                    "during_time": 10
+                }
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "$__mpe_code": {
+            "position": {
+                "x": 5445,
+                "y": 566
+            }
+        }
+    },
+    "$__mpe_anchor_FT_TargetNode_FightWithTxt": {
+        "$__mpe_code": {
+            "position": {
+                "x": 6083,
+                "y": -666
+            }
+        }
+    }
+}
