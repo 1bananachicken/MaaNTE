@@ -153,7 +153,12 @@ class WaypointNavigator:
             self.on_frame(location, angle)
         return location, angle
 
-    def move_to(self, target: tuple[int, int]) -> bool:
+    def move_to(
+        self,
+        target: tuple[int, int],
+        *,
+        on_tick: Callable[[], None] | None = None,
+    ) -> bool:
         target_x, target_y = target
         deadline = (
             time.monotonic() + self.max_duration
@@ -171,6 +176,9 @@ class WaypointNavigator:
             if self.should_cancel is not None and self.should_cancel():
                 self.release()
                 return False
+
+            if on_tick is not None:
+                on_tick()
 
             started = time.perf_counter()
             result = self.update()

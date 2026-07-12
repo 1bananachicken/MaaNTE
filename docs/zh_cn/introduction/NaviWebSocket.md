@@ -39,6 +39,8 @@
 
 该入口位于 `assets/resource/base/pipeline/OnlineMapNavigation.json`，任务设置位于 `assets/resource/tasks/OnlineMapNavigation.json`。
 
+当任务列表紧接着启用 `RealTimeTaskMain` 时，`online_map_navigation` 会把本次配置交给实时辅助任务并结束当前入口。实时辅助随后在同一个线程中交替执行导航更新和 Pipeline 检测；路径点移动期间也会继续检测。这样既保留两个任务各自的选项覆盖，也不会并发调用同一个截图控制器。单独启用在线地图时仍按原有无限循环运行。
+
 服务固定监听 `0.0.0.0`，不可通过任务设置或 Pipeline 参数修改。客户端连接地址：
 
 ```text

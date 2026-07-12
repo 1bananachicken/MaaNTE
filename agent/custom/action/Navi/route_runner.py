@@ -97,7 +97,7 @@ class RouteRunner:
             target = waypoints[current_index]
             with self._lock:
                 self._moving_target = (current_index, target)
-            arrived = self.navigator.move_to(target)
+            arrived = self.navigator.move_to(target, on_tick=on_tick)
             with self._lock:
                 self._moving_target = None
             if arrived:
