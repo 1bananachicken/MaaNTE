@@ -178,7 +178,10 @@ def _find_missing_requirements(deps_path, env):
             continue
         name = canonicalize_name(req.name)
         if name not in have and name not in missing:
-            missing[name] = f"{req.name}{req.specifier}"
+            # 保留 extras（如 pkg[extra]）：补齐下载时让 pip 一并解析
+            # extras 引入的附加依赖，否则闭包仍然不完整
+            extras = f"[{','.join(sorted(req.extras))}]" if req.extras else ""
+            missing[name] = f"{req.name}{extras}{req.specifier}"
     return missing
 
 

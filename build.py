@@ -167,8 +167,12 @@ def _bootstrap_pip_offline(python_dir):
         shutil.rmtree(bootstrap_dir, ignore_errors=True)
 
 
-def step_setup_python(os_type, os_arch):
-    """步骤1: 安装嵌入式 Python + pip"""
+def step_setup_python(os_type, os_arch, is_cross=False):
+    """步骤1: 安装嵌入式 Python + pip
+
+    is_cross: 目标平台（OS 或架构）与宿主不一致时为 True，此时目标
+    python.exe 无法在宿主机执行，pip 走离线解压方式安装。
+    """
     print("\n" + "=" * 60)
     print("[1/12] 安装嵌入式 Python")
     print("=" * 60)
@@ -264,8 +268,9 @@ def step_setup_python(os_type, os_arch):
 
     # 安装 pip
     print("  安装 pip...")
-    if os_type == "Windows" and platform.system() != "Windows":
-        # 交叉构建：python.exe 无法在宿主机执行，走离线解压方式
+    if os_type == "Windows" and is_cross:
+        # 交叉构建（跨 OS 或同 OS 跨架构）：目标 python.exe 无法在
+        # 宿主机执行，走离线解压方式
         _bootstrap_pip_offline(PYTHON_DIR)
     else:
         get_pip_url = "https://bootstrap.pypa.io/get-pip.py"
@@ -666,7 +671,7 @@ def main():
 
     if not args.skip_download:
         # 1. 嵌入式 Python
-        python_exe = step_setup_python(os_type, os_arch)
+        python_exe = step_setup_python(os_type, os_arch, is_cross=is_cross)
 
         # 交叉构建时目标 python.exe 无法在宿主机执行，工具脚本改用宿主 Python
         tool_python = Path(sys.executable) if is_cross else python_exe
