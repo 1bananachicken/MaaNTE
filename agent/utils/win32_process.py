@@ -189,8 +189,12 @@ def _match_class_name(class_name, patterns):
 
 
 def _match_title(title, patterns):
-    """标题正则过滤。None 表示不过滤；str 或 str 列表按 re.search 匹配。"""
-    if patterns is None:
+    """标题正则过滤。None/空列表 表示不过滤；str 或 str 列表按 re.search 匹配。
+
+    空列表与 None 同义（不过滤）：避免动态构建模式列表为空时
+    静默过滤掉所有窗口。
+    """
+    if not patterns:
         return True
     if isinstance(patterns, str):
         patterns = [patterns]
@@ -330,12 +334,15 @@ _detected_game_hwnd = None
 def refresh_game_window_mode(selected_hwnd=0, last_hwnd=0):
     """重新探测游戏窗口模式并更新模块级状态。返回 (mode, hwnd)。"""
     global _detected_game_mode, _detected_game_hwnd
+    prev = (_detected_game_mode, _detected_game_hwnd)
     mode, hwnd = detect_game_window(selected_hwnd=selected_hwnd, last_hwnd=last_hwnd)
     _detected_game_mode = mode
     _detected_game_hwnd = hwnd
-    # 记录窗口类名：用于确认 GFN 客户端等未实测窗口的 class_regex（PRD R3）
-    class_name = get_class_name(hwnd) if hwnd else None
-    _log(f"game window mode detected: {mode}, hwnd={hwnd}, class={class_name}")
+    # 记录窗口类名：用于确认 GFN 客户端等未实测窗口的 class_regex（PRD R3）。
+    # 仅在探测结果变化时输出，避免每次任务/缩放触发的重复探测刷屏
+    if (mode, hwnd) != prev:
+        class_name = get_class_name(hwnd) if hwnd else None
+        _log(f"game window mode detected: {mode}, hwnd={hwnd}, class={class_name}")
     return mode, hwnd
 
 

@@ -490,7 +490,11 @@ def _check_game_resolution():
     if abs(w - baseline_w) > tolerance or abs(h - baseline_h) > tolerance:
         did_resize = True
         logger.info(
-            f"当前窗口分辨率 {w}x{h} 与基准 {baseline_w}x{baseline_h} 不符，尝试自动调整"
+            "当前窗口分辨率 %dx%d 与基准 %dx%d 不符，尝试自动调整",
+            w,
+            h,
+            baseline_w,
+            baseline_h,
         )
         try:
             result = ensure_game_window_resolution(baseline_w, baseline_h)
@@ -499,9 +503,11 @@ def _check_game_resolution():
             result = None
         if result is not None:
             logger.debug(
-                f"窗口分辨率调整结果: mode={result.get('mode')}, "
-                f"reason={result.get('reason')}, "
-                f"before={result.get('before')}, after={result.get('after')}"
+                "窗口分辨率调整结果: mode=%s, reason=%s, before=%s, after=%s",
+                result.get("mode"),
+                result.get("reason"),
+                result.get("before"),
+                result.get("after"),
             )
             after = result.get("after")
             if after is not None:
@@ -516,7 +522,7 @@ def _check_game_resolution():
 
     if abs(w - baseline_w) <= tolerance and abs(h - baseline_h) <= tolerance:
         logger.info(
-            f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})"
+            "当前窗口分辨率: %dx%d [正常], scale=(%.3f, %.3f)", w, h, scale_x, scale_y
         )
         if did_resize and mode == GAME_WINDOW_MODE_GFN_APP:
             # GFN 串流渲染分辨率在会话建立时确定：窗口缩放只改变本地窗口，
@@ -530,13 +536,21 @@ def _check_game_resolution():
             )
     elif mode == GAME_WINDOW_MODE_GFN_APP:
         logger.warning(
-            f"自动调整窗口分辨率未生效，当前 {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
-            "请在 GeForce NOW 客户端设置中将串流分辨率设为 1280x720，否则部分功能可能异常。"
+            "自动调整窗口分辨率未生效，当前 %dx%d，scale=(%.3f, %.3f)。"
+            "请在 GeForce NOW 客户端设置中将串流分辨率设为 1280x720，否则部分功能可能异常。",
+            w,
+            h,
+            scale_x,
+            scale_y,
         )
     else:
         logger.warning(
-            f"自动调整窗口分辨率未生效，当前 {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
-            "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。"
+            "自动调整窗口分辨率未生效，当前 %dx%d，scale=(%.3f, %.3f)。"
+            "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。",
+            w,
+            h,
+            scale_x,
+            scale_y,
         )
 
 
