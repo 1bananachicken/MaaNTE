@@ -119,7 +119,8 @@ def get_platform(target_os="auto", target_arch="auto"):
             proc_id = os.environ.get("PROCESSOR_IDENTIFIER", "")
             if "ARMv8" in proc_id or "ARM64" in proc_id:
                 os_arch = "ARM64"
-        arch_map = {"AMD64": "AMD64", "x86_64": "AMD64", "ARM64": "ARM64", "aarch64": "ARM64"}
+        # 含 --target-arch 传入的小写 "arm64"（CLI choices 为小写）
+        arch_map = {"AMD64": "AMD64", "x86_64": "AMD64", "ARM64": "ARM64", "aarch64": "ARM64", "arm64": "ARM64"}
     elif os_type == "Darwin":
         arch_map = {"x86_64": "x86_64", "arm64": "arm64", "aarch64": "arm64"}
     elif os_type == "Linux":
@@ -638,9 +639,19 @@ def main():
         if r.returncode != 0:
             print("警告: git submodule 初始化失败，OCR 模型可能无法正确配置")
 
-    # 检测平台（target-os/target-arch 非 auto 时为交叉构建目标）
+    # 检测平台（target-os/target-arch 非 auto 时为交叉构建目标）。
+    # 交叉判定需同时比较 OS 与架构：同 OS 跨架构（如 Windows AMD64 宿主
+    # 指定 --target-arch arm64）时目标 python.exe 同样无法在宿主机执行
     os_type, os_arch, platform_tag = get_platform(args.target_os, args.target_arch)
-    is_cross = os_type != platform.system()
+
+    def _norm_arch(arch):
+        return {"amd64": "x86_64", "arm64": "arm64", "aarch64": "arm64"}.get(
+            str(arch).lower(), str(arch).lower()
+        )
+
+    is_cross = os_type != platform.system() or _norm_arch(os_arch) != _norm_arch(
+        platform.machine()
+    )
     if is_cross and os_type != "Windows":
         print(f"错误: 交叉构建仅支持 Windows 目标，当前目标: {os_type}")
         sys.exit(1)

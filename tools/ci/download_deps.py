@@ -5,6 +5,7 @@
 自动检测当前平台并下载对应架构的wheel文件
 """
 
+import email
 import os
 import sys
 import subprocess
@@ -22,6 +23,14 @@ try:
 except ImportError:
     from packaging.requirements import Requirement
     from packaging.utils import canonicalize_name
+
+try:
+    from pip._vendor.packaging.markers import default_environment as _default_marker_environment
+except ImportError:
+    try:
+        from packaging.markers import default_environment as _default_marker_environment
+    except ImportError:
+        _default_marker_environment = None
 
 
 def get_platform_tag():
@@ -113,11 +122,16 @@ def _target_marker_environment(platform_tag, python_version):
             "platform_machine": "aarch64" if "aarch64" in platform_tag else "x86_64",
         }
 
-    env.update(
+    # 以 default_environment() 补齐 PEP 508 全部标准键（如 implementation_version），
+    # 避免 marker 使用未覆盖的变量时评估出错；目标平台相关字段随后全部覆盖
+    base_env = dict(_default_marker_environment()) if _default_marker_environment else {}
+    base_env.update(env)
+    base_env.update(
         {
             "python_version": py_ver,
             "python_full_version": py_full,
             "implementation_name": "cpython",
+            "implementation_version": py_full,
             "platform_python_implementation": "CPython",
             "platform_release": "",
             "platform_version": "",
@@ -125,7 +139,7 @@ def _target_marker_environment(platform_tag, python_version):
             "extra": "",
         }
     )
-    return env
+    return base_env
 
 
 def _find_missing_requirements(deps_path, env):
@@ -148,9 +162,11 @@ def _find_missing_requirements(deps_path, env):
         except (StopIteration, zipfile.BadZipFile, OSError) as e:
             print(f"警告: 无法读取 wheel 元数据 {whl.name}: {e}")
             continue
-        for line in meta.split("\n"):
-            if line.startswith("Requires-Dist:"):
-                all_requires.append(line.split(":", 1)[1].strip())
+        # METADATA 为 RFC 822 风格头部，Requires-Dist 允许折叠续行（PEP 566），
+        # 用 email 解析器正确合并续行，避免按行解析丢失折叠部分
+        msg = email.message_from_string(meta)
+        for req_line in msg.get_all("Requires-Dist") or []:
+            all_requires.append(" ".join(str(req_line).split()))
 
     missing = {}
     for req_str in all_requires:
