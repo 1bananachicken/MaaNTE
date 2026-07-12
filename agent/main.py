@@ -512,6 +512,10 @@ def _check_game_resolution():
             after = result.get("after")
             if after is not None:
                 w, h = after
+            # 缩放内部会重新枚举选窗（多 Chrome 窗口场景可能选中不同句柄），
+            # 后续兜底测量必须用缩放实际作用的窗口
+            if result.get("hwnd"):
+                hwnd = result["hwnd"]
         # 调整可能改变窗口尺寸，用最终实际值兜底刷新
         final_size = get_client_size(hwnd)
         if final_size is not None:

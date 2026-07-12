@@ -73,7 +73,9 @@ GFN_CHROME_PROCESS_NAME = "chrome.exe"
 GFN_CHROME_WINDOW_CLASS = "Chrome_WidgetWin_1"
 GFN_CHROME_TITLE_REGEX = r"NTE.*on GeForce NOW"
 # 原生客户端：标题已实测确认（GFNWindowMover 进程选择器截图），与 Chrome 版一致；
-# 窗口类待运行时日志确认（PRD 风险 R3），探测时不过滤类名
+# 窗口类已运行时实测确认为 CEFCLIENT（PRD 风险 R3 已关闭，interface.json 控制器
+# 按此匹配）。agent 侧探测仍不过滤类名：进程名 + 标题正则已足够唯一，
+# 且可兼容未来客户端更新导致的类名变更（探测日志保留 class= 字段供核对）
 GFN_APP_PROCESS_NAME = "GeForceNOW.exe"
 GFN_APP_TITLE_REGEX = r"NTE.*on GeForce NOW"
 
@@ -98,8 +100,12 @@ SWP_SHOWWINDOW = 0x0040
 MONITOR_DEFAULTTONEAREST = 0x00000002
 
 
-def _log(message):
-    print(f"[Win32Process] {message}")
+def _log(message, level="info"):
+    """经项目统一 logger 输出（文件滚动/级别控制/MXU 控制台格式），
+    保留 [Win32Process] 前缀便于按模块过滤。"""
+    from utils.logger import logger
+
+    getattr(logger, level, logger.info)("[Win32Process] %s", message)
 
 
 class PROCESSENTRY32W(ctypes.Structure):
@@ -669,7 +675,8 @@ def ensure_game_window_resolution(
             # 在 GFN 设置中固定 720p 串流或使用外部工具调整窗口
             _log(
                 f"GFN app window resize failed ({result.get('reason')}), "
-                f"client size={result.get('after')}, expected {int(width)}x{int(height)}"
+                f"client size={result.get('after')}, expected {int(width)}x{int(height)}",
+                level="warning",
             )
             result["success"] = True
             result["reason"] = "gfn_app_resize_failed"
