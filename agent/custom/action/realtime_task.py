@@ -63,7 +63,7 @@ class RealTimeTaskAction(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         nodes = _parse_nodes(argv.custom_action_param)
         pipeline_override = _build_pipeline_override(nodes)
-        navigation_params = consume_navigation_handoff()
+        navigation_params = consume_navigation_handoff(argv.task_detail.task_id)
         if navigation_params is not None:
             return self.run_with_navigation(
                 context,
