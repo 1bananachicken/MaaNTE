@@ -3,13 +3,13 @@
         "$__mpe_code": {
             "prefix": "",
             "coordinateMode": "absolute-v1",
-            "lastSyncTime": 1783833782718,
+            "lastSyncTime": 1783841425122,
             "isModifiedExternally": false,
             "filePath": "E:\\PyCharm\\Project\\MaaTest\\MaaNTE\\assets\\resource\\base\\pipeline\\AutoFight\\FightWithTxt.json",
             "savedViewport": {
-                "x": -2097,
-                "y": 135,
-                "zoom": 0.53
+                "x": -1331,
+                "y": 585,
+                "zoom": 0.44
             },
             "filename": "FightWithTxt",
             "version": "v1.7.3"
@@ -27,8 +27,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 4384,
-                "y": -914
+                "x": 4088,
+                "y": -894
             }
         }
     },
@@ -75,8 +75,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 5758,
-                "y": -717
+                "x": 5175,
+                "y": -882
             }
         }
     },
@@ -93,9 +93,6 @@
         },
         "pre_delay": 0,
         "post_delay": 0,
-        "next": [
-            "FT_StartFight"
-        ],
         "$__mpe_code": {
             "position": {
                 "x": 5424,
@@ -103,11 +100,28 @@
             }
         }
     },
-    "FT_StopFight": {
+    "$__mpe_anchor_FT_TargetNode_FightWithTxt": {
         "$__mpe_code": {
             "position": {
-                "x": 4780,
-                "y": -1007
+                "x": 5549,
+                "y": -816
+            }
+        }
+    },
+    "FT_StopFight": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "FT_StopFight",
+                "custom_recognition_param": {
+                    "fight_spend_time": 5
+                }
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 4663,
+                "y": -1005
             }
         }
     },
@@ -132,8 +146,8 @@
         ],
         "$__mpe_code": {
             "position": {
-                "x": 5195,
-                "y": -1052
+                "x": 4915,
+                "y": -1192
             }
         }
     },
@@ -221,9 +235,6 @@
         },
         "pre_delay": 0,
         "post_delay": 0,
-        "next": [
-            "FT_StartFight"
-        ],
         "$__mpe_code": {
             "position": {
                 "x": 5427,
@@ -293,9 +304,6 @@
         },
         "pre_delay": 0,
         "post_delay": 0,
-        "next": [
-            "FT_StartFight"
-        ],
         "$__mpe_code": {
             "position": {
                 "x": 5441,
@@ -372,11 +380,11 @@
             }
         }
     },
-    "$__mpe_anchor_FT_TargetNode_FightWithTxt": {
+    "新建节点13": {
         "$__mpe_code": {
             "position": {
-                "x": 6083,
-                "y": -666
+                "x": 4602,
+                "y": -662
             }
         }
     }
