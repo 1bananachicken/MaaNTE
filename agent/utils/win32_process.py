@@ -403,6 +403,12 @@ def _get_window_work_area(hwnd):
     )
 
 
+# Window placement within the monitor work area (rcWork excludes the taskbar).
+WINDOW_POSITION_CENTER = "center"
+WINDOW_POSITION_BOTTOM_RIGHT = "bottom_right"
+_WINDOW_POSITIONS = {WINDOW_POSITION_CENTER, WINDOW_POSITION_BOTTOM_RIGHT}
+
+
 def show_title_bar(hwnd):
     """make sure the target window has a normal title bar."""
     try:
@@ -426,12 +432,83 @@ def show_title_bar(hwnd):
         return False
 
 
-def resize_window(hwnd, width, height, center=True):
-    """Resize the outer window and center it, following OK-NTE's sequence."""
+def _resolve_window_position(center=None, position=None):
+    """Normalize placement. ``position`` wins; legacy ``center`` maps to center/None."""
+    if position is not None:
+        position = str(position).strip().lower()
+        if position not in _WINDOW_POSITIONS:
+            raise ValueError(
+                f"position must be one of {sorted(_WINDOW_POSITIONS)}, got {position!r}"
+            )
+        return position
+    if center is False:
+        return None
+    return WINDOW_POSITION_CENTER
+
+
+def _anchor_point(work_area, window_width, window_height, position):
+    """Return (left, top) for ``position`` inside the work area, or None if it won't fit."""
+    work_left, work_top, work_right, work_bottom = work_area
+    work_width = work_right - work_left
+    work_height = work_bottom - work_top
+    if work_width < window_width or work_height < window_height:
+        return None
+    if position == WINDOW_POSITION_BOTTOM_RIGHT:
+        # Flush to work-area bottom-right so the taskbar never covers the window.
+        return work_right - window_width, work_bottom - window_height
+    return (
+        work_left + (work_width - window_width) // 2,
+        work_top + (work_height - window_height) // 2,
+    )
+
+
+def move_window(hwnd, position=WINDOW_POSITION_CENTER):
+    """Move a window within the monitor work area without resizing it."""
+    if not hwnd or not position:
+        return False
+    position = _resolve_window_position(position=position)
+    rect = get_window_rect(hwnd)
+    if rect is None:
+        return False
+    left, top, right, bottom = rect
+    window_width = right - left
+    window_height = bottom - top
+    expected = _anchor_point(
+        _get_window_work_area(hwnd), window_width, window_height, position
+    )
+    if expected is None:
+        return False
+    expected_left, expected_top = expected
+    if left == expected_left and top == expected_top:
+        return True
+    if not user32.SetWindowPos(
+        hwnd,
+        None,
+        expected_left,
+        expected_top,
+        0,
+        0,
+        SWP_NOSIZE | SWP_NOZORDER | SWP_SHOWWINDOW,
+    ):
+        return False
+    for _ in range(50):
+        rect = get_window_rect(hwnd)
+        if rect is None:
+            return False
+        left, top, _, _ = rect
+        if left == expected_left and top == expected_top:
+            return True
+        kernel32.Sleep(100)
+    return False
+
+
+def resize_window(hwnd, width, height, center=True, position=None):
+    """Resize the outer window, then optionally place it in the work area."""
     if not hwnd:
         return False
     width = int(width)
     height = int(height)
+    position = _resolve_window_position(center=center, position=position)
     flags = SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOMOVE
     if not user32.SetWindowPos(hwnd, None, 0, 0, width, height, flags):
         return False
@@ -439,20 +516,19 @@ def resize_window(hwnd, width, height, center=True):
 
     expected_left = None
     expected_top = None
-    if center:
+    if position:
         rect = get_window_rect(hwnd)
         if rect is None:
             return False
         left, top, right, bottom = rect
         window_width = right - left
         window_height = bottom - top
-        work_left, work_top, work_right, work_bottom = _get_window_work_area(hwnd)
-        work_width = work_right - work_left
-        work_height = work_bottom - work_top
-        if work_width < window_width or work_height < window_height:
+        expected = _anchor_point(
+            _get_window_work_area(hwnd), window_width, window_height, position
+        )
+        if expected is None:
             return False
-        expected_left = work_left + (work_width - window_width) // 2
-        expected_top = work_top + (work_height - window_height) // 2
+        expected_left, expected_top = expected
         if not user32.SetWindowPos(
             hwnd,
             None,
@@ -472,7 +548,7 @@ def resize_window(hwnd, width, height, center=True):
         current_width = right - left
         current_height = bottom - top
         size_ok = current_width == width and current_height == height
-        pos_ok = not center or (left == expected_left and top == expected_top)
+        pos_ok = not position or (left == expected_left and top == expected_top)
         if size_ok and pos_ok:
             break
         kernel32.Sleep(100)
@@ -480,7 +556,15 @@ def resize_window(hwnd, width, height, center=True):
     return True
 
 
-def resize_client_area(hwnd, width, height, center=True, tolerance=2, manage_title_bar=True):
+def resize_client_area(
+    hwnd,
+    width,
+    height,
+    center=True,
+    position=None,
+    tolerance=2,
+    manage_title_bar=True,
+):
     """Resize a window so its client area matches the target size.
 
     manage_title_bar=False 时不强制恢复 WS_CAPTION——GFN 客户端等
@@ -490,6 +574,8 @@ def resize_client_area(hwnd, width, height, center=True, tolerance=2, manage_tit
         return False
     target_width = int(width)
     target_height = int(height)
+    requested_position = position
+    position = _resolve_window_position(center=center, position=position)
     if user32.IsIconic(hwnd) or user32.IsZoomed(hwnd):
         user32.ShowWindow(hwnd, SW_RESTORE)
         kernel32.Sleep(100)
@@ -504,6 +590,8 @@ def resize_client_area(hwnd, width, height, center=True, tolerance=2, manage_tit
         abs(current_client[0] - target_width) <= tolerance
         and abs(current_client[1] - target_height) <= tolerance
     ):
+        if requested_position is not None and position:
+            return move_window(hwnd, position)
         return True
 
     left, top, right, bottom = current_rect
@@ -519,7 +607,9 @@ def resize_client_area(hwnd, width, height, center=True, tolerance=2, manage_tit
     if work_width < resized_width or work_height < resized_height:
         return False
 
-    if not resize_window(hwnd, resized_width, resized_height, center=center):
+    if not resize_window(
+        hwnd, resized_width, resized_height, center=center, position=position
+    ):
         return False
 
     for _ in range(20):
@@ -538,6 +628,7 @@ def ensure_process_client_size(
     width,
     height,
     center=True,
+    position=None,
     tolerance=2,
     settle_ms=300,
     hwnd_class=None,
@@ -548,6 +639,11 @@ def ensure_process_client_size(
     manage_title_bar=True,
 ):
     """Find a process window and resize its client area to the target size."""
+    # Keep the caller's explicit position so already-matched windows can still
+    # be docked (e.g. GFN bottom-right) without moving local windows that only
+    # used the default center-on-resize behavior.
+    requested_position = position
+    position = _resolve_window_position(center=center, position=position)
     hwnd = find_window_by_process(
         process_name,
         hwnd_class=hwnd_class,
@@ -580,6 +676,15 @@ def ensure_process_client_size(
         abs(before[0] - target[0]) <= tolerance
         and abs(before[1] - target[1]) <= tolerance
     ):
+        if requested_position is not None and position:
+            if not move_window(hwnd, position):
+                return {
+                    "success": False,
+                    "reason": "reposition_failed",
+                    "hwnd": hwnd,
+                    "before": before,
+                    "after": before,
+                }
         return {
             "success": True,
             "reason": "already_matched",
@@ -593,6 +698,7 @@ def ensure_process_client_size(
         target[0],
         target[1],
         center=center,
+        position=position,
         tolerance=tolerance,
         manage_title_bar=manage_title_bar,
     )
@@ -654,11 +760,13 @@ def ensure_game_window_resolution(
     if mode == GAME_WINDOW_MODE_GFN_APP:
         # GFN 原生客户端流窗口为无边框 CEF 窗口，接受标准 MoveWindow/SetWindowPos
         # 缩放（GFNWindowMover 即用此方式）。manage_title_bar=False 保持无边框。
+        # 默认贴到工作区右下角（rcWork，避开任务栏），与 GFNWindowMover 布局一致。
         passthrough = {
             k: v
             for k, v in kwargs.items()
             if k not in ("hwnd_class", "require_title", "title_regex", "manage_title_bar")
         }
+        passthrough.setdefault("position", WINDOW_POSITION_BOTTOM_RIGHT)
         result = ensure_process_client_size(
             GFN_APP_PROCESS_NAME,
             width,

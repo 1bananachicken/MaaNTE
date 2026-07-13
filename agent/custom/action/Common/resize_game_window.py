@@ -87,6 +87,8 @@ def _parse_optional_resize_kwargs(raw_param):
         kwargs["process_name"] = str(params["process_name"])
     if "center" in params:
         kwargs["center"] = _parse_bool(params["center"], True)
+    if "position" in params and params["position"] is not None:
+        kwargs["position"] = str(params["position"]).strip().lower()
     if "tolerance" in params:
         kwargs["tolerance"] = int(params["tolerance"])
     if "settle_ms" in params:
