@@ -7,14 +7,16 @@ on:
     paths:
       - ".github/workflows/install.yml"
       - "assets/**"
-      - "**.py"
+      - "agent/**"
+      - "tools/**"
   pull_request:
     branches:
       - "**"
     paths:
       - ".github/workflows/install.yml"
       - "assets/**"
-      - "**.py"
+      - "agent/**"
+      - "tools/**"
   workflow_dispatch:
 
 env:
@@ -104,7 +106,7 @@ jobs:
           tag: ${{ env.MAA_FRAMEWORK_VERSION }}
           out-file-path: "deps"
           extract: true
-      
+
       - name: Download MXU
         id: download_mxu
         uses: robinraju/release-downloader@v1
@@ -161,11 +163,18 @@ jobs:
         shell: bash
         run: |
           python tools/ci/download_maadeps.py
-          cmake -S agent/cpp-navi -B agent/cpp-navi/build \
-            -G "Visual Studio 17 2022" -A x64 \
-            -DNAVI_BUILD_TESTS=OFF
+
+          if ! cmake -S agent/cpp-navi --preset msvc-2026 \
+            -DNAVI_BUILD_TESTS=OFF; then
+            echo "Visual Studio 2026 is unavailable; falling back to Visual Studio 2022."
+            rm -f agent/cpp-navi/build/CMakeCache.txt
+            rm -rf agent/cpp-navi/build/CMakeFiles
+            cmake -S agent/cpp-navi --preset msvc-2022 \
+              -DNAVI_BUILD_TESTS=OFF
+          fi
+
           cmake --build agent/cpp-navi/build --config RelWithDebInfo
-      
+
       - name: Create MXU version
         shell: bash
         run: |
