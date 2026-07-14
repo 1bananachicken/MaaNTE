@@ -21,5 +21,48 @@
         "rate_limit": 0,
         "pre_delay": 0,
         "post_delay": 0
+    },
+    "__CheckTeleportRequiredNearMessage": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "focus": {
+            "Node.Action.Succeeded": "距离过近，直接使用自动导航。"
+        }
+    },
+    "__CheckTeleportRequiredFarMessage": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "focus": {
+            "Node.Action.Succeeded": "距离较远，使用地图传送"
+        }
+    },
+    "__CheckTeleportRequiredRunTeleport": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "map_teleport_to_point",
+                "custom_action_param": {}
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0
     }
 }

@@ -7,6 +7,7 @@ docs/.vuepress/.temp
 # Compiled Object files
 build
 build-*
+agent/cpp-navi/bin/
 *.slo
 *.lo
 *.o

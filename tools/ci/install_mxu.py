@@ -88,18 +88,81 @@ def install_agent():
         working_dir / "agent",
         install_path / "agent",
         dirs_exist_ok=True,
+        ignore=shutil.ignore_patterns("cpp-navi", "__pycache__", "*.pyc"),
     )
+    thirdparty = working_dir / "thirdparty"
+    if thirdparty.exists():
+        shutil.copytree(
+            thirdparty,
+            install_path / "thirdparty",
+            dirs_exist_ok=True,
+            ignore=shutil.ignore_patterns("__pycache__", "*.pyc"),
+        )
+
+    cpp_navi_name = "cpp-navi.exe" if sys.platform.startswith("win") else "cpp-navi"
+    cpp_navi_bin = working_dir / "agent" / "cpp-navi" / "bin"
+    cpp_navi_source = cpp_navi_bin / cpp_navi_name
+    if not cpp_navi_source.exists():
+        raise FileNotFoundError(f"C++ Navi Agent not built: {cpp_navi_source}")
+    cpp_navi_install = install_path / "agent" / "cpp-navi"
+    if cpp_navi_install.exists():
+        shutil.rmtree(cpp_navi_install)
+    cpp_navi_install.mkdir(parents=True, exist_ok=True)
+    if sys.platform.startswith("win"):
+        runtime_names = {
+            cpp_navi_name,
+            "DirectML.dll",
+            "MaaAgentServer.dll",
+            "MaaFramework.dll",
+            "MaaUtils.dll",
+            "fastdeploy_ppocr_maa.dll",
+            "onnxruntime_maa.dll",
+            "onnxruntime_providers_shared_maa.dll",
+            "opencv_world4_maa.dll",
+        }
+        required_names = {
+            cpp_navi_name,
+            "MaaAgentServer.dll",
+            "MaaFramework.dll",
+            "MaaUtils.dll",
+            "fastdeploy_ppocr_maa.dll",
+            "onnxruntime_maa.dll",
+            "opencv_world4_maa.dll",
+        }
+        missing = sorted(name for name in required_names if not (cpp_navi_bin / name).exists())
+        if missing:
+            raise FileNotFoundError(f"C++ Navi runtime files missing: {missing}")
+        for name in sorted(runtime_names):
+            source = cpp_navi_bin / name
+            if source.exists():
+                shutil.copy2(source, cpp_navi_install / name)
+    else:
+        shutil.copytree(
+            cpp_navi_bin,
+            cpp_navi_install,
+            dirs_exist_ok=True,
+            ignore=shutil.ignore_patterns("*.pdb", "cpp-navi-tests*"),
+        )
+    (cpp_navi_install / "plugins").mkdir(exist_ok=True)
 
     interface = load_json_with_comments(install_path / "interface.json")
 
-    if sys.platform.startswith("win"):
-        interface["agent"]["child_exec"] = r"./python/python.exe"
-    elif sys.platform.startswith("darwin"):
-        interface["agent"]["child_exec"] = r"./python/bin/python3"
-    elif sys.platform.startswith("linux"):
-        interface["agent"]["child_exec"] = r"python3"
+    agents = interface["agent"]
+    if not isinstance(agents, list) or len(agents) < 2:
+        raise ValueError("interface.agent must contain Python and C++ agents")
+    python_agent = agents[0]
+    cpp_navi_agent = agents[1]
 
-    interface["agent"]["child_args"] = ["-u", r"./agent/main.py"]
+    if sys.platform.startswith("win"):
+        python_agent["child_exec"] = r"./python/python.exe"
+    elif sys.platform.startswith("darwin"):
+        python_agent["child_exec"] = r"./python/bin/python3"
+    elif sys.platform.startswith("linux"):
+        python_agent["child_exec"] = r"python3"
+
+    python_agent["child_args"] = ["-u", r"./agent/main.py"]
+    cpp_navi_agent["child_exec"] = f"./agent/cpp-navi/{cpp_navi_name}"
+    cpp_navi_agent.pop("child_args", None)
 
     with open(install_path / "interface.json", "w", encoding="utf-8") as f:
         json.dump(interface, f, ensure_ascii=False, indent=4)

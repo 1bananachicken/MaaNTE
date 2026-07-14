@@ -90,12 +90,17 @@
             ]
         }
     ],
-    "agent": {
-        "child_exec": "python",
-        "child_args": [
-            "../agent/main.py"
-        ]
-    },
+    "agent": [
+        {
+            "child_exec": "python",
+            "child_args": [
+                "../agent/main.py"
+            ]
+        },
+        {
+            "child_exec": "../agent/cpp-navi/bin/cpp-navi.exe"
+        }
+    ],
     "group": [
         {
             "name": "Daily",

@@ -7,14 +7,16 @@ on:
     paths:
       - ".github/workflows/install.yml"
       - "assets/**"
-      - "**.py"
+      - "agent/**"
+      - "tools/**"
   pull_request:
     branches:
       - "**"
     paths:
       - ".github/workflows/install.yml"
       - "assets/**"
-      - "**.py"
+      - "agent/**"
+      - "tools/**"
   workflow_dispatch:
 
 env:
@@ -114,7 +116,7 @@ jobs:
           tag: ${{ env.MAA_FRAMEWORK_VERSION }}
           out-file-path: "deps"
           extract: true
-      
+
       - name: Download MXU
         id: download_mxu
         uses: robinraju/release-downloader@v1
@@ -166,7 +168,23 @@ jobs:
         shell: bash
         run: |
           ./install/python/python.exe tools/ci/download_deps.py --deps-dir install/deps
-      
+
+      - name: Build C++ Navi Agent
+        shell: bash
+        run: |
+          python tools/ci/download_maadeps.py
+
+          if ! cmake -S agent/cpp-navi --preset msvc-2026 \
+            -DNAVI_BUILD_TESTS=OFF; then
+            echo "Visual Studio 2026 is unavailable; falling back to Visual Studio 2022."
+            rm -f agent/cpp-navi/build/CMakeCache.txt
+            rm -rf agent/cpp-navi/build/CMakeFiles
+            cmake -S agent/cpp-navi --preset msvc-2022 \
+              -DNAVI_BUILD_TESTS=OFF
+          fi
+
+          cmake --build agent/cpp-navi/build --config RelWithDebInfo
+
       - name: Create MXU version
         shell: bash
         run: |
@@ -214,7 +232,7 @@ jobs:
           rm -rf install-mxu/thirdparty
           cp -a "$extract_dir/thirdparty" install-mxu/thirdparty
           echo "Added PacketNTE thirdparty to install-mxu/thirdparty"
-      
+
       - name: Pre-install all dependencies
         shell: bash
         run: |

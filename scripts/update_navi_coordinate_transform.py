@@ -15,13 +15,13 @@ import numpy as np
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_INPUT = PROJECT_ROOT / "config" / "navi_coordinate_calibration.json"
 DEFAULT_TARGET = (
-    PROJECT_ROOT / "agent" / "custom" / "action" / "Navi" / "coordinate_position.py"
+    PROJECT_ROOT / "agent" / "cpp-navi" / "src" / "coordinate.cpp"
 )
 MAP_WORLD_ORIGIN = (5632.0, 5632.0)
 MAP_PIXELS_PER_WORLD_UNIT = 22.0
 PLANE_AXES = ((0, 1), (0, 2), (1, 2))
-BEGIN_MARKER = "# BEGIN GENERATED NAVI COORDINATE TRANSFORM"
-END_MARKER = "# END GENERATED NAVI COORDINATE TRANSFORM"
+BEGIN_MARKER = "// BEGIN GENERATED NAVI COORDINATE TRANSFORM"
+END_MARKER = "// END GENERATED NAVI COORDINATE TRANSFORM"
 
 
 def parse_point(value: Any, index: int) -> tuple[tuple[float, float, float], tuple[float, float]]:
@@ -106,12 +106,12 @@ def render_constants(
     return "\n".join(
         (
             BEGIN_MARKER,
-            f"_CALIBRATION_AXES = {axes!r}",
-            f"_CALIBRATION_A = {a!r}",
-            f"_CALIBRATION_B = {b!r}",
-            f"_CALIBRATION_TX = {tx!r}",
-            f"_CALIBRATION_TY = {ty!r}",
-            f"_CALIBRATION_ERROR = {error!r}",
+            "constexpr std::array<int, 2> kCalibrationAxes "
+            f"{{ {axes[0]}, {axes[1]} }};",
+            f"constexpr double kCalibrationA = {a!r};",
+            f"constexpr double kCalibrationB = {b!r};",
+            f"constexpr double kCalibrationTx = {tx!r};",
+            f"constexpr double kCalibrationTy = {ty!r};",
             END_MARKER,
         )
     )

@@ -594,6 +594,10 @@ def agent(is_dev_mode=False):
 
         import custom
 
+        from utils.coordinate_bridge import start_coordinate_bridge
+
+        start_coordinate_bridge()
+
         Tasker.set_log_dir("./debug")
 
         from utils.i18n import init as i18n_init
