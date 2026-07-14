@@ -87,8 +87,5 @@
     "tetris.task_failed": "[테트리스] 작업 비정상 종료",
     "tetris.progress": "[테트리스] 진행률: %d/%d",
     "tetris.task_done": "[테트리스] 작업 완료",
-    "tetris.vitality_exhausted": "[테트리스] 활력 소진, 작업 완료",
-    "gfn.mode_chrome_detected": "GeForce NOW(Chrome) 창이 감지되었습니다. 포그라운드 모드만 지원됩니다",
-    "gfn.mode_app_detected": "GeForce NOW 클라이언트 창이 감지되었습니다. 포그라운드 모드만 지원됩니다",
-    "gfn.app_resize_failed": "GeForce NOW 클라이언트 창 크기 조정이 적용되지 않았습니다. GFN 설정에서 스트리밍 해상도를 %dx%d로 설정하거나 창 도구로 해당 크기로 조정하세요"
+    "tetris.vitality_exhausted": "[테트리스] 활력 소진, 작업 완료"
 }

@@ -9,9 +9,7 @@
                 "MakeCoffeeLoopTime"
             ],
             "controller": [
-                "Win32-Front",
-                "GFN-Chrome",
-                "GFN-App"
+                "Win32-Front"
             ],
             "group": [
                 "HethereauHobbies"

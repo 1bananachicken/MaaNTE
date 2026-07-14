@@ -4,16 +4,14 @@
             "name": "PinkPawHeist",
             "label": "粉爪大劫案",
             "entry": "PinkPawHeist_Main",
-            "description": "自动刷取粉爪大劫案，需要<span style='color:red'>“桌面端-前台”或 GFN</span> 前台控制器。",
+            "description": "自动刷取粉爪大劫案，需要<span style='color:red'>“桌面端-前台”</span>控制器。",
             "option": [
                 "PinkPawHeist_Loop",
                 "PinkPawHeist_Scheme",
                 "PinkPawHeist_AutoResizeGameWindow"
             ],
             "controller": [
-                "Win32-Front",
-                "GFN-Chrome",
-                "GFN-App"
+                "Win32-Front"
             ],
             "group": [
                 "HethereauHobbies"

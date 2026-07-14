@@ -55,30 +55,6 @@
                 "mouse": "SendMessageWithWindowPos",
                 "keyboard": "PostMessage"
             }
-        },
-        {
-            "name": "GFN-Chrome",
-            "label": "$controller_gfn_chrome_label",
-            "type": "Win32",
-            "win32": {
-                "class_regex": "Chrome_WidgetWin_1",
-                "window_regex": "NTE.*on GeForce NOW",
-                "screencap": "PrintWindow",
-                "mouse": "Seize",
-                "keyboard": "Seize"
-            }
-        },
-        {
-            "name": "GFN-App",
-            "label": "$controller_gfn_app_label",
-            "type": "Win32",
-            "win32": {
-                "class_regex": "CEFCLIENT",
-                "window_regex": "NTE.*on GeForce NOW",
-                "screencap": "PrintWindow",
-                "mouse": "Seize",
-                "keyboard": "Seize"
-            }
         }
     ],
     "resource": [

@@ -85,8 +85,5 @@
     "tetris.task_failed": "[泯除方块] 任务异常结束",
     "tetris.progress": "[泯除方块] 进度: %d/%d",
     "tetris.task_done": "[泯除方块] 任务完成",
-    "tetris.vitality_exhausted": "[泯除方块] 活力耗尽，任务完成",
-    "gfn.mode_chrome_detected": "检测到 GeForce NOW（Chrome 网页版）窗口，仅支持前台模式运行",
-    "gfn.mode_app_detected": "检测到 GeForce NOW 客户端窗口，仅支持前台模式运行",
-    "gfn.app_resize_failed": "GeForce NOW 客户端窗口缩放未生效，请在 GFN 设置中将串流分辨率设为 %dx%d，或用窗口工具将窗口调整为该尺寸"
+    "tetris.vitality_exhausted": "[泯除方块] 活力耗尽，任务完成"
 }

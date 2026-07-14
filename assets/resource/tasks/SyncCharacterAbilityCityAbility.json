@@ -6,9 +6,7 @@
             "entry": "SyncCharacterAbilityCityAbilityEntrance",
             "description": "$task.SyncCharacterAbilityCityAbility.description",
             "controller": [
-                "Win32-Front",
-                "GFN-Chrome",
-                "GFN-App"
+                "Win32-Front"
             ],
             "group": [
                 "UserInfo"

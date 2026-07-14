@@ -59,7 +59,7 @@ description: MaaNTE 任务配置（tasks/*.json）编写指南。覆盖任务入
 | `entry` | string | ✅ | Pipeline 入口节点名，对应 pipeline JSON 中的节点 key |
 | `description` | string | ❌ | UI 描述，`$i18n_key` 格式（不加 `$` 则为纯文本） |
 | `option` | string[] | ❌ | 启用的选项名列表，对应 `option` 块中的 key |
-| `controller` | string[] | ❌ | 限制可用控制器：`"Win32"` / `"Win32-Front"` / `"Win32-Background"` / `"GFN-Chrome"` / `"GFN-App"`。不写 = 通用 |
+| `controller` | string[] | ❌ | 限制可用控制器：`"Win32"` / `"Win32-Front"` / `"Win32-Background"`。不写 = 通用 |
 
 ## 选项类型
 
@@ -218,17 +218,8 @@ switch 的 case 中可嵌套 `"option"` 数组，实现"启用某功能后才显
 - `"Win32"` — 后台 SendMessage 模式（需管理员权限）
 - `"Win32-Front"` — 前台 Seize 模式（会抢占鼠标）
 - `"Win32-Background"` — 后台 SendMessageWithWindowPos 模式
-- `"GFN-Chrome"` — GeForce NOW Chrome 网页版，前台 Seize 模式（等同 Win32-Front）
-- `"GFN-App"` — GeForce NOW 原生客户端，前台 Seize 模式（等同 Win32-Front）
 
 不写 `controller` 字段 = 所有控制器通用。多个值 = 任一匹配即可。
-
-GFN 两个控制器与 `Win32-Front` 的截图/输入模式完全一致（PrintWindow + Seize），
-因此允许 `Win32-Front` 的任务原则上应同时允许 `GFN-Chrome` / `GFN-App`。
-**例外**：依赖本机游戏进程数据的任务不能在 GFN 下运行——GFN 场景下游戏运行在
-NVIDIA 云端，本机只有加密串流流量。目前的例外是依赖抓包定位坐标
-（`agent/custom/action/Navi/coordinate_position.py`，pcap/pktmon）的地图传送/寻路类
-任务：`FountainCheckin`、`WitchDivination` 保持仅 `Win32-Front`。
 
 ## 完整示例
 

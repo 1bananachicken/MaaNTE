@@ -87,8 +87,5 @@
     "tetris.task_failed": "[Tetris] Task aborted",
     "tetris.progress": "[Tetris] Progress: %d/%d",
     "tetris.task_done": "[Tetris] Task complete",
-    "tetris.vitality_exhausted": "[Tetris] Vitality exhausted, task complete",
-    "gfn.mode_chrome_detected": "GeForce NOW (Chrome) window detected; foreground mode only",
-    "gfn.mode_app_detected": "GeForce NOW client window detected; foreground mode only",
-    "gfn.app_resize_failed": "GeForce NOW client window resize did not take effect; set the streaming resolution to %dx%d in GFN settings, or resize the window to that size with a window tool"
+    "tetris.vitality_exhausted": "[Tetris] Vitality exhausted, task complete"
 }

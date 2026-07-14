@@ -6,26 +6,17 @@ from maa.custom_action import CustomAction
 from maa.context import Context
 
 from utils.logger import logger
-from utils.maafocus import PrintT
 
 DEFAULT_WIDTH = 1280
 DEFAULT_HEIGHT = 720
 
 if sys.platform == "win32":
     try:
-        from utils.win32_process import (
-            GAME_WINDOW_MODE_GFN_APP,
-            GAME_WINDOW_MODE_GFN_CHROME,
-            ensure_game_window_resolution,
-        )
+        from utils.win32_process import ensure_game_window_resolution
     except Exception:
         ensure_game_window_resolution = None
-        GAME_WINDOW_MODE_GFN_APP = "gfn_app"
-        GAME_WINDOW_MODE_GFN_CHROME = "gfn_chrome"
 else:
     ensure_game_window_resolution = None
-    GAME_WINDOW_MODE_GFN_APP = "gfn_app"
-    GAME_WINDOW_MODE_GFN_CHROME = "gfn_chrome"
 
 
 def _parse_bool(value, default=False):
@@ -87,8 +78,6 @@ def _parse_optional_resize_kwargs(raw_param):
         kwargs["process_name"] = str(params["process_name"])
     if "center" in params:
         kwargs["center"] = _parse_bool(params["center"], True)
-    if "position" in params and params["position"] is not None:
-        kwargs["position"] = str(params["position"]).strip().lower()
     if "tolerance" in params:
         kwargs["tolerance"] = int(params["tolerance"])
     if "settle_ms" in params:
@@ -117,21 +106,8 @@ class ResizeGameWindow(CustomAction):
             return CustomAction.RunResult(success=False)
 
         success = bool(result.get("success")) if isinstance(result, dict) else bool(result)
-        if isinstance(result, dict):
-            self._notify_gfn_mode(context, result, width, height)
         if success:
             logger.debug("resize_game_window 成功: %s", result)
         else:
             logger.warning("resize_game_window 失败: %s", result)
         return CustomAction.RunResult(success=success)
-
-    @staticmethod
-    def _notify_gfn_mode(context: Context, result: dict, width: int, height: int):
-        """GFN 模式下向用户发送前台限制与分辨率引导消息（FR5）。"""
-        mode = result.get("mode")
-        if mode == GAME_WINDOW_MODE_GFN_CHROME:
-            PrintT(context, "gfn.mode_chrome_detected")
-        elif mode == GAME_WINDOW_MODE_GFN_APP:
-            PrintT(context, "gfn.mode_app_detected")
-            if result.get("reason") == "gfn_app_resize_failed":
-                PrintT(context, "gfn.app_resize_failed", width, height)

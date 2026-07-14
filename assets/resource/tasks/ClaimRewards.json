@@ -7,9 +7,7 @@
             "description": "$task_claim_rewards_desc",
             "controller": [
                 "Win32",
-                "Win32-Front",
-                "GFN-Chrome",
-                "GFN-App"
+                "Win32-Front"
             ],
             "group": [
                 "Daily"
