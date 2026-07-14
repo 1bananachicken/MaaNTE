@@ -1,6 +1,6 @@
 # Navi 本地 WebSocket
 
-`online_map_navigation` custom action 会在同一个截图循环中执行 NCC 定位、方向预测和路径寻路。它会把实时位置和方向广播给本地地图前端，也会通过同一个双向 WebSocket 接收在线地图工具发送的路径点并依序寻路。Maa 同时只能运行一个 action，因此在线地图实时定位和路径寻路共用这个组合 action：
+`online_map_navigation` custom action 由 `agent/cpp-navi/` 下的独立 C++ Agent 提供，会在同一个循环中执行 NCC 定位、方向预测和路径寻路。它会把实时位置和方向广播给本地地图前端，也会通过同一个双向 WebSocket 接收在线地图工具发送的路径点并依序寻路。Maa 同时只能运行一个 action，因此在线地图实时定位和路径寻路共用这个组合 action：
 
 ```json
 {

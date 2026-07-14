@@ -55,6 +55,18 @@
                 "mouse": "SendMessageWithWindowPos",
                 "keyboard": "PostMessage"
             }
+        },
+        {
+            "name": "CloudGame",
+            // "label": "$controller_front_label",
+            "type": "Win32",
+            "win32": {
+                "class_regex": "",
+                "window_regex": "云.*异环",
+                "screencap": "FramePool",
+                "mouse": "Seize",
+                "keyboard": "Seize"
+            }
         }
     ],
     "resource": [
@@ -66,12 +78,17 @@
             ]
         }
     ],
-    "agent": {
-        "child_exec": "python",
-        "child_args": [
-            "../agent/main.py"
-        ]
-    },
+    "agent": [
+        {
+            "child_exec": "python",
+            "child_args": [
+                "../agent/main.py"
+            ]
+        },
+        {
+            "child_exec": "../agent/cpp-navi/bin/cpp-navi.exe"
+        }
+    ],
     "group": [
         {
             "name": "Daily",

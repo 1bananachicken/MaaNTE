@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import cv2
@@ -24,16 +25,10 @@ except ImportError:
 
 from ..Common.logger import get_logger
 from ..Common.utils import match_template_in_region
-from .check_teleport_required import (
-    DEFAULT_COORDINATE_TYPE,
-    find_named_record,
-    load_json_resource,
-    point_xy,
-    resource_base_path,
-)
 
 logger = get_logger(__name__)
 
+DEFAULT_COORDINATE_TYPE = "world"
 DEFAULT_TELEPORT_POINTS_FILE = "map_teleport/teleport_points.json"
 MAP_INDEX_ICON_TEMPLATE = "image/map_teleport/map_index_icon.png"
 AREA_NEXT_BTN_TEMPLATE = "image/map_teleport/area_next_btn.png"
@@ -77,6 +72,61 @@ class TeleportPoint:
     description: str
 
 
+def resource_base_path() -> Path:
+    for parent in Path(__file__).resolve().parents:
+        assets_base = parent / "assets" / "resource" / "base"
+        if assets_base.exists():
+            return assets_base
+
+        resource_base = parent / "resource" / "base"
+        if resource_base.exists():
+            return resource_base
+
+    raise FileNotFoundError("Unable to locate resource/base directory")
+
+
+def load_json_resource(relative_path: str | Path) -> Any:
+    path = resource_base_path() / relative_path
+    with path.open("r", encoding="utf-8") as file:
+        return json.load(file)
+
+
+def point_xy(data: dict[str, Any]) -> tuple[float, float]:
+    for x_key, y_key in (
+        ("worldX", "worldY"),
+        ("rawX", "rawY"),
+        ("pixelX", "pixelY"),
+        ("x", "y"),
+    ):
+        if x_key in data and y_key in data:
+            return float(data[x_key]), float(data[y_key])
+    coordinate = data.get("coordinate")
+    if isinstance(coordinate, dict) and "x" in coordinate and "y" in coordinate:
+        return float(coordinate["x"]), float(coordinate["y"])
+    raise ValueError("point needs worldX/worldY, pixelX/pixelY, or x/y")
+
+
+def find_named_record(
+    data: Any,
+    collection_name: str,
+    record_id: str,
+) -> dict[str, Any]:
+    records = data.get(collection_name) if isinstance(data, dict) else data
+    if not isinstance(records, list):
+        raise ValueError("%s must be a list" % collection_name)
+
+    normalized_id = str(record_id).strip()
+    for record in records:
+        if not isinstance(record, dict):
+            continue
+        if normalized_id in {
+            str(record.get("id", "")).strip(),
+            str(record.get("name", "")).strip(),
+        }:
+            return record
+    raise ValueError("%s record not found: %s" % (collection_name, record_id))
+
+
 def parse_params(custom_action_param: Any) -> dict[str, Any]:
     if not custom_action_param:
         return {}
@@ -105,15 +155,15 @@ def load_teleport_point(
 
 def _notify(context: Context | None, message: str) -> None:
     if context is None:
-        print(message)
+        logger.info("%s", message)
         return
 
     try:
         from utils.maafocus import Print
 
         Print(context, message)
-    except Exception:
-        logger.info("%s", message)
+    except Exception as exc:
+        logger.warning("MapTeleport notification failed: message=%s error=%s", message, exc)
 
 
 def _is_stopping(context: Context | None) -> bool:
@@ -741,7 +791,7 @@ if AgentServer is not None and CustomAction is not None:
                 )
                 action_delay = float(params.get("action_delay", DEFAULT_ACTION_DELAY))
             except Exception as exc:
-                print("MapTeleportToPoint param invalid: %s" % exc)
+                logger.error("MapTeleportToPoint param invalid: %s", exc)
                 return CustomAction.RunResult(success=False)
 
             try:
@@ -755,6 +805,6 @@ if AgentServer is not None and CustomAction is not None:
                     action_delay=action_delay,
                 )
             except Exception as exc:
-                print("MapTeleportToPoint failed: %s" % exc)
+                logger.error("MapTeleportToPoint failed: %s", exc)
                 return CustomAction.RunResult(success=False)
             return CustomAction.RunResult(success=success)

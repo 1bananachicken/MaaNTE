@@ -9,7 +9,6 @@ from .rhythm.feats.select_song import *
 from .Common.click import *
 from .Common.resize_game_window import *
 from .realtime_task import *
-from .Navi import *
 from .MapTeleport import *
 from .pinkpaw.pinkpaw_core1 import *
 from .pinkpaw.pinkpaw_core2 import *
@@ -45,15 +44,10 @@ __all__ = [
     "AutoRhythmRepeatDecision",
     "AutoRhythmSelectSong",
     "RealTimeTaskAction",
-    "OnlineMapNavigationAction",
-    "LocalRouteNavigation",
-    "LocalRouteNavigationAction",
-    "LocalRouteNavigationUnitTestAction",
-    "parse_route_waypoints",
-    "resolve_route_json_path",
-    "CheckTeleportRequiredAction",
-    "TeleportDecision",
-    "check_teleport_required",
+    "MapTeleportToPointAction",
+    "TeleportPoint",
+    "load_teleport_point",
+    "run_map_teleport_flow",
     "PinkPawHeistScheme1Action",
     "PinkPawHeistScheme2Action",
     "PinkPawHeistScheme3Action",

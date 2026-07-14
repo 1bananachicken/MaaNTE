@@ -7,6 +7,7 @@ docs/.vuepress/.temp
 # Compiled Object files
 build
 build-*
+agent/cpp-navi/bin/
 *.slo
 *.lo
 *.o
@@ -462,6 +463,7 @@ assets/resource/base/model/detect/limbo_stage_lightest.onnx
 assets/resource/base/model/detect/sos_nodes.onnx
 .claude/
 .nicegui/
+.agents
 
 # local gui test
 MFA/

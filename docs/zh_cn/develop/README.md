@@ -28,7 +28,7 @@
 | 文档 | 说明 |
 |------|------|
 | [自定义动作开发](./custom-action.md) | Python CustomAction 编写、Controller API、Pipeline 集成 |
-| [本地路线寻路接口](./local-route-navigation.md) | local_route_navigation Pipeline 入口、LocalRouteNavigation 类接口、路线 JSON 格式 |
+| [本地路线寻路接口](./local-route-navigation.md) | C++ Navi Agent、Pipeline 入口、路线 JSON 格式 |
 | [节点测试](./node-testing.md) | 如何编写和运行节点测试，验证识别是否稳定命中 |
 | [DMCA / Abuse 提报模板](./dmca-abuse-template.md) | 仿冒/搬运/带毒仓库的一键复用提报文案（AGPL-3.0） |
 | [DeepWiki — MaaNTE](https://deepwiki.com/1bananachicken/MaaNTE) | 带 AI 的在线项目文档速览 |
@@ -51,7 +51,6 @@
 | [InScene 场景识别](./in-scene.md) | 判断当前画面所在场景 | `Interface/Scene/Status.json` |
 | [通用按钮](./common-buttons.md) | 各场景入口按钮 | `Common/Button/` |
 | [Custom 动作与识别](./custom-action.md) | 通用 Python 工具：alt_click等 | `agent/custom/action/Common/` |
-| [网络坐标 API](./coordinate-capture-api.md) | 网络坐标捕获接口、参数、返回值与生命周期 | `nte_coordinate_api` |
 | [本地路线寻路](./local-route-navigation.md) | 按路线 JSON 执行地图寻路 | `LocalRouteNavigation.json` |
 
 ## 高级组件参考

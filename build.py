@@ -47,6 +47,7 @@ PYTHON_DIR = INSTALL_DIR / "python"
 PYTHON_DEPS_DIR = INSTALL_DIR / "deps"
 ASSETS_DIR = ROOT / "assets"
 TOOLS_DIR = ROOT / "tools" / "ci"
+CPP_NAVI_DIR = ROOT / "agent" / "cpp-navi"
 
 # platform tag mapping (pip-style)
 PLATFORM_TAG_MAP = {
@@ -415,6 +416,76 @@ def step_install_mxu(python_exe, tag):
         shutil.copytree(PYTHON_DEPS_DIR, INSTALL_MXU_DIR / "deps")
 
 
+def step_build_cpp_navi(python_exe, os_type):
+    """构建独立的 C++ Navi Agent。"""
+    print("\n" + "=" * 60)
+    print("[C++] 构建 Navi Agent")
+    print("=" * 60)
+
+    maadeps = CPP_NAVI_DIR / "MaaUtils" / "MaaDeps" / "vcpkg" / "installed"
+    if not maadeps.exists() or not any(path.is_file() for path in maadeps.rglob("*")):
+        if args.skip_download:
+            print("MaaDeps 未安装；请先运行不带 --skip-download 的 build.py")
+            sys.exit(1)
+        run([str(python_exe), str(TOOLS_DIR / "download_maadeps.py")])
+
+    cmake = shutil.which("cmake")
+    if cmake is None and os_type == "Windows":
+        candidates = sorted(
+            Path(r"C:\Program Files\Microsoft Visual Studio").glob(
+                "*/*/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+            ),
+            reverse=True,
+        )
+        cmake = str(candidates[0]) if candidates else None
+    if cmake is None:
+        print("未找到 CMake 3.28+，无法构建 C++ Navi Agent")
+        sys.exit(1)
+
+    build_dir = CPP_NAVI_DIR / "build-release"
+    if os_type == "Windows":
+        vcvars_candidates = sorted(
+            Path(r"C:\Program Files\Microsoft Visual Studio").glob(
+                "*/*/VC/Auxiliary/Build/vcvars64.bat"
+            ),
+            reverse=True,
+        )
+        if not vcvars_candidates:
+            print("未找到 Visual Studio x64 C++ 工具链")
+            sys.exit(1)
+        command = (
+            f'call "{vcvars_candidates[0]}" && '
+            f'"{cmake}" -S "{CPP_NAVI_DIR}" -B "{build_dir}" '
+            '-G "NMake Makefiles" -DCMAKE_BUILD_TYPE=RelWithDebInfo '
+            '-DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY '
+            '-DNAVI_BUILD_TESTS=OFF && '
+            f'"{cmake}" --build "{build_dir}" --config RelWithDebInfo'
+        )
+        run(["cmd.exe", "/d", "/s", "/c", command])
+    else:
+        run(
+            [
+                cmake,
+                "-S",
+                str(CPP_NAVI_DIR),
+                "-B",
+                str(build_dir),
+                "-G",
+                "Ninja",
+                "-DCMAKE_BUILD_TYPE=RelWithDebInfo",
+                "-DNAVI_BUILD_TESTS=OFF",
+            ]
+        )
+        run([cmake, "--build", str(build_dir), "--config", "RelWithDebInfo"])
+
+    executable = CPP_NAVI_DIR / "bin" / (
+        "cpp-navi.exe" if os_type == "Windows" else "cpp-navi"
+    )
+    if not executable.exists():
+        print(f"C++ Navi Agent 构建产物不存在: {executable}")
+        sys.exit(1)
+
+
 def step_copy_mfa():
     """步骤10: 复制 MFAAvalonia 文件到安装目录"""
     print("\n" + "=" * 60)
@@ -615,6 +686,9 @@ def main():
     # 8. 安装 (MFAA 版本)
     if not skip_mfa:
         step_install(python_exe, args.tag, platform_tag)
+
+    if not skip_mxu:
+        step_build_cpp_navi(python_exe, os_type)
 
     # 9. 安装 (MXU 版本)
     if not skip_mxu:

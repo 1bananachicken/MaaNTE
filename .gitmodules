@@ -5,3 +5,6 @@
 [submodule "assets/MaaNTEModels"]
 	path = assets/MaaNTEModels
 	url = https://github.com/1bananachicken/MaaNTEModels.git
+[submodule "agent/cpp-navi/MaaUtils"]
+	path = agent/cpp-navi/MaaUtils
+	url = https://github.com/MaaXYZ/MaaUtils.git
