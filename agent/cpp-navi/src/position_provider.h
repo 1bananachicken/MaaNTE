@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <memory>
 #include <optional>
 #include <string>
@@ -34,6 +35,8 @@ private:
     std::unique_ptr<CoordinateCapture> coordinate_capture_;
     std::unique_ptr<MapLocator> locator_;
     std::optional<LocationResult> last_coordinate_location_;
+    std::chrono::steady_clock::time_point last_coordinate_warning_ {};
+    bool coordinate_was_unavailable_ = false;
 };
 
 } // namespace navi

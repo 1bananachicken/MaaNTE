@@ -48,6 +48,7 @@ PositionProvider::PositionProvider(std::string backend, bool debug)
                 auto capture = std::make_unique<CoordinateCapture>(candidate);
                 capture->start();
                 coordinate_capture_ = std::move(capture);
+                last_coordinate_warning_ = std::chrono::steady_clock::now();
                 LogInfo << "Navi coordinate capture started" << VAR(candidate);
                 break;
             }
@@ -103,10 +104,20 @@ LocationResult PositionProvider::coordinate_location()
         LocationResult stale = last_coordinate_location_.value_or(LocationResult {});
         stale.found = false;
         stale.mode = "coordinate_stale";
-        if (debug_) {
-            LogDebug << "Navi coordinate unavailable" << VAR(coordinate_capture_->stats());
+        const auto now = std::chrono::steady_clock::now();
+        if (now - last_coordinate_warning_ >= std::chrono::seconds(5)) {
+            LogWarn << "Navi coordinate unavailable" << VAR(coordinate_capture_->stats());
+            last_coordinate_warning_ = now;
+            coordinate_was_unavailable_ = true;
+        }
+        else if (debug_) {
+            LogDebug << "Navi coordinate awaiting sample" << VAR(coordinate_capture_->stats());
         }
         return stale;
+    }
+    if (coordinate_was_unavailable_) {
+        LogInfo << "Navi coordinate capture recovered" << VAR(coordinate_capture_->stats());
+        coordinate_was_unavailable_ = false;
     }
     const auto point = CoordinateTransform::to_map(pose->x, pose->y, pose->z);
     if (!point || !std::isfinite(pose->pitch) || !std::isfinite(pose->heading)) {

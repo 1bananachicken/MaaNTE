@@ -408,14 +408,24 @@ public:
     void stop()
     {
         stopping_ = true;
+#ifdef _WIN32
+        for (std::thread& thread : pcap_threads_) {
+            if (thread.joinable()) {
+                thread.join();
+            }
+        }
+        pcap_threads_.clear();
+#endif
         if (thread_.joinable()) {
             thread_.join();
         }
 #ifdef _WIN32
-        if (pcap_handle_ != nullptr && pcap_close_ != nullptr) {
-            pcap_close_(pcap_handle_);
-            pcap_handle_ = nullptr;
+        if (pcap_close_ != nullptr) {
+            for (const PcapCapture& capture : pcap_captures_) {
+                pcap_close_(capture.handle);
+            }
         }
+        pcap_captures_.clear();
         if (pcap_module_ != nullptr) {
             FreeLibrary(pcap_module_);
             pcap_module_ = nullptr;
@@ -480,6 +490,14 @@ private:
     using PcapFreeCode = void(__cdecl*)(BpfProgram*);
     using PcapNextEx = int(__cdecl*)(void*, PcapHeader**, const uint8_t**);
     using PcapClose = void(__cdecl*)(void*);
+    using PcapDataLink = int(__cdecl*)(void*);
+
+    struct PcapCapture
+    {
+        void* handle = nullptr;
+        int link_type = 0;
+        std::string name;
+    };
 
     void start_pcap()
     {
@@ -495,7 +513,8 @@ private:
         const auto free_code = reinterpret_cast<PcapFreeCode>(GetProcAddress(pcap_module_, "pcap_freecode"));
         pcap_next_ex_ = reinterpret_cast<PcapNextEx>(GetProcAddress(pcap_module_, "pcap_next_ex"));
         pcap_close_ = reinterpret_cast<PcapClose>(GetProcAddress(pcap_module_, "pcap_close"));
-        if (!find_all || !free_all || !open_live || !compile || !set_filter || !free_code || !pcap_next_ex_ || !pcap_close_) {
+        const auto data_link = reinterpret_cast<PcapDataLink>(GetProcAddress(pcap_module_, "pcap_datalink"));
+        if (!find_all || !free_all || !open_live || !compile || !set_filter || !free_code || !pcap_next_ex_ || !pcap_close_ || !data_link) {
             throw std::runtime_error("wpcap.dll is missing required exports");
         }
         std::array<char, 256> error {};
@@ -503,38 +522,73 @@ private:
         if (find_all(&devices, error.data()) != 0 || devices == nullptr) {
             throw std::runtime_error(std::string("pcap_findalldevs failed: ") + error.data());
         }
-        PcapIf* selected = devices;
-        while (selected != nullptr && (selected->name == nullptr || (selected->flags & 1U) != 0)) {
-            selected = selected->next;
+        std::string failures;
+        for (PcapIf* device = devices; device != nullptr; device = device->next) {
+            if (device->name == nullptr || (device->flags & 1U) != 0) {
+                continue;
+            }
+            error.fill('\0');
+            void* handle = open_live(device->name, 65536, 1, 20, error.data());
+            if (handle == nullptr) {
+                failures += std::string(device->name) + ": " + error.data() + "; ";
+                continue;
+            }
+            BpfProgram program {};
+            const bool compiled = compile(handle, &program, "tcp port 30031 or udp", 1, 0xFFFFFFFFU) == 0;
+            const bool filtered = compiled && set_filter(handle, &program) == 0;
+            if (compiled) {
+                free_code(&program);
+            }
+            if (!filtered) {
+                failures += std::string(device->name) + ": failed to apply filter; ";
+                pcap_close_(handle);
+                continue;
+            }
+            const int link_type = data_link(handle);
+            if (link_type != 1 && link_type != 12 && link_type != 228 && link_type != 229) {
+                failures += std::string(device->name) + ": unsupported link type " + std::to_string(link_type) + "; ";
+                pcap_close_(handle);
+                continue;
+            }
+            pcap_captures_.push_back({ handle, link_type, device->name });
         }
-        if (selected == nullptr) {
-            selected = devices;
-        }
-        pcap_handle_ = open_live(selected->name, 65536, 1, 20, error.data());
         free_all(devices);
-        if (pcap_handle_ == nullptr) {
-            throw std::runtime_error(std::string("pcap_open_live failed: ") + error.data());
+        if (pcap_captures_.empty()) {
+            throw std::runtime_error("pcap could not open a usable interface: " + failures);
         }
-        BpfProgram program {};
-        if (compile(pcap_handle_, &program, "tcp port 30031 or udp", 1, 0xFFFFFFFFU) != 0 || set_filter(pcap_handle_, &program) != 0) {
-            free_code(&program);
-            throw std::runtime_error("failed to apply pcap filter");
-        }
-        free_code(&program);
         stopping_ = false;
-        thread_ = std::thread([this]() { pcap_loop(); });
+        for (const PcapCapture& capture : pcap_captures_) {
+            LogInfo << "Navi pcap interface opened" << VAR(capture.name) << VAR(capture.link_type);
+            pcap_threads_.emplace_back([this, handle = capture.handle, link_type = capture.link_type]() { pcap_loop(handle, link_type); });
+        }
     }
 
-    static bool parse_packet(std::span<const uint8_t> packet, std::span<const uint8_t>& payload, PacketFlow& flow)
+    static bool parse_packet(std::span<const uint8_t> packet, int link_type, std::span<const uint8_t>& payload, PacketFlow& flow)
     {
-        if (packet.size() < 14) {
-            return false;
+        size_t offset = 0;
+        uint16_t ether_type = 0;
+        if (link_type == 1) {
+            if (packet.size() < 14) {
+                return false;
+            }
+            offset = 14;
+            ether_type = static_cast<uint16_t>((packet[12] << 8) | packet[13]);
+            if ((ether_type == 0x8100 || ether_type == 0x88A8) && packet.size() >= 18) {
+                ether_type = static_cast<uint16_t>((packet[16] << 8) | packet[17]);
+                offset = 18;
+            }
         }
-        size_t offset = 14;
-        uint16_t ether_type = static_cast<uint16_t>((packet[12] << 8) | packet[13]);
-        if (ether_type == 0x8100 && packet.size() >= 18) {
-            ether_type = static_cast<uint16_t>((packet[16] << 8) | packet[17]);
-            offset = 18;
+        else if (link_type == 12) {
+            if (packet.empty()) {
+                return false;
+            }
+            ether_type = (packet[0] >> 4) == 4 ? 0x0800 : (packet[0] >> 4) == 6 ? 0x86DD : 0;
+        }
+        else if (link_type == 228 || link_type == 229) {
+            ether_type = link_type == 228 ? 0x0800 : 0x86DD;
+        }
+        else {
+            return false;
         }
         uint8_t protocol = 0;
         if (ether_type == 0x0800 && packet.size() >= offset + 20) {
@@ -593,12 +647,12 @@ private:
         return !payload.empty();
     }
 
-    void pcap_loop()
+    void pcap_loop(void* handle, int link_type)
     {
         while (!stopping_) {
             PcapHeader* header = nullptr;
             const uint8_t* data = nullptr;
-            const int status = pcap_next_ex_(pcap_handle_, &header, &data);
+            const int status = pcap_next_ex_(handle, &header, &data);
             if (status == 0) {
                 continue;
             }
@@ -607,8 +661,9 @@ private:
             }
             std::span<const uint8_t> payload;
             PacketFlow flow;
-            if (parse_packet(std::span(data, header->captured_length), payload, flow)) {
-                const double timestamp = static_cast<double>(header->timestamp.tv_sec) + static_cast<double>(header->timestamp.tv_usec) / 1000000.0;
+            if (parse_packet(std::span(data, header->captured_length), link_type, payload, flow)) {
+                const double timestamp =
+                    static_cast<double>(header->timestamp.tv_sec) + static_cast<double>(header->timestamp.tv_usec) / 1000000.0;
                 callback_(payload, timestamp, std::move(flow));
             }
         }
@@ -685,7 +740,8 @@ private:
     }
 
     HMODULE pcap_module_ = nullptr;
-    void* pcap_handle_ = nullptr;
+    std::vector<PcapCapture> pcap_captures_;
+    std::vector<std::thread> pcap_threads_;
     PcapNextEx pcap_next_ex_ = nullptr;
     PcapClose pcap_close_ = nullptr;
     HMODULE pktmon_module_ = nullptr;
@@ -756,17 +812,15 @@ void CoordinateCapture::close()
 void CoordinateCapture::accept_packet(std::span<const uint8_t> payload, double timestamp, PacketFlow flow)
 {
     const Direction direction = packet_direction(flow);
-    {
-        std::scoped_lock lock(mutex_);
-        ++packet_count_;
-        last_packet_wall_ = std::chrono::system_clock::now();
-        if (!payload.empty()) {
-            ++payload_count_;
-            last_payload_wall_ = last_packet_wall_;
-        }
-        if (direction == Direction::ServerToClient) {
-            ++s2c_count_;
-        }
+    std::scoped_lock lock(mutex_);
+    ++packet_count_;
+    last_packet_wall_ = std::chrono::system_clock::now();
+    if (!payload.empty()) {
+        ++payload_count_;
+        last_payload_wall_ = last_packet_wall_;
+    }
+    if (direction == Direction::ServerToClient) {
+        ++s2c_count_;
     }
     if (payload.empty() || direction == Direction::ServerToClient) {
         return;
@@ -775,7 +829,6 @@ void CoordinateCapture::accept_packet(std::span<const uint8_t> payload, double t
     if (!sample) {
         return;
     }
-    std::scoped_lock lock(mutex_);
     sample_ = sample;
     sample_timestamp_ = timestamp;
     ++sample_count_;
