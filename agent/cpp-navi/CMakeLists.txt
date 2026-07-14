@@ -12,6 +12,7 @@ endif()
 set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO RelWithDebInfo)
 set(CMAKE_MAP_IMPORTED_CONFIG_RELEASE RelWithDebInfo)
 set(CMAKE_MAP_IMPORTED_CONFIG_DEBUG RelWithDebInfo)
+set(CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL RelWithDebInfo)
 
 set(MaaFramework_DIR "${DEPS_DIR}/share/cmake/MaaFramework")
 set(MaaAgentServer_DIR "${DEPS_DIR}/share/cmake/MaaAgentServer")

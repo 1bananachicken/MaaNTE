@@ -8,6 +8,13 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 TOOLS = ROOT / "agent" / "cpp-navi" / "MaaUtils" / "tools"
 MAADEPS = ROOT / "agent" / "cpp-navi" / "MaaUtils" / "MaaDeps"
+
+if not (TOOLS / "maadeps_download.py").is_file():
+    raise SystemExit(
+        "MaaUtils submodule is missing. Run "
+        "`git submodule update --init agent/cpp-navi/MaaUtils`."
+    )
+
 sys.path.insert(0, str(TOOLS))
 
 from maadeps_download import detect_host_triplet, main as download_main
