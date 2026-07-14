@@ -87,5 +87,8 @@
     "tetris.task_failed": "[テトリス] タスク異常終了",
     "tetris.progress": "[テトリス] 進捗: %d/%d",
     "tetris.task_done": "[テトリス] タスク完了",
-    "tetris.vitality_exhausted": "[テトリス] スタミナ切れ、タスク完了"
+    "tetris.vitality_exhausted": "[テトリス] スタミナ切れ、タスク完了",
+    "gfn.mode_chrome_detected": "GeForce NOW（Chrome 版）ウィンドウを検出しました。フォアグラウンドモードのみ対応です",
+    "gfn.mode_app_detected": "GeForce NOW クライアントウィンドウを検出しました。フォアグラウンドモードのみ対応です",
+    "gfn.app_resize_failed": "GeForce NOW クライアントウィンドウのリサイズが反映されませんでした。GFN の設定でストリーミング解像度を %dx%d に設定するか、ウィンドウツールでそのサイズに調整してください"
 }

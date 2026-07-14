@@ -447,13 +447,35 @@ def _check_admin_privilege():
 
 
 def _check_game_resolution():
-    """连接控制器后检测游戏窗口分辨率"""
-    from utils.win32_process import find_window_by_process, get_client_size
+    """连接控制器后检测游戏窗口分辨率（本地客户端 / GFN Chrome / GFN 原生客户端）。
 
-    hwnd = find_window_by_process("HTGame.exe")
-    if hwnd is None:
-        logger.warning("分辨率检测: 未找到游戏窗口 (HTGame.exe)")
+    分辨率与基准（1280x720）不符时先尝试自动调整窗口客户区，
+    调整失败才提示用户手动处理；无论成败都按最终实际尺寸更新缩放系数。
+    """
+    if not sys.platform.startswith("win"):
+        logger.debug("分辨率检测: 非 Windows 平台，跳过")
         return
+
+    from utils.win32_process import (
+        GAME_WINDOW_MODE_GFN_APP,
+        GAME_WINDOW_MODE_GFN_CHROME,
+        GAME_WINDOW_MODE_NOT_FOUND,
+        ensure_game_window_resolution,
+        get_client_size,
+        refresh_game_window_mode,
+    )
+
+    mode, hwnd = refresh_game_window_mode()
+    if mode == GAME_WINDOW_MODE_NOT_FOUND or hwnd is None:
+        logger.warning(
+            "分辨率检测: 未找到游戏窗口 (HTGame.exe / GFN Chrome / GeForceNOW.exe)"
+        )
+        return
+
+    if mode == GAME_WINDOW_MODE_GFN_CHROME:
+        logger.info("检测到 GeForce NOW (Chrome 网页版) 窗口，仅支持前台模式运行")
+    elif mode == GAME_WINDOW_MODE_GFN_APP:
+        logger.info("检测到 GeForce NOW 原生客户端窗口，仅支持前台模式运行")
 
     size = get_client_size(hwnd)
     if size is None:
@@ -461,17 +483,78 @@ def _check_game_resolution():
         return
 
     w, h = size
+    baseline_w, baseline_h = screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT
+    tolerance = 2
+    did_resize = False
+
+    if abs(w - baseline_w) > tolerance or abs(h - baseline_h) > tolerance:
+        did_resize = True
+        logger.info(
+            "当前窗口分辨率 %dx%d 与基准 %dx%d 不符，尝试自动调整",
+            w,
+            h,
+            baseline_w,
+            baseline_h,
+        )
+        try:
+            result = ensure_game_window_resolution(baseline_w, baseline_h)
+        except Exception:
+            logger.exception("自动调整窗口分辨率时发生异常")
+            result = None
+        if result is not None:
+            logger.debug(
+                "窗口分辨率调整结果: mode=%s, reason=%s, before=%s, after=%s",
+                result.get("mode"),
+                result.get("reason"),
+                result.get("before"),
+                result.get("after"),
+            )
+            after = result.get("after")
+            if after is not None:
+                w, h = after
+            # 缩放内部会重新枚举选窗（多 Chrome 窗口场景可能选中不同句柄），
+            # 后续兜底测量必须用缩放实际作用的窗口
+            if result.get("hwnd"):
+                hwnd = result["hwnd"]
+        # 调整可能改变窗口尺寸，用最终实际值兜底刷新
+        final_size = get_client_size(hwnd)
+        if final_size is not None:
+            w, h = final_size
+
     screen.update_screen_size(w, h)
     scale_x, scale_y = screen.scaling_factors()
 
-    if (w, h) == (screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT):
+    if abs(w - baseline_w) <= tolerance and abs(h - baseline_h) <= tolerance:
         logger.info(
-            f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})"
+            "当前窗口分辨率: %dx%d [正常], scale=(%.3f, %.3f)", w, h, scale_x, scale_y
+        )
+        if did_resize and mode == GAME_WINDOW_MODE_GFN_APP:
+            # GFN 串流渲染分辨率在会话建立时确定：窗口缩放只改变本地窗口，
+            # 已在串流中的会话仍按原分辨率（如 1920x1200）云端渲染后缩放显示，
+            # 画面内 UI 尺寸/位置与 1280x720 基准不符，模板匹配会系统性失败。
+            logger.warning(
+                "GFN 窗口已调整为 1280x720，但若游戏会话在调整前已开始串流，"
+                "云端仍按原分辨率渲染，识别可能失败。若任务无法识别画面，请在 "
+                "GeForce NOW 设置中将串流分辨率固定为 1280x720 后重启游戏会话，"
+                "或保持窗口为 1280x720 时再启动游戏。"
+            )
+    elif mode == GAME_WINDOW_MODE_GFN_APP:
+        logger.warning(
+            "自动调整窗口分辨率未生效，当前 %dx%d，scale=(%.3f, %.3f)。"
+            "请在 GeForce NOW 客户端设置中将串流分辨率设为 1280x720，否则部分功能可能异常。",
+            w,
+            h,
+            scale_x,
+            scale_y,
         )
     else:
         logger.warning(
-            f"当前窗口分辨率: {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
-            "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。"
+            "自动调整窗口分辨率未生效，当前 %dx%d，scale=(%.3f, %.3f)。"
+            "请将游戏设置为 1280x720 窗口化模式，否则部分功能可能异常。",
+            w,
+            h,
+            scale_x,
+            scale_y,
         )
 
 

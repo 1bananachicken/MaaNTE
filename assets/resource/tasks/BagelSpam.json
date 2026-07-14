@@ -6,7 +6,9 @@
             "entry": "BagelSpamEntrance",
             "description": "$task_bagel_spam_desc",
             "controller": [
-                "Win32-Front"
+                "Win32-Front",
+                "GFN-Chrome",
+                "GFN-App"
             ],
             "group": [
                 "HethereauHobbies"

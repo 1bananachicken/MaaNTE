@@ -6,7 +6,9 @@
             "entry": "FurnitureEntrance",
             "description": "$task_furniture_desc",
             "controller": [
-                "Win32-Front"
+                "Win32-Front",
+                "GFN-Chrome",
+                "GFN-App"
             ],
             "group": [
                 "Daily",
