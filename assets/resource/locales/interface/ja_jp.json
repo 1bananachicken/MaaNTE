@@ -76,6 +76,7 @@
     "task_make_coffee_lite_label": "自動でコーヒーを作ります（簡易版）",
     "task_make_coffee_lite_desc": "ステージ選択画面でタスクを開始します。特別なキャラクターは不要です",
     "task_make_coffee_option_loop_time": "製作回数",
+    "task_make_coffee_lite_option": "コーヒー作成設定",
     "task_make_coffee_lite_option_loop_time": "製作回数",
     "task_make_coffee_lite_option_timeout": "製作タイムアウト時間(秒)",
     "task_rhythm_label": "ハイパーサウンド",

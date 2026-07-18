@@ -6,8 +6,7 @@
             "desc": "$task_make_coffee_lite_desc",
             "entry": "AutoMakeCoffeeLiteEntrance",
             "option": [
-                "MakeCoffeeLoopTimeLite",
-                "MakeCoffeeTimeoutLite"
+                "MakeCoffeeLoopTimeAndTimeout"
             ],
             "controller": [
                 "Win32-Front"
@@ -18,38 +17,29 @@
         }
     ],
     "option": {
-        "MakeCoffeeLoopTimeLite": {
-            "label": "$task_make_coffee_lite_option_loop_time",
+        "MakeCoffeeLoopTimeAndTimeout": {
             "type": "input",
+            "label": "$task_make_coffee_lite_option",
             "inputs": [
                 {
                     "name": "LoopTime",
                     "default": "10",
+                    "label": "$task_make_coffee_lite_option_loop_time",
                     "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "MakeCoffeeLiteRun": {
-                    "custom_action_param": {
-                        "count": "{LoopTime}"
-                    }
-                }
-            }
-        },
-        "MakeCoffeeTimeoutLite": {
-            "label": "$task_make_coffee_lite_option_timeout",
-            "type": "input",
-            "inputs": [
+                },
                 {
                     "name": "Timeout",
                     "default": "5",
+                    "label": "$task_make_coffee_lite_option_timeout",
                     "pipeline_type": "int"
+                    
                 }
             ],
             "pipeline_override": {
                 "MakeCoffeeLiteRun": {
                     "custom_action_param": {
-                        "timeout": "{Timeout}"
+                        "timeout": "{Timeout}",
+                        "count": "{LoopTime}"
                     }
                 }
             }

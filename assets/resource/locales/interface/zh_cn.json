@@ -56,6 +56,7 @@
     "task_make_coffee_lite_label": "自动做咖啡(平民版)",
     "task_make_coffee_lite_desc": "在选择关卡页面开始任务，无需特殊角色",
     "task_make_coffee_option_loop_time": "制作次数",
+    "task_make_coffee_lite_option": "做咖啡设置",
     "task_make_coffee_lite_option_loop_time": "制作次数",
     "task_make_coffee_lite_option_timeout": "制作超时退出时间(秒)",
     "task_rhythm_label": "超强音",
