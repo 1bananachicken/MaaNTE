@@ -207,6 +207,7 @@ jobs:
           targets: ${{ matrix.arch == 'x86_64' && 'x86_64-pc-windows-msvc' || 'aarch64-pc-windows-msvc' }}
 
       - name: Cache MXU Rust build
+        if: ${{ needs.meta.outputs.trusted_release != 'true' }}
         uses: swatinem/rust-cache@42dc69e1aa15d09112580998cf2ef0119e2e91ae # v2
         with:
           workspaces: "third_party/MXU/src-tauri -> target"
@@ -247,6 +248,15 @@ jobs:
           pnpm tauri build --ci --no-bundle
           --target ${{ matrix.arch == 'x86_64' && 'x86_64-pc-windows-msvc' || 'aarch64-pc-windows-msvc' }}
           -- --locked
+
+      - name: Upload source-built executable for signing
+        if: ${{ needs.meta.outputs.trusted_release == 'true' }}
+        id: upload-unsigned-executable
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          path: third_party/MXU/src-tauri/target/${{ matrix.arch == 'x86_64' && 'x86_64-pc-windows-msvc' || 'aarch64-pc-windows-msvc' }}/release/MaaNTE.exe
+          archive: false
+          retention-days: 1
 
       - name: Setup Embed Python on Windows
         shell: bash
@@ -363,15 +373,6 @@ jobs:
           echo "Removing deps directory to reduce package size..."
           rm -rf install-mxu/deps
           echo "Deps directory removed. Package size reduced by ~171MB."
-
-      - name: Upload unsigned executable for signing
-        if: ${{ needs.meta.outputs.trusted_release == 'true' }}
-        id: upload-unsigned-executable
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
-        with:
-          path: install-mxu/MaaNTE.exe
-          archive: false
-          retention-days: 1
 
       - name: Upload unsigned package for signing
         if: ${{ needs.meta.outputs.trusted_release == 'true' }}
