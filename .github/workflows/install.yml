@@ -15,14 +15,6 @@ on:
   pull_request:
     branches:
       - "**"
-    paths:
-      - ".github/workflows/install.yml"
-      - ".gitmodules"
-      - "assets/**"
-      - "requirements*.txt"
-      - "third_party/MXU"
-      - "tools/ci/**"
-      - "**.py"
   workflow_dispatch:
     inputs:
       signing_mode:
@@ -57,6 +49,8 @@ jobs:
           REF_TYPE: ${{ github.ref_type }}
           REPOSITORY: ${{ github.repository }}
           SIGNING_MODE: ${{ inputs.signing_mode || 'unsigned' }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
@@ -112,6 +106,27 @@ jobs:
             fi
           fi
 
+          # Keep the PR workflow alive for the required gate, but reserve the
+          # Windows runner for changes that can affect the release artifact.
+          build_required=true
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            if [ -z "$BASE_SHA" ] || [ -z "$HEAD_SHA" ]; then
+              echo "Pull request base/head SHA is unavailable; refusing to skip the build."
+              exit 1
+            fi
+
+            build_required=false
+            changed_files="$(git diff --name-only "$BASE_SHA...$HEAD_SHA")"
+            while IFS= read -r path; do
+              case "$path" in
+                .github/workflows/install.yml|.gitmodules|assets/*|requirements*.txt|third_party/MXU|tools/ci/*|*.py)
+                  build_required=true
+                  break
+                  ;;
+              esac
+            done <<< "$changed_files"
+          fi
+
           test_signing=false
           if [ "$EVENT_NAME" = "workflow_dispatch" ] \
             && [ "$SIGNING_MODE" = "test" ] \
@@ -131,6 +146,7 @@ jobs:
           echo "trusted_release=$trusted_release" | tee -a "$GITHUB_OUTPUT"
           echo "test_signing=$test_signing" | tee -a "$GITHUB_OUTPUT"
           echo "signing_requested=$signing_requested" | tee -a "$GITHUB_OUTPUT"
+          echo "build_required=$build_required" | tee -a "$GITHUB_OUTPUT"
     outputs:
       tag: ${{ steps.set_tag.outputs.tag }}
       is_release: ${{ steps.set_tag.outputs.is_release }}
@@ -138,9 +154,11 @@ jobs:
       trusted_release: ${{ steps.set_tag.outputs.trusted_release }}
       test_signing: ${{ steps.set_tag.outputs.test_signing }}
       signing_requested: ${{ steps.set_tag.outputs.signing_requested }}
+      build_required: ${{ steps.set_tag.outputs.build_required }}
 
-  windows:
+  windows_build:
     needs: meta
+    if: ${{ needs.meta.outputs.build_required == 'true' }}
     permissions:
       contents: read
     strategy:
@@ -427,9 +445,43 @@ jobs:
           name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
           path: install-mxu
 
+  # Keep this exact check name for the dev branch ruleset. The heavy build is
+  # skipped for unrelated PRs and its result is checked here on Ubuntu.
+  windows:
+    name: windows (x86_64, windows-latest)
+    if: ${{ always() }}
+    needs: [meta, windows_build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Windows build result
+        shell: bash
+        env:
+          META_RESULT: ${{ needs.meta.result }}
+          BUILD_REQUIRED: ${{ needs.meta.outputs.build_required }}
+          BUILD_RESULT: ${{ needs.windows_build.result }}
+        run: |
+          set -euo pipefail
+
+          if [ "$META_RESULT" != "success" ]; then
+            echo "The meta job did not succeed: $META_RESULT"
+            exit 1
+          fi
+
+          if [ "$BUILD_REQUIRED" = "true" ] && [ "$BUILD_RESULT" != "success" ]; then
+            echo "The required Windows build did not succeed: $BUILD_RESULT"
+            exit 1
+          fi
+
+          if [ "$BUILD_REQUIRED" != "true" ] && [ "$BUILD_RESULT" != "skipped" ]; then
+            echo "Unexpected Windows build result for an unrelated pull request: $BUILD_RESULT"
+            exit 1
+          fi
+
+          echo "Windows build gate passed (build_required=$BUILD_REQUIRED, result=$BUILD_RESULT)."
+
   test-sign:
     if: ${{ needs.meta.outputs.test_signing == 'true' }}
-    needs: [meta, windows]
+    needs: [meta, windows_build]
     runs-on: windows-latest
     permissions:
       actions: write
@@ -449,7 +501,7 @@ jobs:
           organization-id: 52da06e6-4590-473f-a3c3-ae7ea178db3e
           project-slug: MaaNTE
           signing-policy-slug: test-signing
-          github-artifact-id: ${{ needs.windows.outputs.unsigned_executable_artifact_id }}
+          github-artifact-id: ${{ needs.windows_build.outputs.unsigned_executable_artifact_id }}
           wait-for-completion: true
           output-artifact-directory: signed-artifact
           skip-decompress: true
@@ -473,8 +525,8 @@ jobs:
         with:
           script: |
             const artifactIds = [
-              Number('${{ needs.windows.outputs.unsigned_executable_artifact_id }}'),
-              Number('${{ needs.windows.outputs.unsigned_package_artifact_id }}')
+              Number('${{ needs.windows_build.outputs.unsigned_executable_artifact_id }}'),
+              Number('${{ needs.windows_build.outputs.unsigned_package_artifact_id }}')
             ].filter((id) => Number.isInteger(id) && id > 0);
 
             for (const artifactId of artifactIds) {
@@ -487,7 +539,7 @@ jobs:
 
   sign:
     if: ${{ needs.meta.outputs.trusted_release == 'true' }}
-    needs: [meta, windows]
+    needs: [meta, windows_build]
     runs-on: windows-latest
     permissions:
       actions: write
@@ -507,7 +559,7 @@ jobs:
           organization-id: 52da06e6-4590-473f-a3c3-ae7ea178db3e
           project-slug: MaaNTE
           signing-policy-slug: test-signing
-          github-artifact-id: ${{ needs.windows.outputs.unsigned_executable_artifact_id }}
+          github-artifact-id: ${{ needs.windows_build.outputs.unsigned_executable_artifact_id }}
           wait-for-completion: true
           output-artifact-directory: signed-artifact
           skip-decompress: true
@@ -530,8 +582,8 @@ jobs:
         with:
           script: |
             const artifactIds = [
-              Number('${{ needs.windows.outputs.unsigned_executable_artifact_id }}'),
-              Number('${{ needs.windows.outputs.unsigned_package_artifact_id }}')
+              Number('${{ needs.windows_build.outputs.unsigned_executable_artifact_id }}'),
+              Number('${{ needs.windows_build.outputs.unsigned_package_artifact_id }}')
             ].filter((id) => Number.isInteger(id) && id > 0);
 
             for (const artifactId of artifactIds) {
@@ -544,7 +596,7 @@ jobs:
 
   release:
     if: ${{ needs.meta.outputs.trusted_release == 'true' }}
-    needs: [meta, windows, sign]
+    needs: [meta, windows_build, sign]
     runs-on: ubuntu-latest
     permissions:
       actions: write
