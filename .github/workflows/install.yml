@@ -8,11 +8,21 @@ on:
       - ".github/workflows/install.yml"
       - ".gitmodules"
       - "assets/**"
+      - "requirements*.txt"
       - "third_party/MXU"
+      - "tools/ci/**"
       - "**.py"
   pull_request:
     branches:
       - "**"
+    paths:
+      - ".github/workflows/install.yml"
+      - ".gitmodules"
+      - "assets/**"
+      - "requirements*.txt"
+      - "third_party/MXU"
+      - "tools/ci/**"
+      - "**.py"
   workflow_dispatch:
     inputs:
       signing_mode:
@@ -55,7 +65,7 @@ jobs:
           identifier='(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)'
           prerelease="${identifier}(\.${identifier})*"
           build='[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*'
-          stable_regex="^v${core}\.${core}\.${core}$"
+          stable_regex="^v${core}\.${core}\.${core}(\+${build})?$"
           semver_regex="^v${core}\.${core}\.${core}(-${prerelease})?(\+${build})?$"
 
           is_stable_release=false
@@ -90,7 +100,7 @@ jobs:
           fi
 
           trusted_release=false
-          if [ "$is_stable_release" = "true" ] \
+          if [ "$is_release" = "true" ] \
             && [ "$EVENT_NAME" = "push" ] \
             && [ "$REF_TYPE" = "tag" ] \
             && [ "$REPOSITORY" = "1bananachicken/MaaNTE" ]; then

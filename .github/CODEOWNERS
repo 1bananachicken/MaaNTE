@@ -4,4 +4,7 @@
 /.github/CODEOWNERS @1bananachicken
 /.gitmodules @1bananachicken
 /build.py @1bananachicken
+/install.py @1bananachicken
+/requirements*.txt @1bananachicken
+/tools/ci/** @1bananachicken
 /third_party/MXU @1bananachicken
