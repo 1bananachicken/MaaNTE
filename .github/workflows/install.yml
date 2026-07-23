@@ -14,6 +14,15 @@ on:
     branches:
       - "**"
   workflow_dispatch:
+    inputs:
+      signing_mode:
+        description: "Select test to submit the build to SignPath test-signing without creating a release"
+        required: true
+        default: unsigned
+        type: choice
+        options:
+          - unsigned
+          - test
 
 env:
   MAA_FRAMEWORK_VERSION: "v5.10.5"
@@ -37,6 +46,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           REF_TYPE: ${{ github.ref_type }}
           REPOSITORY: ${{ github.repository }}
+          SIGNING_MODE: ${{ inputs.signing_mode || 'unsigned' }}
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
@@ -92,15 +102,32 @@ jobs:
             fi
           fi
 
+          test_signing=false
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] \
+            && [ "$SIGNING_MODE" = "test" ] \
+            && [ "$REF_TYPE" = "branch" ] \
+            && [ "$REPOSITORY" = "1bananachicken/MaaNTE" ]; then
+            test_signing=true
+          fi
+
+          signing_requested=false
+          if [ "$trusted_release" = "true" ] || [ "$test_signing" = "true" ]; then
+            signing_requested=true
+          fi
+
           echo "tag=$tag" | tee -a "$GITHUB_OUTPUT"
           echo "is_release=$is_release" | tee -a "$GITHUB_OUTPUT"
           echo "is_prerelease=$is_prerelease" | tee -a "$GITHUB_OUTPUT"
           echo "trusted_release=$trusted_release" | tee -a "$GITHUB_OUTPUT"
+          echo "test_signing=$test_signing" | tee -a "$GITHUB_OUTPUT"
+          echo "signing_requested=$signing_requested" | tee -a "$GITHUB_OUTPUT"
     outputs:
       tag: ${{ steps.set_tag.outputs.tag }}
       is_release: ${{ steps.set_tag.outputs.is_release }}
       is_prerelease: ${{ steps.set_tag.outputs.is_prerelease }}
       trusted_release: ${{ steps.set_tag.outputs.trusted_release }}
+      test_signing: ${{ steps.set_tag.outputs.test_signing }}
+      signing_requested: ${{ steps.set_tag.outputs.signing_requested }}
 
   windows:
     needs: meta
@@ -207,7 +234,7 @@ jobs:
           targets: ${{ matrix.arch == 'x86_64' && 'x86_64-pc-windows-msvc' || 'aarch64-pc-windows-msvc' }}
 
       - name: Cache MXU Rust build
-        if: ${{ needs.meta.outputs.trusted_release != 'true' }}
+        if: ${{ needs.meta.outputs.signing_requested != 'true' }}
         uses: swatinem/rust-cache@42dc69e1aa15d09112580998cf2ef0119e2e91ae # v2
         with:
           workspaces: "third_party/MXU/src-tauri -> target"
@@ -250,7 +277,7 @@ jobs:
           -- --locked
 
       - name: Upload source-built executable for signing
-        if: ${{ needs.meta.outputs.trusted_release == 'true' }}
+        if: ${{ needs.meta.outputs.signing_requested == 'true' }}
         id: upload-unsigned-executable
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
@@ -375,7 +402,7 @@ jobs:
           echo "Deps directory removed. Package size reduced by ~171MB."
 
       - name: Upload unsigned package for signing
-        if: ${{ needs.meta.outputs.trusted_release == 'true' }}
+        if: ${{ needs.meta.outputs.signing_requested == 'true' }}
         id: upload-unsigned-package
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
@@ -384,11 +411,69 @@ jobs:
           retention-days: 1
 
       - name: Upload unsigned build artifact
-        if: ${{ needs.meta.outputs.trusted_release != 'true' }}
+        if: ${{ needs.meta.outputs.signing_requested != 'true' }}
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
           path: install-mxu
+
+  test-sign:
+    if: ${{ needs.meta.outputs.test_signing == 'true' }}
+    needs: [meta, windows]
+    runs-on: windows-latest
+    permissions:
+      actions: write
+      contents: read
+    environment: test-signing
+    steps:
+      - name: Download unsigned package
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: unsigned-MaaNTE-win-x86_64-${{ needs.meta.outputs.tag }}-MXU
+          path: install-mxu
+
+      - name: Submit test signing request
+        uses: signpath/github-action-submit-signing-request@b9d91eadd323de506c0c81cf0c7fe7438f3360fd # v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: 52da06e6-4590-473f-a3c3-ae7ea178db3e
+          project-slug: MaaNTE
+          signing-policy-slug: test-signing
+          github-artifact-id: ${{ needs.windows.outputs.unsigned_executable_artifact_id }}
+          wait-for-completion: true
+          output-artifact-directory: signed-artifact
+          skip-decompress: true
+          parameters: |
+            version: ${{ toJSON(needs.meta.outputs.tag) }}
+
+      - name: Replace unsigned executable with test-signed executable
+        shell: bash
+        run: cp signed-artifact/MaaNTE.exe install-mxu/MaaNTE.exe
+
+      - name: Upload test-signed build artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: test-signed-MaaNTE-win-x86_64-${{ needs.meta.outputs.tag }}-MXU
+          path: install-mxu
+          retention-days: 7
+
+      - name: Delete signing-only artifacts
+        if: ${{ success() }}
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
+        with:
+          script: |
+            const artifactIds = [
+              Number('${{ needs.windows.outputs.unsigned_executable_artifact_id }}'),
+              Number('${{ needs.windows.outputs.unsigned_package_artifact_id }}')
+            ].filter((id) => Number.isInteger(id) && id > 0);
+
+            for (const artifactId of artifactIds) {
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifactId
+              });
+            }
 
   sign:
     if: ${{ needs.meta.outputs.trusted_release == 'true' }}
