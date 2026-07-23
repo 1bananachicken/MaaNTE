@@ -303,7 +303,7 @@ def get_mxu_executable(os_type, os_arch):
     target = get_mxu_target(os_type, os_arch)
     if target:
         target_dir /= target
-    executable = "mxu.exe" if os_type == "Windows" else "mxu"
+    executable = "MaaNTE.exe" if os_type == "Windows" else "MaaNTE"
     return target_dir / "release" / executable
 
 
