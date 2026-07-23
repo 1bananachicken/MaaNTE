@@ -4,6 +4,24 @@ from maa.context import Context
 from maa.define import Status
 from datetime import datetime
 
+try:
+    from agent.custom.action.pinkpaw.pinkpaw_common import (
+        _get_auto_resize_game_window,
+        _parse_bool,
+        _parse_custom_action_param,
+        ensure_game_window_resolution,
+    )
+except ImportError:
+    from .pinkpaw_common import (
+        _get_auto_resize_game_window,
+        _parse_bool,
+        _parse_custom_action_param,
+        ensure_game_window_resolution,
+    )
+
+DEFAULT_WIDTH = 1280
+DEFAULT_HEIGHT = 720
+
 VK = {
     "W": 0x57,
     "A": 0x41,
@@ -185,6 +203,14 @@ class PinkPawHeistScheme1Action(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
+        params = _parse_custom_action_param(argv, log_prefix="[PinkPawHeist/Core1]")
+        auto_resize_default = _get_auto_resize_game_window(context)
+        auto_resize = _parse_bool(
+            params.get("auto_resize_game_window"),
+            auto_resize_default,
+        )
+        if auto_resize and ensure_game_window_resolution:
+            ensure_game_window_resolution(DEFAULT_WIDTH, DEFAULT_HEIGHT)
         ah = ActionHelper(context)
 
         # ----- 切换3号，前往铁门 -----

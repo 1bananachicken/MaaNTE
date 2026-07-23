@@ -17,6 +17,7 @@
                 "FurnitureChooseEdenApartments",
                 "FurnitureChooseSkyviewHalls",
                 "FurnitureChooseGoldenCapital",
+                "FurnitureChooseTianJun",
                 "FurnitureChooseFenglinVilla"
             ]
         }
@@ -116,6 +117,31 @@
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "FurnitureChooseGoldenCapital": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "FurnitureChooseTianJun": {
+            "type": "switch",
+            "label": "天骏公阁",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "FurnitureChooseTianJun": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "FurnitureChooseTianJun": {
                             "enabled": false
                         }
                     }

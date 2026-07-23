@@ -46,10 +46,10 @@ class Dodger:
             if self._busy:
                 return
             self._busy = True
+            self._last_dodge = time.time()
 
         try:
             self.dodge_fn()
-            self._last_dodge = time.time()
         except Exception as e:
             _log().error(f"Dodge failed: {e}")
         finally:
@@ -66,10 +66,10 @@ class Dodger:
             if self._busy:
                 return
             self._busy = True
+            self._last_counter = time.time()
 
         try:
             self.counter_fn()
-            self._last_counter = time.time()
         except Exception as e:
             _log().error(f"Counter failed: {e}")
         finally:
@@ -83,7 +83,7 @@ class Dodger:
     def _default_dodge(self):
         _log().info("执行按键: 左Shift按下 -> 左Shift释放")
         self._click_key(VK_SHIFT)
-        time.sleep(0.1 + random.random() * 0.2)
+        time.sleep(0.1 + random.random() * 0.1)
         self._click_key(VK_SHIFT)
 
     def _default_counter(self):

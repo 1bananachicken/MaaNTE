@@ -9,7 +9,7 @@ MaaNTE 本地自动化构建脚本
     python build.py --mode=mfaa            # 仅构建 MFAA 版本
     python build.py --mode=mxu             # 仅构建 MXU 版本
     python build.py --compress=false       # 不打包压缩包
-    python build.py --skip-download        # 跳过下载，仅本地组装
+    python build.py --skip-download        # 跳过下载和源码构建，仅本地组装
     python build.py --skip-icon            # 跳过图标处理
     python build.py --tag v1.0.0           # 指定版本号
     python build.py --output-dir ./output  # 指定输出目录
@@ -31,9 +31,8 @@ from pathlib import Path
 # 可配置常量
 # ---------------------------------------------------------------------------
 
-MAA_FRAMEWORK_VERSION = "v5.10.4"
+MAA_FRAMEWORK_VERSION = "v5.10.5"
 MFAA_VERSION = "v2.12.1"
-MXU_VERSION = "v2.1.3"
 PYTHON_VERSION_TARGET = "3.12.10"
 PYTHON_BUILD_STANDALONE_RELEASE_TAG = "20250409"
 
@@ -42,7 +41,7 @@ INSTALL_DIR = ROOT / "install"
 INSTALL_MXU_DIR = ROOT / "install-mxu"
 DEPS_DIR = ROOT / "deps"
 MFA_DIR = ROOT / "MFA"
-MXU_DIR = ROOT / "MXU"
+MXU_SOURCE_DIR = ROOT / "third_party" / "MXU"
 PYTHON_DIR = INSTALL_DIR / "python"
 PYTHON_DEPS_DIR = INSTALL_DIR / "deps"
 ASSETS_DIR = ROOT / "assets"
@@ -288,27 +287,59 @@ def step_download_mfa(os_arch, platform_tag):
     print(f"  MFAAvalonia 解压完成 -> {MFA_DIR}")
 
 
-def step_download_mxu(os_arch):
-    """步骤5: 下载 MXU GUI"""
+def get_mxu_target(os_type, os_arch):
+    """返回 MXU 的 Rust target；Linux 原生构建无需显式 target。"""
+    return {
+        ("Windows", "AMD64"): "x86_64-pc-windows-msvc",
+        ("Windows", "ARM64"): "aarch64-pc-windows-msvc",
+        ("Darwin", "x86_64"): "x86_64-apple-darwin",
+        ("Darwin", "arm64"): "aarch64-apple-darwin",
+    }.get((os_type, os_arch))
+
+
+def get_mxu_executable(os_type, os_arch):
+    """返回源码构建生成的 MXU 可执行文件路径。"""
+    target_dir = MXU_SOURCE_DIR / "src-tauri" / "target"
+    target = get_mxu_target(os_type, os_arch)
+    if target:
+        target_dir /= target
+    executable = "mxu.exe" if os_type == "Windows" else "mxu"
+    return target_dir / "release" / executable
+
+
+def step_build_mxu(os_type, os_arch):
+    """步骤5: 从固定的 MXU 子模块源码构建 GUI。"""
     print("\n" + "=" * 60)
-    print("[5/12] 下载 MXU GUI")
+    print("[5/12] 从源码构建 MXU GUI")
     print("=" * 60)
 
-    if MXU_DIR.exists():
-        print(f"  {MXU_DIR} 已存在，跳过下载（如需重新下载请删除该目录）")
-        return
+    if not (MXU_SOURCE_DIR / "package.json").is_file():
+        raise FileNotFoundError(
+            f"MXU 子模块未初始化: {MXU_SOURCE_DIR}。"
+            "请运行 git submodule update --init --recursive"
+        )
 
-    mxu_tag = "x86_64" if os_arch in ("AMD64", "x86_64") else "arm64"
-    url = (
-        f"https://github.com/MistEO/MXU/releases/download/"
-        f"{MXU_VERSION}/MXU-win-{mxu_tag}-{MXU_VERSION}.zip"
-    )
-    zip_path = ROOT / f"mxu-{mxu_tag}.zip"
-    download(url, zip_path)
-    MXU_DIR.mkdir(parents=True, exist_ok=True)
-    shutil.unpack_archive(zip_path, MXU_DIR)
-    zip_path.unlink()
-    print(f"  MXU 解压完成 -> {MXU_DIR}")
+    corepack = shutil.which("corepack")
+    if corepack:
+        pnpm_command = [corepack, "pnpm"]
+    else:
+        pnpm = shutil.which("pnpm")
+        if not pnpm:
+            raise RuntimeError("未找到 Corepack 或 pnpm，请先安装 Node.js 和 pnpm")
+        pnpm_command = [pnpm]
+
+    run([*pnpm_command, "install", "--frozen-lockfile"], cwd=MXU_SOURCE_DIR)
+    command = [*pnpm_command, "tauri", "build", "--ci", "--no-bundle"]
+    target = get_mxu_target(os_type, os_arch)
+    if target:
+        command.extend(["--target", target])
+    command.extend(["--", "--locked"])
+    run(command, cwd=MXU_SOURCE_DIR)
+
+    executable = get_mxu_executable(os_type, os_arch)
+    if not executable.is_file():
+        raise FileNotFoundError(f"MXU 源码构建未生成可执行文件: {executable}")
+    print(f"  MXU 源码构建完成 -> {executable}")
 
 
 def step_convert_icon():
@@ -341,8 +372,8 @@ def step_convert_icon():
         print("  ImageMagick 未安装，跳过 ICO 转换。安装命令: choco install imagemagick")
 
 
-def step_modify_icons(os_arch):
-    """步骤7: 使用 rcedit 修改 exe 图标 (仅 x64 Windows)"""
+def step_modify_mfa_icon(os_arch):
+    """步骤7: 使用 rcedit 修改 MFAAvalonia 图标 (仅 x64 Windows)"""
     print("\n" + "=" * 60)
     print("[7/12] 修改 exe 图标")
     print("=" * 60)
@@ -371,15 +402,6 @@ def step_modify_icons(os_arch):
         run([str(rcedit_path), str(mfa_exe), "--set-icon", str(ico_path)])
     else:
         print(f"  MFAAvalonia.exe 未找到 ({mfa_exe})，跳过图标修改。")
-
-    # 修改 MXU 图标
-    mxu_exe = MXU_DIR / "mxu.exe"
-    if mxu_exe.exists():
-        print(f"  修改图标: {mxu_exe}")
-        run([str(rcedit_path), str(mxu_exe), "--set-icon", str(ico_path)])
-    else:
-        print(f"  mxu.exe 未找到 ({mxu_exe})，跳过图标修改。")
-
 
 def step_install(python_exe, tag, platform_tag):
     """步骤8: 运行 install.py 组装安装目录"""
@@ -448,27 +470,25 @@ def step_copy_mfa():
         print("  重命名: MFAAvalonia -> MaaNTE")
 
 
-def step_copy_mxu():
+def step_copy_mxu(os_type, os_arch):
     """步骤11: 复制 MXU 文件到 MXU 安装目录"""
     print("\n" + "=" * 60)
     print("[11/12] 整合 MXU GUI")
     print("=" * 60)
 
-    if not MXU_DIR.exists():
-        print("  MXU 目录不存在，跳过。")
-        return
-
     if not INSTALL_MXU_DIR.exists():
-        print("  install-mxu 目录不存在，跳过。")
-        return
+        raise FileNotFoundError(f"MXU 安装目录不存在: {INSTALL_MXU_DIR}")
 
-    mxu_exe = MXU_DIR / "mxu.exe"
-    if mxu_exe.exists():
-        shutil.copy2(mxu_exe, INSTALL_MXU_DIR / "MaaNTE.exe")
-        print(f"  复制: {mxu_exe} -> {INSTALL_MXU_DIR / 'MaaNTE.exe'}")
-    elif (MXU_DIR / "mxu").exists():
-        shutil.copy2(MXU_DIR / "mxu", INSTALL_MXU_DIR / "MaaNTE")
-        print(f"  复制: mxu -> MaaNTE")
+    mxu_exe = get_mxu_executable(os_type, os_arch)
+    if not mxu_exe.is_file():
+        raise FileNotFoundError(
+            f"MXU 可执行文件不存在: {mxu_exe}。请先完成 MXU 源码构建"
+        )
+
+    target_name = "MaaNTE.exe" if os_type == "Windows" else "MaaNTE"
+    target = INSTALL_MXU_DIR / target_name
+    shutil.copy2(mxu_exe, target)
+    print(f"  复制: {mxu_exe} -> {target}")
 
 
 def step_copy_icons():
@@ -477,24 +497,26 @@ def step_copy_icons():
     print("[12/12] 复制图标")
     print("=" * 60)
 
-    ico_path = ROOT / "maante.ico"
-    if not ico_path.exists():
-        print("  maante.ico 不存在，跳过。")
-        return
-
     # MFAA 版本：删除 MFA 自带 Assets + 复制图标
     if INSTALL_DIR.exists():
-        assets_path = INSTALL_DIR / "Assets"
-        if assets_path.exists():
-            shutil.rmtree(assets_path)
-            print("  删除 MFA 自带 Assets 目录")
-        shutil.copy2(ico_path, INSTALL_DIR / "logo.ico")
-        print("  复制 logo.ico -> install/logo.ico")
+        ico_path = ROOT / "maante.ico"
+        if ico_path.exists():
+            assets_path = INSTALL_DIR / "Assets"
+            if assets_path.exists():
+                shutil.rmtree(assets_path)
+                print("  删除 MFA 自带 Assets 目录")
+            shutil.copy2(ico_path, INSTALL_DIR / "logo.ico")
+            print("  复制 logo.ico -> install/logo.ico")
+        else:
+            print("  maante.ico 不存在，跳过 MFAA 图标复制。")
 
-    # MXU 版本：复制图标
+    # MXU 版本：复制随源码固定的图标
     if INSTALL_MXU_DIR.exists():
-        shutil.copy2(ico_path, INSTALL_MXU_DIR / "logo.ico")
-        print("  复制 logo.ico -> install-mxu/logo.ico")
+        mxu_icon = MXU_SOURCE_DIR / "src-tauri" / "icons" / "icon.ico"
+        if not mxu_icon.is_file():
+            raise FileNotFoundError(f"MXU 图标不存在: {mxu_icon}")
+        shutil.copy2(mxu_icon, INSTALL_MXU_DIR / "logo.ico")
+        print("  复制 MXU 源码图标 -> install-mxu/logo.ico")
 
 
 def step_package(platform_tag, tag, output_dir, mxu=False):
@@ -534,7 +556,7 @@ def step_package(platform_tag, tag, output_dir, mxu=False):
 # ========== 主入口 ==========
 
 def main():
-    global MAA_FRAMEWORK_VERSION, MFAA_VERSION, MXU_VERSION
+    global MAA_FRAMEWORK_VERSION, MFAA_VERSION
 
     parser = argparse.ArgumentParser(description="MaaNTE 本地自动化构建脚本")
     parser.add_argument("--tag", default="v0.0.1", help="版本号 (默认: v0.0.1)")
@@ -542,7 +564,11 @@ def main():
                         help="构建模式 (默认: all)")
     parser.add_argument("--compress", default="true", choices=["true", "false"],
                         help="是否打包压缩包 (默认: true)")
-    parser.add_argument("--skip-download", action="store_true", help="跳过所有下载步骤")
+    parser.add_argument(
+        "--skip-download",
+        action="store_true",
+        help="跳过依赖下载和源码构建，仅本地组装",
+    )
     parser.add_argument("--skip-icon", action="store_true", help="跳过图标转换与安装")
     parser.add_argument("--skip-package", action="store_true", help="跳过最终打包")
     parser.add_argument("--output-dir", default=str(ROOT / "output"), help="输出目录 (默认: ./output)")
@@ -550,13 +576,9 @@ def main():
                         help=f"MaaFramework 版本 (默认: {MAA_FRAMEWORK_VERSION})")
     parser.add_argument("--mfa-version", default=MFAA_VERSION,
                         help=f"MFAAvalonia 版本 (默认: {MFAA_VERSION})")
-    parser.add_argument("--mxu-version", default=MXU_VERSION,
-                        help=f"MXU 版本 (默认: {MXU_VERSION})")
-
     args = parser.parse_args()
     MAA_FRAMEWORK_VERSION = args.maa_version
     MFAA_VERSION = args.mfa_version
-    MXU_VERSION = args.mxu_version
 
     # 从 --mode 推导 skip 标志
     skip_mfa = args.mode == "mxu"
@@ -564,12 +586,20 @@ def main():
     skip_package = args.skip_package or args.compress == "false"
 
     # 初始化 git 子模块
-    submodules_ok = (ASSETS_DIR / "MaaCommonAssets" / ".git").exists()
-    if not submodules_ok:
+    required_submodules = [
+        ASSETS_DIR / "MaaCommonAssets",
+        ASSETS_DIR / "MaaNTEModels",
+    ]
+    if not skip_mxu:
+        required_submodules.append(MXU_SOURCE_DIR)
+    missing_submodules = [
+        path for path in required_submodules if not (path / ".git").exists()
+    ]
+    if missing_submodules:
         print("正在初始化 git 子模块...")
         r = subprocess.run(["git", "submodule", "update", "--init", "--recursive"], cwd=ROOT)
         if r.returncode != 0:
-            print("警告: git submodule 初始化失败，OCR 模型可能无法正确配置")
+            print("警告: git submodule 初始化失败，构建所需源码或模型可能缺失")
 
     # 检测平台
     os_type, os_arch, platform_tag = get_platform()
@@ -578,7 +608,8 @@ def main():
     print(f"输出: {args.output_dir}")
     print(f"MaaFramework: {MAA_FRAMEWORK_VERSION}")
     print(f"MFAAvalonia: {MFAA_VERSION}")
-    print(f"MXU: {MXU_VERSION}")
+    if not skip_mxu:
+        print(f"MXU 源码: {MXU_SOURCE_DIR}")
     print(f"模式: {args.mode}  |  打包: {args.compress}")
 
     if not args.skip_download:
@@ -595,17 +626,17 @@ def main():
         if not skip_mfa:
             step_download_mfa(os_arch, platform_tag)
 
-        # 5. MXU
+        # 5. MXU 源码构建
         if not skip_mxu:
-            step_download_mxu(os_arch)
+            step_build_mxu(os_type, os_arch)
 
-        # 6. 图标转换
-        if not args.skip_icon:
+        # 6. MFAA 图标转换
+        if not args.skip_icon and not skip_mfa:
             step_convert_icon()
 
-        # 7. 修改 exe 图标 (rcedit)
-        if not args.skip_icon:
-            step_modify_icons(os_arch)
+        # 7. 修改 MFAA exe 图标 (rcedit)
+        if not args.skip_icon and not skip_mfa:
+            step_modify_mfa_icon(os_arch)
     else:
         python_exe = PYTHON_DIR / ("python.exe" if os_type == "Windows" else "bin/python3")
         if not python_exe.exists():
@@ -626,7 +657,7 @@ def main():
 
     # 11. 整合 MXU
     if not skip_mxu:
-        step_copy_mxu()
+        step_copy_mxu(os_type, os_arch)
 
     # 清理未构建模式的 install 目录
     if skip_mfa and INSTALL_DIR.exists():

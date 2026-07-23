@@ -460,15 +460,18 @@ debug
 .maa/Debugger/store.json
 assets/resource/base/model/detect/limbo_stage_lightest.onnx
 assets/resource/base/model/detect/sos_nodes.onnx
-
+.claude/
 .nicegui/
 
 # local gui test
 MFA/
-MXU/
+/MXU/
 deps_maafw.zip
 test/
 output/
-
+thirdparty/
+agent/custom/action/temp/
+scripts/*
+!scripts/update_navi_coordinate_transform.py
 # Models
 assets/resource/base/model/*

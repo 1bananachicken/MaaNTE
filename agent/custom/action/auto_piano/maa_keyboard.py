@@ -1,5 +1,6 @@
-import time
 import ctypes
+import time
+
 from .key_mapping import NOTE_KEY_MAPPING
 from utils.logger import logger
 
@@ -9,7 +10,7 @@ WM_KEYUP = 0x0101
 WM_ACTIVATE = 0x0006
 WA_CLICKACTIVE = 2
 
-# 使用游戏专用的 左Shift 和 左Ctrl 防跑调
+# 使用游戏专用的左 Shift 和左 Ctrl 防跑调。
 WIN32_VK = {
     "shift": 0xA0,
     "ctrl": 0xA2,
@@ -41,17 +42,14 @@ WIN32_VK = {
     "z": 0x5A,
 }
 
-# ==========================================
-# 填入游戏的精确名称列表（脚本会按从上到下的顺序匹配）
 WINDOW_TITLES = [
     "NTE  ",
     "异环  ",
 ]
-# ==========================================
 
 
 def get_lparam(vk_code, is_down=True):
-    """构建底层硬件扫描码"""
+    """构建底层硬件扫描码。"""
     scan_code = user32.MapVirtualKeyW(vk_code, 0)
     lparam = 1 | (scan_code << 16)
     if not is_down:
@@ -61,54 +59,65 @@ def get_lparam(vk_code, is_down=True):
 
 class MaaKeyboardBridge:
     def __init__(
-        self, controller=None, hold_seconds: float = 0.008, wait_jobs: bool = False
+        self,
+        hold_seconds: float = 0.008,
+        mapping: dict | None = None,
     ):
-        self.mapping = NOTE_KEY_MAPPING
+        self.mapping = mapping if mapping is not None else NOTE_KEY_MAPPING
         self.hold_seconds = hold_seconds
         self.hwnd = 0
 
-        # 按顺序遍历列表，寻找第一个存在的游戏窗口
         for title in WINDOW_TITLES:
             hwnd = user32.FindWindowW(None, title)
             if hwnd:
                 self.hwnd = hwnd
                 logger.info("已连接到游戏窗口: '%s' (HWND: %s)", title, self.hwnd)
-                break  # 找到了就立刻停止搜索
+                break
 
         if not self.hwnd:
-            logger.warning("未找到列表中的任何窗口，请检查游戏是否运行！列表: %s", WINDOW_TITLES)
+            logger.warning(
+                "未找到列表中的任何窗口，请检查游戏是否运行！列表: %s",
+                WINDOW_TITLES,
+            )
 
     def _force_send_key(self, vk_code, is_down):
-        """带有强行唤醒的底层发送器"""
+        """通过 PostMessage 向游戏窗口发送按键。"""
         if not self.hwnd:
             return
-
-        # 发送前强行给窗口发一个“鼠标点击激活”信号，骗过后台检测！
-        user32.SendMessageW(self.hwnd, WM_ACTIVATE, WA_CLICKACTIVE, 0)
 
         lparam = get_lparam(vk_code, is_down)
         msg = WM_KEYDOWN if is_down else WM_KEYUP
         user32.PostMessageW(self.hwnd, msg, vk_code, lparam)
 
+    def _activate(self):
+        user32.SendMessageW(self.hwnd, WM_ACTIVATE, WA_CLICKACTIVE, 0)
+
     def execute_chord(self, midi_notes):
+        """按修饰键类型隔离并短按一个和弦。"""
         if not self.hwnd:
             return
+
+        self._activate()
+        self._execute_chord_groups(midi_notes)
+
+    def _execute_chord_groups(self, midi_notes):
+        """发送已经激活窗口的短按和弦。"""
 
         normal_keys, shift_keys, ctrl_keys = [], [], []
 
         for note in midi_notes:
-            if note in self.mapping:
-                action = self.mapping[note]
-                key = action.split("+")[-1]
-                if "shift+" in action:
-                    shift_keys.append(key)
-                elif "ctrl+" in action:
-                    ctrl_keys.append(key)
-                else:
-                    normal_keys.append(key)
+            if note not in self.mapping:
+                continue
+            action = self.mapping[note]
+            key = action.split("+")[-1]
+            if "shift+" in action:
+                shift_keys.append(key)
+            elif "ctrl+" in action:
+                ctrl_keys.append(key)
+            else:
+                normal_keys.append(key)
 
-        # 隔离分组，并发弹奏
-        self._press_group(normal_keys, None)
+        self._press_group(normal_keys)
         self._press_group(shift_keys, "shift")
         self._press_group(ctrl_keys, "ctrl")
 
@@ -116,25 +125,20 @@ class MaaKeyboardBridge:
         if not keys:
             return
 
-        # 1. 按下修饰键
         if modifier and modifier in WIN32_VK:
             self._force_send_key(WIN32_VK[modifier], True)
-            time.sleep(0.002)  # 微小停顿，防跑调
+            time.sleep(0.002)
 
-        # 2. 批量按下音符键
         vk_codes = [WIN32_VK[key] for key in keys if key in WIN32_VK]
         for vk in vk_codes:
             self._force_send_key(vk, True)
 
-        # 3. 极速停留
         if self.hold_seconds > 0:
             time.sleep(self.hold_seconds)
 
-        # 4. 批量抬起音符键
         for vk in reversed(vk_codes):
             self._force_send_key(vk, False)
 
-        # 5. 抬起修饰键
         if modifier and modifier in WIN32_VK:
             time.sleep(0.001)
             self._force_send_key(WIN32_VK[modifier], False)

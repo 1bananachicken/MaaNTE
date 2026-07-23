@@ -1,0 +1,13 @@
+{
+    "task": [
+        {
+            "name": "WitchDivination",
+            "label": "$task_witch_divination_label",
+            "description": "$task_witch_divination_desc",
+            "controller": [
+                "Win32-Front"
+            ],
+            "entry": "WitchDivinationEntrance"
+        }
+    ]
+}

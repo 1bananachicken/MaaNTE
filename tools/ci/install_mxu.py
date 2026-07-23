@@ -9,7 +9,7 @@ import re
 script_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(script_dir)
 
-from configure import configure_ocr_model
+from configure import configure_all_models
 
 
 def load_json_with_comments(path):
@@ -54,7 +54,7 @@ def install_deps():
 
 def install_resource():
 
-    configure_ocr_model()
+    configure_all_models()
 
     shutil.copytree(
         working_dir / "assets" / "resource",

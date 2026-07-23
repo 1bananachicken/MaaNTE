@@ -1,4 +1,5 @@
 {
+    // 若觉得太抽象可以参考家具/一咖舍任务开头
     "SceneExampleNormalTask": {
         "desc": "普通接口使用示例",
         "pre_delay": 0,

@@ -25,6 +25,7 @@ if current_script_dir not in sys.path:
     sys.path.insert(0, current_script_dir)
 
 from utils import setup_logger
+
 logger = setup_logger()
 import utils.screen as screen
 
@@ -49,6 +50,7 @@ MAAHUB_ACCENT = {
 
 # 路径兼容性检测 —— 最早执行，检测含中文/全角字符/中文符号的路径
 import re
+
 _cwd = os.getcwd()
 if re.search(r"[一-鿿　-〿＀-￯]", _cwd):
     logger.warning(
@@ -188,88 +190,6 @@ def read_config(config_name: str, default_config: dict) -> dict:
     except Exception:
         logger.exception(f"读取 {config_name}.json 失败，使用默认配置")
         return default_config
-
-
-def _apply_maahub_ui_config(config: dict) -> bool:
-    changed = False
-
-    settings = config.setdefault("settings", {})
-    if not isinstance(settings, dict):
-        settings = {}
-        config["settings"] = settings
-        changed = True
-
-    custom_accents = config.setdefault("customAccents", [])
-    if not isinstance(custom_accents, list):
-        custom_accents = []
-        config["customAccents"] = custom_accents
-        changed = True
-
-    accent_index = next(
-        (
-            index
-            for index, accent in enumerate(custom_accents)
-            if isinstance(accent, dict)
-            and (
-                accent.get("id") == MAAHUB_ACCENT["id"]
-                or accent.get("name") == MAAHUB_ACCENT_NAME
-            )
-        ),
-        None,
-    )
-
-    is_first_maahub_startup = accent_index is None
-
-    if is_first_maahub_startup and settings.get("theme") != "dark":
-        settings["theme"] = "dark"
-        changed = True
-    if settings.get("accentColor") != MAAHUB_ACCENT_NAME:
-        settings["accentColor"] = MAAHUB_ACCENT_NAME
-        changed = True
-
-    accent_config = json.loads(json.dumps(MAAHUB_ACCENT, ensure_ascii=False))
-    if accent_index is None:
-        custom_accents.append(accent_config)
-        changed = True
-    elif custom_accents[accent_index] != accent_config:
-        custom_accents[accent_index] = accent_config
-        changed = True
-
-    return changed
-
-
-def ensure_mxu_ui_config() -> None:
-    import stat
-    config_dir = Path(project_root_dir) / "config"
-    config_dir.mkdir(exist_ok=True)
-    config_path = config_dir / "mxu-MaaNTE.json"
-    config = {}
-    if config_path.exists():
-        try:
-            os.chmod(config_path, stat.S_IWRITE)
-            with open(config_path, "r", encoding="utf-8") as f:
-                config = json.load(f)
-        except Exception:
-            logger.exception("读取 mxu-MaaNTE.json 失败，将重建UI主题配置")
-    else:
-        return
-
-    if not isinstance(config, dict):
-        config = {}
-
-    changed = _apply_maahub_ui_config(config)
-    
-    if not changed:
-        return
-
-    try:
-        with open(config_path, "w", encoding="utf-8") as f:
-            json.dump(config, f, indent=2, ensure_ascii=False)
-            f.write("\n")
-    except Exception:
-        logger.exception("写入 mxu-MaaNTE.json 失败")
-    
-    os.chmod(config_path, stat.S_IREAD)
 
 
 def read_interface_version(interface_file_name="./interface.json") -> str:
@@ -545,7 +465,9 @@ def _check_game_resolution():
     scale_x, scale_y = screen.scaling_factors()
 
     if (w, h) == (screen.BASELINE_WIDTH, screen.BASELINE_HEIGHT):
-        logger.info(f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})")
+        logger.info(
+            f"当前窗口分辨率: {w}x{h} [正常], scale=({scale_x:.3f}, {scale_y:.3f})"
+        )
     else:
         logger.warning(
             f"当前窗口分辨率: {w}x{h}，scale=({scale_x:.3f}, {scale_y:.3f})。"
@@ -584,7 +506,6 @@ def agent(is_dev_mode=False):
             change_console_level("DEBUG")
             logger.info("开发模式：日志等级已设置为DEBUG")
 
-
         from maa.agent.agent_server import AgentServer
         from maa.tasker import Tasker
 
@@ -592,7 +513,9 @@ def agent(is_dev_mode=False):
 
         Tasker.set_log_dir("./debug")
 
-        from utils.i18n import init as i18n_init; i18n_init()
+        from utils.i18n import init as i18n_init
+
+        i18n_init()
 
         if len(sys.argv) < 2:
             logger.error("缺少必要的 socket_id 参数")
@@ -645,5 +568,4 @@ def main():
 
 
 if __name__ == "__main__":
-    ensure_mxu_ui_config()
     main()

@@ -97,10 +97,10 @@
     "vitality_detect": {
         "enabled": true,
         "roi": [
-            544,
-            622,
-            184,
-            46
+            606,
+            627,
+            112,
+            31
         ],
         "cost_pattern": "(\\d+)",
         "min_confirm_reads": 2,

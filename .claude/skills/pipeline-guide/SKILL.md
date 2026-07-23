@@ -268,18 +268,150 @@ PrintT(context, "tetris.task_done")
 }
 ```
 
+## SceneManager 与场景跳转
+
+MaaNTE 的场景管理器提供"从任意界面自动导航到目标场景"的能力，分两层架构：
+
+- **公共接口**（`Interface/Scene/`）— Pipeline 任务使用的节点，名称不含 `__ScenePrivate`
+- **私有实现**（`SceneManager/`）— 内部节点，以 `__ScenePrivate` 开头，**禁止在 Pipeline 中直接引用**
+
+### 常用场景跳转接口
+
+| 接口 | 说明 |
+|------|------|
+| `SceneAnyEnterWorld` | 从任意界面返回大世界 |
+| `SceneLoading` | 等待加载界面结束 |
+| `SceneClickBlankToExit` | 点击空白区域关闭弹窗 |
+| `SceneAnyEnterEscMenu` | 进入 Esc 菜单 |
+| `SceneAnyEnterBagMenu` | 进入背包 |
+| `SceneAnyEnterBattlePassMenu` | 进入环期赏令 |
+| `SceneAnyEnterCharactersMenu` | 进入角色界面 |
+| `SceneAnyEnterCityTycoonsMenu` | 进入都市大亨 |
+| `SceneAnyEnterEventsMenu` | 进入活动菜单 |
+| `SceneAnyEnterExplorationGuideMenu` | 进入探索指南 |
+| `SceneAnyEnterHethereauHobbiesMenu` | 进入都市闲趣 |
+
+### InScene 场景识别
+
+InScene 节点（`Interface/Scene/Status.json`）用于判断当前画面所在场景，配合 SceneManager 实现自动导航：
+
+```jsonc
+{
+    "MyTaskEntry": {
+        "next": [
+            "MyTaskCheckInWorld",
+            "[JumpBack]SceneAnyEnterWorld"   // 不在大世界时自动跳转
+        ]
+    },
+    "MyTaskCheckInWorld": {
+        "recognition": { "type": "And", "param": { "all_of": ["InWorld"] } },
+        "next": ["MyTaskNextStep"]
+    }
+}
+```
+
+> **重要**：跳转后必须有 InScene 检查节点确认已在目标场景，避免反复跳转导致死循环。
+
+常用 InScene 节点：`InWorld`、`InEscMenu`、`InBagMenu`、`InCityTycoonMenu`、`InExplorationGuideMenu`、`InBattlePassMenu`、`InCharactersMenu`。完整列表见 `Interface/Scene/Status.json`。
+
+### 新增场景接口
+
+需要新增场景跳转时：
+1. 在 `SceneManager/` 下添加 `__ScenePrivate*` 私有节点处理实际导航
+2. 在 `Interface/Scene/` 中添加公共接口节点
+3. 在 `Status.json` 中添加状态检测节点（如 `InNewMenu`），使用 OCR 识别页面标题文字
+4. 在 SceneManager 的 `__ScenePrivateAnyEnterXxxSuccess` 中引用新节点，接入万能跳转链
+
+## 关键编码规范
+
+### 禁止硬延迟
+
+尽量不用 `pre_delay` / `post_delay` / `timeout`，用中间识别节点或 `pre_wait_freezes` / `post_wait_freezes` 替代。当确实不需要延迟时，显式将 `rate_limit` / `pre_delay` / `post_delay` 设为 0（协议默认 `rate_limit=1000ms`、`pre_delay/post_delay=200ms`）。
+
+**不要为了执行稳定而使用延迟，而是通过增加中间节点判断，因为延迟实际上是在掩盖问题，在用户设备存在高延迟时仍然不会稳定。**
+
+### 第一轮即命中
+
+尽可能扩充 `next` 列表，保证任何游戏画面都处于预期中，实现一次截图就命中目标节点。项目一般拒绝一切形式的重试机制，一定要保证在一次流程中完成所有任务。
+
+### 识别 → 操作 → 再识别
+
+每一步操作后必须重新识别确认画面变化，禁止假设操作后状态：
+
+- **推荐**：识别 A → 点击 A → 识别 B → 点击 B
+- **禁止**：整体识别一次 → 点击 A → 点击 B → 点击 C
+
+例如：点击提交按钮后必须识别确认提交成功（用户网络可能延迟，界面可能卡死）。
+
+### 禁止盲目重试
+
+遇到 bug 时找根因，详细到具体哪个节点失败、哪个识别不符合预期，去修补对应节点的识别/操作问题。**禁止**同样的操作再试一次、盲目添加 `max_hit`。
+
+### 处理弹窗和加载
+
+好的流程是正常主线能跑、弹窗能处理、加载能等过去、不在目标场景时能自动跳过去。常见做法是在 `next` 里挂：
+
+- `[JumpBack]SceneAnyEnterWorld`
+- `[JumpBack]SceneClickBlankToExit`
+- `[JumpBack]SceneLoading`
+
+### OCR 写完整文本
+
+`expected` 写完整文本，不写半截。多语言处理由 CI 工作流自动完成。需要片段或手写正则时添加 `// @i18n-skip` 标记。
+
+### 先复用，再新增
+
+写新节点前先查已有 Pipeline 是否已有现成能力。优先使用 SceneManager 公共接口，**禁止直接引用 `__ScenePrivate*` 内部节点**。
+
+### 配套文件
+
+新增或修改任务时，改动通常涉及多个文件：
+- `assets/resource/tasks/*.json` — 任务配置
+- `assets/resource/base/pipeline/**/*.json` — Pipeline 节点
+- `assets/resource/locales/interface/` 下五种语言文件 — i18n 文案
+- `assets/interface.json` — 注册 task 文件
+
+### switch 控制节点启停
+
+```jsonc
+// 任务配置中通过 switch option 控制节点 enabled
+"MyFeature": {
+    "type": "switch",
+    "cases": {
+        "Yes": { "pipeline_override": { "MyNode": { "enabled": true } } },
+        "No":  { "pipeline_override": { "MyNode": { "enabled": false } } }
+    }
+}
+```
+
+## 子模块目录
+
+复杂任务建议拆分为独立目录，主流程与辅助节点分离：
+
+```
+pipeline/WithdrawMoney/
+├── WithdrawMoney.json       # 主流程节点
+└── WithdrawMoneyStatus.json # 辅助识别/动作节点
+```
+
 ## 审查清单
 
 - [ ] 字段名拼写正确、类型合法（核对 Pipeline 协议）
-- [ ] 无不必要的 `pre_delay` / `post_delay` / `timeout`
-- [ ] `next` 列表覆盖所有可能画面，含弹窗/加载/异常
-- [ ] 每次点击后有识别验证，不假设操作后状态
+- [ ] 无不必要的 `pre_delay` / `post_delay` / `timeout`，不需要时显式设为 0
+- [ ] `next` 列表覆盖所有可能画面，含弹窗/加载/异常，力争一次截图命中
+- [ ] 每次操作后有识别验证，不假设操作后状态（识别→操作→再识别）
+- [ ] 无盲目重试逻辑（同样操作再试一次、随意加 `max_hit`）
+- [ ] 弹窗和加载有对应的 `[JumpBack]` 处理节点
+- [ ] 先查已有 Pipeline 是否有现成能力，优先复用
+- [ ] 未直接引用 `__ScenePrivate*` 内部节点
+- [ ] 场景跳转后有 InScene 检查节点确认到达目标场景
 - [ ] ROI / target 坐标基于 1280×720
 - [ ] 自定义动作名与 Python `@AgentServer.custom_action("name")` 一致
 - [ ] 自定义识别/动作参数与 Python 代码中解析的参数名一致
 - [ ] 用户消息优先用 `maafocus.PrintT()`（Python 侧），简单通知用 JSON `focus`（pipeline 侧）
 - [ ] OCR `expected` 写完整文本
 - [ ] 使用 `post_wait_freezes` 或中间节点避免重复点击
+- [ ] 配套文件齐全（task JSON、pipeline JSON、i18n、interface.json 注册）
 
 ## 参考
 

@@ -27,8 +27,8 @@ class Ear:
     ch = 2
     chunk = 1600
     sample_len = 0.2
-    interval = 0.1
-    log_every = 20
+    interval = 0.05
+    log_every = 40
     degree = 4
     cut_off = 1000
 
@@ -196,14 +196,19 @@ class Ear:
         if now - self._last_trigger < self._trigger_cd:
             return
 
-        if d_score >= self.threshold:
+        dodge_hit = d_score >= self.threshold
+        counter_hit = c_score >= self.counter_threshold
+        dodge_confidence = d_score / max(self.threshold, 1e-6)
+        counter_confidence = c_score / max(self.counter_threshold, 1e-6)
+
+        if dodge_hit and (not counter_hit or dodge_confidence >= counter_confidence):
             self._last_trigger = now
             _log().info(f"闪避触发分数: {d_score:.5f}")
             if self.on_dodge:
                 self.on_dodge()
             return
 
-        if c_score >= self.counter_threshold:
+        if counter_hit:
             self._last_trigger = now
             _log().info(f"反击触发分数: {c_score:.5f}")
             if self.on_counter:

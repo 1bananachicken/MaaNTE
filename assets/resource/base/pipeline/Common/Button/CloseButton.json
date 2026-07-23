@@ -1,0 +1,48 @@
+{
+    "CloseButton": {
+        "desc": "通用关闭按钮类型1：右上角 X，仅覆盖普通关闭按钮，不兼容 ESC 菜单",
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "__CloseButtonType1"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": {
+            "time": 80,
+            "target": [
+                0,
+                0,
+                0,
+                0
+            ]
+        },
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "__CloseButtonType1": {
+        "desc": "通用关闭按钮常用变体1：圆形黑底白色 X，优先匹配，适配 Hover",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1180,
+                    0,
+                    100,
+                    100
+                ],
+                "template": [
+                    "Common/Button/CloseButtonType1.png"
+                ]
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    }
+}

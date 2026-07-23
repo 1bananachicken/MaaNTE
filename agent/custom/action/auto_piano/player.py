@@ -9,6 +9,7 @@ from maa.context import Context
 from utils.maafocus import PrintT
 from .maa_keyboard import MaaKeyboardBridge
 from .midi_processor import MidiProcessor
+from . import key_mapping
 
 DEFAULT_SPEED = 1.0
 DEFAULT_TRANSPOSE = 0
@@ -25,6 +26,9 @@ class AutoPianoSettings:
     song: str
     speed: float = DEFAULT_SPEED
     transpose: int = DEFAULT_TRANSPOSE
+    key_mode: str = "36"
+    tracks: str = "all"  # "all" | "melody" | 轨道索引列表由 action 处理
+    out_of_range_mode: str = "fold"  # "fold" | "shift" | "cut"
 
 
 class AutoPianoPlayer:
@@ -42,10 +46,19 @@ class AutoPianoPlayer:
         if not song_path.is_file():
             raise FileNotFoundError(f"Song file not found: {song_path}")
 
-        parsed = self.processor.parse(str(song_path))
+        # 解析轨道选择参数
+        tracks_param = self._parse_tracks_param(settings.tracks)
+
+        parsed = self.processor.parse(str(song_path), tracks=tracks_param)
         notes = parsed["notes"]
         if not notes:
             PrintT(context, "auto_piano.no_notes", str(song_path))
+            return 0
+
+        # 根据超出音域模式处理音符
+        notes, effective_transpose = self._apply_range_mode(notes, settings)
+        if not notes:
+            PrintT(context, "auto_piano.no_playable_notes")
             return 0
 
         PrintT(
@@ -54,35 +67,61 @@ class AutoPianoPlayer:
             parsed["title"],
             len(notes),
             settings.speed,
-            settings.transpose,
+            effective_transpose,
         )
+        if parsed.get("track_count", 1) > 1:
+            PrintT(
+                context,
+                "auto_piano.tracks_info",
+                parsed["track_count"],
+                parsed.get("parsed_tracks", []),
+            )
+
+        # 转换到游戏可用音域，再按原版逻辑分组成短和弦。
+        mapping = key_mapping.get_mapping(settings.key_mode)
+        playable_notes = self._build_playable_notes(
+            notes,
+            mapping,
+            effective_transpose,
+            settings.key_mode,
+            settings.out_of_range_mode,
+        )
+        if not playable_notes:
+            PrintT(context, "auto_piano.no_playable_notes")
+            return 0
 
         self.sleep_interruptibly(context, DEFAULT_COUNTDOWN)
-        bridge = MaaKeyboardBridge(self.get_controller(context))
+        bridge = MaaKeyboardBridge(mapping=mapping)
         played = self.play_notes(
-            context, notes, bridge, settings.speed, settings.transpose
+            context,
+            playable_notes,
+            bridge,
+            settings.speed,
         )
+
         PrintT(context, "auto_piano.finished", played)
         return played
+
+    @staticmethod
+    def _parse_tracks_param(tracks_raw: str) -> str | list[int]:
+        """将 tracks 字符串参数转换为解析器需要的格式。"""
+        tracks_str = str(tracks_raw).strip().lower()
+        if tracks_str in ("all", "melody", ""):
+            return tracks_str or "all"
+        # 尝试解析为逗号分隔的轨道索引，例如 "0,2"
+        try:
+            indices = [int(x.strip()) for x in tracks_str.split(",") if x.strip()]
+            if indices:
+                return indices
+        except ValueError:
+            pass
+        return "all"
 
     def resolve_song_path(self, song: str) -> Path:
         path = Path(song).expanduser()
         if path.is_absolute():
             return path
         return self.project_root / path
-
-    @staticmethod
-    def get_controller(context: Context):
-        controller = getattr(context, "controller", None)
-        if controller is not None:
-            return controller
-
-        tasker = getattr(context, "tasker", None)
-        controller = getattr(tasker, "controller", None)
-        if controller is not None:
-            return controller
-
-        raise RuntimeError("Maa controller is unavailable in custom action context.")
 
     @staticmethod
     def is_stop_requested(context: Context) -> bool:
@@ -113,8 +152,53 @@ class AutoPianoPlayer:
                 return
             time.sleep(min(step, remaining))
 
-    @staticmethod
-    def adjust_pitch(midi_pitch: int) -> int:
+    @classmethod
+    def _apply_range_mode(
+        cls, notes: list[dict], settings: AutoPianoSettings
+    ) -> tuple[list[dict], int]:
+        """
+        根据超出音域处理模式预处理音符。
+        返回: (处理后的音符列表, 有效移调值)
+        """
+        mode = settings.out_of_range_mode
+        transpose = settings.transpose
+
+        if mode == "fold":
+            return notes, transpose
+
+        if mode == "shift":
+            pitches = [n["p"] for n in notes]
+            center = (min(pitches) + max(pitches)) / 2
+            # 目标中心: 77.5 = (60 + 95) / 2
+            auto_shift = round(77.5 - center)
+            effective_transpose = transpose + auto_shift
+            filtered = []
+            for note in notes:
+                p = note["p"] + effective_transpose
+                if 60 <= p <= 95:
+                    filtered.append({**note, "p": p})
+            return filtered, effective_transpose
+
+        if mode == "cut":
+            effective_transpose = transpose
+            filtered = []
+            for note in notes:
+                p = note["p"] + effective_transpose
+                if 60 <= p <= 95:
+                    filtered.append({**note, "p": p})
+            return filtered, effective_transpose
+
+        # 未知模式回退到 fold
+        return notes, transpose
+
+    @classmethod
+    def adjust_pitch(cls, midi_pitch: int, key_mode: str = "36") -> int | None:
+        """调整音高到可用范围，并过滤掉无法映射的音符。"""
+        # 21键模式：先将半音映射到最近白键
+        if key_mode == "21":
+            midi_pitch = key_mapping.snap_to_white_key(midi_pitch)
+
+        # 折叠到游戏钢琴支持的 60~95 范围
         while midi_pitch < 60:
             midi_pitch += 12
         while midi_pitch > 95:
@@ -122,20 +206,39 @@ class AutoPianoPlayer:
         return midi_pitch
 
     @classmethod
-    def collect_chord(
+    def _build_playable_notes(
         cls,
         notes: list[dict],
-        start_index: int,
+        mapping: dict[int, str],
         transpose: int,
-        window: float,
+        key_mode: str,
+        range_mode: str = "fold",
+    ) -> list[dict]:
+        """将音符转换到当前键位模式可播放的音高。"""
+        playable_notes = []
+        for note in notes:
+            pitch = int(note["p"])
+            if range_mode == "fold":
+                pitch = cls.adjust_pitch(pitch + transpose, key_mode)
+            elif key_mode == "21":
+                pitch = key_mapping.snap_to_white_key(pitch)
+
+            if pitch in mapping:
+                playable_notes.append({**note, "p": pitch})
+
+        return playable_notes
+
+    @staticmethod
+    def collect_chord(
+        notes: list[dict], start_index: int, window: float
     ) -> tuple[list[int], int]:
+        """收集指定时间窗口内开始的音符。"""
         base_time = notes[start_index]["t"]
         chord = []
         index = start_index
 
         while index < len(notes) and abs(notes[index]["t"] - base_time) <= window:
-            pitch = int(notes[index]["p"]) + transpose
-            chord.append(cls.adjust_pitch(pitch))
+            chord.append(int(notes[index]["p"]))
             index += 1
 
         return chord, index
@@ -147,8 +250,8 @@ class AutoPianoPlayer:
         notes: list[dict],
         bridge: MaaKeyboardBridge,
         speed: float,
-        transpose: int,
     ) -> int:
+        """按原版节奏将音符分组成短和弦播放。"""
         start_time = time.perf_counter()
         elapsed = 0.0
         index = 0
@@ -158,7 +261,7 @@ class AutoPianoPlayer:
             cls.raise_if_stopped(context)
             target_time = float(notes[index]["t"]) / speed
             chord, next_index = cls.collect_chord(
-                notes, index, transpose, DEFAULT_CHORD_WINDOW
+                notes, index, DEFAULT_CHORD_WINDOW
             )
 
             while elapsed < target_time:

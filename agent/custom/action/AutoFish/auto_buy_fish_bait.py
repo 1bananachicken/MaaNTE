@@ -10,7 +10,6 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 
-from utils.logger import logger
 from utils.maafocus import PrintT
 
 
@@ -76,13 +75,6 @@ class AutoBuyFishBait(CustomAction):
             found_bait, prob, x, y = match_template_in_region(
                 img, fish_shop_region, self.bait_template, found_bait_threshold
             )
-            logger.debug(
-                "Current found bait threshold: %s, match probability: %.2f, clicked on bait at (%d, %d)",
-                found_bait_threshold,
-                prob,
-                x + 15,
-                y + 5,
-            )
             if found_bait:
                 controller.post_touch_move(
                     x, y
@@ -116,7 +108,6 @@ class AutoBuyFishBait(CustomAction):
             found_select_max, prob, _, _ = match_template_in_region(
                 img, select_max_region, self.select_max_template, match_threshold
             )
-            logger.debug("Looking for select max option, match probability: %.2f", prob)
             if found_select_max:
                 PrintT(context, "autofish.select_max_found")
                 for _ in range(5):

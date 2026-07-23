@@ -132,6 +132,9 @@
                         },
                         "FishNewOpenFishMaster": {
                             "enabled": true
+                        },
+                        "FishNewSellFishExit": {
+                            "enabled": false
                         }
                     }
                 },
@@ -144,6 +147,9 @@
                         },
                         "FishNewOpenFishMaster": {
                             "enabled": false
+                        },
+                        "FishNewSellFishExit": {
+                            "enabled": true
                         }
                     }
                 }
@@ -166,6 +172,9 @@
                         },
                         "FishNewGotoBuyBait": {
                             "enabled": true
+                        },
+                        "FishNewBaitExit": {
+                            "enabled": false
                         }
                     },
                     "option": [
@@ -184,6 +193,9 @@
                         },
                         "FishNewGotoBuyBait": {
                             "enabled": false
+                        },
+                        "FishNewBaitExit": {
+                            "enabled": true
                         }
                     }
                 }

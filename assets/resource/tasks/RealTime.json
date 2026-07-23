@@ -7,13 +7,16 @@
             "description": "$task_realtime_desc",
             "option": [
                 "RealTimeCheckInterval",
+                "RealTimeAutoLoot",
                 "RealTimeAutoSkipStory",
                 "RealTimeAutoTeleport"
             ],
             "controller": [
                 "Win32-Front"
             ],
-            "group": ["RealTimeAssist"]
+            "group": [
+                "RealTimeAssist"
+            ]
         }
     ],
     "option": {
@@ -35,6 +38,32 @@
                 }
             }
         },
+        "RealTimeAutoLoot": {
+            "type": "switch",
+            "label": "$task.RealTime.option.RealTimeAutoLoot.label",
+            "description": "$task.RealTime.option.RealTimeAutoLoot.desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "RealTimeLoot": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "RealTimeLoot": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
         "RealTimeAutoSkipStory": {
             "type": "switch",
             "label": "$task_realtime_option_auto_skip_story",
@@ -44,7 +73,9 @@
                     "name": "Yes",
                     "label": "$option_switch_case_yes",
                     "option": [
-                        "RealTimeAutoSkipStoryDialog"
+                        "RealTimeAutoSkipStoryDialog",
+                        "RealTimeAutoSkipStorySummary",
+                        "RealTimeAutoSkipImportantStory"
                     ],
                     "pipeline_override": {
                         "RealTimeSkipStory": {
@@ -95,6 +126,58 @@
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
                         "RealTimeSkipStoryDialogCheckbox": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoSkipStorySummary": {
+            "type": "switch",
+            "label": "$task.RealTime.option.RealTimeAutoSkipStorySummary.label",
+            "description": "$task.RealTime.option.RealTimeAutoSkipStorySummary.desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "RealTimeSkipStorySummary": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "RealTimeSkipStorySummary": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ],
+            "default_case": "Yes"
+        },
+        "RealTimeAutoSkipImportantStory": {
+            "type": "switch",
+            "label": "$task.RealTime.option.RealTimeAutoSkipImportantStory.label",
+            "description": "$task.RealTime.option.RealTimeAutoSkipImportantStory.desc",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "RealTimeSkipImportantStory": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "RealTimeSkipImportantStory": {
                             "enabled": false
                         }
                     }

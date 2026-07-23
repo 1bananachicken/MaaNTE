@@ -43,8 +43,8 @@
         "duration": 500,
         "end_hold": 600
     },
-    "WithdrawMoneyItemValue": {
-        "desc": "商品列表数值/h",
+    "WithdrawMoneyItemValueUp": {
+        "desc": "商品列表数值/h（上）",
         "recognition": {
             "type": "OCR",
             "only_rec": true,
@@ -54,6 +54,25 @@
                     90,
                     391,
                     596
+                ],
+                "expected": [
+                    // @i18n-skip
+                    "/h"
+                ]
+            }
+        }
+    },
+    "WithdrawMoneyItemValueDown": {
+        "desc": "商品列表数值/h（下）",
+        "recognition": {
+            "type": "OCR",
+            "only_rec": true,
+            "param": {
+                "roi": [
+                    29,
+                    222,
+                    391,
+                    462
                 ],
                 "expected": [
                     // @i18n-skip

@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "routes": [
+    {
+      "id": "route-1781191301743",
+      "name": "WitchDivinatNavigation",
+      "isHidden": false,
+      "segments": [
+        {
+          "id": "segment-1781283192221",
+          "name": "1",
+          "isHidden": false,
+          "points": [
+            {
+              "lat": -31.215909,
+              "lng": -45.261364
+            },
+            {
+              "lat": -31.556818,
+              "lng": -44.931818
+            },
+            {
+              "lat": -31.875,
+              "lng": -44.579545
+            },
+            {
+              "lat": -32.159091,
+              "lng": -44.306818
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

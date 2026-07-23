@@ -14,11 +14,9 @@
         ],
         "post_delay": 1000,
         "action": {
-            "type": "ClickKey",
+            "type": "Custom",
             "param": {
-                "key": [
-                    70
-                ]
+                "custom_action": "enter_fishprepare"//用一种适配后台的方法进入钓鱼准备界面
             }
         }
     },
@@ -34,7 +32,7 @@
         "rate_limit": 0,
         "next": [
             "FishScenePrepareToStore",
-            "FishScenePrepareToFishGame"
+            "FishScenePrepareToFishGameGo"
         ]
     },
     "FishScenePrepareToFishGame": {
@@ -50,7 +48,7 @@
         ]
     },
     "FishScenePrepareToFishGameGo": {
-        "desc": "从钓鱼准备界面进入钓鱼游戏界面 (old钓鱼)",
+        "desc": "从钓鱼准备界面进入钓鱼游戏界面",
         "recognition": "And",
         "all_of": [
             "FishSceneOnFishPrepare",
@@ -74,8 +72,7 @@
             "未选择",
             "未選擇",
             "(?i)Not\\s*Selected",
-            "未選択",
-            "미선택"
+            "未選択"
         ],
         "action": "Click",
         "target_offset": [
@@ -104,8 +101,7 @@
             "未选择",
             "未選擇",
             "(?i)Not\\s*Selected",
-            "未選択",
-            "미선택"
+            "未選択"
         ],
         "action": "Click",
         "target_offset": [
@@ -144,15 +140,14 @@
                 "roi": [
                     821,
                     39,
-                    124,
+                    252,
                     51
                 ],
                 "expected": [
                     "钓鱼准备",
                     "釣魚準備",
                     "(?i)Fishing\\s*Preparations",
-                    "釣り準備",
-                    "낚시 준비"
+                    "釣り準備"
                 ]
             }
         },
@@ -175,8 +170,7 @@
                     "开始钓鱼",
                     "開始釣魚",
                     "(?i)Start\\s*Fishing",
-                    "釣り開始",
-                    "낚시 시작"
+                    "釣り開始"
                 ]
             }
         },
@@ -203,8 +197,7 @@
                             "钓鱼",
                             "釣魚",
                             "Fishing",
-                            "釣り",
-                            "낚시"
+                            "釣り"
                         ]
                     }
                 }
@@ -248,5 +241,77 @@
         "pre_delay": 0,
         "post_delay": 0,
         "rate_limit": 0
+    },
+    "FishNewPrepareToHethereauHobbies": {
+        "desc": "从钓鱼准备界面进入都市闲趣(应对在钓鱼准备界面既没有鱼饵又没有鱼鳞币的情况)",
+        "recognition": "OCR",
+        "roi": [
+            1096,
+            545,
+            91,
+            52
+        ],
+        "expected": [
+            "未选择",
+            "未選擇",
+            "(?i)Not\\s*Selected",
+            "未選択"
+        ],
+        "next": [
+            "FishNewHethereauHobbiesToSeaAngler",
+            "[JumpBack]SceneAnyEnterHethereauHobbiesMenu"
+        ]
+    },
+    "FishNewHethereauHobbiesToSeaAngler": {
+        "desc": "都市闲趣界面点击海上钓客",
+        "recognition": "OCR",
+        "roi": [
+            801,
+            469,
+            280,
+            62
+        ],
+        "expected": [
+            "海上钓客",
+            "海上釣客",
+            "(?i)Sea\\s*Angler",
+            "海釣り"
+        ],
+        "action": "Click",
+        "next": [
+            "FishNewSeaAnglerToFishMarket"
+        ],
+        "roi_offset": [
+            0,
+            0,
+            35,
+            0
+        ]
+    },
+    "FishNewSeaAnglerToFishMarket": {
+        "desc": "海上钓客界面点击渔获市场",
+        "recognition": "OCR",
+        "roi": [
+            935,
+            266,
+            332,
+            47
+        ],
+        "expected": [
+            "渔获市场",
+            "漁獲市場",
+            "(?i)Fish\\s*Market",
+            "鮮魚市場"
+        ],
+        "action": "Click",
+        "next": [
+            "FishNewSellFishStart"
+        ],
+        "roi_offset": [
+            0,
+            0,
+            13,
+            0
+        ]
     }
 }

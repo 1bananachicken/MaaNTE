@@ -1,0 +1,32 @@
+{
+    "RealTimeLoot": {
+        "desc": "自动拾取",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "realtime_assist/loot_btn_focus.png"
+                ],
+                "roi": [
+                    770,
+                    280,
+                    30,
+                    270
+                ],
+                "threshold": 0.7,
+                "green_mask": true
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "RealTimeFakeTrue"
+        ]
+    }
+}

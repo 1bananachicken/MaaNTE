@@ -3,6 +3,7 @@ import re
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+from utils.logger import logger
 
 
 def _screencap(controller):
@@ -31,9 +32,11 @@ def _box_to_rect(box):
 def _click_rect(controller, rect):
     cx = rect[0] + rect[2] // 2
     cy = rect[1] + rect[3] // 2
+    controller.post_touch_move(cx, cy).wait()  # 先移动再点击，防止误滑动
     controller.post_touch_down(cx, cy).wait()
     time.sleep(0.05)  # 间隔太短概率失效
     controller.post_touch_up().wait()
+    time.sleep(0.05)
 
 
 def _parse_value(text):
@@ -68,12 +71,11 @@ class WithdrawMoneyChooseItem(CustomAction):
             result = run_recog("WithdrawMoneyGreyBackground")
             for box in _filtered_boxes(result):
                 _click_rect(controller, _box_to_rect(box))
-                time.sleep(0.5)
 
-        def collect_product_values():
+        def collect_product_values(recog_name):
             """识别当前截图中所有商品 /h 价格，返回 [(value, rect), ...]"""
             items = []
-            result = run_recog("WithdrawMoneyItemValue")
+            result = run_recog(recog_name)
             for r in result.filtered_results if result else []:
                 text = getattr(r, "text", "")
                 value = _parse_value(text)
@@ -94,40 +96,26 @@ class WithdrawMoneyChooseItem(CustomAction):
 
         # Step 3: 再次关掉灰色背景角标
         click_all_grey_backgrounds()
-
-        down_items = []
-        seen = set()
+        time.sleep(1)
 
         # Step 4: 向下位置匹配商品价格 /h
-        for value, rect in collect_product_values():
-            key = (rect[0], rect[1])
-            if key not in seen:
-                seen.add(key)
-                down_items.append((value, rect))
+        down_items = [
+            (v, r, "down")
+            for v, r in collect_product_values("WithdrawMoneyItemValueDown")
+        ]
 
         # Step 5: 向上滑动
         run_act("WithdrawMoneySwipeUp")
-        time.sleep(1)
-
-        up_items = []
+        time.sleep(0.1)  # 等待动画
 
         # Step 6: 向上位置匹配商品价格 /h
-        for value, rect in collect_product_values():
-            key = (rect[0], rect[1])
-            if key not in seen:
-                seen.add(key)
-                up_items.append((value, rect))
-
-        # Step 7: 按 value 去重，从大到小排序，只点前五个
-        all_items = [(v, r, "down") for v, r in down_items] + [
-            (v, r, "up") for v, r in up_items
+        up_items = [
+            (v, r, "up") for v, r in collect_product_values("WithdrawMoneyItemValueUp")
         ]
-        # 按 value 去重（保留第一个出现的 rect）
-        deduped: dict[float, tuple] = {}
-        for value, rect, swipe in all_items:
-            if value not in deduped:
-                deduped[value] = (value, rect, swipe)
-        sorted_items = sorted(deduped.values(), key=lambda x: x[0], reverse=True)
+
+        # Step 7: 按 value 从大到小排序，只点前五个
+        all_items = down_items + up_items
+        sorted_items = sorted(all_items, key=lambda x: x[0], reverse=True)
         top5 = sorted_items[:5]
 
         current_swipe = "up"
@@ -142,6 +130,7 @@ class WithdrawMoneyChooseItem(CustomAction):
                     current_swipe = "down"
                 time.sleep(1)
             _click_rect(controller, rect)
+            logger.debug(f"click {value} in {rect} of {item_swipe}")
             time.sleep(0.5)
 
         return CustomAction.RunResult(success=True)

@@ -1,0 +1,354 @@
+{
+    "SyncCharacterAbilityCityAbilityEntrance": {
+        "desc": "识别角色都市技能入口",
+        "next": [
+            "SyncCharacterAbilityCityAbilityFirstCharacter",
+            "[JumpBack]SceneAnyEnterCharactersMenu"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityMain": {
+        "desc": "角色都市技能主流程",
+        "anchor": {
+            "CityAbilityAfterClick": ""
+        },
+        "action": {
+            "type": "Custom",
+            "custom_action": "SyncCharacterAbilityCityAbilityMainAction"
+        }
+    },
+    "SyncCharacterAbilityCityAbilityOpenAbilityPage": {
+        "desc": "进入角色都市技能页面",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Character_UI/CharacterAbility.png"
+                ],
+                "roi": [
+                    25,
+                    390,
+                    40,
+                    40
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000
+    },
+    "SyncCharacterAbilityCityAbilityOpenInfoPage": {
+        "desc": "进入角色信息页面",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Character_UI/CharacterInfo.png"
+                ],
+                "roi": [
+                    25,
+                    150,
+                    40,
+                    40
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        },
+        "action": {
+            "type": "Click"
+        }
+    },
+    "SyncCharacterAbilityCityAbilityOCRName": {
+        "desc": "OCR角色名字",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    865,
+                    120,
+                    210,
+                    40
+                ],
+                "replace": [
+                    [
+                        "[一二三—#-]",
+                        ""
+                    ],
+                    [
+                        "小(咬|岐).*",
+                        "小吱"
+                    ],
+                    [
+                        "^[黯霸]$",
+                        "翳"
+                    ],
+                    [
+                        "^[海涛]$",
+                        "浔"
+                    ]
+                ]
+            }
+        }
+    },
+    "SyncCharacterAbilityCityAbilityMatchCharacter": {
+        "desc": "TemplateMatch识别角色（优先于OCR，仅作为配置数据源被CustomAction读取）",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Character_UI/Character_Pic/Adler.png",
+                    "Character_UI/Character_Pic/Aurelia.png",
+                    "Character_UI/Character_Pic/Chiz.png",
+                    "Character_UI/Character_Pic/Daffodill.png",
+                    "Character_UI/Character_Pic/Edgar.png",
+                    "Character_UI/Character_Pic/Haniel.png",
+                    "Character_UI/Character_Pic/Hathor.png",
+                    "Character_UI/Character_Pic/Hotori.png",
+                    "Character_UI/Character_Pic/Jiuyuan.png",
+                    "Character_UI/Character_Pic/Lacrimosa.png",
+                    "Character_UI/Character_Pic/Mint.png",
+                    "Character_UI/Character_Pic/Nanally.png",
+                    "Character_UI/Character_Pic/Sakiri.png",
+                    "Character_UI/Character_Pic/Skia.png",
+                    "Character_UI/Character_Pic/Zero.png"
+                ],
+                "roi": [
+                    390,
+                    80,
+                    200,
+                    210
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "SyncCharacterAbilityCityAbilityOCRSkill0": {
+        "desc": "OCR角色技能0",
+        "pre_wait_freezes": {
+            "time": 200,
+            "timeout": 1000,
+            "rate_limit": 200
+        },
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    355,
+                    405,
+                    40,
+                    20
+                ]
+            }
+        }
+    },
+    "SyncCharacterAbilityCityAbilityOCRSkill1": {
+        "desc": "OCR角色技能1",
+        "pre_wait_freezes": {
+            "time": 200,
+            "timeout": 1000,
+            "rate_limit": 200
+        },
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    435,
+                    410,
+                    41,
+                    21
+                ]
+            }
+        }
+    },
+    "SyncCharacterAbilityCityAbilityFirstCharacter": {
+        "desc": "切换至第一个角色",
+        "anchor": {
+            "CityAbilityAfterClick": "SyncCharacterAbilityCityAbilityMain"
+        },
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Character_UI/CharacterIcon.png"
+                ],
+                "roi": [
+                    20,
+                    20,
+                    40,
+                    40
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        },
+        "action": {
+            "type": "Swipe",
+            "begin": [
+                1230,
+                200
+            ],
+            "end": [
+                1230,
+                500
+            ],
+            "duration": 500
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter1Move"
+        ],
+        "repeat": 5
+    },
+    "SyncCharacterAbilityCityAbilityNextCharacter": {
+        "desc": "移动鼠标后切换下一个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                276
+            ]
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityNextCharacterSwipe"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityNextCharacterSwipe": {
+        "desc": "滑动切换下一个角色",
+        "action": {
+            "type": "Swipe",
+            "begin": [
+                1230,
+                276
+            ],
+            "end": [
+                1230,
+                200
+            ],
+            "duration": 500
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter1Move"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityCharacter1Move": {
+        "desc": "移动鼠标到第1个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                130
+            ]
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter1Click"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityCharacter1Click": {
+        "desc": "点击第1个角色",
+        "action": {
+            "type": "Click",
+            "target": [
+                1230,
+                130
+            ]
+        },
+        "next": [
+            "[Anchor]CityAbilityAfterClick"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityCharacter2Move": {
+        "desc": "移动鼠标到第2个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                240
+            ]
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter2Click"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityCharacter2Click": {
+        "desc": "点击第2个角色",
+        "action": {
+            "type": "Click",
+            "target": [
+                1230,
+                240
+            ]
+        }
+    },
+    "SyncCharacterAbilityCityAbilityCharacter3Move": {
+        "desc": "移动鼠标到第3个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                345
+            ]
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter3Click"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityCharacter3Click": {
+        "desc": "点击第3个角色",
+        "action": {
+            "type": "Click",
+            "target": [
+                1230,
+                345
+            ]
+        }
+    },
+    "SyncCharacterAbilityCityAbilityCharacter4Move": {
+        "desc": "移动鼠标到第4个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                450
+            ]
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter4Click"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityCharacter4Click": {
+        "desc": "点击第4个角色",
+        "action": {
+            "type": "Click",
+            "target": [
+                1230,
+                450
+            ]
+        }
+    },
+    "SyncCharacterAbilityCityAbilityCharacter5Move": {
+        "desc": "移动鼠标到第5个角色",
+        "action": {
+            "type": "TouchMove",
+            "target": [
+                1230,
+                555
+            ]
+        },
+        "next": [
+            "SyncCharacterAbilityCityAbilityCharacter5Click"
+        ]
+    },
+    "SyncCharacterAbilityCityAbilityCharacter5Click": {
+        "desc": "点击第5个角色",
+        "action": {
+            "type": "Click",
+            "target": [
+                1230,
+                555
+            ]
+        }
+    }
+}

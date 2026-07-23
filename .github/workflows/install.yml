@@ -6,20 +6,23 @@ on:
       - "**"
     paths:
       - ".github/workflows/install.yml"
+      - ".gitmodules"
       - "assets/**"
+      - "third_party/MXU"
       - "**.py"
   pull_request:
     branches:
       - "**"
     paths:
       - ".github/workflows/install.yml"
+      - ".gitmodules"
       - "assets/**"
+      - "third_party/MXU"
       - "**.py"
   workflow_dispatch:
 
 env:
-  MAA_FRAMEWORK_VERSION: "v5.10.4"
-  MXU_VERSION: "v2.1.3"
+  MAA_FRAMEWORK_VERSION: "v5.10.5"
 
 permissions:
   contents: write
@@ -84,7 +87,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
 
       - name: Set platform variables
         id: platform
@@ -96,6 +99,16 @@ jobs:
             echo "tag=arm64" >> $GITHUB_OUTPUT
           fi
 
+      - name: Download PacketNTE thirdparty
+        id: download_packetnte
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: 1pineappleduck/PacketNTE
+          fileName: "nte_coordinate_api-*.zip"
+          latest: true
+          out-file-path: "PacketNTE"
+          extract: false
+
       - name: Download MaaFramework
         uses: robinraju/release-downloader@v1
         with:
@@ -104,48 +117,65 @@ jobs:
           tag: ${{ env.MAA_FRAMEWORK_VERSION }}
           out-file-path: "deps"
           extract: true
-      
-      - name: Download MXU
-        id: download_mxu
-        uses: robinraju/release-downloader@v1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v6
         with:
-          repository: MistEO/MXU
-          fileName: "MXU-win-${{ matrix.arch }}*"
-          tag: ${{ env.MXU_VERSION }}
-          out-file-path: "MXU"
-          extract: true
+          version: "10.28.0"
 
-      - name: Clean up MXU archive on Windows
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: third_party/MXU/pnpm-lock.yaml
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.arch == 'x86_64' && 'x86_64-pc-windows-msvc' || 'aarch64-pc-windows-msvc' }}
+
+      - name: Cache MXU Rust build
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "third_party/MXU/src-tauri -> target"
+          shared-key: "mxu-windows-${{ matrix.arch }}"
+          cache-on-failure: true
+
+      - name: Verify MXU source checkout
         shell: bash
         run: |
-          ARCHIVE_FILE_PATH="${{ fromJson(steps.download_mxu.outputs.downloaded_files)[0] }}"
-          rm -f "${ARCHIVE_FILE_PATH}"
-          echo "Archive cleanup command executed for MXU on Windows."
+          expected_url="https://github.com/1bananachicken/MXU.git"
+          actual_url="$(git -C third_party/MXU remote get-url origin)"
+          expected_commit="$(git ls-tree HEAD third_party/MXU | awk '{print $3}')"
+          actual_commit="$(git -C third_party/MXU rev-parse HEAD)"
 
-      - name: Convert PNG to ICO
-        if: matrix.arch == 'x86_64'
-        shell: bash
-        run: |
-          # 安装 ImageMagick
-          choco install imagemagick -y
-
-          # 转换 PNG 到 ICO
-          magick convert assets/logo.png -define icon:auto-resize=256,128,64,48,32,24,16 maante.ico
-
-      - name: Modify Windows exe icons
-        if: matrix.arch == 'x86_64'
-        shell: bash
-        run: |
-          # 下载 rcedit
-          curl -L https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe -o rcedit.exe
-
-          # 修改 MXU 图标（如果存在）
-          if [ -f "MXU/mxu.exe" ]; then
-            ./rcedit.exe "MXU/mxu.exe" --set-icon "maante.ico"
-            echo "MXU icon modified successfully"
-          else
-            echo "MXU exe not found, skipping icon update."
+          if [ "$actual_url" != "$expected_url" ]; then
+            echo "Unexpected MXU source URL: $actual_url"
+            exit 1
           fi
+          if [ "$actual_commit" != "$expected_commit" ]; then
+            echo "MXU checkout $actual_commit does not match gitlink $expected_commit"
+            exit 1
+          fi
+          if [ -n "$(git -C third_party/MXU status --porcelain)" ]; then
+            echo "MXU source checkout is dirty before build"
+            git -C third_party/MXU status --short
+            exit 1
+          fi
+
+          echo "MXU source: $actual_url@$actual_commit"
+
+      - name: Install MXU frontend dependencies
+        working-directory: third_party/MXU
+        run: pnpm install --frozen-lockfile
+
+      - name: Build MXU from source
+        working-directory: third_party/MXU
+        run: >-
+          pnpm tauri build --ci --no-bundle
+          --target ${{ matrix.arch == 'x86_64' && 'x86_64-pc-windows-msvc' || 'aarch64-pc-windows-msvc' }}
+          -- --locked
 
       - name: Setup Embed Python on Windows
         shell: bash
@@ -156,7 +186,7 @@ jobs:
         shell: bash
         run: |
           ./install/python/python.exe tools/ci/download_deps.py --deps-dir install/deps
-      
+
       - name: Create MXU version
         shell: bash
         run: |
@@ -165,7 +195,46 @@ jobs:
           if [ -d "install/deps" ]; then
             cp -rpvn install/deps/. install-mxu/deps/
           fi
-      
+
+      - name: Copy PacketNTE thirdparty to MXU version
+        shell: bash
+        run: |
+          archive_path="${{ fromJson(steps.download_packetnte.outputs.downloaded_files)[0] }}"
+          extract_dir="PacketNTE-extracted"
+          mkdir -p "$extract_dir"
+
+          python - "$archive_path" "$extract_dir" << 'PYEOF'
+          import sys
+          import zipfile
+          from pathlib import Path
+
+          archive = Path(sys.argv[1])
+          extract_dir = Path(sys.argv[2]).resolve()
+
+          with zipfile.ZipFile(archive) as zf:
+              for info in zf.infolist():
+                  name = info.filename.replace("\\", "/")
+                  target = (extract_dir / name).resolve()
+                  if extract_dir != target and extract_dir not in target.parents:
+                      raise RuntimeError(f"Unsafe PacketNTE archive entry: {info.filename}")
+                  if name.endswith("/"):
+                      target.mkdir(parents=True, exist_ok=True)
+                      continue
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  with zf.open(info) as src, target.open("wb") as dst:
+                      dst.write(src.read())
+          PYEOF
+
+          if [ ! -d "$extract_dir/thirdparty" ]; then
+            echo "PacketNTE release did not extract to $extract_dir/thirdparty."
+            find "$extract_dir" -maxdepth 2 -type d -print
+            exit 1
+          fi
+
+          rm -rf install-mxu/thirdparty
+          cp -a "$extract_dir/thirdparty" install-mxu/thirdparty
+          echo "Added PacketNTE thirdparty to install-mxu/thirdparty"
+
       - name: Pre-install all dependencies
         shell: bash
         run: |
@@ -201,28 +270,21 @@ jobs:
           echo "Removing soundcard wheel from deps to prevent re-install..."
           rm -f install-mxu/deps/soundcard-*.whl
 
-      - name: Copy MXU files to MXU version
+      - name: Copy source-built MXU to MXU version
         shell: bash
         run: |
-          if [ -d "MXU" ]; then
-            echo "Copying MXU files to install-mxu directory..."
-            mkdir -p install-mxu
-            if [ -f "MXU/mxu.exe" ]; then
-              cp MXU/mxu.exe install-mxu/MaaNTE.exe
-            elif [ -f "MXU/mxu" ]; then
-              cp MXU/mxu install-mxu/MaaNTE
-            fi
-          else
-            echo "MXU directory not found, skipping copy."
-          fi
+          target="${{ matrix.arch == 'x86_64' && 'x86_64-pc-windows-msvc' || 'aarch64-pc-windows-msvc' }}"
+          mxu_exe="third_party/MXU/src-tauri/target/$target/release/mxu.exe"
+          mxu_icon="third_party/MXU/src-tauri/icons/icon.ico"
 
-      - name: Copy custom icons
-        shell: bash
-        run: |
-          # MXU 版本的图标
-          if [ -f "maante.ico" ]; then
-            cp maante.ico install-mxu/logo.ico
-          fi
+          test -f "$mxu_exe"
+          test -f "$mxu_icon"
+          mkdir -p install-mxu
+          cp "$mxu_exe" install-mxu/MaaNTE.exe
+          cp "$mxu_icon" install-mxu/logo.ico
+
+          echo "Unsigned MaaNTE executable built from MXU source:"
+          sha256sum install-mxu/MaaNTE.exe
 
       - name: Remove deps directory to reduce package size
         shell: bash
@@ -274,21 +336,18 @@ jobs:
               artifact_id: Number('${{ steps.upload-unsigned-artifact.outputs.artifact-id }}')
             })
 
-  changelog:
-    name: Generate changelog
-    needs: meta
+  release:
+    if: ${{ needs.meta.outputs.is_release == 'true' }}
+    needs: [meta, windows]
     runs-on: ubuntu-latest
-    outputs:
-      release_body: ${{ steps.git-cliff.outputs.content }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Generate a changelog
+      - name: Generate release notes
         uses: orhun/git-cliff-action@v4
-        id: git-cliff
         with:
           config: .github/cliff.toml
           # 正式版：使用 tag-pattern 只匹配正式版标签，包含所有从上一个正式版以来的提交
@@ -300,28 +359,41 @@ jobs:
           OUTPUT: CHANGES.md
           GITHUB_REPO: ${{ github.repository }}
 
-  release:
-    if: ${{ needs.meta.outputs.is_release == 'true' }}
-    needs: [meta, windows, changelog]
-    runs-on: ubuntu-latest
-    steps:
+      - name: Check release notes
+        shell: bash
+        run: |
+          test -s CHANGES.md
+          cat CHANGES.md
+
       - uses: actions/download-artifact@v4
         with:
-          path: assets
+          path: downloaded-artifacts
           pattern: MaaNTE-*-MXU
 
       - name: Process and package artifacts
+        shell: bash
         run: |
-          cd assets
-          for f in *; do
-            if [[ $f == *"win"* ]]; then
-              (cd "$f" && zip -r "../$f.zip" .)
+          artifact_dir="$PWD/downloaded-artifacts"
+          release_dir="$PWD/release-assets"
+          mkdir -p "$release_dir"
+
+          for f in "$artifact_dir"/*; do
+            artifact_name="$(basename "$f")"
+
+            if [[ ! -d "$f" ]]; then
+              echo "Skipping non-directory artifact entry: $artifact_name"
+              continue
+            fi
+
+            if [[ $artifact_name == *"win"* ]]; then
+              echo "Processing Windows artifact: $artifact_name"
+              (cd "$f" && zip -r "$release_dir/$artifact_name.zip" .)
             else
-              echo "Processing Unix artifact: $f"
+              echo "Processing Unix artifact: $artifact_name"
 
               if [[ -f "$f/MaaPiCli" ]]; then
                 chmod +x "$f/MaaPiCli"
-                echo "Set execute permission for $f/MaaPiCli"
+                echo "Set execute permission for $artifact_name/MaaPiCli"
               fi
 
               find "$f" -type f -name "MFAUpdater*" -exec chmod +x {} \; 2>/dev/null || true
@@ -329,34 +401,31 @@ jobs:
 
               if [[ -f "$f/MaaNTE" ]]; then
                 chmod +x "$f/MaaNTE"
-                echo "Set execute permission for $f/MaaNTE"
+                echo "Set execute permission for $artifact_name/MaaNTE"
               fi
 
-              PYTHON_PATHS=(
-                "$f/python/bin/python3"
-                "$f/python/python"
-                "$f/python/bin/python"
-                "$f/python/python.exe"
-              )
-              for PYTHON_PATH in "${PYTHON_PATHS[@]}"; do
+              for PYTHON_PATH in "$f/python/bin/python3" "$f/python/python" "$f/python/bin/python" "$f/python/python.exe"; do
                 if [[ -f "$PYTHON_PATH" ]]; then
                   chmod +x "$PYTHON_PATH"
-                  echo "Set execute permission for $PYTHON_PATH"
+                  echo "Set execute permission for ${PYTHON_PATH#$artifact_dir/}"
                 fi
               done
 
-              tar -cpzf "$f.tar.gz" -C "$f" .
-              echo "Created archive with preserved permissions: $f.tar.gz"
+              tar -cpzf "$release_dir/$artifact_name.tar.gz" -C "$f" .
+              echo "Created archive with preserved permissions: $artifact_name.tar.gz"
             fi
           done
 
+          if [[ -z "$(find "$release_dir" -maxdepth 1 -type f -print -quit)" ]]; then
+            echo "No release assets were created."
+            exit 1
+          fi
+
       - uses: softprops/action-gh-release@v2.2.2
         with:
-          files: |
-            assets/*.zip
-            assets/*.tar.gz
+          files: release-assets/*
           tag_name: ${{ needs.meta.outputs.tag }}
-          body: ${{ needs.changelog.outputs.release_body }}
+          body_path: CHANGES.md
           draft: false
           prerelease: ${{ needs.meta.outputs.is_prerelease == 'true' }}
 

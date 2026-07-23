@@ -54,6 +54,33 @@
           "pipeline_type": "string",
           "verify": "^-?\\d+$",
           "pattern_msg": "$task_auto_piano_input_transpose_pattern_msg"
+        },
+        {
+          "name": "KeyMode",
+          "label": "$task_auto_piano_input_key_mode_label",
+          "description": "$task_auto_piano_input_key_mode_desc",
+          "default": "36",
+          "pipeline_type": "string",
+          "verify": "^(36|21)$",
+          "pattern_msg": "$task_auto_piano_input_key_mode_pattern_msg"
+        },
+        {
+          "name": "Tracks",
+          "label": "$task_auto_piano_input_tracks_label",
+          "description": "$task_auto_piano_input_tracks_desc",
+          "default": "all",
+          "pipeline_type": "string",
+          "verify": "^(all|melody|\\d+(,\\d+)*)$",
+          "pattern_msg": "$task_auto_piano_input_tracks_pattern_msg"
+        },
+        {
+          "name": "OutOfRangeMode",
+          "label": "$task_auto_piano_input_range_mode_label",
+          "description": "$task_auto_piano_input_range_mode_desc",
+          "default": "fold",
+          "pipeline_type": "string",
+          "verify": "^(fold|shift|cut)$",
+          "pattern_msg": "$task_auto_piano_input_range_mode_pattern_msg"
         }
       ],
       "pipeline_override": {
@@ -61,7 +88,10 @@
           "custom_action_param": {
             "song": "{SongPath}",
             "speed": "{Speed}",
-            "transpose": "{Transpose}"
+            "transpose": "{Transpose}",
+            "key_mode": "{KeyMode}",
+            "tracks": "{Tracks}",
+            "out_of_range_mode": "{OutOfRangeMode}"
           }
         }
       }

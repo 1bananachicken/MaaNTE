@@ -30,7 +30,7 @@
                     "name": "PinkPawHeist",
                     "option": {
                         "PinkPawHeist_Loop": "Yes",
-                        "PinkPawHeist_Scheme": "Core2"
+                        "PinkPawHeist_Scheme": "Core3"
                     },
                     "enabled": false
                 }

@@ -20,7 +20,6 @@ class AutoFishWithoutCV(CustomAction):
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
         deadzone = 15  # 光标与绿条中心的距离在 deadzone（像素）以内时不操作，避免过度频繁地轻微调整导致的抖动
-        max_try_item = 5  # 识别不完整（绿条或光标未命中）的最大尝试次数，超过后放弃本次钓鱼，重新抛竿（执行 FishHook）
         factor = 1.5  # 控条时长的调整因子，实际时长 = 基础时长 * factor，基础时长 = (光标与绿条中心的像素偏移 / CURSOR_PX_PER_SEC) * 1000ms，增加 factor 可以适当补偿识别误差和按键响应延迟
         cap_ms = (
             1500  # 控条时长的上限（毫秒），避免因识别到较大偏移时按键过久，导致过度补偿
@@ -32,7 +31,6 @@ class AutoFishWithoutCV(CustomAction):
             try:
                 params = json.loads(argv.custom_action_param)
                 deadzone = params.get("deadzone", deadzone)
-                max_try_item = params.get("max_try", max_try_item)
                 factor = params.get("factor", factor)
                 cap_ms = params.get("cap_ms", cap_ms)
                 floor_ms = params.get("floor_ms", floor_ms)
@@ -48,7 +46,7 @@ class AutoFishWithoutCV(CustomAction):
             green_bar = context.run_recognition("FishGreenBar", image)
             cursor = context.run_recognition("FishCursor", image)
 
-            if not (
+            while not (
                 green_bar
                 and green_bar.hit
                 and green_bar.box
@@ -58,22 +56,27 @@ class AutoFishWithoutCV(CustomAction):
                 and cursor.box
                 is not None  # 这个是为了消除pylance的warning，实际运行时不应该有None的情况
             ):
-                # 绿条/光标未命中时检查是否已弹出结算画面
+                time.sleep(0.5)
+                image = context.tasker.controller.post_screencap().wait().get()
                 click_blank = context.run_recognition("SceneClickBlankToExit", image)
                 if click_blank and click_blank.hit:
                     PrintT(context, "autofish.fish_caught")
+                    logger.debug("识别到钓上鱼, 钓鱼退出")
                     return CustomAction.RunResult(success=True)
 
-                max_try_item -= 1
-                logger.debug(
-                    f"识别不完整（绿条或光标未命中），剩余尝试次数: {max_try_item}"
-                )
-
-                if max_try_item <= 0:
-                    logger.debug("尝试次数用尽，控条失败")
+                fish_escape = context.run_recognition("FishEscape", image)
+                if fish_escape and fish_escape.hit:
+                    PrintT(context, "autofish.fish_escape")
+                    logger.debug("识别到鱼溜走，钓鱼退出")
                     return CustomAction.RunResult(success=True)
-                # 看来就是通过识别失败几次直接通用适配成功/失败的情况的，不用管，根本没有去识别有没有钓到
-                continue
+                fish_on_gaming = context.run_recognition("FishSceneOnFishGame", image)
+                if fish_on_gaming and fish_on_gaming.hit:
+                    Print(
+                        context, "钓鱼异常结束（可能是鱼溜走），继续钓鱼"
+                    )  # 通常不会执行这一步
+                    return CustomAction.RunResult(success=True)
+                green_bar = context.run_recognition("FishGreenBar", image)
+                cursor = context.run_recognition("FishCursor", image)
 
             green_bar_x, green_bar_y, green_bar_w, green_bar_h = green_bar.box
             cursor_x, cursor_y, cursor_w, cursor_h = cursor.box
@@ -113,5 +116,5 @@ class AutoFishWithoutCV(CustomAction):
                     },
                 )
 
-        logger.debug("任务结束（success=True）")
+        logger.debug("任务中止")
         return CustomAction.RunResult(success=True)
