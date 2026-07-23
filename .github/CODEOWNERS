@@ -1,0 +1,7 @@
+# Trusted build provenance and release-signing inputs.
+/.github/workflows/install.yml @1bananachicken
+/.github/dependabot.yml @1bananachicken
+/.github/CODEOWNERS @1bananachicken
+/.gitmodules @1bananachicken
+/build.py @1bananachicken
+/third_party/MXU @1bananachicken

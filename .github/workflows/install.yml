@@ -1,7 +1,7 @@
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+*"
+      - "v*"
     branches:
       - "**"
     paths:
@@ -23,59 +23,95 @@ on:
 
 env:
   MAA_FRAMEWORK_VERSION: "v5.10.5"
+  MAA_FRAMEWORK_X86_64_SHA256: "e1f4cf62099fade89b39c4c0cd45c6673530fcacc8a343912036f2fab5d18615"
+  PACKET_NTE_VERSION: "v1.2.0"
+  PACKET_NTE_SHA256: "93d856edb3813c5087a38b730d62969b24da4b537142786c8d34381760263d63"
 
 permissions:
-  contents: write
-  actions: write
+  contents: read
 
 jobs:
   meta:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
       - id: set_tag
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          REPOSITORY: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          # 检查标签格式
-          if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?$ ]]; then
+          set -euo pipefail
+
+          core='(0|[1-9][0-9]*)'
+          identifier='(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)'
+          prerelease="${identifier}(\.${identifier})*"
+          build='[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*'
+          stable_regex="^v${core}\.${core}\.${core}$"
+          semver_regex="^v${core}\.${core}\.${core}(-${prerelease})?(\+${build})?$"
+
+          is_stable_release=false
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            tag="${GITHUB_REF#refs/tags/}"
+            if [[ ! "$tag" =~ $semver_regex ]]; then
+              echo "Invalid SemVer release tag: $tag"
+              exit 1
+            fi
+
             is_release=true
-            tag=${GITHUB_REF#refs/tags/}
             echo "Release tag format is valid: $tag"
+            if [[ "$tag" =~ $stable_regex ]]; then
+              is_stable_release=true
+            fi
           else
             is_release=false
-            # 获取最新的发布标签
-            tag=$(curl -sX GET "https://api.github.com/repos/${{ github.repository }}/releases/latest" --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' | awk '/tag_name/{print $4}' FS='["]')
-            if [[ ! $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+            tag=$(curl --fail --silent --show-error \
+              "https://api.github.com/repos/${REPOSITORY}/releases/latest" \
+              --header "Authorization: Bearer ${GH_TOKEN}" \
+              | awk '/tag_name/{print $4}' FS='["]' || true)
+            if [[ ! "$tag" =~ $stable_regex ]]; then
               echo "No valid release tag found, using v0.0.1"
               tag="v0.0.1"
             fi
-            tag=$(date "+$tag-%y%m%d-$(git rev-parse --short HEAD)")
+            tag="${tag}-ci.$(date +%y%m%d)-$(git rev-parse --short HEAD)"
           fi
 
-          if [ "$is_release" != "true" ] ; then
-            prefix=${tag%-*-*}
-            suffix=${tag#$prefix-}
-            tag="$prefix-ci.$suffix"
+          is_prerelease=true
+          if [ "$is_stable_release" = "true" ]; then
+            is_prerelease=false
           fi
 
-          # 检查是否为预发布版本
-          is_prerelease=false
-          if [[ $tag =~ .*alpha.* || $tag =~ .*beta.* || $tag =~ .*rc.* || $tag =~ .*dev.* || $tag =~ .*-ci.* || $tag =~ .*preview.* ]]; then
-            is_prerelease=true
-            echo "This is a pre-release version"
+          trusted_release=false
+          if [ "$is_stable_release" = "true" ] \
+            && [ "$EVENT_NAME" = "push" ] \
+            && [ "$REF_TYPE" = "tag" ] \
+            && [ "$REPOSITORY" = "1bananachicken/MaaNTE" ]; then
+            git fetch --no-tags origin "+refs/heads/dev:refs/remotes/origin/dev"
+            if git merge-base --is-ancestor "$GITHUB_SHA" origin/dev; then
+              trusted_release=true
+            else
+              echo "Release tag commit $GITHUB_SHA is not contained in origin/dev; signing is disabled."
+            fi
           fi
 
-          echo tag=$tag | tee -a $GITHUB_OUTPUT
-          echo is_release=$is_release | tee -a $GITHUB_OUTPUT
-          echo is_prerelease=$is_prerelease | tee -a $GITHUB_OUTPUT
+          echo "tag=$tag" | tee -a "$GITHUB_OUTPUT"
+          echo "is_release=$is_release" | tee -a "$GITHUB_OUTPUT"
+          echo "is_prerelease=$is_prerelease" | tee -a "$GITHUB_OUTPUT"
+          echo "trusted_release=$trusted_release" | tee -a "$GITHUB_OUTPUT"
     outputs:
       tag: ${{ steps.set_tag.outputs.tag }}
       is_release: ${{ steps.set_tag.outputs.is_release }}
       is_prerelease: ${{ steps.set_tag.outputs.is_prerelease }}
+      trusted_release: ${{ steps.set_tag.outputs.trusted_release }}
 
   windows:
     needs: meta
+    permissions:
+      contents: read
     strategy:
       matrix:
         include:
@@ -83,11 +119,15 @@ jobs:
             runner: windows-latest
       fail-fast: false
     runs-on: ${{ matrix.runner }}
+    outputs:
+      unsigned_executable_artifact_id: ${{ steps.upload-unsigned-executable.outputs.artifact-id }}
+      unsigned_package_artifact_id: ${{ steps.upload-unsigned-package.outputs.artifact-id }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           submodules: recursive
+          persist-credentials: false
 
       - name: Set platform variables
         id: platform
@@ -101,42 +141,79 @@ jobs:
 
       - name: Download PacketNTE thirdparty
         id: download_packetnte
-        uses: robinraju/release-downloader@v1
+        uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1
         with:
           repository: 1pineappleduck/PacketNTE
-          fileName: "nte_coordinate_api-*.zip"
-          latest: true
+          fileName: "nte_coordinate_api-${{ env.PACKET_NTE_VERSION }}.cp312-win_amd64.zip"
+          tag: ${{ env.PACKET_NTE_VERSION }}
           out-file-path: "PacketNTE"
           extract: false
 
       - name: Download MaaFramework
-        uses: robinraju/release-downloader@v1
+        id: download_maaframework
+        uses: robinraju/release-downloader@28fc21f50d76778e7023361aa1f863e717d3d56f # v1
         with:
           repository: MaaXYZ/MaaFramework
-          fileName: "MAA-win-${{ matrix.arch }}*"
+          fileName: "MAA-win-${{ matrix.arch }}-${{ env.MAA_FRAMEWORK_VERSION }}.zip"
           tag: ${{ env.MAA_FRAMEWORK_VERSION }}
           out-file-path: "deps"
-          extract: true
+          extract: false
+
+      - name: Verify pinned release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          packet_archive="${{ fromJson(steps.download_packetnte.outputs.downloaded_files)[0] }}"
+          maafw_archive="${{ fromJson(steps.download_maaframework.outputs.downloaded_files)[0] }}"
+
+          echo "${PACKET_NTE_SHA256}  ${packet_archive}" | sha256sum --check --strict
+          echo "${MAA_FRAMEWORK_X86_64_SHA256}  ${maafw_archive}" | sha256sum --check --strict
+
+      - name: Extract MaaFramework
+        shell: bash
+        run: |
+          python - "${{ fromJson(steps.download_maaframework.outputs.downloaded_files)[0] }}" deps << 'PYEOF'
+          import sys
+          import zipfile
+          from pathlib import Path
+
+          archive = Path(sys.argv[1])
+          extract_dir = Path(sys.argv[2]).resolve()
+
+          with zipfile.ZipFile(archive) as zf:
+              for info in zf.infolist():
+                  name = info.filename.replace("\\", "/")
+                  target = (extract_dir / name).resolve()
+                  if extract_dir != target and extract_dir not in target.parents:
+                      raise RuntimeError(f"Unsafe MaaFramework archive entry: {info.filename}")
+                  if name.endswith("/"):
+                      target.mkdir(parents=True, exist_ok=True)
+                      continue
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  with zf.open(info) as src, target.open("wb") as dst:
+                      dst.write(src.read())
+          PYEOF
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v6
+        uses: pnpm/action-setup@b0f76dfb45f55f8421693e4803ac7bb65143bd34 # v6
         with:
           version: "10.28.0"
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
         with:
           node-version: 20
           cache: pnpm
           cache-dependency-path: third_party/MXU/pnpm-lock.yaml
 
       - name: Setup Rust
-        uses: dtolnay/rust-toolchain@stable
+        uses: dtolnay/rust-toolchain@4cda84d5c5c54efe2404f9d843567869ab1699d4 # stable
         with:
           targets: ${{ matrix.arch == 'x86_64' && 'x86_64-pc-windows-msvc' || 'aarch64-pc-windows-msvc' }}
 
       - name: Cache MXU Rust build
-        uses: swatinem/rust-cache@v2
+        uses: swatinem/rust-cache@42dc69e1aa15d09112580998cf2ef0119e2e91ae # v2
         with:
           workspaces: "third_party/MXU/src-tauri -> target"
           shared-key: "mxu-windows-${{ matrix.arch }}"
@@ -274,7 +351,7 @@ jobs:
         shell: bash
         run: |
           target="${{ matrix.arch == 'x86_64' && 'x86_64-pc-windows-msvc' || 'aarch64-pc-windows-msvc' }}"
-          mxu_exe="third_party/MXU/src-tauri/target/$target/release/mxu.exe"
+          mxu_exe="third_party/MXU/src-tauri/target/$target/release/MaaNTE.exe"
           mxu_icon="third_party/MXU/src-tauri/icons/icon.ico"
 
           test -f "$mxu_exe"
@@ -294,20 +371,53 @@ jobs:
           echo "Deps directory removed. Package size reduced by ~171MB."
 
       - name: Upload unsigned executable for signing
-        id: upload-unsigned-artifact
-        uses: actions/upload-artifact@v7
+        if: ${{ needs.meta.outputs.trusted_release == 'true' }}
+        id: upload-unsigned-executable
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           path: install-mxu/MaaNTE.exe
           archive: false
+          retention-days: 1
+
+      - name: Upload unsigned package for signing
+        if: ${{ needs.meta.outputs.trusted_release == 'true' }}
+        id: upload-unsigned-package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unsigned-MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
+          path: install-mxu
+          retention-days: 1
+
+      - name: Upload unsigned build artifact
+        if: ${{ needs.meta.outputs.trusted_release != 'true' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
+          path: install-mxu
+
+  sign:
+    if: ${{ needs.meta.outputs.trusted_release == 'true' }}
+    needs: [meta, windows]
+    runs-on: windows-latest
+    permissions:
+      actions: write
+      contents: read
+    environment: production-signing
+    steps:
+      - name: Download unsigned package
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: unsigned-MaaNTE-win-x86_64-${{ needs.meta.outputs.tag }}-MXU
+          path: install-mxu
 
       - name: Submit signing request
-        uses: signpath/github-action-submit-signing-request@v2
+        uses: signpath/github-action-submit-signing-request@b9d91eadd323de506c0c81cf0c7fe7438f3360fd # v2
         with:
           api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
           organization-id: 52da06e6-4590-473f-a3c3-ae7ea178db3e
           project-slug: MaaNTE
           signing-policy-slug: test-signing
-          github-artifact-id: ${{ steps.upload-unsigned-artifact.outputs.artifact-id }}
+          github-artifact-id: ${{ needs.windows.outputs.unsigned_executable_artifact_id }}
           wait-for-completion: true
           output-artifact-directory: signed-artifact
           skip-decompress: true
@@ -316,38 +426,48 @@ jobs:
 
       - name: Replace unsigned executable with signed executable
         shell: bash
-        run: |
-          cp signed-artifact/MaaNTE.exe install-mxu/MaaNTE.exe
+        run: cp signed-artifact/MaaNTE.exe install-mxu/MaaNTE.exe
 
-      - name: Upload signed artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload signed build artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
+          name: MaaNTE-win-x86_64-${{ needs.meta.outputs.tag }}-MXU
           path: install-mxu
 
-      - name: Delete signing-only artifact
-        if: ${{ always() && steps.upload-unsigned-artifact.outputs.artifact-id != '' }}
-        uses: actions/github-script@v7
+      - name: Delete signing-only artifacts
+        if: ${{ success() }}
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b # v7
         with:
           script: |
-            await github.rest.actions.deleteArtifact({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              artifact_id: Number('${{ steps.upload-unsigned-artifact.outputs.artifact-id }}')
-            })
+            const artifactIds = [
+              Number('${{ needs.windows.outputs.unsigned_executable_artifact_id }}'),
+              Number('${{ needs.windows.outputs.unsigned_package_artifact_id }}')
+            ].filter((id) => Number.isInteger(id) && id > 0);
+
+            for (const artifactId of artifactIds) {
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifactId
+              });
+            }
 
   release:
-    if: ${{ needs.meta.outputs.is_release == 'true' }}
-    needs: [meta, windows]
+    if: ${{ needs.meta.outputs.trusted_release == 'true' }}
+    needs: [meta, windows, sign]
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Generate release notes
-        uses: orhun/git-cliff-action@v4
+        uses: orhun/git-cliff-action@f50e11560dce63f7c33227798f90b924471a88b5 # v4
         with:
           config: .github/cliff.toml
           # 正式版：使用 tag-pattern 只匹配正式版标签，包含所有从上一个正式版以来的提交
@@ -365,7 +485,7 @@ jobs:
           test -s CHANGES.md
           cat CHANGES.md
 
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           path: downloaded-artifacts
           pattern: MaaNTE-*-MXU
@@ -421,7 +541,7 @@ jobs:
             exit 1
           fi
 
-      - uses: softprops/action-gh-release@v2.2.2
+      - uses: softprops/action-gh-release@da05d552573ad5aba039eaac05058a918a7bf631 # v2.2.2
         with:
           files: release-assets/*
           tag_name: ${{ needs.meta.outputs.tag }}
