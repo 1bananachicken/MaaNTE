@@ -13,12 +13,6 @@ on:
   pull_request:
     branches:
       - "**"
-    paths:
-      - ".github/workflows/install.yml"
-      - ".gitmodules"
-      - "assets/**"
-      - "third_party/MXU"
-      - "**.py"
   workflow_dispatch:
 
 env:
