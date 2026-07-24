@@ -1,0 +1,44 @@
+{
+    "task": [
+        {
+            "name": "战斗",
+            "label": "战斗",
+            "description": "按流程进行战斗，加载模型则为带闪避的版本",
+            "entry": "FT_Action",
+            "option": [
+                "FT_StopFight",
+                "FT_CharacterFight_1"
+            ]
+        }
+    ],
+
+    "option": {
+        "FT_StopFight": {
+            "type": "input",
+            "label": "$刷取次数",
+            "description": "$指定日常本的刷取次数",
+            "inputs": [
+                {
+                    "name": "FT_StopFight_fight_spend_time",
+                    "label": "$战斗持续时长",
+                    "description": "$战斗持续时长",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9][0-9]{1,2}$",
+                    "default": "30"
+                }
+            ],
+            "pipeline_override": {
+                "FT_StopFight": {
+                    "recognition": {
+                        "param": {
+                            "custom_recognition_param": {
+
+                                "fight_spend_time": "{FT_StopFight_fight_spend_time}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

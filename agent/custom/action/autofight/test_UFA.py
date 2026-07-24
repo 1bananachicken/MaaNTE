@@ -3,10 +3,10 @@ import json
 
 from maa.context import Context
 from maa.custom_action import CustomAction
-from maa.agent.agent_server import AgentServer
+
 from .logger import logger
 
-@AgentServer.custom_action("UF_ActionLogger")
+
 class UF_ActionLogger(CustomAction):
     def run(
             self,
@@ -28,7 +28,7 @@ class UF_ActionLogger(CustomAction):
                 logger.debug(f'{debug_one}')
         return True
 
-@AgentServer.custom_action("UF_ActionMoveScreen")
+
 class UF_ActionMoveScreen(CustomAction):
     def run(
             self,
@@ -69,3 +69,15 @@ class UF_ActionMoveScreen(CustomAction):
         print()
 
         return True
+
+
+class UF_ActionErrorRecognition(CustomAction):
+    def run(
+            self,
+            context: Context,
+            argv: CustomAction.RunArg,
+    ) -> bool:
+        logger.debug("##########_##########_##########")
+        logger.debug(f'节点{argv.node_name}运行失败，进入 error pipeline')
+
+        return False

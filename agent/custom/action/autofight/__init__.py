@@ -63,8 +63,49 @@
 # __all__.append("change_console_level")
 # # 定义导出列表：包含所有函数和recognition_handler实例
 
-from .test_AF import AF_AutoFightClsTest
-from .test_AUF import UF_ActionLogger
+from .test_UFR import UF_Logger, UF_Count, UF_CountClean, UF_GetImage
+from .test_UFA import UF_ActionLogger, UF_ActionMoveScreen
+from .test_DFR import DF_Action
+from .test_AFR import AF_ChooseNormalInstance, AF_AutoFightCls, AF_AutoFightClsTest
+from .test_FTR import FT_StopFight,FT_ReadTxt
+
+from maa.agent.agent_server import AgentServer
+
+# __all__ = ["AF_AutoFightClsTest","UF_ActionLogger"]
 
 
-__all__ = ["AF_AutoFightClsTest","UF_ActionLogger"]
+FUNCTIONS_RECOGNITION = [
+    # 来自 test_UF 的函数
+    UF_Logger,
+    UF_Count,
+    UF_CountClean,
+    UF_GetImage,
+
+    # 来自 test_AF 的函数
+    AF_ChooseNormalInstance,
+    AF_AutoFightCls,
+    AF_AutoFightClsTest,
+    # 来自 test_DF 的函数
+    DF_Action,
+
+    FT_StopFight,
+    FT_ReadTxt,
+
+]
+
+FUNCTIONS_ACTION = [
+    # 来自 test_AUF 的函数
+    UF_ActionLogger,
+    UF_ActionMoveScreen,
+
+]
+
+for func in FUNCTIONS_RECOGNITION:
+    decorated_func = AgentServer.custom_recognition(func.__name__)(func)
+    globals()[func.__name__] = decorated_func
+
+for func in FUNCTIONS_ACTION:
+    decorated_func = AgentServer.custom_action(func.__name__)(func)
+    globals()[func.__name__] = decorated_func
+
+__all__ = [func.__name__ for func in FUNCTIONS_RECOGNITION]  # 添加实例到导出列表

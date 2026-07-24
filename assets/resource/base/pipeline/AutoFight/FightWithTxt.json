@@ -114,7 +114,7 @@
             "param": {
                 "custom_recognition": "FT_StopFight",
                 "custom_recognition_param": {
-                    "fight_spend_time": 5
+                    "fight_spend_time": 30
                 }
             }
         },

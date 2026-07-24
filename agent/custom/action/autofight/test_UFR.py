@@ -10,11 +10,8 @@ from maa.context import Context
 from maa.custom_recognition import CustomRecognition
 
 from .logger import logger
-from maa.agent.agent_server import AgentServer
 
 
-
-@AgentServer.custom_recognition("UF_Logger")
 class UF_Logger(CustomRecognition):
     def analyze(
             self,
@@ -68,7 +65,7 @@ def save_image(img, save_dir="screenshots"):
     cv2.imwrite(filepath, img)
     return filepath
 
-@AgentServer.custom_recognition("UF_GetImage")
+
 class UF_GetImage(CustomRecognition):
     def analyze(
             self,
@@ -108,7 +105,7 @@ class UF_GetImage(CustomRecognition):
 
         return CustomRecognition.AnalyzeResult(box=(0, 0, 100, 100), detail="Finish")
 
-@AgentServer.custom_recognition("UF_CountClean")
+
 class UF_CountClean(CustomRecognition):
     def analyze(
             self,
@@ -138,7 +135,7 @@ class UF_CountClean(CustomRecognition):
         return CustomRecognition.AnalyzeResult(box=(0, 0, 100, 100), detail="Finish")
 
 
-@AgentServer.custom_recognition("UF_Count")
+# @resource.custom_recognition("UF_Count")
 class UF_Count(CustomRecognition):
     def analyze(
             self,
@@ -180,7 +177,7 @@ class UF_Count(CustomRecognition):
             return CustomRecognition.AnalyzeResult(box=(0, 0, 100, 100), detail="Finish")
 
 
-@AgentServer.custom_recognition("UF_ChangePipeline")
+# @resource.custom_recognition("UF_ChangePipeline")
 class UF_ChangePipeline(CustomRecognition):
     def analyze(
             self,

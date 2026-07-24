@@ -43,7 +43,59 @@ try:
 except ImportError:
     import logging
 
-    logging.basicConfig(
-        format="%(asctime)s | %(levelname)s | %(message)s", level=logging.INFO
-    )
-    logger = logging
+    _root_handler = None  # type: logging.Handler | None
+
+    def setup_logger(log_dir="debug/custom", console_level="INFO"):
+        """设置标准 logging logger
+
+        Args:
+            log_dir: 日志文件目录
+            console_level: 控制台输出等级 (DEBUG, INFO, WARNING, ERROR)
+        """
+        global _root_handler
+
+        os.makedirs(log_dir, exist_ok=True)
+
+        _logger = logging.getLogger("autofight")
+        _logger.setLevel(logging.DEBUG)
+
+        # 移除旧的 handler（如果存在）
+        if _root_handler is not None:
+            _logger.removeHandler(_root_handler)
+
+        # 控制台 handler
+        _root_handler = logging.StreamHandler(sys.stderr)
+        _root_handler.setLevel(getattr(logging, console_level.upper(), logging.INFO))
+        _root_handler.setFormatter(
+            logging.Formatter("%(asctime)s | %(levelname)s | %(message)s")
+        )
+        _logger.addHandler(_root_handler)
+
+        # 文件 handler
+        from datetime import datetime
+
+        file_handler = logging.FileHandler(
+            f"{log_dir}/{datetime.now().strftime('%Y-%m-%d')}.log",
+            encoding="utf-8",
+        )
+        file_handler.setLevel(logging.DEBUG)
+        file_handler.setFormatter(
+            logging.Formatter(
+                "%(asctime)s | %(levelname)-8s | %(name)s:%(funcName)s:%(lineno)d | %(message)s"
+            )
+        )
+        _logger.addHandler(file_handler)
+
+        return _logger
+
+    def change_console_level(level="DEBUG"):
+        """动态修改控制台日志等级"""
+        global _root_handler
+        _logger = logging.getLogger("autofight")
+        if _root_handler is not None:
+            _root_handler.setLevel(getattr(logging, level.upper(), logging.DEBUG))
+        else:
+            _logger.setLevel(getattr(logging, level.upper(), logging.DEBUG))
+        _logger.info(f"控制台日志等级已更改为: {level}")
+
+    logger = setup_logger()
