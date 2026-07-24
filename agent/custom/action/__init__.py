@@ -31,6 +31,8 @@ from .withdraw_money_choose_item import *
 from .SyncCharacterAbilityCityAbility import *
 from .DatasetCollection.autonomous_driving_dataset_recorder import *
 from .BagelSpam import *
+from .autofight import *
+
 
 __all__ = [
     "AutoMakeCoffee",
@@ -74,4 +76,5 @@ __all__ = [
     "BagelSpamPickIndex",
     "BagelSpamOutputText",
     "BagelSpamLLMGenerate",
+    "AF_AutoFightClsTest"
 ]

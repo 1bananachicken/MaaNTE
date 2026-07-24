@@ -461,6 +461,7 @@ debug
 assets/resource/base/model/detect/limbo_stage_lightest.onnx
 assets/resource/base/model/detect/sos_nodes.onnx
 .claude/
+
 .nicegui/
 
 # local gui test
@@ -475,3 +476,5 @@ scripts/*
 !scripts/update_navi_coordinate_transform.py
 # Models
 assets/resource/base/model/*
+# 测试文件（根目录）
+/agent/test_*.py
