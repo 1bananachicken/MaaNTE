@@ -56,6 +56,7 @@
     "task_make_coffee_lite_label": "Auto Make Coffee (Lite)",
     "task_make_coffee_lite_desc": "Start the task on the stage selection page. No special character is required",
     "task_make_coffee_option_loop_time": "Make Count",
+    "task_make_coffee_lite_option": "Make Settings",
     "task_make_coffee_lite_option_loop_time": "Make Count",
     "task_make_coffee_lite_option_timeout": "Making Timeout (seconds)",
     "task_rhythm_label": "Super Sound",
