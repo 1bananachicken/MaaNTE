@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import ctypes
 import json
 import time
 from dataclasses import dataclass
@@ -39,6 +40,7 @@ MAP_INDEX_ICON_TEMPLATE = "image/map_teleport/map_index_icon.png"
 AREA_NEXT_BTN_TEMPLATE = "image/map_teleport/area_next_btn.png"
 TELEPORT_ICON_TEMPLATE = "image/map_teleport/teleport_icon.png"
 MAIN_SELECTION_BTN_TEMPLATE = "image/map_teleport/main_seletion_btn.png"
+SUB_SELECTION_BTN_TEMPLATE = "image/map_teleport/sub_seletion_btn.png"
 
 # 所有 ROI 都基于 1280x720；这些区域只覆盖地图索引和传送确认流程中需要看的小块。
 MAP_INDEX_ICON_ROI = [1069, 626, 89, 74]
@@ -47,6 +49,7 @@ AREA_NAME_ROI = [958, 127, 235, 40]
 AREA_NEXT_BTN_ROI = [1203, 126, 44, 42]
 RECOMMENDED_PLACE_ROI = [894, 175, 369, 468]
 MAIN_SELECTION_ROI = [1182, 180, 67, 456]
+SUB_SELECTION_ROI = [1190, 180, 55, 461]
 NEW_HERLAND_RECOMMENDED_PLACE_SWIPE_ROI = [897, 195, 351, 429]
 TELEPORT_ICON_ROI = [894, 175, 369, 468]
 TELEPORT_CONFIRM_POINT = [639, 361]
@@ -77,7 +80,7 @@ class TeleportPoint:
     area_name: str
     area_index: int
     selection_index: int
-    point_name: str
+    point_path: str
     description: str
 
 
@@ -104,7 +107,7 @@ def load_teleport_point(
         area_name=str(record["areaName"]),
         area_index=int(record["areaIndex"]),
         selection_index=int(record.get("selectionIndex", 0)),
-        point_name=str(record.get("pointName", "")),
+        point_path=str(record.get("pointPath", "")),
         description=str(record.get("description", "")),
     )
 
@@ -496,6 +499,146 @@ def _switch_to_area(
     return False
 
 
+def _get_cursor_pos() -> tuple[int, int]:
+    """获取当前系统鼠标屏幕坐标。"""
+    pt = ctypes.wintypes.POINT()
+    ctypes.windll.user32.GetCursorPos(ctypes.byref(pt))
+    return (pt.x, pt.y)
+
+
+def _identify_new_list_nodes(
+    context: Context,
+    template: Any,
+    *,
+    template_threshold: float,
+) -> tuple[int, int, int, int, float] | None:
+    """识别推荐地点列表中鼠标分界线以下第一个新出现的图标。
+
+    通过系统 API 获取鼠标 Y 坐标，在子选项列表中匹配目标图标模板，
+    取 Y 严格大于鼠标 Y 的第一个匹配点。
+
+    Args:
+        context: MAA 上下文。
+        template: 目标传送图标的模板图像。
+        template_threshold: 模板匹配最低置信度。
+
+    Returns:
+        第一个新出现的图标 (x, y, w, h, score)，没有则返回 None。
+    """
+    frame = _wait_screen_still(context, max_wait=3.0)
+
+    _, mouse_y = _get_cursor_pos()
+
+    matches = _find_template_matches(
+        frame, SUB_SELECTION_ROI, template,
+        threshold=template_threshold,
+    )
+
+    for x, y, w, h, score in matches:
+        if y > mouse_y:
+            logger.debug(
+                "_identify_new_list_nodes found: rect=[%s,%s,%s,%s] "
+                "score=%.3f mouse_y=%s",
+                x, y, w, h, score, mouse_y,
+            )
+            return (x, y, w, h, score)
+
+    logger.debug(
+        "_identify_new_list_nodes no new node below mouse_y=%s "
+        "total_matches=%s",
+        mouse_y, len(matches),
+    )
+    return None
+
+
+def _find_closest_icon_center(
+    context: Context,
+    template: Any,
+    *,
+    template_threshold: float,
+) -> tuple[int, int] | None:
+    """找到离鼠标 Y 最近的图标，返回其拖动起始坐标。"""
+    _, mouse_y = _get_cursor_pos()
+
+    roi_h = 85
+    search_roi = [1196, mouse_y - roi_h // 2, 47, roi_h]
+
+    frame = _wait_screen_still(context, max_wait=1.5)
+    matches = _find_template_matches(
+        frame, search_roi, template,
+        threshold=template_threshold,
+    )
+    if not matches:
+        return None
+
+    closest = min(matches, key=lambda m: abs(m[1] + m[3] // 2 - mouse_y))
+    _, y, _, h, _ = closest
+    return (1160, y + h // 2)
+
+
+def _drag_list_upward(
+    context: Context,
+    template: Any,
+    *,
+    template_threshold: float,
+) -> bool:
+    """拖住列表底部图标向上移动，露出下方新图标。"""
+    drag_start = _find_closest_icon_center(
+        context, template, template_threshold=template_threshold,
+    )
+    if drag_start is None:
+        logger.debug("_drag_list_upward: no icon near mouse")
+        return False
+
+    drag_end = (1160, drag_start[1] - 50)
+
+    controller = context.tasker.controller
+    controller.post_touch_move(drag_start[0], drag_start[1]).wait()
+    controller.post_touch_down(drag_start[0], drag_start[1]).wait()
+    time.sleep(0.05)
+    controller.post_touch_move(drag_end[0], drag_end[1]).wait()
+    time.sleep(0.05)
+    controller.post_touch_up().wait()
+    time.sleep(0.1)
+
+    # 重新定位鼠标到当前最近的图标中心
+    anchor = _find_closest_icon_center(
+        context, template, template_threshold=template_threshold,
+    )
+    if anchor is not None:
+        controller.post_touch_move(anchor[0], anchor[1]).wait()
+
+    logger.debug(
+        "_drag_list_upward: dragged from %s to %s", drag_start, drag_end,
+    )
+    return True
+
+
+def _check_closest_icon(
+    context: Context,
+    point_path: str,
+    *,
+    template_threshold: float,
+) -> bool:
+    """检查鼠标附近是否恰好匹配到一个目标传送图标。
+
+    通过 point_path 加载模板，以鼠标 Y 为基准定位窄 ROI 做匹配。
+    调用前需保证鼠标 Y 已对准选项位置。
+    """
+    _, mouse_y = _get_cursor_pos()
+
+    search_roi = [914, mouse_y - 20, 40, 41]
+    template = _load_template(point_path)
+
+    frame = _wait_screen_still(context, max_wait=1.5)
+    matches = _find_template_matches(
+        frame, search_roi, template,
+        threshold=template_threshold,
+        max_results=2,
+    )
+    return len(matches) == 1
+
+
 def _click_main_selection(
     context: Context,
     template: Any,
@@ -643,6 +786,7 @@ def run_map_teleport_flow(
     area_next_template = _load_template(AREA_NEXT_BTN_TEMPLATE)
     teleport_icon_template = _load_template(TELEPORT_ICON_TEMPLATE)
     main_selection_btn_template = _load_template(MAIN_SELECTION_BTN_TEMPLATE)
+    sub_selection_btn_template = _load_template(SUB_SELECTION_BTN_TEMPLATE)
 
     if not _ensure_in_world(context):
         _notify(context, "地图传送失败：当前未确认处于大世界界面")
