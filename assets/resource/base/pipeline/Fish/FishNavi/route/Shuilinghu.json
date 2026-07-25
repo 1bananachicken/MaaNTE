@@ -1,3 +1,255 @@
 {
-    
+    "ShuilinghuRouteEntrance": {
+        "desc": "水菱湖钓点路线",
+        "action": "DoNothing",
+        "enabled": false,
+        "max_hit": 3,
+        "anchor": "SlhRestart",
+        "next": [
+            "SlhOpenMap",
+            "[JumpBack]SceneAnyEnterWorld"
+        ],
+        "on_error": [
+            "SlhExit"
+        ]
+    },
+    "SlhExit": {},
+    "SlhClick":{
+        "desc": "用于重复点击",
+        "action":"Click",
+        "target":"[Anchor]SlhClickNode"
+    },
+    "SlhOpenMap": {
+        "desc": "打开地图",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "action": "ClickKey",
+        "key": [
+            77 // M
+        ],
+        "post_wait_freezes": 100,
+        "next": [
+            "SlhOpenMapReference"
+        ]
+    },
+    "SlhOpenMapReference": {
+        "desc": "在地图中打开地图索引",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1047,
+                    601,
+                    129,
+                    120
+                ],
+                "template": "map_teleport/map_index_icon.png"
+            }
+        },
+        "action": "Click",
+        "post_wait_freezes": 500,
+        "next": [
+            "SlhSwitchLocation",
+            "[JumpBack]SlhSwitchClick"
+        ],
+        "on_error": [
+            "[Anchor]SlhRestart"
+        ]
+    },
+    "SlhSwitchLocation": {
+        "desc": "选择地点",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    953,
+                    120,
+                    249,
+                    48
+                ],
+                "expected": [
+                    "米格尔区"
+                ]
+            }
+        },
+        "next": [
+            "SlhOpenReferenceList"
+        ],
+        "on_error": [
+            "[Anchor]SlhRestart"
+        ]
+    },
+    "SlhSwitchClick": {
+        "max_hit": 15,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1180,
+                    106,
+                    86,
+                    83
+                ],
+                "template": "map_teleport/area_next_btn.png"
+            }
+        },
+        "action": "Click",
+        "post_wait_freezes": 500
+    },
+    "SlhOpenReferenceList": {
+        "desc": "地图索引点击指定选项",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    893,
+                    183,
+                    364,
+                    455
+                ],
+                "expected": [
+                    "推荐地点"
+                ]
+            }
+        },
+        "action": "Click",
+        "next": [
+            "[JumpBack]SlhZoominMap",
+            "SlhChooseTeleport"
+        ],
+        "on_error": [
+            "[Anchor]SlhRestart"
+        ]
+    },
+    "SlhZoominMap": {
+        "desc": "放大地图,点击+号最多5次",
+        "max_hit": 5,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    34,
+                    216,
+                    57,
+                    53
+                ],
+                "template": "map_teleport/map_zoom_in.png"
+            }
+        },
+        "action": "Click"
+    },
+    "SlhChooseTeleport": {
+        "desc": "在地图索引列表中选择目标传送点",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    890,
+                    179,
+                    370,
+                    459
+                ],
+                "expected": [
+                    "维特海默塔"
+                ]
+            }
+        },
+        "anchor" : "SlhClickNode",
+        "action":"Click",
+        "post_wait_freezes": 1000,
+        "next": [
+            "SlhClickMiddle",
+            "[JumpBack]SlhClick"
+        ],
+        "on_error": [
+            "[Anchor]SlhRestart"
+        ]
+    },
+    "SlhClickMiddle": {
+        "desc": "点击位于中心的地点",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    110,
+                    58,
+                    783,
+                    602
+                ],
+                "template": "map_teleport/choose_teleport.png",
+                "greem_mask": true,
+                "threshold": 0.5
+            }
+        },
+        "post_delay": 100,
+        "action": "Click",
+        "target":[
+            630,
+            350,
+            20,
+            20
+        ],
+        "next": [
+            "SlhTeleport"
+        ],
+        "on_error": [
+            "[Anchor]SlhRestart"
+        ]
+    },
+    "SlhTeleport": {
+        "desc": "点击传送",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    923,
+                    592,
+                    357,
+                    88
+                ],
+                "expected": [
+                    "传送"
+                ]
+            }
+        },
+        "action": "Click",
+        "post_delay": 100,
+        "next": [
+            "SlhStartNavi"
+        ],
+        "on_error": [
+            "[Anchor]SlhRestart"
+        ]
+    },
+    "SlhStartNavi": {
+        "desc": "开始寻路",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "FishNavigation",
+            "route_name": "钓鱼路线",
+            "segment_index": 2,
+            "tolerance": 2,
+            "angle_backend": "auto",
+            "position_backend": "auto",
+            "debug": false
+        },
+        "on_error": [
+            "[Anchor]SlhRestart"
+        ]
+    }
 }

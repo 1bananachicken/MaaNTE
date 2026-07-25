@@ -294,6 +294,13 @@
                     "pipeline_override": {
                         "LixiangguanRouteEntrance": { "enabled": true }
                     }
+                },
+                {
+                    "name": "Shuilinghu",
+                    "label": "水菱湖钓点",
+                    "pipeline_override": {
+                        "ShuilinghuRouteEntrance": { "enabled": true }
+                    }
                 }
             ]
         }

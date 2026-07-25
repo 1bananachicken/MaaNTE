@@ -19,7 +19,8 @@
             }
         },
         "next": [
-            "LixiangguanRouteEntrance"
+            "LixiangguanRouteEntrance",
+            "ShuilinghuRouteEntrance"
         ]
     }
 }

@@ -2,10 +2,12 @@
     "LixiangguanRouteEntrance": {
         "desc": "理想馆钓点路线",
         "action": "DoNothing",
+        "enabled": false,
         "max_hit": 3,
         "anchor": "LxgRestart",
         "next": [
-            "LxgOpenMap"
+            "LxgOpenMap",
+            "[JumpBack]SceneAnyEnterWorld"
         ],
         "on_error":[
             "LxgExit"
@@ -16,6 +18,14 @@
     },
     "LxgOpenMap": {
         "desc": "打开地图",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
         "action": "ClickKey",
         "key": [
             77 // M
@@ -109,15 +119,15 @@
         "post_delay": 500,
         "next": [
             "[JumpBack]LxgZoominMap",
-            "LxgChooseTeleport"
+            "LxgMouseMove"
         ],
         "on_error": [
             "[Anchor]LxgRestart"
         ]
     },
     "LxgZoominMap": {
-        "desc": "放大地图,点击+号最多10次",
-        "max_hit": 10,
+        "desc": "放大地图,点击+号最多5次",
+        "max_hit": 5,
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -131,6 +141,19 @@
             }
         },
         "action": "Click"
+    },
+    "LxgMouseMove":{
+        "desc": "一个或许有用的节点",
+        "action":"TouchMove",
+        "target":[
+            851,
+            318,
+            8,
+            10
+        ],
+        "next":[
+            "LxgChooseTeleport"
+        ]
     },
     "LxgChooseTeleport": {
         "desc": "在地图索引列表中选择目标传送点",
@@ -161,14 +184,12 @@
         "desc": "此时目标点在屏幕中间，点击",
         "post_delay": 100,
         "action": "Click",
-        "custom_action_param": {
-            "target": [
-                630,
-                350,
-                20,
-                20
-            ]
-        },
+        "target": [
+            630,
+            350,
+            20,
+            20
+        ],
         "next": [
             "LxgTeleport"
         ],
