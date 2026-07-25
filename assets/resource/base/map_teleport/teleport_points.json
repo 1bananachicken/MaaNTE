@@ -10,7 +10,7 @@
             "areaName": "绘空",
             "areaIndex": 2,
             "selectionIndex": 1,
-            "pointPath": "image/map_teleport/phone_booth.png",
+            "pointPath": "image/map_teleport/teleport_icon/phone_booth.png",
             "description": "地图索引中使用的传送点"
         },
         {
@@ -22,7 +22,7 @@
             "areaName": "新赫兰德",
             "areaIndex": 5,
             "selectionIndex": 3,
-            "pointPath": "image/map_teleport/phone_booth.png",
+            "pointPath": "image/map_teleport/teleport_icon/phone_booth.png",
             "description": "测试用"
         }
     ]

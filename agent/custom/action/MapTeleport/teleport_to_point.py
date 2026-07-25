@@ -38,7 +38,6 @@ logger = get_logger(__name__)
 DEFAULT_TELEPORT_POINTS_FILE = "map_teleport/teleport_points.json"
 MAP_INDEX_ICON_TEMPLATE = "image/map_teleport/map_index_icon.png"
 AREA_NEXT_BTN_TEMPLATE = "image/map_teleport/area_next_btn.png"
-TELEPORT_ICON_TEMPLATE = "image/map_teleport/teleport_icon.png"
 MAIN_SELECTION_BTN_TEMPLATE = "image/map_teleport/main_seletion_btn.png"
 SUB_SELECTION_BTN_TEMPLATE = "image/map_teleport/sub_seletion_btn.png"
 
@@ -47,11 +46,8 @@ MAP_INDEX_ICON_ROI = [1069, 626, 89, 74]
 MAP_INDEX_TITLE_ROI = [907, 66, 121, 36]
 AREA_NAME_ROI = [958, 127, 235, 40]
 AREA_NEXT_BTN_ROI = [1203, 126, 44, 42]
-RECOMMENDED_PLACE_ROI = [894, 175, 369, 468]
 MAIN_SELECTION_ROI = [1182, 180, 67, 456]
 SUB_SELECTION_ROI = [1190, 180, 55, 461]
-NEW_HERLAND_RECOMMENDED_PLACE_SWIPE_ROI = [897, 195, 351, 429]
-TELEPORT_ICON_ROI = [894, 175, 369, 468]
 TELEPORT_CONFIRM_POINT = [639, 361]
 TELEPORT_BUTTON_ROI = [933, 620, 332, 45]
 
@@ -68,7 +64,6 @@ DEFAULT_STILL_MAX_WAIT = 8.0
 DEFAULT_STILL_INTERVAL = 0.25
 DEFAULT_STILL_CONSECUTIVE = 2
 DEFAULT_STILL_DIFF_THRESHOLD = 1.5
-DEFAULT_SWIPE_DURATION_MS = 600
 
 
 @dataclass(frozen=True)
@@ -219,26 +214,6 @@ def _click_rect_action(context: Context, rect: list[int]) -> bool:
         logger.error("MapTeleport click failed: rect=%s error=%s", rect, exc)
         return False
     return result is not None
-
-
-def _swipe_up_in_roi(context: Context, roi: list[int], *, duration: int) -> bool:
-    x, y, w, h = roi
-    start_x = int(x + w / 2)
-    start_y = int(y + h * 0.82)
-    end_x = start_x
-    end_y = int(y + h * 0.18)
-    try:
-        context.tasker.controller.post_swipe(
-            start_x,
-            start_y,
-            end_x,
-            end_y,
-            duration=duration,
-        ).wait()
-    except Exception as exc:
-        logger.error("MapTeleport swipe failed: roi=%s error=%s", roi, exc)
-        return False
-    return True
 
 
 def _box_to_rect(box: Any) -> list[int] | None:
@@ -500,9 +475,12 @@ def _switch_to_area(
 
 
 def _get_cursor_pos() -> tuple[int, int]:
-    """获取当前系统鼠标屏幕坐标。"""
+    """获取当前鼠标在游戏窗口内的坐标。"""
     pt = ctypes.wintypes.POINT()
     ctypes.windll.user32.GetCursorPos(ctypes.byref(pt))
+    hwnd = ctypes.windll.user32.WindowFromPoint(pt)
+    if hwnd:
+        ctypes.windll.user32.ScreenToClient(hwnd, ctypes.byref(pt))
     return (pt.x, pt.y)
 
 
@@ -516,14 +494,6 @@ def _identify_new_list_nodes(
 
     通过系统 API 获取鼠标 Y 坐标，在子选项列表中匹配目标图标模板，
     取 Y 严格大于鼠标 Y 的第一个匹配点。
-
-    Args:
-        context: MAA 上下文。
-        template: 目标传送图标的模板图像。
-        template_threshold: 模板匹配最低置信度。
-
-    Returns:
-        第一个新出现的图标 (x, y, w, h, score)，没有则返回 None。
     """
     frame = _wait_screen_still(context, max_wait=3.0)
 
@@ -558,7 +528,7 @@ def _find_closest_icon_center(
     template_threshold: float,
 ) -> tuple[int, int] | None:
     """找到离鼠标 Y 最近的图标，返回其拖动起始坐标。"""
-    _, mouse_y = _get_cursor_pos()
+    cursor_x, mouse_y = _get_cursor_pos()
 
     roi_h = 85
     search_roi = [1196, mouse_y - roi_h // 2, 47, roi_h]
@@ -592,13 +562,16 @@ def _drag_list_upward(
 
     drag_end = (1160, drag_start[1] - 50)
 
-    controller = context.tasker.controller
-    controller.post_touch_move(drag_start[0], drag_start[1]).wait()
-    controller.post_touch_down(drag_start[0], drag_start[1]).wait()
-    time.sleep(0.05)
-    controller.post_touch_move(drag_end[0], drag_end[1]).wait()
-    time.sleep(0.05)
-    controller.post_touch_up().wait()
+    try:
+        context.tasker.controller.post_swipe(
+            drag_start[0], drag_start[1],
+            drag_end[0], drag_end[1],
+            duration=1000,
+        ).wait()
+    except Exception as exc:
+        logger.error("_drag_list_upward failed: %s", exc)
+        return False
+
     time.sleep(0.1)
 
     # 重新定位鼠标到当前最近的图标中心
@@ -606,7 +579,7 @@ def _drag_list_upward(
         context, template, template_threshold=template_threshold,
     )
     if anchor is not None:
-        controller.post_touch_move(anchor[0], anchor[1]).wait()
+        context.tasker.controller.post_touch_move(anchor[0], anchor[1]).wait()
 
     logger.debug(
         "_drag_list_upward: dragged from %s to %s", drag_start, drag_end,
@@ -620,12 +593,13 @@ def _check_closest_icon(
     *,
     template_threshold: float,
 ) -> bool:
-    """检查鼠标附近是否恰好匹配到一个目标传送图标。
-
-    通过 point_path 加载模板，以鼠标 Y 为基准定位窄 ROI 做匹配。
-    调用前需保证鼠标 Y 已对准选项位置。
-    """
+    """检查鼠标附近是否恰好匹配到一个目标传送图标。"""
     _, mouse_y = _get_cursor_pos()
+
+    logger.debug(
+        "_check_closest_icon: start point_path=%s mouse_y=%s",
+        point_path, mouse_y,
+    )
 
     search_roi = [914, mouse_y - 20, 40, 41]
     template = _load_template(point_path)
@@ -636,7 +610,18 @@ def _check_closest_icon(
         threshold=template_threshold,
         max_results=2,
     )
-    return len(matches) == 1
+    if len(matches) == 1:
+        logger.debug(
+            "_check_closest_icon: HIT pos=(%s,%s) mouse_y=%s",
+            matches[0][0], matches[0][1], mouse_y,
+        )
+        return True
+    else:
+        logger.debug(
+            "_check_closest_icon: MISS count=%s mouse_y=%s roi=%s",
+            len(matches), mouse_y, search_roi,
+        )
+        return False
 
 
 def _click_main_selection(
@@ -673,51 +658,68 @@ def _click_main_selection(
     return True
 
 
-def _adjust_recommended_place_list(
-    context: Context,
-    teleport_point: TeleportPoint,
-    *,
-    action_delay: float,
-) -> bool:
-    if teleport_point.area_name != "新赫兰德":
-        return True
-
-    # 新赫兰德的推荐地点列表需要先向上滚动，目标传送点才会进入后续图标匹配区域。
-    if not _swipe_up_in_roi(
-        context,
-        NEW_HERLAND_RECOMMENDED_PLACE_SWIPE_ROI,
-        duration=DEFAULT_SWIPE_DURATION_MS,
-    ):
-        return False
-    time.sleep(action_delay)
-    return True
-
-
 def _click_teleport_icon(
     context: Context,
-    teleport_point: TeleportPoint,
-    teleport_icon_template: Any,
+    sub_btn_template: Any,
+    point_path: str,
+    area_index: int,
     *,
     template_threshold: float,
 ) -> bool:
-    frame = _wait_screen_still(context, max_wait=5.0)
-    matches = _find_template_matches(
-        frame,
-        TELEPORT_ICON_ROI,
-        teleport_icon_template,
-        threshold=template_threshold,
-    )
-    logger.info(
-        "MapTeleport teleport icons matched: count=%s area_index=%s",
-        len(matches),
-        teleport_point.area_index,
-    )
-    if teleport_point.area_index < 1 or teleport_point.area_index > len(matches):
-        return False
+    """在列表中逐项拖动，找到第 area_index 个目标传送图标并点击。"""
 
-    x, y, w, h, _ = matches[teleport_point.area_index - 1]
-    _click_rect(context.tasker.controller, [x, y, w, h])
-    return True
+    # 鼠标移到屏幕顶部
+    context.tasker.controller.post_touch_move(1160, 50).wait()
+    time.sleep(0.3)
+
+    count = 0
+    consecutive_miss = 0
+    while count < area_index and consecutive_miss < 4:
+        new_node = _identify_new_list_nodes(
+            context, sub_btn_template,
+            template_threshold=template_threshold,
+        )
+        if new_node is not None:
+            consecutive_miss = 0
+            x, y, w, h, _ = new_node
+            cy = y + h // 2
+            time.sleep(0.1)
+            logger.debug("_click_teleport_icon: moving to (1160,%s)", cy)
+            context.tasker.controller.post_touch_move(1160, cy).wait()
+            time.sleep(0.1)
+
+            if _check_closest_icon(
+                context, point_path, template_threshold=template_threshold,
+            ):
+                count += 1
+                if count == area_index:
+                    context.tasker.controller.post_touch_down(1160, cy).wait()
+                    time.sleep(0.05)
+                    context.tasker.controller.post_touch_up().wait()
+                    logger.info(
+                        "MapTeleport teleport icon clicked: index=%s pos=(1160,%s)",
+                        area_index, cy,
+                    )
+                    return True
+
+        else:
+            consecutive_miss += 1
+            # 没找到图标，拖动两次露出更多
+
+            _drag_list_upward(
+                context, sub_btn_template,
+                template_threshold=template_threshold,
+            )
+            _drag_list_upward(
+                context, sub_btn_template,
+                template_threshold=template_threshold,
+            )
+
+    logger.error(
+        "MapTeleport teleport icon not found: area_index=%s count=%s",
+        area_index, count,
+    )
+    return False
 
 
 def _click_teleport_button(
@@ -784,7 +786,6 @@ def run_map_teleport_flow(
     controller = context.tasker.controller
     map_index_icon_template = _load_template(MAP_INDEX_ICON_TEMPLATE)
     area_next_template = _load_template(AREA_NEXT_BTN_TEMPLATE)
-    teleport_icon_template = _load_template(TELEPORT_ICON_TEMPLATE)
     main_selection_btn_template = _load_template(MAIN_SELECTION_BTN_TEMPLATE)
     sub_selection_btn_template = _load_template(SUB_SELECTION_BTN_TEMPLATE)
 
@@ -835,18 +836,12 @@ def run_map_teleport_flow(
         return False
 
     time.sleep(action_delay)
-    if not _adjust_recommended_place_list(
-        context,
-        teleport_point,
-        action_delay=action_delay,
-    ):
-        _notify(context, "地图传送失败：推荐地点列表滑动失败")
-        return False
 
     if not _click_teleport_icon(
         context,
-        teleport_point,
-        teleport_icon_template,
+        sub_selection_btn_template,
+        teleport_point.point_path,
+        teleport_point.area_index,
         template_threshold=template_threshold,
     ):
         _notify(
