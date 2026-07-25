@@ -20,6 +20,7 @@
             "entry": "FishNewEntrance",
             "description": "$task_fish_new_desc",
             "option": [
+                "FishNewAutoNavi",
                 "FishSellAuto",
                 "FishBuyBaitAuto"
             ],
@@ -254,6 +255,44 @@
                                 "found_bait_threshold": 0.4
                             }
                         }
+                    }
+                }
+            ]
+        },
+        "FishNewAutoNavi": {
+            "type": "switch",
+            "label": "$task_fish_new_option_auto_navi",
+            "description": "$task_fish_new_option_auto_navi_desc",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "FishNaviEntrance": { "enabled": true }
+                    },
+                    "option": ["FishNewNaviLocations"]
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "FishNaviEntrance": { "enabled": false }
+                    }
+                }
+            ]
+        },
+        "FishNewNaviLocations": {
+            "type": "select",
+            "label": "$task_fish_new_option_navi_locations",
+            "description": "$task_fish_new_option_navi_locations_desc",
+            "default_case": "Lixiangguan",
+            "cases": [
+                {
+                    "name": "Lixiangguan",
+                    "label": "理想馆钓点",
+                    "pipeline_override": {
+                        "LixiangguanRouteEntrance": { "enabled": true }
                     }
                 }
             ]

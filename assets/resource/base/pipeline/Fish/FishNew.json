@@ -3,6 +3,7 @@
         "desc": "钓鱼(新)功能入口",
         "anchor": "FishNewErrorRestart",
         "next": [
+            "[JumpBack]FishNaviEntrance",
             "FishNewStart",
             "[JumpBack]FishSceneAnyEnterFishGame"
         ]

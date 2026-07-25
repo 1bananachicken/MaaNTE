@@ -1,0 +1,25 @@
+{
+    "FishNaviEntrance": {
+        "desc": "钓鱼前自动寻路入口",
+        "enabled": false,
+        "action": "DoNothing",
+        "max_hit": 1,
+        "next": [
+            "FishNaviPickLocation",
+            "[JumpBack]SceneAnyEnterWorld"
+        ]
+    },
+    "FishNaviPickLocation": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "next": [
+            "LixiangguanRouteEntrance"
+        ]
+    }
+}
