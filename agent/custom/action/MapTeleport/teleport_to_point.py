@@ -38,6 +38,7 @@ DEFAULT_TELEPORT_POINTS_FILE = "map_teleport/teleport_points.json"
 MAP_INDEX_ICON_TEMPLATE = "image/map_teleport/map_index_icon.png"
 AREA_NEXT_BTN_TEMPLATE = "image/map_teleport/area_next_btn.png"
 TELEPORT_ICON_TEMPLATE = "image/map_teleport/teleport_icon.png"
+MAIN_SELECTION_BTN_TEMPLATE = "image/map_teleport/main_seletion_btn.png"
 
 # 所有 ROI 都基于 1280x720；这些区域只覆盖地图索引和传送确认流程中需要看的小块。
 MAP_INDEX_ICON_ROI = [1069, 626, 89, 74]
@@ -45,6 +46,7 @@ MAP_INDEX_TITLE_ROI = [907, 66, 121, 36]
 AREA_NAME_ROI = [958, 127, 235, 40]
 AREA_NEXT_BTN_ROI = [1203, 126, 44, 42]
 RECOMMENDED_PLACE_ROI = [894, 175, 369, 468]
+MAIN_SELECTION_ROI = [1182, 180, 67, 456]
 NEW_HERLAND_RECOMMENDED_PLACE_SWIPE_ROI = [897, 195, 351, 429]
 TELEPORT_ICON_ROI = [894, 175, 369, 468]
 TELEPORT_CONFIRM_POINT = [639, 361]
@@ -74,6 +76,8 @@ class TeleportPoint:
     coordinate_type: str
     area_name: str
     area_index: int
+    selection_index: int
+    point_name: str
     description: str
 
 
@@ -99,6 +103,8 @@ def load_teleport_point(
         coordinate_type=str(record.get("coordinateType", DEFAULT_COORDINATE_TYPE)),
         area_name=str(record["areaName"]),
         area_index=int(record["areaIndex"]),
+        selection_index=int(record.get("selectionIndex", 0)),
+        point_name=str(record.get("pointName", "")),
         description=str(record.get("description", "")),
     )
 
@@ -490,24 +496,37 @@ def _switch_to_area(
     return False
 
 
-def _click_recommended_place(
+def _click_main_selection(
     context: Context,
+    template: Any,
+    selection_index: int,
     *,
-    ocr_threshold: float,
+    template_threshold: float,
 ) -> bool:
     frame = _wait_screen_still(context, max_wait=3.0)
-    detail = _ocr_match(
-        context,
+    matches = _find_template_matches(
         frame,
-        "推荐地点",
-        RECOMMENDED_PLACE_ROI,
-        threshold=ocr_threshold,
+        MAIN_SELECTION_ROI,
+        template,
+        threshold=template_threshold,
     )
-    if detail is None:
+    idx = selection_index - 1   # selection_index 从 1 开始
+    if idx < 0 or idx >= len(matches):
+        logger.error(
+            "MapTeleport main selection index out of range: "
+            "index=%s found=%s",
+            selection_index,
+            len(matches),
+        )
         return False
 
-    rect = _detail_box(detail) or RECOMMENDED_PLACE_ROI
-    _click_rect(context.tasker.controller, rect)
+    x, y, w, h, _ = matches[idx]
+    _click_rect(context.tasker.controller, [x, y, w, h])
+    logger.info(
+        "MapTeleport main selection clicked: index=%s rect=[%s,%s,%s,%s]",
+        selection_index,
+        x, y, w, h,
+    )
     return True
 
 
@@ -623,6 +642,7 @@ def run_map_teleport_flow(
     map_index_icon_template = _load_template(MAP_INDEX_ICON_TEMPLATE)
     area_next_template = _load_template(AREA_NEXT_BTN_TEMPLATE)
     teleport_icon_template = _load_template(TELEPORT_ICON_TEMPLATE)
+    main_selection_btn_template = _load_template(MAIN_SELECTION_BTN_TEMPLATE)
 
     if not _ensure_in_world(context):
         _notify(context, "地图传送失败：当前未确认处于大世界界面")
@@ -661,8 +681,13 @@ def run_map_teleport_flow(
         _notify(context, "地图传送失败：未找到地区 %s" % teleport_point.area_name)
         return False
 
-    if not _click_recommended_place(context, ocr_threshold=ocr_threshold):
-        _notify(context, "地图传送失败：未找到推荐地点")
+    if not _click_main_selection(
+        context,
+        main_selection_btn_template,
+        teleport_point.selection_index,
+        template_threshold=template_threshold,
+    ):
+        _notify(context, "地图传送失败：未找到主选项")
         return False
 
     time.sleep(action_delay)
