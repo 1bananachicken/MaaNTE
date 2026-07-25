@@ -286,20 +286,20 @@
             "type": "select",
             "label": "$task_fish_new_option_navi_locations",
             "description": "$task_fish_new_option_navi_locations_desc",
-            "default_case": "Lixiangguan",
+            "default_case": "Luoyuting",
             "cases": [
-                {
-                    "name": "Lixiangguan",
-                    "label": "理想馆钓点",
-                    "pipeline_override": {
-                        "LixiangguanRouteEntrance": { "enabled": true }
-                    }
-                },
                 {
                     "name": "Shuilinghu",
                     "label": "水菱湖钓点",
                     "pipeline_override": {
                         "ShuilinghuRouteEntrance": { "enabled": true }
+                    }
+                },
+                {
+                    "name": "Luoyuting",
+                    "label": "落雨亭钓点",
+                    "pipeline_override": {
+                        "LuoyutingRouteEntrance": { "enabled": true }
                     }
                 }
             ]

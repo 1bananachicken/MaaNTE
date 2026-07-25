@@ -1,0 +1,254 @@
+{
+    "LuoyutingRouteEntrance": {
+        "desc": "落雨亭钓点路线",
+        "action": "DoNothing",
+        "enabled": false,
+        "max_hit": 3,
+        "anchor": "LytRestart",
+        "next": [
+            //"LytOpenMap",
+            "LytTeleport",
+            "[JumpBack]SceneAnyEnterWorld"
+        ],
+        "on_error": [
+            "LytExit"
+        ]
+    },
+    "LytExit": {},
+    "LytClick":{
+        "desc": "用于重复点击",
+        "action":"Click",
+        "target":"[Anchor]LytClickNode"
+    },
+    "LytOpenMap": {
+        "desc": "打开地图",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "action": "ClickKey",
+        "key": [
+            77 // M
+        ],
+        "post_wait_freezes": 100,
+        "next": [
+            "LytOpenMapReference"
+        ]
+    },
+    "LytOpenMapReference": {
+        "desc": "在地图中打开地图索引",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1047,
+                    601,
+                    129,
+                    120
+                ],
+                "template": "map_teleport/map_index_icon.png"
+            }
+        },
+        "action": "Click",
+        "post_wait_freezes": 500,
+        "next": [
+            "LytSwitchLocation",
+            "[JumpBack]LytSwitchClick"
+        ],
+        "on_error": [
+            "[Anchor]LytRestart"
+        ]
+    },
+    "LytSwitchLocation": {
+        "desc": "选择地点",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    953,
+                    120,
+                    249,
+                    48
+                ],
+                "expected": [
+                    "米格尔区"
+                ]
+            }
+        },
+        "next": [
+            "LytOpenReferenceList"
+        ],
+        "on_error": [
+            "[Anchor]LytRestart"
+        ]
+    },
+    "LytSwitchClick": {
+        "max_hit": 15,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1180,
+                    106,
+                    86,
+                    83
+                ],
+                "template": "map_teleport/area_next_btn.png"
+            }
+        },
+        "action": "Click",
+        "post_wait_freezes": 500
+    },
+    "LytOpenReferenceList": {
+        "desc": "地图索引点击指定选项",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    893,
+                    183,
+                    364,
+                    455
+                ],
+                "expected": [
+                    "推荐地点"
+                ]
+            }
+        },
+        "action": "Click",
+        "next": [
+            "[JumpBack]LytZoominMap",
+            "LytChooseTeleport"
+        ],
+        "on_error": [
+            "[Anchor]LytRestart"
+        ]
+    },
+    "LytZoominMap": {
+        "desc": "放大地图,点击+号最多5次",
+        "max_hit": 5,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    34,
+                    216,
+                    57,
+                    53
+                ],
+                "template": "map_teleport/map_zoom_in.png"
+            }
+        },
+        "action": "Click"
+    },
+    "LytChooseTeleport": {
+        "desc": "在地图索引列表中选择目标传送点",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    890,
+                    179,
+                    370,
+                    459
+                ],
+                "expected": [
+                    "维特海默塔"
+                ]
+            }
+        },
+        "anchor" : "LytClickNode",
+        "action":"Click",
+        "post_wait_freezes": 1000,
+        "next": [
+            "LytClickMiddle",
+            "[JumpBack]LytClick"
+        ],
+        "on_error": [
+            "[Anchor]LytRestart"
+        ]
+    },
+    "LytClickMiddle": {
+        "desc": "点击位于中心的地点",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    110,
+                    58,
+                    783,
+                    602
+                ],
+                "template": "map_teleport/choose_teleport.png",
+                "greem_mask": true,
+                "threshold": 0.5
+            }
+        },
+        "post_delay": 100,
+        "action": "Click",
+        "target":[
+            630,
+            350,
+            20,
+            20
+        ],
+        "next": [
+            "LytTeleport"
+        ],
+        "on_error": [
+            "[Anchor]LytRestart"
+        ]
+    },
+    "LytTeleport": {
+        "desc": "使用地图传送至落雨亭",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "check_teleport_required",
+                "custom_action_param": {//和喷泉任务同一个传送点
+                    "point_id": "fountain",
+                    "teleport_point_id": "fountain",
+                    "position_backend": "auto",
+                    "coordinate_type": "world",
+                    "coordinate_timeout": 1.5,
+                    "debug": true
+                }
+            }
+        },
+        "next": [
+            "LytStartNavi"
+        ],
+        "on_error": [
+            "[Anchor]LytRestart"
+        ]
+    },
+    "LytStartNavi": {
+        "desc": "开始寻路",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "FishNavigation",
+            "route_name": "钓鱼路线",
+            "segment_index": 4,
+            "tolerance": 2,
+            "angle_backend": "auto",
+            "position_backend": "auto",
+            "debug": false
+        },
+        "on_error": [
+            "[Anchor]LytRestart"
+        ]
+    }
+}
