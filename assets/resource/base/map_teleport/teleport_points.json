@@ -8,9 +8,9 @@
             "worldX": -152904.578,
             "worldY": 129793.907,
             "areaName": "绘空",
-            "areaIndex": 2,
-            "selectionIndex": 1,
-            "pointPath": "image/map_teleport/teleport_icon/phone_booth.png",
+            "iconIndex": 2,
+            "selectionName": "推荐地点",
+            "iconPath": "image/map_teleport/teleport_icon/phone_booth.png",
             "description": "地图索引中使用的传送点"
         },
         {
@@ -19,10 +19,10 @@
             "coordinateType": "world",
             "worldX": -10988.560,
             "worldY": 75357.886,
-            "areaName": "新赫兰德",
-            "areaIndex": 5,
-            "selectionIndex": 3,
-            "pointPath": "image/map_teleport/teleport_icon/phone_booth.png",
+            "areaName": "桥间地",
+            "iconIndex": 2,
+            "selectionName": "推荐地点",
+            "iconPath": "image/map_teleport/teleport_icon/phone_booth.png",
             "description": "测试用"
         }
     ]
