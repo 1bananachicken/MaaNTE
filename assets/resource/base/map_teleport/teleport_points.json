@@ -20,9 +20,9 @@
             "worldX": -10988.560,
             "worldY": 75357.886,
             "areaName": "桥间地",
-            "iconIndex": 2,
+            "iconIndex": 1,
             "selectionName": "推荐地点",
-            "iconPath": "image/map_teleport/teleport_icon/phone_booth.png",
+            "iconPath": "image/map_teleport/teleport_icon/tower.png",
             "description": "测试用"
         }
     ]

@@ -2,29 +2,8 @@
     "FountainCheckinEntrance": {
         "desc": "喷泉打卡入口",
         "next": [
-            "test"
-        ]
-    },
-    "test":{
-        "desc": "测试 map_teleport_to_point（新赫兰德 第5个电话亭 selectionIndex=3）",
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "Custom",
-            "param": {
-                "custom_action": "map_teleport_to_point",
-                "custom_action_param": {
-                    "teleport_point_id": "test",
-                    "template_threshold": 0.8,
-                    "ocr_threshold": 0.5,
-                    "max_area_switches": 15,
-                    "action_delay": 0.5
-                }
-            }
-        },
-        "next": [
-            "FountainCheckTeleportRequired"
+            "FountainCheckTeleportRequired",
+            "FountainRouteNavigation"
         ]
     },
     // 先按世界坐标判断距离；距离远时会在 CustomAction 内完成地图传送，距离近则直接继续。
