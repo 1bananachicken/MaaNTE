@@ -52,6 +52,7 @@
 | [通用按钮](./common-buttons.md) | 各场景入口按钮 | `Common/Button/` |
 | [Custom 动作与识别](./custom-action.md) | 通用 Python 工具：alt_click等 | `agent/custom/action/Common/` |
 | [网络坐标 API](./coordinate-capture-api.md) | 网络坐标捕获接口、参数、返回值与生命周期 | `nte_coordinate_api` |
+| [地图传送](./map-teleport.md) | 通过地图索引自动传送到指定传送点 | `agent/custom/action/MapTeleport/` |
 | [本地路线寻路](./local-route-navigation.md) | 按路线 JSON 执行地图寻路 | `LocalRouteNavigation.json` |
 
 ## 高级组件参考
@@ -79,6 +80,7 @@
 | 准备提交 PR | [pull-request-guidelines.md](./pull-request-guidelines.md) |
 | 改 Pipeline 节点 | [pipeline-guide.md](./pipeline-guide.md) |
 | 写 Python 自定义逻辑 | [custom-action.md](./custom-action.md) |
+| 调用地图传送 | [map-teleport.md](./map-teleport.md) |
 | 调用本地路线寻路 | [local-route-navigation.md](./local-route-navigation.md) |
 | 场景跳转/界面导航 | [scene-manager.md](./scene-manager.md) |
 | 调试单个节点 | [node-testing.md](./node-testing.md) |
