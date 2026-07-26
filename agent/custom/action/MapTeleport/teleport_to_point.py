@@ -217,6 +217,26 @@ def _click_rect_action(context: Context, rect: list[int]) -> bool:
     return result is not None
 
 
+def _swipe_up_in_roi(context: Context, roi: list[int], *, duration: int) -> bool:
+    x, y, w, h = roi
+    start_x = int(x + w / 2)
+    start_y = int(y + h * 0.82)
+    end_x = start_x
+    end_y = int(y + h * 0.18)
+    try:
+        context.tasker.controller.post_swipe(
+            start_x,
+            start_y,
+            end_x,
+            end_y,
+            duration=duration,
+        ).wait()
+    except Exception as exc:
+        logger.error("MapTeleport swipe failed: roi=%s error=%s", roi, exc)
+        return False
+    return True
+
+
 def _box_to_rect(box: Any) -> list[int] | None:
     if box is None:
         return None
@@ -549,16 +569,8 @@ def _drag_list_upward(
     if drag_start is None:
         return False
 
-    drag_end = (1160, drag_start[1] - 20)
-
-    try:
-        context.tasker.controller.post_swipe(
-            drag_start[0], drag_start[1],
-            drag_end[0], drag_end[1],
-            duration=200,
-        ).wait()
-    except Exception as exc:
-        logger.error("_drag_list_upward failed: %s", exc)
+    roi = [drag_start[0] - 1, drag_start[1] - 20, 2, 20]
+    if not _swipe_up_in_roi(context, roi, duration=200):
         return False
 
     # 重新定位鼠标到当前最近的图标中心
@@ -619,12 +631,8 @@ def _drag_zoom_control(
     cy = y + h // 2
 
     end_y = cy - 300
-    try:
-        context.tasker.controller.post_swipe(
-            cx, cy, cx, end_y, duration=300,
-        ).wait()
-    except Exception as exc:
-        logger.error("MapTeleport zoom control drag failed: %s", exc)
+    roi = [cx - 1, end_y, 2, 300]
+    if not _swipe_up_in_roi(context, roi, duration=300):
         return False
 
     logger.info(
