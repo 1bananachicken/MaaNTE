@@ -220,5 +220,9 @@
     "task.SyncCharacterAbilityCityAbility.label": "Record Character Life Skills",
     "task.SyncCharacterAbilityCityAbility.description": "Automatically identify life skill levels of all characters and record them in the configuration file.",
     "task.SyncCharacterAbilityCityAbility.option.fresh_record": "Fresh Record",
-    "task.SyncCharacterAbilityCityAbility.option.fresh_record.desc": "Overwrite existing character life skill records<br><span style='color:red'>Note: This will clear all previous records.</span><br><span style='color:orange'>Use this option to clear and overwrite previous content if you find issues with the existing records.</span>"
+    "task.SyncCharacterAbilityCityAbility.option.fresh_record.desc": "Overwrite existing character life skill records<br><span style='color:red'>Note: This will clear all previous records.</span><br><span style='color:orange'>Use this option to clear and overwrite previous content if you find issues with the existing records.</span>",
+    "task_bid_king_label": "Bid King",
+    "task_bid_king_desc": "Automatically completes the auction flow. Start the task after the Start button appears in the auction screen.",
+    "task_bid_king_option_loop_count": "Total Loop Count",
+    "task_bid_king_option_loop_count_desc": "One complete auction flow from Start to Exit counts as one loop."
 }

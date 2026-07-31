@@ -1,0 +1,40 @@
+{
+    "task": [
+        {
+            "name": "BidKing",
+            "label": "$task_bid_king_label",
+            "entry": "BidKingEntrance",
+            "description": "$task_bid_king_desc",
+            "option": [
+                "BidKingLoopCount"
+            ],
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ]
+        }
+    ],
+    "option": {
+        "BidKingLoopCount": {
+            "type": "input",
+            "label": "$task_bid_king_option_loop_count",
+            "description": "$task_bid_king_option_loop_count_desc",
+            "inputs": [
+                {
+                    "name": "count",
+                    "label": "$task_bid_king_option_loop_count",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9]\\d{0,3}$"
+                }
+            ],
+            "pipeline_override": {
+                "BidKingRound": {
+                    "max_hit": "{count}"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,272 @@
+{
+    "BidKingEntrance": {
+        "desc": "拍卖之王入口",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "BidKingRound"
+        ]
+    },
+    "BidKingRound": {
+        "desc": "单个完整拍卖轮次；max_hit 为总体拍卖轮数",
+        "max_hit": 1,
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 2000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": -1,
+        "next": [
+            "BidKingStart"
+        ]
+    },
+    "BidKingStart": {
+        "desc": "识别并点击开始按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "BidKing/start.png",
+                "roi": [
+                    973,
+                    630,
+                    93,
+                    34
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": -1,
+        "next": [
+            "BidKingConfirm"
+        ]
+    },
+    "BidKingConfirm": {
+        "desc": "等待并确认开始拍卖",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "BidKing/confirm.png",
+                "roi": [
+                    738,
+                    455,
+                    71,
+                    39
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 2000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": -1,
+        "next": [
+            "BidKingBalance"
+        ]
+    },
+    "BidKingBalance": {
+        "desc": "等待拍卖界面的余额标识，每秒检测一次",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "BidKing/balance.png",
+                "roi": [
+                    952,
+                    26,
+                    83,
+                    34
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 2000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": -1,
+        "next": [
+            "BidKingWaitBidOrSkip"
+        ]
+    },
+    "BidKingWaitBidOrSkip": {
+        "desc": "拍卖中优先检测跳过，其次检测出价",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 2500,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": -1,
+        "next": [
+            "BidKingSkip",
+            "BidKingBid"
+        ]
+    },
+    "BidKingBid": {
+        "desc": "检测并点击出价",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "BidKing/bid.png",
+                "roi": [
+                    1129,
+                    654,
+                    62,
+                    35
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": -1,
+        "next": [
+            "BidKingSelectOne"
+        ]
+    },
+    "BidKingSelectOne": {
+        "desc": "选择出价数量 1",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "BidKing/1.png",
+                "roi": [
+                    271,
+                    355,
+                    71,
+                    57
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": -1,
+        "next": [
+            "BidKingConfirmBid"
+        ]
+    },
+    "BidKingConfirmBid": {
+        "desc": "确认本次出价",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "BidKing/confirm_bid.png",
+                "roi": [
+                    835,
+                    624,
+                    90,
+                    31
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": -1,
+        "next": [
+            "BidKingWaitBidOrSkip"
+        ]
+    },
+    "BidKingSkip": {
+        "desc": "检测到跳过后结束本轮拍卖",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "BidKing/skip.png",
+                "roi": [
+                    925,
+                    658,
+                    84,
+                    31
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": -1,
+        "next": [
+            "BidKingExit"
+        ]
+    },
+    "BidKingExit": {
+        "desc": "检测并点击退出",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "BidKing/exit.png",
+                "roi": [
+                    1106,
+                    661,
+                    70,
+                    27
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": -1,
+        "next": [
+            "BidKingRound",
+            "BidKingTaskExit"
+        ]
+    },
+    "BidKingTaskExit": {
+        "desc": "已完成设定的拍卖轮数",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "StopTask"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0
+    }
+}

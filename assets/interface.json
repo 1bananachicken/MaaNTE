@@ -55,6 +55,18 @@
                 "mouse": "SendMessageWithWindowPos",
                 "keyboard": "PostMessage"
             }
+        },
+        {
+            "name": "CloudGame-Front",
+            "type": "Win32",
+            "permission_required": true,
+            "win32": {
+                "class_regex": "Qt.*",
+                "window_regex": "^\\s*(云.*?异环)\\s*$",
+                "screencap": "FramePool",
+                "mouse": "Seize",
+                "keyboard": "Seize"
+            }
         }
     ],
     "resource": [
@@ -113,6 +125,7 @@
         "resource/tasks/WithdrawMoney.json",
         // group:HethereauHobbies
         "resource/tasks/Fish.json",
+        "resource/tasks/BidKing.json",
         "resource/tasks/PinkPawHeist.json",
         "resource/tasks/MakeCoffee.json",
         "resource/tasks/MakeCoffeeLite.json",

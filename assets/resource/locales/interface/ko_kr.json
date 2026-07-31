@@ -220,5 +220,9 @@
     "task_online_map_navigation_option_debug_desc": "활성화하면 위치 확인 및 방향 예측 디버그 창을 표시합니다.",
     "task_online_map_navigation_input_port": "수신 포트",
     "task_online_map_navigation_input_frame_interval": "샘플링 간격 (초)",
-    "task_online_map_navigation_input_frame_interval_desc": "스크린샷 위치 확인 사이의 최소 간격입니다. 작업에서 최소 0.05초로 제한됩니다."
+    "task_online_map_navigation_input_frame_interval_desc": "스크린샷 위치 확인 사이의 최소 간격입니다. 작업에서 최소 0.05초로 제한됩니다.",
+    "task_bid_king_label": "경매 왕",
+    "task_bid_king_desc": "경매 화면에 시작 버튼이 표시된 후 작업을 시작하면 경매 절차를 자동으로 완료합니다.",
+    "task_bid_king_option_loop_count": "총 반복 횟수",
+    "task_bid_king_option_loop_count_desc": "시작부터 나가기까지의 전체 경매 절차를 1회로 계산합니다."
 }

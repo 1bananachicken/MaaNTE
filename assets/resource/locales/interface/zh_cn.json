@@ -230,5 +230,9 @@
     "task_online_map_navigation_option_debug_desc": "启用后显示定位和方向预测调试窗口。",
     "task_online_map_navigation_input_port": "监听端口",
     "task_online_map_navigation_input_frame_interval": "采样间隔 (秒)",
-    "task_online_map_navigation_input_frame_interval_desc": "每次截图定位之间的最小间隔，最低会限制为 0.05 秒。"
+    "task_online_map_navigation_input_frame_interval_desc": "每次截图定位之间的最小间隔，最低会限制为 0.05 秒。",
+    "task_bid_king_label": "自动拍卖之王",
+    "task_bid_king_desc": "自动拍卖刷低保，每次自动出价1，选择海贝场,请在拍卖界面出现开始匹配按钮后启动。",
+    "task_bid_king_option_loop_count": "循环次数",
+    "task_bid_king_option_loop_count_desc": "完成一次从开始到退出的完整拍卖流程记为一轮。"
 }
