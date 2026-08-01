@@ -1,0 +1,60 @@
+{
+    "XingzhuyoutingRouteEntrance": {
+        "desc": "星渚游艇码头钓点路线",
+        "action": "DoNothing",
+        "enabled": false,
+        "max_hit": 3,
+        "anchor": "XingzhuyoutingRestart",
+        "next": [
+            "XingzhuyoutingTeleport",
+            "[JumpBack]SceneAnyEnterWorld"
+        ],
+        "on_error": [
+            "XingzhuyoutingExit"
+        ]
+    },
+    "XingzhuyoutingExit": {},
+    "XingzhuyoutingTeleport": {
+        "desc": "使用地图传送至星渚游艇码头钓点",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "map_teleport_to_point",
+                "custom_action_param": {
+                    "teleport_point_id": "xingzhuport"
+                }
+            }
+        },
+        "next": [
+            "XingzhuyoutingStartNavi"
+        ],
+        "on_error": [
+            "[Anchor]XingzhuyoutingRestart"
+        ]
+    },
+    "XingzhuyoutingStartNavi": {
+        "desc": "开始寻路",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "FishNavigation",
+            "route_name": "钓鱼路线",
+            "segment_index": 6,
+            "tolerance": 2,
+            "angle_backend": "auto",
+            "position_backend": "auto",
+            "debug": false
+        },
+        "on_error": [
+            "[Anchor]XingzhuyoutingRestart"
+        ]
+    }
+}

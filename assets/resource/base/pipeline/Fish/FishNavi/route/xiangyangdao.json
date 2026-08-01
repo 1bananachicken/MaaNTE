@@ -1,0 +1,60 @@
+{
+    "XiangyangdaoRouteEntrance": {
+        "desc": "向阳岛钓点路线",
+        "action": "DoNothing",
+        "enabled": false,
+        "max_hit": 3,
+        "anchor": "XiangyangdaoRestart",
+        "next": [
+            "XiangyangdaoTeleport",
+            "[JumpBack]SceneAnyEnterWorld"
+        ],
+        "on_error": [
+            "XiangyangdaoExit"
+        ]
+    },
+    "XiangyangdaoExit": {},
+    "XiangyangdaoTeleport": {
+        "desc": "使用地图传送至向阳岛钓点",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "map_teleport_to_point",
+                "custom_action_param": {
+                    "teleport_point_id": "xiangyangisland"
+                }
+            }
+        },
+        "next": [
+            "XiangyangdaoStartNavi"
+        ],
+        "on_error": [
+            "[Anchor]XiangyangdaoRestart"
+        ]
+    },
+    "XiangyangdaoStartNavi": {
+        "desc": "开始寻路",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "FishNavigation",
+            "route_name": "钓鱼路线",
+            "segment_index": 9,
+            "tolerance": 2,
+            "angle_backend": "auto",
+            "position_backend": "auto",
+            "debug": false
+        },
+        "on_error": [
+            "[Anchor]XiangyangdaoRestart"
+        ]
+    }
+}

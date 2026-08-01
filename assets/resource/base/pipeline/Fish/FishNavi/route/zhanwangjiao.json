@@ -1,0 +1,60 @@
+{
+    "ZhanwangjiaoRouteEntrance": {
+        "desc": "湛望角钓点路线",
+        "action": "DoNothing",
+        "enabled": false,
+        "max_hit": 3,
+        "anchor": "ZhanwangjiaoRestart",
+        "next": [
+            "ZhanwangjiaoTeleport",
+            "[JumpBack]SceneAnyEnterWorld"
+        ],
+        "on_error": [
+            "ZhanwangjiaoExit"
+        ]
+    },
+    "ZhanwangjiaoExit": {},
+    "ZhanwangjiaoTeleport": {
+        "desc": "使用地图传送至湛望角钓点",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "map_teleport_to_point",
+                "custom_action_param": {
+                    "teleport_point_id": "wushoutieyu"
+                }
+            }
+        },
+        "next": [
+            "ZhanwangjiaoStartNavi"
+        ],
+        "on_error": [
+            "[Anchor]ZhanwangjiaoRestart"
+        ]
+    },
+    "ZhanwangjiaoStartNavi": {
+        "desc": "开始寻路",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "FishNavigation",
+            "route_name": "钓鱼路线",
+            "segment_index": 8,
+            "tolerance": 2,
+            "angle_backend": "auto",
+            "position_backend": "auto",
+            "debug": false
+        },
+        "on_error": [
+            "[Anchor]ZhanwangjiaoRestart"
+        ]
+    }
+}

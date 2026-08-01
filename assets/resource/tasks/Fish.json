@@ -303,10 +303,52 @@
                     }
                 },
                 {
+                    "name": "Yingwuluodong",
+                    "label": "鹦鹉螺隧道东钓点",
+                    "pipeline_override": {
+                        "YingwuluodongRouteEntrance": { "enabled": true }
+                    }
+                },
+                {
                     "name": "Luoyuting",
                     "label": "落雨亭钓点",
                     "pipeline_override": {
                         "LuoyutingRouteEntrance": { "enabled": true }
+                    }
+                },
+                {
+                    "name": "Yingwuluoxi",
+                    "label": "鹦鹉螺隧道西钓点",
+                    "pipeline_override": {
+                        "YingwuluoxiRouteEntrance": { "enabled": true }
+                    }
+                },
+                {
+                    "name": "Xingzhuyouting",
+                    "label": "星渚游艇码头钓点",
+                    "pipeline_override": {
+                        "XingzhuyoutingRouteEntrance": { "enabled": true }
+                    }
+                },
+                {
+                    "name": "Haijiaoguangchang",
+                    "label": "海角广场钓点",
+                    "pipeline_override": {
+                        "HaijiaoguangchangRouteEntrance": { "enabled": true }
+                    }
+                },
+                {
+                    "name": "Zhanwangjiao",
+                    "label": "湛望角钓点",
+                    "pipeline_override": {
+                        "ZhanwangjiaoRouteEntrance": { "enabled": true }
+                    }
+                },
+                {
+                    "name": "Xiangyangdao",
+                    "label": "向阳岛钓点",
+                    "pipeline_override": {
+                        "XiangyangdaoRouteEntrance": { "enabled": true }
                     }
                 }
             ]

@@ -1,0 +1,60 @@
+{
+    "YingwuluodongRouteEntrance": {
+        "desc": "鹦鹉螺隧道东钓点路线",
+        "action": "DoNothing",
+        "enabled": false,
+        "max_hit": 3,
+        "anchor": "YingwuluodongRestart",
+        "next": [
+            "YingwuluodongTeleport",
+            "[JumpBack]SceneAnyEnterWorld"
+        ],
+        "on_error": [
+            "YingwuluodongExit"
+        ]
+    },
+    "YingwuluodongExit": {},
+    "YingwuluodongTeleport": {
+        "desc": "使用地图传送至鹦鹉螺隧道东钓点",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "map_teleport_to_point",
+                "custom_action_param": {
+                    "teleport_point_id": "huibishoupaimai"
+                }
+            }
+        },
+        "next": [
+            "YingwuluodongStartNavi"
+        ],
+        "on_error": [
+            "[Anchor]YingwuluodongRestart"
+        ]
+    },
+    "YingwuluodongStartNavi": {
+        "desc": "开始寻路",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "action": "Custom",
+        "custom_action": "local_route_navigation",
+        "custom_action_param": {
+            "json_path": "FishNavigation",
+            "route_name": "钓鱼路线",
+            "segment_index": 3,
+            "tolerance": 2,
+            "angle_backend": "auto",
+            "position_backend": "auto",
+            "debug": false
+        },
+        "on_error": [
+            "[Anchor]YingwuluodongRestart"
+        ]
+    }
+}

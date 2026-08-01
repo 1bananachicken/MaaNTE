@@ -21,7 +21,13 @@
         "next": [
             "LixiangguanRouteEntrance",
             "ShuilinghuRouteEntrance",
-            "LuoyutingRouteEntrance"
+            "YingwuluodongRouteEntrance",
+            "LuoyutingRouteEntrance",
+            "YingwuluoxiRouteEntrance",
+            "XingzhuyoutingRouteEntrance",
+            "HaijiaoguangchangRouteEntrance",
+            "ZhanwangjiaoRouteEntrance",
+            "XiangyangdaoRouteEntrance"
         ]
     }
 }
