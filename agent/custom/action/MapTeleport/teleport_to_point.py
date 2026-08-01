@@ -220,9 +220,9 @@ def _click_rect_action(context: Context, rect: list[int]) -> bool:
 def _swipe_up_in_roi(context: Context, roi: list[int], *, duration: int) -> bool:
     x, y, w, h = roi
     start_x = int(x + w / 2)
-    start_y = int(y + h * 0.82)
+    start_y = int(y + h)  # 从 ROI 最底下
     end_x = start_x
-    end_y = int(y + h * 0.18)
+    end_y = int(y)  # 拖到 ROI 最顶上
     try:
         context.tasker.controller.post_swipe(
             start_x,
@@ -569,7 +569,7 @@ def _drag_list_upward(
     if drag_start is None:
         return False
 
-    roi = [drag_start[0] - 1, drag_start[1] - 20, 2, 20]
+    roi = [drag_start[0] - 1, drag_start[1] - 17, 2, 20]
     if not _swipe_up_in_roi(context, roi, duration=200):
         return False
 
@@ -612,7 +612,7 @@ def _drag_zoom_control(
     *,
     template_threshold: float = DEFAULT_TEMPLATE_THRESHOLD,
 ) -> bool:
-    """拖动缩放调节按钮。识别按钮后向下拖拽 300px 缩小地图视图。"""
+    """拖动缩放调节按钮。识别按钮后向上拖拽放大地图视图。"""
     frame = _wait_screen_still(context, max_wait=3.0)
     template = _load_template(ZOOM_CONTROL_BTN_TEMPLATE)
 
@@ -630,6 +630,7 @@ def _drag_zoom_control(
     cx = x + w // 2
     cy = y + h // 2
 
+    # roi 底部正好落在按钮中心 (cx, cy)，从按钮拖到上方 300px
     end_y = cy - 300
     roi = [cx - 1, end_y, 2, 300]
     if not _swipe_up_in_roi(context, roi, duration=300):
@@ -778,7 +779,8 @@ def _click_teleport_button(
         if detail is None:
             return False
 
-    return _click_rect_action(context, TELEPORT_BUTTON_ROI)
+    rect = _detail_box(detail) or TELEPORT_BUTTON_ROI
+    return _click_rect_action(context, rect)
 
 
 def _wait_teleport_loading(context: Context) -> bool:
