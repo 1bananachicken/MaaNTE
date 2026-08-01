@@ -289,6 +289,13 @@
             "default_case": "Luoyuting",
             "cases": [
                 {
+                    "name": "Lixiangguan",
+                    "label": "理想馆钓点",
+                    "pipeline_override": {
+                        "LixiangguanRouteEntrance": { "enabled": true }
+                    }
+                },
+                {
                     "name": "Shuilinghu",
                     "label": "水菱湖钓点",
                     "pipeline_override": {

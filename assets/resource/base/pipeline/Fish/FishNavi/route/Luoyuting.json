@@ -20,14 +20,9 @@
         "action": {
             "type": "Custom",
             "param": {
-                "custom_action": "check_teleport_required",
+                "custom_action": "map_teleport_to_point",
                 "custom_action_param": {//和喷泉任务同一个传送点
-                    "point_id": "fountain",
-                    "teleport_point_id": "fountain",
-                    "position_backend": "auto",
-                    "coordinate_type": "world",
-                    "coordinate_timeout": 1.5,
-                    "debug": true
+                    "teleport_point_id": "fountain"
                 }
             }
         },

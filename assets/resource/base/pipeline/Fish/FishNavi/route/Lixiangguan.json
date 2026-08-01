@@ -6,215 +6,25 @@
         "max_hit": 3,
         "anchor": "LxgRestart",
         "next": [
-            "LxgOpenMap",
+            "LxgTeleport",
             "[JumpBack]SceneAnyEnterWorld"
         ],
-        "on_error":[
+        "on_error": [
             "LxgExit"
         ]
     },
-    "LxgExit":{
-        
-    },
-    "LxgOpenMap": {
-        "desc": "打开地图",
-        "recognition": {
-            "type": "And",
-            "param": {
-                "all_of": [
-                    "InWorld"
-                ]
-            }
-        },
-        "action": "ClickKey",
-        "key": [
-            77 // M
-        ],
-        "post_wait_freezes": 100,
-        "next": [
-            "LxgOpenMapReference"
-        ]
-    },
-    "LxgOpenMapReference": {
-        "desc": "在地图中打开地图索引",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    1047,
-                    601,
-                    129,
-                    120
-                ],
-                "template": "map_teleport/map_index_icon.png"
-            }
-        },
-        "action": "Click",
-        "post_wait_freezes": 500,
-        "next": [
-            "LxgSwitchLocation",
-            "[JumpBack]LxgSwitchClick"
-        ],
-        "on_error": [
-            "[Anchor]LxgRestart"
-        ]
-    },
-    "LxgSwitchLocation": {
-        "desc": "选择地点",
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    953,
-                    120,
-                    249,
-                    48
-                ],
-                "expected": [
-                    "未闻浦"
-                ]
-            }
-        },
-        "next": [
-            "LxgOpenReferenceList"
-        ],
-        "on_error": [
-            "[Anchor]LxgRestart"
-        ]
-    },
-    "LxgSwitchClick": {
-        "max_hit": 15,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    1180,
-                    106,
-                    86,
-                    83
-                ],
-                "template": "map_teleport/area_next_btn.png"
-            }
-        },
-        "action": "Click",
-        "post_wait_freezes": 500
-    },
-    "LxgOpenReferenceList": {
-        "desc": "地图索引点击指定选项",
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    893,
-                    183,
-                    364,
-                    455
-                ],
-                "expected": [
-                    "推荐地点"
-                ]
-            }
-        },
-        "action": "Click",
-        "post_delay": 500,
-        "next": [
-            "[JumpBack]LxgZoominMap",
-            "LxgMouseMove"
-        ],
-        "on_error": [
-            "[Anchor]LxgRestart"
-        ]
-    },
-    "LxgZoominMap": {
-        "desc": "放大地图,点击+号最多5次",
-        "max_hit": 5,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    34,
-                    216,
-                    57,
-                    53
-                ],
-                "template": "map_teleport/map_zoom_in.png"
-            }
-        },
-        "action": "Click"
-    },
-    "LxgMouseMove":{
-        "desc": "一个或许有用的节点",
-        "action":"TouchMove",
-        "target":[
-            851,
-            318,
-            8,
-            10
-        ],
-        "next":[
-            "LxgChooseTeleport"
-        ]
-    },
-    "LxgChooseTeleport": {
-        "desc": "在地图索引列表中选择目标传送点",
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    890,
-                    179,
-                    370,
-                    459
-                ],
-                "expected": [
-                    "维特海默塔"
-                ]
-            }
-        },
-        "action": "Click",
-        "post_wait_freezes": 1000,
-        "next": [
-            "LxgClickMiddle"
-        ],
-        "on_error": [
-            "[Anchor]LxgRestart"
-        ]
-    },
-    "LxgClickMiddle": {
-        "desc": "此时目标点在屏幕中间，点击",
-        "post_delay": 100,
-        "action": "Click",
-        "target": [
-            630,
-            350,
-            20,
-            20
-        ],
-        "next": [
-            "LxgTeleport"
-        ],
-        "on_error": [
-            "[Anchor]LxgRestart"
-        ]
-    },
+    "LxgExit": {},
     "LxgTeleport": {
-        "desc": "点击传送",
-        "recognition": {
-            "type": "OCR",
+        "desc": "使用地图传送至理想馆",
+        "action": {
+            "type": "Custom",
             "param": {
-                "roi": [
-                    923,
-                    592,
-                    357,
-                    88
-                ],
-                "expected": [
-                    "传送"
-                ]
+                "custom_action": "map_teleport_to_point",
+                "custom_action_param": {
+                    "teleport_point_id": "lixiangguan"
+                }
             }
         },
-        "action": "Click",
-        "post_delay": 100,
         "next": [
             "LxgStartNavi"
         ],
