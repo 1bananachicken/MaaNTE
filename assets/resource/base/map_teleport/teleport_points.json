@@ -80,9 +80,9 @@
             "worldX": 0,
             "worldY": 0,
             "areaName": "新赫兰德区",
-            "iconIndex": 1,
+            "iconIndex": 2,
             "selectionName": "异象界域",
-            "iconPath": "image/map_teleport/teleport_icon/rabibthole.png",
+            "iconPath": "image/map_teleport/teleport_icon/rabbithole.png",
             "description": "传送至兔子洞"
         },
         {
