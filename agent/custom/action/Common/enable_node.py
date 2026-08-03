@@ -1,21 +1,9 @@
-import json
+from .utils import load_params
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
-
-
-def load_params(custom_action_param) -> dict:
-    """兼容 None / dict / JSON 字符串（含 "null"、"{}"）的 custom_action_param 解析。"""
-    if not custom_action_param:
-        return {}
-    if isinstance(custom_action_param, dict):
-        return custom_action_param
-    try:
-        params = json.loads(custom_action_param)
-    except Exception:
-        return {}
-    return params if isinstance(params, dict) else {}
+from utils.logger import logger
 
 
 @AgentServer.custom_action("enable_node")
@@ -30,6 +18,10 @@ class EnableNode(CustomAction):
         params = load_params(argv.custom_action_param)
         target = params.get("target")
         if not target:
+            logger.warning(
+                "EnableNode: missing target node name. custom_action_param=%r",
+                argv.custom_action_param,
+            )
             return CustomAction.RunResult(success=False)
         context.override_pipeline({target: {"enabled": True}})
         return CustomAction.RunResult(success=True)

@@ -1,6 +1,24 @@
 import cv2
+import json
 import time
 import numpy as np
+
+
+def load_params(custom_action_param) -> dict:
+    """兼容 None / dict / JSON 字符串（含 "null"、"{}"）的 custom_action_param 解析。
+
+    统一收敛为 dict：无论 MaaFramework 传入的是 None、dict、JSON 字符串
+    还是非法字符串，返回值永远是 dict，下游 .get() 不会崩溃。
+    """
+    if not custom_action_param:
+        return {}
+    if isinstance(custom_action_param, dict):
+        return custom_action_param
+    try:
+        params = json.loads(custom_action_param)
+    except Exception:
+        return {}
+    return params if isinstance(params, dict) else {}
 
 
 def get_image(controller):
