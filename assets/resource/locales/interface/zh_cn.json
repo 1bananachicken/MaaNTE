@@ -39,6 +39,8 @@
     "task_fish_new_option_auto_navi_desc": "开启后自动使用地图导航到达指定钓鱼点，再开始钓鱼。",
     "task_fish_new_option_navi_locations": "选择钓鱼点",
     "task_fish_new_option_navi_locations_desc": "勾选要前往的钓鱼点，将从已勾选地点中随机选取。",
+    "task_fish_new_option_today_recommend": "前往今日推荐钓鱼点",
+    "task_fish_new_option_today_recommend_desc": "开启后自动前往今日推荐钓鱼点；关闭后可以手动选择钓鱼点。",
     "task_fish_new_desc": "重构的钓鱼功能。理论上目前能无限钓鱼。<br><span style='color:red'>仍无法直接处理被月卡打断的跨夜钓鱼，可以尝试设置定时任务来继续钓鱼，实际效果无法保证。</span><br>钓鱼功能仅自动买鱼饵和自动卖鱼抢占鼠标。<br>自动买鱼饵为识别到鱼饵不足时购买或切换为万能鱼饵（鱼饵识别阈值与本任务无关），卖鱼也是在鱼鳞币不足时尝试卖",
     "task_fish_option_infinite": "无限循环",
     "task_fish_option_infinite_desc": "启用后钓鱼任务将无限循环，直到手动停止。",

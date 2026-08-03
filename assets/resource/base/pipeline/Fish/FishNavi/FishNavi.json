@@ -5,6 +5,7 @@
         "action": "DoNothing",
         "max_hit": 1,
         "next": [
+            "[JumpBack]FishNaviAutoChooseRecommendLocation",
             "FishNaviPickLocation",
             "[JumpBack]SceneAnyEnterWorld"
         ]
@@ -29,5 +30,374 @@
             "ZhanwangjiaoRouteEntrance",
             "XiangyangdaoRouteEntrance"
         ]
+    },
+    "FishNaviAutoChooseRecommendLocation": {
+        "desc": "寻路选择今日推荐地点",
+        "enabled": false,
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "InWorld"
+                ]
+            }
+        },
+        "max_hit": 1,
+        "next": [
+            "FishNaviHethereauHobbiesToSeaAngler",
+            "[JumpBack]SceneAnyEnterHethereauHobbiesMenu"
+        ]
+    },
+    "FishNaviHethereauHobbiesToSeaAngler": {
+        "desc": "都市闲趣界面点击海上钓客",
+        "recognition": "OCR",
+        "roi": [
+            183,
+            157,
+            897,
+            430
+        ],
+        "expected": [
+            "海上钓客",
+            "海上釣客",
+            "(?i)Sea\\s*Angler",
+            "海釣り"
+        ],
+        "action": "Custom",
+        "custom_action": "click_override",
+        "post_wait_freezes":500,
+        "next": [
+            "FishNaviSeaAnglerToFishMarket"
+        ]
+    },
+    "FishNaviSeaAnglerToFishMarket": {
+        "desc": "海上钓客界面点击渔获市场",
+        "recognition": "OCR",
+        "roi": [
+            935,
+            266,
+            332,
+            47
+        ],
+        "expected": [
+            "渔获市场",
+            "漁獲市場",
+            "(?i)Fish\\s*Market",
+            "鮮魚市場"
+        ],
+        "action": "Custom",
+        "custom_action": "click_override",
+        "post_wait_freezes":500,
+        "next": [
+            "FishNaviFishMarketToRecommend"
+        ],
+        "roi_offset": [
+            0,
+            0,
+            13,
+            0
+        ]
+    },
+    "FishNaviFishMarketToRecommend": {
+        "desc": "渔获市场界面点击前往今日推荐钓鱼点",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    560,
+                    155,
+                    250,
+                    50
+                ],
+                "expected": [
+                    "前往今日推荐钓鱼点"
+                ]
+            }
+        },
+        "action": "Custom",
+        "custom_action": "click_override",
+        "post_wait_freezes":500,
+        "next": [
+            "FishNaviActivateRecommendRoute"
+        ]
+    },
+    "FishNaviActivateRecommendRoute": {
+        "desc": "启用推荐地点对应路线",
+        "next": [
+            "FishNaviRecommendLixiangguan",
+            "FishNaviRecommendShuilinghu",
+            "FishNaviRecommendYingwuluodong",
+            "FishNaviRecommendLuoyuting",
+            "FishNaviRecommendYingwuluoxi",
+            "FishNaviRecommendXingzhuyouting",
+            "FishNaviRecommendHaijiaoguangchang",
+            "FishNaviRecommendZhanwangjiao",
+            "FishNaviRecommendXiangyangdao",
+            "FishNaviRecommendFallback"
+        ]
+    },
+    "FishNaviRecommendLixiangguan": {
+        "desc": "推荐地点识别：理想馆钓点",
+        "recognition": "OCR",
+        "roi": [
+            1027,
+            46,
+            240,
+            49
+        ],
+        "expected": [
+            "理想馆钓点",
+            "理想館釣點",
+            "(?i)Imaginist\\s*Fishing\\s*Spot",
+            "釣場-イマジニスト"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "enable_node",
+                "custom_action_param": {
+                    "target": "LixiangguanRouteEntrance"
+                }
+            }
+        }
+    },
+    "FishNaviRecommendShuilinghu": {
+        "desc": "推荐地点识别：水菱湖钓点",
+        "recognition": "OCR",
+        "roi": [
+            1027,
+            46,
+            240,
+            49
+        ],
+        "expected": [
+            "水菱湖钓点",
+            "水菱湖釣點",
+            "(?i)Caltrop\\s*Lake\\s*Fishing\\s*Spot",
+            "釣場-ロンバス湖"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "enable_node",
+                "custom_action_param": {
+                    "target": "ShuilinghuRouteEntrance"
+                }
+            }
+        }
+    },
+    "FishNaviRecommendYingwuluodong": {
+        "desc": "推荐地点识别：鹦鹉螺隧道东钓点",
+        "recognition": "OCR",
+        "roi": [
+            1027,
+            46,
+            240,
+            49
+        ],
+        "expected": [
+            "鹦鹉螺隧道东钓点",
+            "鸚鵡螺隧道東釣點",
+            "(?i)Nautili\\s*Tunnel\\s*East\\s*Fishing\\s*Spot",
+            "釣場-オウム貝トンネル東"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "enable_node",
+                "custom_action_param": {
+                    "target": "YingwuluodongRouteEntrance"
+                }
+            }
+        }
+    },
+    "FishNaviRecommendLuoyuting": {
+        "desc": "推荐地点识别：落雨庭钓点",
+        "recognition": "OCR",
+        "roi": [
+            1027,
+            46,
+            240,
+            49
+        ],
+        "expected": [
+            "落雨庭钓点",
+            "落雨庭釣點",
+            "(?i)Raindrop\\s*Court\\s*Fishing\\s*Spot",
+            "釣場-雨落庭"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "enable_node",
+                "custom_action_param": {
+                    "target": "LuoyutingRouteEntrance"
+                }
+            }
+        }
+    },
+    "FishNaviRecommendYingwuluoxi": {
+        "desc": "推荐地点识别：鹦鹉螺隧道西钓点",
+        "recognition": "OCR",
+        "roi": [
+            1027,
+            46,
+            240,
+            49
+        ],
+        "expected": [
+            "鹦鹉螺隧道西钓点",
+            "鸚鵡螺隧道西釣點",
+            "(?i)Nautili\\s*Tunnel\\s*West\\s*Fishing\\s*Spot",
+            "釣場-オウム貝トンネル西"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "enable_node",
+                "custom_action_param": {
+                    "target": "YingwuluoxiRouteEntrance"
+                }
+            }
+        }
+    },
+    "FishNaviRecommendXingzhuyouting": {
+        "desc": "推荐地点识别：星渚游艇码头钓点",
+        "recognition": "OCR",
+        "roi": [
+            1027,
+            46,
+            240,
+            49
+        ],
+        "expected": [
+            "星渚游艇码头钓点",
+            "星渚遊艇碼頭釣點",
+            "(?i)Stellar\\s*Marina\\s*Fishing\\s*Spot",
+            "釣場-星渚ヨットハーバー"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "enable_node",
+                "custom_action_param": {
+                    "target": "XingzhuyoutingRouteEntrance"
+                }
+            }
+        }
+    },
+    "FishNaviRecommendHaijiaoguangchang": {
+        "desc": "推荐地点识别：海角广场钓点",
+        "recognition": "OCR",
+        "roi": [
+            1027,
+            46,
+            240,
+            49
+        ],
+        "expected": [
+            "海角广场钓点",
+            "海角廣場釣點",
+            "(?i)Cape\\s*Square\\s*Fishing\\s*Spot",
+            "釣場-ケープ広場"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "enable_node",
+                "custom_action_param": {
+                    "target": "HaijiaoguangchangRouteEntrance"
+                }
+            }
+        }
+    },
+    "FishNaviRecommendZhanwangjiao": {
+        "desc": "推荐地点识别：湛望角钓点",
+        "recognition": "OCR",
+        "roi": [
+            1027,
+            46,
+            240,
+            49
+        ],
+        "expected": [
+            "湛望角钓点",
+            "湛望角釣點",
+            "(?i)Azure\\s*Vista\\s*Fishing\\s*Spot",
+            "釣場-クリアビュー丘"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "enable_node",
+                "custom_action_param": {
+                    "target": "ZhanwangjiaoRouteEntrance"
+                }
+            }
+        }
+    },
+    "FishNaviRecommendXiangyangdao": {
+        "desc": "推荐地点识别：向阳岛",
+        "recognition": "OCR",
+        "roi": [
+            1027,
+            46,
+            240,
+            49
+        ],
+        "expected": [
+            "向阳岛",
+            "向陽島",
+            "(?i)Sunni\\s*Island",
+            "ヒナタ島"
+        ],
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "enable_node",
+                "custom_action_param": {
+                    "target": "XiangyangdaoRouteEntrance"
+                }
+            }
+        }
+    },
+    "FishNaviRecommendFallback": {
+        "desc": "未识别到任何推荐地点，兜底启用落雨庭钓点",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "enable_node",
+                "custom_action_param": {
+                    "target": "LuoyutingRouteEntrance"
+                }
+            }
+        }
     }
 }

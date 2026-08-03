@@ -1,6 +1,6 @@
 {
     "LuoyutingRouteEntrance": {
-        "desc": "落雨亭钓点路线",
+        "desc": "落雨庭钓点路线",
         "action": "DoNothing",
         "enabled": false,
         "max_hit": 3,
@@ -16,7 +16,7 @@
     },
     "LytExit": {},
     "LytTeleport": {
-        "desc": "使用地图传送至落雨亭",
+        "desc": "使用地图传送至落雨庭",
         "action": {
             "type": "Custom",
             "param": {

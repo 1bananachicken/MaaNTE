@@ -271,7 +271,7 @@
                     "pipeline_override": {
                         "FishNaviEntrance": { "enabled": true }
                     },
-                    "option": ["FishNewNaviLocations"]
+                    "option": ["FishNewTodayRecommend"]
                 },
                 {
                     "name": "No",
@@ -279,6 +279,29 @@
                     "pipeline_override": {
                         "FishNaviEntrance": { "enabled": false }
                     }
+                }
+            ]
+        },
+        "FishNewTodayRecommend": {
+            "type": "switch",
+            "label": "$task_fish_new_option_today_recommend",
+            "description": "$task_fish_new_option_today_recommend_desc",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "FishNaviAutoChooseRecommendLocation": { "enabled": true }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "FishNaviAutoChooseRecommendLocation": { "enabled": false }
+                    },
+                    "option": ["FishNewNaviLocations"]
                 }
             ]
         },
@@ -311,7 +334,7 @@
                 },
                 {
                     "name": "Luoyuting",
-                    "label": "落雨亭钓点",
+                    "label": "落雨庭钓点",
                     "pipeline_override": {
                         "LuoyutingRouteEntrance": { "enabled": true }
                     }
