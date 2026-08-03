@@ -15,6 +15,7 @@ def click_rect(controller, rect, delay=0.001):
     cx = x + w // 2
     cy = y + h // 2
     controller.post_touch_move(cx, cy).wait()  # 先移动鼠标位置到目标点，再执行点击
+    time.sleep(delay)
     controller.post_touch_down(cx, cy).wait()
     time.sleep(delay)
     controller.post_touch_up().wait()
