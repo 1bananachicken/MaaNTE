@@ -224,5 +224,20 @@
     "task_bid_king_label": "オークションキング",
     "task_bid_king_desc": "オークション画面に開始ボタンが表示された後に開始すると、オークション手順を自動で実行します。",
     "task_bid_king_option_loop_count": "総ループ回数",
-    "task_bid_king_option_loop_count_desc": "開始から退出までの完全なオークション手順を1回として数えます。"
+    "task_bid_king_option_loop_count_desc": "開始から退出までの完全なオークション手順を1回として数えます。",
+    "task_fish_new_option_auto_navi": "釣り場まで自動で移動",
+    "task_fish_new_option_auto_navi_desc": "有効にすると、釣り場まで自動で移動してから釣りを開始します。<span style='color:red'>デスクトップ端末（フォアグラウンド）</span>コントローラーが必要です。",
+    "task_fish_new_option_today_recommend": "本日のおすすめ釣り場へ移動",
+    "task_fish_new_option_today_recommend_desc": "有効にすると、本日のおすすめ釣り場へ自動で移動します。無効にすると、釣り場を手動で選択できます。",
+    "task_fish_new_option_navi_locations": "釣り場を選択",
+    "task_fish_new_option_navi_locations_desc": "行きたい釣り場にチェックを入れます。チェックした場所の中からランダムに選択されます。",
+    "task_fish_new_option_navi_locations_case_lixiangguan": "釣場-イマジニスト",
+    "task_fish_new_option_navi_locations_case_shuilinghu": "釣場-ロンバス湖",
+    "task_fish_new_option_navi_locations_case_yingwuluodong": "釣場-オウム貝トンネル東",
+    "task_fish_new_option_navi_locations_case_luoyuting": "釣場-雨落庭",
+    "task_fish_new_option_navi_locations_case_yingwuluoxi": "釣場-オウム貝トンネル西",
+    "task_fish_new_option_navi_locations_case_xingzhuyouting": "釣場-星渚ヨットハーバー",
+    "task_fish_new_option_navi_locations_case_haijiaoguangchang": "釣場-ケープ広場",
+    "task_fish_new_option_navi_locations_case_zhanwangjiao": "釣場-クリアビュー丘",
+    "task_fish_new_option_navi_locations_case_xiangyangdao": "ヒナタ島"
 }

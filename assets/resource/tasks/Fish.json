@@ -269,15 +269,21 @@
                     "name": "Yes",
                     "label": "$option_switch_case_yes",
                     "pipeline_override": {
-                        "FishNaviEntrance": { "enabled": true }
+                        "FishNaviEntrance": {
+                            "enabled": true
+                        }
                     },
-                    "option": ["FishNewTodayRecommend"]
+                    "option": [
+                        "FishNewTodayRecommend"
+                    ]
                 },
                 {
                     "name": "No",
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
-                        "FishNaviEntrance": { "enabled": false }
+                        "FishNaviEntrance": {
+                            "enabled": false
+                        }
                     }
                 }
             ]
@@ -292,16 +298,22 @@
                     "name": "Yes",
                     "label": "$option_switch_case_yes",
                     "pipeline_override": {
-                        "FishNaviAutoChooseRecommendLocation": { "enabled": true }
+                        "FishNaviAutoChooseRecommendLocation": {
+                            "enabled": true
+                        }
                     }
                 },
                 {
                     "name": "No",
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
-                        "FishNaviAutoChooseRecommendLocation": { "enabled": false }
+                        "FishNaviAutoChooseRecommendLocation": {
+                            "enabled": false
+                        }
                     },
-                    "option": ["FishNewNaviLocations"]
+                    "option": [
+                        "FishNewNaviLocations"
+                    ]
                 }
             ]
         },
@@ -313,65 +325,83 @@
             "cases": [
                 {
                     "name": "Lixiangguan",
-                    "label": "理想馆钓点",
+                    "label": "$task_fish_new_option_navi_locations_case_lixiangguan",
                     "pipeline_override": {
-                        "LixiangguanRouteEntrance": { "enabled": true }
+                        "LixiangguanRouteEntrance": {
+                            "enabled": true
+                        }
                     }
                 },
                 {
                     "name": "Shuilinghu",
-                    "label": "水菱湖钓点",
+                    "label": "$task_fish_new_option_navi_locations_case_shuilinghu",
                     "pipeline_override": {
-                        "ShuilinghuRouteEntrance": { "enabled": true }
+                        "ShuilinghuRouteEntrance": {
+                            "enabled": true
+                        }
                     }
                 },
                 {
                     "name": "Yingwuluodong",
-                    "label": "鹦鹉螺隧道东钓点",
+                    "label": "$task_fish_new_option_navi_locations_case_yingwuluodong",
                     "pipeline_override": {
-                        "YingwuluodongRouteEntrance": { "enabled": true }
+                        "YingwuluodongRouteEntrance": {
+                            "enabled": true
+                        }
                     }
                 },
                 {
                     "name": "Luoyuting",
-                    "label": "落雨庭钓点",
+                    "label": "$task_fish_new_option_navi_locations_case_luoyuting",
                     "pipeline_override": {
-                        "LuoyutingRouteEntrance": { "enabled": true }
+                        "LuoyutingRouteEntrance": {
+                            "enabled": true
+                        }
                     }
                 },
                 {
                     "name": "Yingwuluoxi",
-                    "label": "鹦鹉螺隧道西钓点",
+                    "label": "$task_fish_new_option_navi_locations_case_yingwuluoxi",
                     "pipeline_override": {
-                        "YingwuluoxiRouteEntrance": { "enabled": true }
+                        "YingwuluoxiRouteEntrance": {
+                            "enabled": true
+                        }
                     }
                 },
                 {
                     "name": "Xingzhuyouting",
-                    "label": "星渚游艇码头钓点",
+                    "label": "$task_fish_new_option_navi_locations_case_xingzhuyouting",
                     "pipeline_override": {
-                        "XingzhuyoutingRouteEntrance": { "enabled": true }
+                        "XingzhuyoutingRouteEntrance": {
+                            "enabled": true
+                        }
                     }
                 },
                 {
                     "name": "Haijiaoguangchang",
-                    "label": "海角广场钓点",
+                    "label": "$task_fish_new_option_navi_locations_case_haijiaoguangchang",
                     "pipeline_override": {
-                        "HaijiaoguangchangRouteEntrance": { "enabled": true }
+                        "HaijiaoguangchangRouteEntrance": {
+                            "enabled": true
+                        }
                     }
                 },
                 {
                     "name": "Zhanwangjiao",
-                    "label": "湛望角钓点",
+                    "label": "$task_fish_new_option_navi_locations_case_zhanwangjiao",
                     "pipeline_override": {
-                        "ZhanwangjiaoRouteEntrance": { "enabled": true }
+                        "ZhanwangjiaoRouteEntrance": {
+                            "enabled": true
+                        }
                     }
                 },
                 {
                     "name": "Xiangyangdao",
-                    "label": "向阳岛钓点",
+                    "label": "$task_fish_new_option_navi_locations_case_xiangyangdao",
                     "pipeline_override": {
-                        "XiangyangdaoRouteEntrance": { "enabled": true }
+                        "XiangyangdaoRouteEntrance": {
+                            "enabled": true
+                        }
                     }
                 }
             ]

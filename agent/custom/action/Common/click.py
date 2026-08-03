@@ -22,7 +22,6 @@ def load_params(custom_action_param) -> dict:
 @AgentServer.custom_action("click_override")
 class ClickOverride(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
-        print("=== Click Action Started ===")
         controller = context.tasker.controller
 
         params = load_params(argv.custom_action_param)
@@ -30,13 +29,10 @@ class ClickOverride(CustomAction):
 
         if target and len(target) == 4:
             click_rect(controller, target, 0.005)
-            print(f"Clicked at rect: {target}")
             return CustomAction.RunResult(success=True)
 
         if argv.reco_detail is not None:
             click_rect(controller, argv.box, 0.005)
-            print(f"Clicked at reco box: {argv.box}")
             return CustomAction.RunResult(success=True)
 
-        print("No valid parameters provided for click action.")
         return CustomAction.RunResult(success=False)

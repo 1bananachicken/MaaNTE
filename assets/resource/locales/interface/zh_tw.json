@@ -224,5 +224,20 @@
     "task_bid_king_label": "拍賣之王",
     "task_bid_king_desc": "自動完成拍賣流程。請在拍賣介面出現開始按鈕後啟動。",
     "task_bid_king_option_loop_count": "總循環次數",
-    "task_bid_king_option_loop_count_desc": "完成一次從開始到退出的完整拍賣流程記為一輪。"
+    "task_bid_king_option_loop_count_desc": "完成一次從開始到退出的完整拍賣流程記為一輪。",
+    "task_fish_new_option_auto_navi": "自動尋路到釣魚點",
+    "task_fish_new_option_auto_navi_desc": "開啟後自動尋路到釣魚點，再開始釣魚，需要控制器為<span style='color:red'>桌面端-前台</span>",
+    "task_fish_new_option_today_recommend": "前往今日推薦釣魚點",
+    "task_fish_new_option_today_recommend_desc": "開啟後自動前往今日推薦釣魚點；關閉後可以手動選擇釣魚點。",
+    "task_fish_new_option_navi_locations": "選擇釣魚點",
+    "task_fish_new_option_navi_locations_desc": "勾選要前往的釣魚點，將從已勾選地點中隨機選取。",
+    "task_fish_new_option_navi_locations_case_lixiangguan": "理想館釣點",
+    "task_fish_new_option_navi_locations_case_shuilinghu": "水菱湖釣點",
+    "task_fish_new_option_navi_locations_case_yingwuluodong": "鸚鵡螺隧道東釣點",
+    "task_fish_new_option_navi_locations_case_luoyuting": "落雨庭釣點",
+    "task_fish_new_option_navi_locations_case_yingwuluoxi": "鸚鵡螺隧道西釣點",
+    "task_fish_new_option_navi_locations_case_xingzhuyouting": "星渚遊艇碼頭釣點",
+    "task_fish_new_option_navi_locations_case_haijiaoguangchang": "海角廣場釣點",
+    "task_fish_new_option_navi_locations_case_zhanwangjiao": "湛望角釣點",
+    "task_fish_new_option_navi_locations_case_xiangyangdao": "向陽島"
 }

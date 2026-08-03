@@ -50,7 +50,7 @@
             "segment_index": 6,
             "tolerance": 2,
             "angle_backend": "auto",
-            "position_backend": "auto",
+            "position_backend": "coordinate",
             "debug": false
         },
         "on_error": [

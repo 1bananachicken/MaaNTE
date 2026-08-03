@@ -224,5 +224,20 @@
     "task_bid_king_label": "경매 왕",
     "task_bid_king_desc": "경매 화면에 시작 버튼이 표시된 후 작업을 시작하면 경매 절차를 자동으로 완료합니다.",
     "task_bid_king_option_loop_count": "총 반복 횟수",
-    "task_bid_king_option_loop_count_desc": "시작부터 나가기까지의 전체 경매 절차를 1회로 계산합니다."
+    "task_bid_king_option_loop_count_desc": "시작부터 나가기까지의 전체 경매 절차를 1회로 계산합니다.",
+    "task_fish_new_option_auto_navi": "낚시터로 자동 이동",
+    "task_fish_new_option_auto_navi_desc": "활성화하면 낚시터로 자동 이동한 후 낚시를 시작합니다. <span style='color:red'>데스크톱 - 포그라운드</span> 컨트롤러가 필요합니다.",
+    "task_fish_new_option_today_recommend": "오늘의 추천 낚시터로 이동",
+    "task_fish_new_option_today_recommend_desc": "활성화하면 오늘의 추천 낚시터로 자동 이동합니다. 비활성화하면 낚시터를 직접 선택할 수 있습니다.",
+    "task_fish_new_option_navi_locations": "낚시터 선택",
+    "task_fish_new_option_navi_locations_desc": "이동할 낚시터를 선택하세요. 선택한 장소 중 하나가 무작위로 정해집니다.",
+    "task_fish_new_option_navi_locations_case_lixiangguan": "이매지니스트 낚시 포인트",
+    "task_fish_new_option_navi_locations_case_shuilinghu": "체스트넛 레이크 낚시 포인트",
+    "task_fish_new_option_navi_locations_case_yingwuluodong": "노틸러스 터널 동쪽 낚시 포인트",
+    "task_fish_new_option_navi_locations_case_luoyuting": "빗속의 정원 낚시 포인트",
+    "task_fish_new_option_navi_locations_case_yingwuluoxi": "노틸러스 터널 서쪽 낚시 포인트",
+    "task_fish_new_option_navi_locations_case_xingzhuyouting": "스타 아일랜드 요트 선착장 낚시 포인트",
+    "task_fish_new_option_navi_locations_case_haijiaoguangchang": "케이프 광장 낚시 포인트",
+    "task_fish_new_option_navi_locations_case_zhanwangjiao": "하늘 전망대 낚시 포인트",
+    "task_fish_new_option_navi_locations_case_xiangyangdao": "써니 프랭크섬"
 }

@@ -224,5 +224,20 @@
     "task_bid_king_label": "Bid King",
     "task_bid_king_desc": "Automatically completes the auction flow. Start the task after the Start button appears in the auction screen.",
     "task_bid_king_option_loop_count": "Total Loop Count",
-    "task_bid_king_option_loop_count_desc": "One complete auction flow from Start to Exit counts as one loop."
+    "task_bid_king_option_loop_count_desc": "One complete auction flow from Start to Exit counts as one loop.",
+    "task_fish_new_option_auto_navi": "Auto-navigate to Fishing Spot",
+    "task_fish_new_option_auto_navi_desc": "When enabled, automatically navigate to the fishing spot, then start fishing. Requires a <span style='color:red'>Win32 - Front Desk</span> controller.",
+    "task_fish_new_option_today_recommend": "Go to Today's Recommended Fishing Spot",
+    "task_fish_new_option_today_recommend_desc": "When enabled, automatically go to today's recommended fishing spot; when disabled, you can manually select a fishing spot.",
+    "task_fish_new_option_navi_locations": "Select Fishing Spot",
+    "task_fish_new_option_navi_locations_desc": "Check the fishing spots you want to go to; one will be randomly chosen from the checked spots.",
+    "task_fish_new_option_navi_locations_case_lixiangguan": "Imaginist Fishing Spot",
+    "task_fish_new_option_navi_locations_case_shuilinghu": "Caltrop Lake Fishing Spot",
+    "task_fish_new_option_navi_locations_case_yingwuluodong": "Nautili Tunnel East Fishing Spot",
+    "task_fish_new_option_navi_locations_case_luoyuting": "Raindrop Court Fishing Spot",
+    "task_fish_new_option_navi_locations_case_yingwuluoxi": "Nautili Tunnel West Fishing Spot",
+    "task_fish_new_option_navi_locations_case_xingzhuyouting": "Stellar Marina Fishing Spot",
+    "task_fish_new_option_navi_locations_case_haijiaoguangchang": "Cape Square Fishing Spot",
+    "task_fish_new_option_navi_locations_case_zhanwangjiao": "Azure Vista Fishing Spot",
+    "task_fish_new_option_navi_locations_case_xiangyangdao": "Sunni Island"
 }
