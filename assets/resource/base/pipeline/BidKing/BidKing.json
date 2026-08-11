@@ -38,10 +38,10 @@
             "param": {
                 "template": "BidKing/start.png",
                 "roi": [
-                    973,
-                    630,
-                    93,
-                    34
+                    953,
+                    616,
+                    133,
+                    74
                 ],
                 "threshold": 0.7
             }
@@ -211,10 +211,10 @@
             "param": {
                 "template": "BidKing/skip.png",
                 "roi": [
-                    925,
-                    658,
-                    84,
-                    31
+                    905,
+                    631,
+                    124,
+                    71
                 ],
                 "threshold": 0.7
             }
@@ -237,10 +237,10 @@
             "param": {
                 "template": "BidKing/exit.png",
                 "roi": [
-                    1106,
-                    661,
-                    70,
-                    27
+                    1086,
+                    637,
+                    110,
+                    71
                 ],
                 "threshold": 0.7
             }
