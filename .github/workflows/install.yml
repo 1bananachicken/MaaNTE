@@ -1,25 +1,32 @@
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+*"
+      - "v*"
     branches:
       - "**"
     paths:
       - ".github/workflows/install.yml"
+      - ".gitmodules"
       - "assets/**"
+      - "requirements*.txt"
+      - "third_party/MXU"
       - "**.py"
   pull_request:
     branches:
       - "**"
-    paths:
-      - ".github/workflows/install.yml"
-      - "assets/**"
-      - "**.py"
   workflow_dispatch:
+    inputs:
+      signing_mode:
+        description: "Build unsigned or submit MaaNTE.exe to the SignPath test policy"
+        required: true
+        default: unsigned
+        type: choice
+        options:
+          - unsigned
+          - test
 
 env:
   MAA_FRAMEWORK_VERSION: "v5.10.5"
-  MXU_VERSION: "v2.1.3"
 
 permissions:
   contents: write
@@ -32,47 +39,130 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
       - id: set_tag
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_TYPE: ${{ github.ref_type }}
+          REPOSITORY: ${{ github.repository }}
+          SIGNING_MODE: ${{ inputs.signing_mode || 'unsigned' }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          GH_TOKEN: ${{ github.token }}
         run: |
-          # 检查标签格式
-          if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?$ ]]; then
+          set -euo pipefail
+
+          core='(0|[1-9][0-9]*)'
+          identifier='(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)'
+          prerelease="${identifier}(\.${identifier})*"
+          build='[0-9A-Za-z-]+(\.[0-9A-Za-z-]+)*'
+          stable_regex="^v${core}\.${core}\.${core}(\+${build})?$"
+          semver_regex="^v${core}\.${core}\.${core}(-${prerelease})?(\+${build})?$"
+
+          is_stable_release=false
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            tag="${GITHUB_REF#refs/tags/}"
+            if [[ ! "$tag" =~ $semver_regex ]]; then
+              echo "Invalid SemVer release tag: $tag"
+              exit 1
+            fi
+
             is_release=true
-            tag=${GITHUB_REF#refs/tags/}
             echo "Release tag format is valid: $tag"
+            if [[ "$tag" =~ $stable_regex ]]; then
+              is_stable_release=true
+            fi
           else
             is_release=false
-            # 获取最新的发布标签
-            tag=$(curl -sX GET "https://api.github.com/repos/${{ github.repository }}/releases/latest" --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' | awk '/tag_name/{print $4}' FS='["]')
-            if [[ ! $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+            tag=$(curl --fail --silent --show-error \
+              "https://api.github.com/repos/${REPOSITORY}/releases/latest" \
+              --header "Authorization: Bearer ${GH_TOKEN}" \
+              | jq -r '.tag_name // empty' || true)
+            if [[ ! "$tag" =~ $stable_regex ]]; then
               echo "No valid release tag found, using v0.0.1"
               tag="v0.0.1"
             fi
-            tag=$(date "+$tag-%y%m%d-$(git rev-parse --short HEAD)")
+            tag="${tag}-ci.$(date +%y%m%d)-$(git rev-parse --short HEAD)"
           fi
 
-          if [ "$is_release" != "true" ] ; then
-            prefix=${tag%-*-*}
-            suffix=${tag#$prefix-}
-            tag="$prefix-ci.$suffix"
+          is_prerelease=true
+          if [ "$is_stable_release" = "true" ]; then
+            is_prerelease=false
           fi
 
-          # 检查是否为预发布版本
-          is_prerelease=false
-          if [[ $tag =~ .*alpha.* || $tag =~ .*beta.* || $tag =~ .*rc.* || $tag =~ .*dev.* || $tag =~ .*-ci.* || $tag =~ .*preview.* ]]; then
-            is_prerelease=true
-            echo "This is a pre-release version"
+          trusted_release=false
+          if [ "$is_release" = "true" ] \
+            && [ "$EVENT_NAME" = "push" ] \
+            && [ "$REF_TYPE" = "tag" ] \
+            && [ "$REPOSITORY" = "1bananachicken/MaaNTE" ]; then
+            git fetch --no-tags origin "+refs/heads/dev:refs/remotes/origin/dev"
+            if git merge-base --is-ancestor "$GITHUB_SHA" origin/dev; then
+              trusted_release=true
+            else
+              echo "Release tag commit $GITHUB_SHA is not contained in origin/dev; release signing is disabled."
+            fi
           fi
 
-          echo tag=$tag | tee -a $GITHUB_OUTPUT
-          echo is_release=$is_release | tee -a $GITHUB_OUTPUT
-          echo is_prerelease=$is_prerelease | tee -a $GITHUB_OUTPUT
+          build_required=true
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            if [ -z "$BASE_SHA" ] || [ -z "$HEAD_SHA" ]; then
+              echo "Pull request base/head SHA is unavailable; refusing to skip the build."
+              exit 1
+            fi
+
+            build_required=false
+            changed_files="$(git diff --name-only "$BASE_SHA...$HEAD_SHA")"
+            while IFS= read -r path; do
+              case "$path" in
+                .github/workflows/install.yml|.gitmodules|assets/*|requirements*.txt|third_party/MXU|*.py)
+                  build_required=true
+                  break
+                  ;;
+              esac
+            done <<< "$changed_files"
+          fi
+
+          test_signing=false
+          if [ "$EVENT_NAME" = "workflow_dispatch" ] \
+            && [ "$SIGNING_MODE" = "test" ] \
+            && [ "$REF_TYPE" = "branch" ] \
+            && [ "$REPOSITORY" = "1bananachicken/MaaNTE" ]; then
+            test_signing=true
+          fi
+
+          signing_requested=false
+          if [ "$trusted_release" = "true" ] || [ "$test_signing" = "true" ]; then
+            signing_requested=true
+          fi
+
+          if [ "$test_signing" = "true" ]; then
+            final_artifact_name="test-signed-MaaNTE-win-x86_64-${tag}-MXU"
+          else
+            final_artifact_name="MaaNTE-win-x86_64-${tag}-MXU"
+          fi
+
+          echo "tag=$tag" | tee -a "$GITHUB_OUTPUT"
+          echo "is_release=$is_release" | tee -a "$GITHUB_OUTPUT"
+          echo "is_prerelease=$is_prerelease" | tee -a "$GITHUB_OUTPUT"
+          echo "trusted_release=$trusted_release" | tee -a "$GITHUB_OUTPUT"
+          echo "test_signing=$test_signing" | tee -a "$GITHUB_OUTPUT"
+          echo "signing_requested=$signing_requested" | tee -a "$GITHUB_OUTPUT"
+          echo "build_required=$build_required" | tee -a "$GITHUB_OUTPUT"
+          echo "final_artifact_name=$final_artifact_name" | tee -a "$GITHUB_OUTPUT"
+
     outputs:
       tag: ${{ steps.set_tag.outputs.tag }}
       is_release: ${{ steps.set_tag.outputs.is_release }}
       is_prerelease: ${{ steps.set_tag.outputs.is_prerelease }}
+      trusted_release: ${{ steps.set_tag.outputs.trusted_release }}
+      test_signing: ${{ steps.set_tag.outputs.test_signing }}
+      signing_requested: ${{ steps.set_tag.outputs.signing_requested }}
+      build_required: ${{ steps.set_tag.outputs.build_required }}
+      final_artifact_name: ${{ steps.set_tag.outputs.final_artifact_name }}
 
-  windows:
+  build_mxu_raw:
     needs: meta
+    if: ${{ needs.meta.outputs.build_required == 'true' }}
     strategy:
       matrix:
         include:
@@ -80,21 +170,216 @@ jobs:
             runner: windows-latest
       fail-fast: false
     runs-on: ${{ matrix.runner }}
+    permissions:
+      contents: read
+    outputs:
+      signpath_artifact_id: ${{ steps.upload-signing-input.outputs.artifact-id }}
+      raw_artifact_id: ${{ steps.upload-raw-handoff.outputs.artifact-id }}
 
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: true
+          submodules: recursive
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Verify MXU fork checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          expected_url="https://github.com/1bananachicken/MXU.git"
+          actual_url="$(git -C third_party/MXU remote get-url origin)"
+          expected_commit="$(git ls-tree HEAD third_party/MXU | awk '{print $3}')"
+          actual_commit="$(git -C third_party/MXU rev-parse HEAD)"
+
+          test "$actual_url" = "$expected_url"
+          test "$actual_commit" = "$expected_commit"
+          test -z "$(git -C third_party/MXU status --porcelain)"
+          echo "MXU source: $actual_url@$actual_commit"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.28.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+          cache-dependency-path: third_party/MXU/pnpm-lock.yaml
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+
+      - name: Build MXU from source
+        working-directory: third_party/MXU
+        run: >-
+          pnpm install --frozen-lockfile &&
+          pnpm tauri build --ci --no-bundle
+          --target x86_64-pc-windows-msvc
+          -- --locked
+
+      - name: Check source-built executable
+        shell: bash
+        run: |
+          test -f third_party/MXU/src-tauri/target/x86_64-pc-windows-msvc/release/MaaNTE.exe
+          sha256sum third_party/MXU/src-tauri/target/x86_64-pc-windows-msvc/release/MaaNTE.exe
+
+      - name: Upload raw executable for SignPath
+        if: ${{ needs.meta.outputs.signing_requested == 'true' }}
+        id: upload-signing-input
+        uses: actions/upload-artifact@v7
+        with:
+          name: signpath-input-MaaNTE-${{ github.run_id }}-${{ github.run_attempt }}
+          path: third_party/MXU/src-tauri/target/x86_64-pc-windows-msvc/release/MaaNTE.exe
+          archive: false
+          retention-days: 1
+
+      - name: Upload raw executable handoff
+        if: ${{ needs.meta.outputs.signing_requested != 'true' }}
+        id: upload-raw-handoff
+        uses: actions/upload-artifact@v4
+        with:
+          name: raw-MaaNTE-${{ github.run_id }}-${{ github.run_attempt }}
+          path: third_party/MXU/src-tauri/target/x86_64-pc-windows-msvc/release/MaaNTE.exe
+          retention-days: 1
+
+  test_sign:
+    if: ${{ needs.meta.outputs.test_signing == 'true' }}
+    needs: [meta, build_mxu_raw]
+    runs-on: windows-latest
+    permissions:
+      actions: read
+      contents: read
+    environment: test-signing
+    outputs:
+      signed_artifact_id: ${{ steps.upload-signed.outputs.artifact-id }}
+    steps:
+      - name: Submit test signing request
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: 52da06e6-4590-473f-a3c3-ae7ea178db3e
+          project-slug: MaaNTE
+          signing-policy-slug: test-signing
+          github-artifact-id: ${{ needs.build_mxu_raw.outputs.signpath_artifact_id }}
+          wait-for-completion: true
+          output-artifact-directory: signed-artifact
+          skip-decompress: true
+          parameters: |
+            version: ${{ toJSON(needs.meta.outputs.tag) }}
+
+      - name: Check signed executable
+        shell: bash
+        run: test -f signed-artifact/MaaNTE.exe
+
+      - name: Upload signed executable
+        id: upload-signed
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-signed-executable-MaaNTE-${{ github.run_id }}-${{ github.run_attempt }}
+          path: signed-artifact/MaaNTE.exe
+          retention-days: 1
+
+  release_sign:
+    if: ${{ needs.meta.outputs.trusted_release == 'true' }}
+    needs: [meta, build_mxu_raw]
+    runs-on: windows-latest
+    permissions:
+      actions: read
+      contents: read
+    environment: production-signing
+    outputs:
+      signed_artifact_id: ${{ steps.upload-signed.outputs.artifact-id }}
+    steps:
+      - name: Submit release signing request
+        uses: signpath/github-action-submit-signing-request@v2
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: 52da06e6-4590-473f-a3c3-ae7ea178db3e
+          project-slug: MaaNTE
+          signing-policy-slug: release-signing
+          github-artifact-id: ${{ needs.build_mxu_raw.outputs.signpath_artifact_id }}
+          wait-for-completion: true
+          output-artifact-directory: signed-artifact
+          skip-decompress: true
+          parameters: |
+            version: ${{ toJSON(needs.meta.outputs.tag) }}
+
+      - name: Check signed executable
+        shell: bash
+        run: test -f signed-artifact/MaaNTE.exe
+
+      - name: Upload signed executable
+        id: upload-signed
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-signed-executable-MaaNTE-${{ github.run_id }}-${{ github.run_attempt }}
+          path: signed-artifact/MaaNTE.exe
+          retention-days: 1
+
+  package_windows:
+    name: Package Windows artifact
+    if: >-
+      ${{
+        always() && !cancelled() &&
+        needs.meta.result == 'success' &&
+        needs.meta.outputs.build_required == 'true' &&
+        needs.build_mxu_raw.result == 'success' &&
+        (
+          (needs.meta.outputs.trusted_release == 'true' && needs.release_sign.result == 'success') ||
+          (needs.meta.outputs.test_signing == 'true' && needs.test_sign.result == 'success') ||
+          (needs.meta.outputs.signing_requested != 'true' &&
+           needs.release_sign.result == 'skipped' && needs.test_sign.result == 'skipped')
+        )
+      }}
+    needs: [meta, build_mxu_raw, test_sign, release_sign]
+    runs-on: windows-latest
+    permissions:
+      actions: read
+      contents: read
+    outputs:
+      final_artifact_id: ${{ steps.upload-final.outputs.artifact-id }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Download test-signed executable
+        if: ${{ needs.meta.outputs.test_signing == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.test_sign.outputs.signed_artifact_id }}
+          path: selected-executable
+          merge-multiple: true
+
+      - name: Download release-signed executable
+        if: ${{ needs.meta.outputs.trusted_release == 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.release_sign.outputs.signed_artifact_id }}
+          path: selected-executable
+          merge-multiple: true
+
+      - name: Download unsigned executable
+        if: ${{ needs.meta.outputs.signing_requested != 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          artifact-ids: ${{ needs.build_mxu_raw.outputs.raw_artifact_id }}
+          path: selected-executable
+          merge-multiple: true
 
       - name: Set platform variables
         id: platform
         shell: bash
-        run: |
-          if [ "${{ matrix.arch }}" = "x86_64" ]; then
-            echo "tag=x64" >> $GITHUB_OUTPUT
-          else
-            echo "tag=arm64" >> $GITHUB_OUTPUT
-          fi
+        run: echo "tag=x64" >> "$GITHUB_OUTPUT"
 
       - name: Download PacketNTE thirdparty
         id: download_packetnte
@@ -110,63 +395,19 @@ jobs:
         uses: robinraju/release-downloader@v1
         with:
           repository: MaaXYZ/MaaFramework
-          fileName: "MAA-win-${{ matrix.arch }}*"
+          fileName: "MAA-win-x86_64*"
           tag: ${{ env.MAA_FRAMEWORK_VERSION }}
           out-file-path: "deps"
           extract: true
-      
-      - name: Download MXU
-        id: download_mxu
-        uses: robinraju/release-downloader@v1
-        with:
-          repository: MistEO/MXU
-          fileName: "MXU-win-${{ matrix.arch }}*"
-          tag: ${{ env.MXU_VERSION }}
-          out-file-path: "MXU"
-          extract: true
-
-      - name: Clean up MXU archive on Windows
-        shell: bash
-        run: |
-          ARCHIVE_FILE_PATH="${{ fromJson(steps.download_mxu.outputs.downloaded_files)[0] }}"
-          rm -f "${ARCHIVE_FILE_PATH}"
-          echo "Archive cleanup command executed for MXU on Windows."
-
-      - name: Convert PNG to ICO
-        if: matrix.arch == 'x86_64'
-        shell: bash
-        run: |
-          # 安装 ImageMagick
-          choco install imagemagick -y
-
-          # 转换 PNG 到 ICO
-          magick convert assets/logo.png -define icon:auto-resize=256,128,64,48,32,24,16 maante.ico
-
-      - name: Modify Windows exe icons
-        if: matrix.arch == 'x86_64'
-        shell: bash
-        run: |
-          # 下载 rcedit
-          curl -L https://github.com/electron/rcedit/releases/download/v2.0.0/rcedit-x64.exe -o rcedit.exe
-
-          # 修改 MXU 图标（如果存在）
-          if [ -f "MXU/mxu.exe" ]; then
-            ./rcedit.exe "MXU/mxu.exe" --set-icon "maante.ico"
-            echo "MXU icon modified successfully"
-          else
-            echo "MXU exe not found, skipping icon update."
-          fi
 
       - name: Setup Embed Python on Windows
         shell: bash
-        run: |
-          python tools/ci/setup_embed_python.py
+        run: python tools/ci/setup_embed_python.py
 
       - name: Download Python dependencies
         shell: bash
-        run: |
-          ./install/python/python.exe tools/ci/download_deps.py --deps-dir install/deps
-      
+        run: ./install/python/python.exe tools/ci/download_deps.py --deps-dir install/deps
+
       - name: Create MXU version
         shell: bash
         run: |
@@ -207,18 +448,15 @@ jobs:
 
           if [ ! -d "$extract_dir/thirdparty" ]; then
             echo "PacketNTE release did not extract to $extract_dir/thirdparty."
-            find "$extract_dir" -maxdepth 2 -type d -print
             exit 1
           fi
 
           rm -rf install-mxu/thirdparty
           cp -a "$extract_dir/thirdparty" install-mxu/thirdparty
-          echo "Added PacketNTE thirdparty to install-mxu/thirdparty"
-      
+
       - name: Pre-install all dependencies
         shell: bash
         run: |
-          echo "Pre-installing all dependencies into embedded Python..."
           ./install-mxu/python/python.exe -m pip install \
             --no-index \
             --find-links install-mxu/deps \
@@ -227,68 +465,106 @@ jobs:
       - name: Install and patch soundcard
         shell: bash
         run: |
-          echo "Installing soundcard into embedded Python..."
           ./install-mxu/python/python.exe -m pip install \
             --no-index \
             --find-links install-mxu/deps \
             soundcard
 
-          echo "Patching soundcard ole32 → ole32.dll..."
           ./install-mxu/python/python.exe - << 'PYEOF'
           import sys, soundcard
           from pathlib import Path
-          p = Path(soundcard.__path__[0]) / 'mediafoundation.py'
-          c = p.read_text()
-          if "_ffi.dlopen('ole32')" not in c:
-              print(f'ERROR: expected ole32 patch target not found in {p}. soundcard may have changed.')
+
+          path = Path(soundcard.__path__[0]) / "mediafoundation.py"
+          content = path.read_text()
+          if "_ffi.dlopen('ole32')" not in content:
+              print(f"Expected soundcard patch target not found in {path}.")
               sys.exit(1)
-          c = c.replace("_ffi.dlopen('ole32')", "_ffi.dlopen('ole32.dll')")
-          p.write_text(c)
-          print('Patched:', p)
+          path.write_text(content.replace("_ffi.dlopen('ole32')", "_ffi.dlopen('ole32.dll')"))
           PYEOF
 
-          echo "Removing soundcard wheel from deps to prevent re-install..."
           rm -f install-mxu/deps/soundcard-*.whl
-
-      - name: Copy MXU files to MXU version
-        shell: bash
-        run: |
-          if [ -d "MXU" ]; then
-            echo "Copying MXU files to install-mxu directory..."
-            mkdir -p install-mxu
-            if [ -f "MXU/mxu.exe" ]; then
-              cp MXU/mxu.exe install-mxu/MaaNTE.exe
-            elif [ -f "MXU/mxu" ]; then
-              cp MXU/mxu install-mxu/MaaNTE
-            fi
-          else
-            echo "MXU directory not found, skipping copy."
-          fi
-
-      - name: Copy custom icons
-        shell: bash
-        run: |
-          # MXU 版本的图标
-          if [ -f "maante.ico" ]; then
-            cp maante.ico install-mxu/logo.ico
-          fi
 
       - name: Remove deps directory to reduce package size
         shell: bash
-        run: |
-          echo "Removing deps directory to reduce package size..."
-          rm -rf install-mxu/deps
-          echo "Deps directory removed. Package size reduced by ~171MB."
+        run: rm -rf install-mxu/deps
 
-      - uses: actions/upload-artifact@v4
+      - name: Copy selected MXU executable and icon
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          exe="selected-executable/MaaNTE.exe"
+          test -f "$exe"
+          test -f third_party/MXU/src-tauri/icons/icon.ico
+
+          cp "$exe" install-mxu/MaaNTE.exe
+          cp third_party/MXU/src-tauri/icons/icon.ico install-mxu/logo.ico
+          sha256sum install-mxu/MaaNTE.exe
+
+      - name: Upload final package
+        id: upload-final
+        uses: actions/upload-artifact@v4
         with:
-          name: MaaNTE-win-${{ matrix.arch }}-${{ needs.meta.outputs.tag }}-MXU
-          path: "install-mxu"
+          name: ${{ needs.meta.outputs.final_artifact_name }}
+          path: install-mxu
+          overwrite: true
+
+  windows:
+    name: windows (x86_64, windows-latest)
+    if: ${{ always() }}
+    needs: [meta, build_mxu_raw, test_sign, release_sign, package_windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check Windows workflow result
+        shell: bash
+        env:
+          META_RESULT: ${{ needs.meta.result }}
+          BUILD_REQUIRED: ${{ needs.meta.outputs.build_required }}
+          BUILD_RESULT: ${{ needs.build_mxu_raw.result }}
+          PACKAGE_RESULT: ${{ needs.package_windows.result }}
+        run: |
+          set -euo pipefail
+
+          if [ "$META_RESULT" != "success" ]; then
+            echo "The metadata job did not succeed: $META_RESULT"
+            exit 1
+          fi
+
+          if [ "$BUILD_REQUIRED" != "true" ]; then
+            if [ "$BUILD_RESULT" != "skipped" ] || [ "$PACKAGE_RESULT" != "skipped" ]; then
+              echo "Unexpected result for an unrelated pull request: build=$BUILD_RESULT package=$PACKAGE_RESULT"
+              exit 1
+            fi
+            echo "No release artifact inputs changed; the Windows build was skipped."
+            exit 0
+          fi
+
+          if [ "$BUILD_RESULT" != "success" ]; then
+            echo "The MXU source build did not succeed: $BUILD_RESULT"
+            exit 1
+          fi
+
+          if [ "$PACKAGE_RESULT" != "success" ]; then
+            echo "The signing and final package chain did not succeed: $PACKAGE_RESULT"
+            exit 1
+          fi
+
+          echo "Windows build gate passed."
 
   release:
-    if: ${{ needs.meta.outputs.is_release == 'true' }}
-    needs: [meta, windows]
+    if: >-
+      ${{
+        needs.meta.outputs.trusted_release == 'true' &&
+        needs.package_windows.result == 'success' &&
+        needs.windows.result == 'success'
+      }}
+    needs: [meta, package_windows, windows]
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -299,75 +575,29 @@ jobs:
         uses: orhun/git-cliff-action@v4
         with:
           config: .github/cliff.toml
-          # 正式版：使用 tag-pattern 只匹配正式版标签，包含所有从上一个正式版以来的提交
-          # 预发布版：正常生成，只包含从上一个标签以来的提交
           args: >-
             -vv --latest --strip header
-            ${{ needs.meta.outputs.is_prerelease == 'false' && '--tag-pattern "^v[0-9]+\\.[0-9]+\\.[0-9]+$"' || '' }}
+            ${{ needs.meta.outputs.is_prerelease == 'false' && '--tag-pattern "^v[0-9]+\\.[0-9]+\\.[0-9]+(\\+[0-9A-Za-z-]+(\\.[0-9A-Za-z-]+)*)?$"' || '' }}
         env:
           OUTPUT: CHANGES.md
           GITHUB_REPO: ${{ github.repository }}
 
       - name: Check release notes
         shell: bash
-        run: |
-          test -s CHANGES.md
-          cat CHANGES.md
+        run: test -s CHANGES.md
 
-      - uses: actions/download-artifact@v4
+      - name: Download final artifact
+        uses: actions/download-artifact@v4
         with:
-          path: downloaded-artifacts
+          artifact-ids: ${{ needs.package_windows.outputs.final_artifact_id }}
+          path: downloaded-artifact
+          merge-multiple: true
 
-      - name: Process and package artifacts
+      - name: Package release asset
         shell: bash
         run: |
-          artifact_dir="$PWD/downloaded-artifacts"
-          release_dir="$PWD/release-assets"
-          mkdir -p "$release_dir"
-
-          for f in "$artifact_dir"/*; do
-            artifact_name="$(basename "$f")"
-
-            if [[ ! -d "$f" ]]; then
-              echo "Skipping non-directory artifact entry: $artifact_name"
-              continue
-            fi
-
-            if [[ $artifact_name == *"win"* ]]; then
-              echo "Processing Windows artifact: $artifact_name"
-              (cd "$f" && zip -r "$release_dir/$artifact_name.zip" .)
-            else
-              echo "Processing Unix artifact: $artifact_name"
-
-              if [[ -f "$f/MaaPiCli" ]]; then
-                chmod +x "$f/MaaPiCli"
-                echo "Set execute permission for $artifact_name/MaaPiCli"
-              fi
-
-              find "$f" -type f -name "MFAUpdater*" -exec chmod +x {} \; 2>/dev/null || true
-              echo "Set execute permission for all MFAUpdater files"
-
-              if [[ -f "$f/MaaNTE" ]]; then
-                chmod +x "$f/MaaNTE"
-                echo "Set execute permission for $artifact_name/MaaNTE"
-              fi
-
-              for PYTHON_PATH in "$f/python/bin/python3" "$f/python/python" "$f/python/bin/python" "$f/python/python.exe"; do
-                if [[ -f "$PYTHON_PATH" ]]; then
-                  chmod +x "$PYTHON_PATH"
-                  echo "Set execute permission for ${PYTHON_PATH#$artifact_dir/}"
-                fi
-              done
-
-              tar -cpzf "$release_dir/$artifact_name.tar.gz" -C "$f" .
-              echo "Created archive with preserved permissions: $artifact_name.tar.gz"
-            fi
-          done
-
-          if [[ -z "$(find "$release_dir" -maxdepth 1 -type f -print -quit)" ]]; then
-            echo "No release assets were created."
-            exit 1
-          fi
+          mkdir -p release-assets
+          (cd downloaded-artifact && zip -r "../release-assets/${{ needs.meta.outputs.final_artifact_name }}.zip" .)
 
       - uses: softprops/action-gh-release@v2.2.2
         with:

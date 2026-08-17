@@ -5,3 +5,7 @@
 [submodule "assets/MaaNTEModels"]
 	path = assets/MaaNTEModels
 	url = https://github.com/1bananachicken/MaaNTEModels.git
+[submodule "third_party/MXU"]
+	path = third_party/MXU
+	url = https://github.com/1bananachicken/MXU.git
+	branch = maante
