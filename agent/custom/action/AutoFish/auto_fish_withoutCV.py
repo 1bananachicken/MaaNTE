@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import time
 
 from maa.agent.agent_server import AgentServer
@@ -10,27 +9,15 @@ from maa.custom_action import CustomAction
 from utils.logger import logger
 
 from .fish_control import (
+    KEY_A,
+    KEY_D,
     choose_tracking_key,
     estimate_error_velocity,
     predict_tracking_interval,
     should_finish_control,
 )
+from .fish_params import load_custom_action_params
 from .fish_vision import detect_control_boxes
-
-KEY_A = 65
-KEY_D = 68
-
-
-def _load_params(custom_action_param) -> dict:
-    if not custom_action_param:
-        return {}
-    if isinstance(custom_action_param, dict):
-        return custom_action_param
-    try:
-        params = json.loads(custom_action_param)
-    except (TypeError, ValueError):
-        return {}
-    return params if isinstance(params, dict) else {}
 
 
 @AgentServer.custom_action("auto_fish_without_cv")
@@ -38,7 +25,7 @@ class AutoFishWithoutCV(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        params = _load_params(argv.custom_action_param)
+        params = load_custom_action_params(argv.custom_action_param)
         safe_margin = max(0.0, float(params.get("safe_margin", 6)))
         center_band_ratio = max(
             0.0, min(1.0, float(params.get("center_band_ratio", 0.4)))
@@ -57,9 +44,9 @@ class AutoFishWithoutCV(CustomAction):
         )
         width_confirm_frames = max(1, int(params.get("width_confirm_frames", 2)))
         control_end_grace_ms = max(0.0, float(params.get("control_end_grace_ms", 300)))
-        lost_timeout_ms = float(params.get("lost_timeout_ms", 120))
-        lost_abort_ms = float(params.get("lost_abort_ms", 1500))
-        loop_interval_ms = float(params.get("loop_interval_ms", 0))
+        lost_timeout_ms = max(0.0, float(params.get("lost_timeout_ms", 120)))
+        lost_abort_ms = max(0.0, float(params.get("lost_abort_ms", 1500)))
+        loop_interval_ms = max(0.0, float(params.get("loop_interval_ms", 0)))
 
         controller = context.tasker.controller
         last_cursor_center = None
@@ -276,8 +263,8 @@ class AutoFishWithoutCV(CustomAction):
 
             logger.debug("钓鱼控条因任务停止退出")
             return CustomAction.RunResult(success=False)
-        except Exception as exc:
-            logger.error("钓鱼控条异常: %s", exc)
+        except Exception:
+            logger.exception("钓鱼控条异常")
             return CustomAction.RunResult(success=False)
         finally:
             release_control_keys()

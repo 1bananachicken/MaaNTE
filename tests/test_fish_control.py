@@ -14,9 +14,20 @@ from fish_control import (
     estimate_error_velocity,
     should_finish_control,
 )
+from fish_params import load_custom_action_params
 
 
 class FishControlTests(unittest.TestCase):
+    def test_custom_action_params_are_parsed_consistently(self):
+        params = {"safe_margin": 6}
+        self.assertIs(load_custom_action_params(params), params)
+        self.assertEqual(
+            load_custom_action_params('{"safe_margin": 8}'),
+            {"safe_margin": 8},
+        )
+        self.assertEqual(load_custom_action_params("invalid"), {})
+        self.assertEqual(load_custom_action_params("[]"), {})
+
     def test_hysteresis_holds_and_releases_a(self):
         self.assertEqual(choose_control_key(None, 20), KEY_A)
         self.assertEqual(choose_control_key(KEY_A, 10), KEY_A)

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import math
 import time
 
@@ -10,6 +9,8 @@ from maa.custom_action import CustomAction
 from maa.pipeline import JOCR, JRecognitionType, JTemplateMatch
 
 from utils.logger import logger
+
+from .fish_params import load_custom_action_params
 
 STORE_ROI = (26, 81, 418, 585)
 BAIT_TEMPLATE = ["Fish/FishStoreGeneralBait.png"]
@@ -21,18 +22,6 @@ BAIT_NAMES = [
     "万能釣り餌",
     "만능 미끼",
 ]
-
-
-def _load_params(custom_action_param) -> dict:
-    if not custom_action_param:
-        return {}
-    if isinstance(custom_action_param, dict):
-        return custom_action_param
-    try:
-        params = json.loads(custom_action_param)
-    except (TypeError, ValueError):
-        return {}
-    return params if isinstance(params, dict) else {}
 
 
 def _screencap(controller):
@@ -105,7 +94,7 @@ class AutoChooseFishStoreGeneralBait(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        params = _load_params(argv.custom_action_param)
+        params = load_custom_action_params(argv.custom_action_param)
         threshold = float(params.get("candidate_threshold", 0.6))
         max_candidates = max(1, int(params.get("max_candidates", 8)))
         detail_timeout_ms = max(200, int(params.get("detail_timeout_ms", 1200)))
