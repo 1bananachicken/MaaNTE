@@ -1,0 +1,579 @@
+{
+    "VolleyballEntrance": {
+        "desc": "自动排球入口并重置难度状态",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_reset",
+                "custom_action_param": {
+                    "start_difficulty": 1
+                }
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 5000,
+        "next": [
+            "VolleyballWaitDifficultySelection"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballWaitDifficultySelection": {
+        "desc": "等待难度选择界面并点击当前难度",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/SelectDifficulty.png",
+                "roi": [
+                    9,
+                    5,
+                    195,
+                    68
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_select_difficulty"
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballStartButton"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballStartButton": {
+        "desc": "识别并点击难度界面右下角开始按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/StartButton.png",
+                "roi": [
+                    1056,
+                    655,
+                    154,
+                    35
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballChooseTeammate"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballChooseTeammate": {
+        "desc": "确认已进入选择参赛球员界面",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/ChooseTeammate.png",
+                "roi": [
+                    340,
+                    69,
+                    139,
+                    37
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 15000,
+        "next": [
+            "VolleyballSelectTeammates"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballSelectTeammates": {
+        "desc": "点击前先确认队友是否已选中，最多累计失败五次",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_select_teammates"
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 40000,
+        "next": [
+            "VolleyballStartButtonAfterTeammates"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballStartButtonAfterTeammates": {
+        "desc": "队友选择完成后点击开始比赛，直到识别到 Skip",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/StartButton.png",
+                "roi": [
+                    1056,
+                    655,
+                    154,
+                    35
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballSkipStory",
+            "VolleyballStartButtonAfterTeammates"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballStartRacing": {
+        "desc": "识别并点击关卡内开始比赛按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/StartRacing.png",
+                "roi": [
+                    772,
+                    356,
+                    91,
+                    31
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballPlay"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballPlay": {
+        "desc": "每 0.6 秒按一次 J 键，每 5 秒检测剧情或结算",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_play"
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 190000,
+        "next": [
+            "VolleyballSkipStory",
+            "VolleyballWin",
+            "VolleyballLoss"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballSkipStory": {
+        "desc": "剧情动画出现后延迟 1 秒按 Esc 跳过",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/SkipButton.png",
+                "roi": [
+                    1223,
+                    29,
+                    28,
+                    26
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 27
+            }
+        },
+        "rate_limit": 500,
+        "pre_delay": 1000,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballSkipCheckbox",
+            "VolleyballSkipConfirm",
+            "VolleyballStartRacing",
+            "VolleyballWin",
+            "VolleyballLoss",
+            "VolleyballPlay"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballSkipCheckbox": {
+        "desc": "勾选剧情跳过确认框",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/SkipCheckbox.png",
+                "roi": [
+                    566,
+                    361,
+                    23,
+                    24
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 10000,
+        "next": [
+            "VolleyballSkipConfirm"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballSkipConfirm": {
+        "desc": "确认跳过剧情并继续等待结算",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/SkipConfirmButton.png",
+                "roi": [
+                    734,
+                    426,
+                    173,
+                    37
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 10000,
+        "next": [
+            "VolleyballStartRacing",
+            "VolleyballWin",
+            "VolleyballLoss",
+            "VolleyballPlay"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballWin": {
+        "desc": "识别胜利结算并判断三星",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/Win.png",
+                "roi": [
+                    937,
+                    71,
+                    308,
+                    110
+                ],
+                "threshold": 0.85
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 5000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 30000,
+        "next": [
+            "VolleyballThreeStars",
+            "VolleyballRestartButton",
+            "VolleyballSkipStory"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballLoss": {
+        "desc": "识别失败结算并重新开始本关",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/Lose.png",
+                "roi": [
+                    879,
+                    72,
+                    363,
+                    105
+                ],
+                "threshold": 0.85
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 5000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 30000,
+        "next": [
+            "VolleyballRestartButton"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballRestartButton": {
+        "desc": "失败或未三星时点击重新挑战",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/RestartButton.png",
+                "roi": [
+                    45,
+                    582,
+                    33,
+                    32
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballStartRacing",
+            "VolleyballSkipStory",
+            "VolleyballPlay"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballThreeStars": {
+        "desc": "识别三星结算并优先寻找下一关",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/ThreeStars.png",
+                "roi": [
+                    1204,
+                    376,
+                    29,
+                    105
+                ],
+                "threshold": 0.85
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 5000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 30000,
+        "next": [
+            "VolleyballNextButton",
+            "VolleyballExitButton"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballNextButton": {
+        "desc": "胜利且存在下一关时进入下一关",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/NextButton.png",
+                "roi": [
+                    44,
+                    525,
+                    35,
+                    34
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballStartRacing",
+            "VolleyballSkipStory",
+            "VolleyballPlay"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballExitButton": {
+        "desc": "胜利且无下一关时退出当前难度",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/ExitButton.png",
+                "roi": [
+                    43,
+                    635,
+                    36,
+                    35
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballAdvanceDifficulty"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballAdvanceDifficulty": {
+        "desc": "完成当前难度后进入下一难度或结束任务",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_advance_difficulty"
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 5000,
+        "next": [
+            "VolleyballWaitReenterStartRacing"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballWaitReenterStartRacing": {
+        "desc": "退出当前难度后，确认出现开始比赛交互提示",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/StartRacing.png",
+                "roi": [
+                    772,
+                    356,
+                    91,
+                    31
+                ],
+                "threshold": 0.85
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 500,
+        "timeout": 15000,
+        "next": [
+            "VolleyballWaitDifficultySelection"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballTaskComplete": {
+        "desc": "难度四最后一关已三星，结束任务",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "StopTask"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "VolleyballTaskStop": {
+        "desc": "自定义动作异常时停止任务",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "StopTask"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0
+    }
+}

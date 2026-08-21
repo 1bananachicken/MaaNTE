@@ -239,5 +239,15 @@
     "task_fish_new_option_navi_locations_case_xingzhuyouting": "스타 아일랜드 요트 선착장 낚시 포인트",
     "task_fish_new_option_navi_locations_case_haijiaoguangchang": "케이프 광장 낚시 포인트",
     "task_fish_new_option_navi_locations_case_zhanwangjiao": "하늘 전망대 낚시 포인트",
-    "task_fish_new_option_navi_locations_case_xiangyangdao": "써니 프랭크섬"
+    "task_fish_new_option_navi_locations_case_xiangyangdao": "써니 프랭크섬",
+    "task_auto_volleyball_label": "자동 배구",
+    "task_auto_volleyball_desc": "0.6초 간격으로 J 키를 눌러 배구 도전을 자동 완료하고 스토리, 결과, 난이도 전환을 처리합니다.",
+    "task_auto_volleyball_option_difficulty": "시작 난이도",
+    "task_auto_volleyball_option_difficulty_desc": "처음 도전할 난이도를 선택합니다. 완료 후 다음 난이도로 계속 진행합니다.",
+    "task_auto_volleyball_difficulty_1": "난이도 1",
+    "task_auto_volleyball_difficulty_2": "난이도 2",
+    "task_auto_volleyball_difficulty_3": "난이도 3",
+    "task_auto_volleyball_difficulty_4": "난이도 4",
+    "task_auto_volleyball_option_continue_non_three_star": "별 3개 미만 승리 시 다음 단계 진행",
+    "task_auto_volleyball_option_continue_non_three_star_desc": "활성화하면 별 3개 미만으로 승리해도 다음 단계로 진행합니다. 비활성화하면 별 3개 승리만 진행하고 나머지는 재도전합니다."
 }

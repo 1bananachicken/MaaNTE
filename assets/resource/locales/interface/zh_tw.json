@@ -239,5 +239,15 @@
     "task_fish_new_option_navi_locations_case_xingzhuyouting": "星渚遊艇碼頭釣點",
     "task_fish_new_option_navi_locations_case_haijiaoguangchang": "海角廣場釣點",
     "task_fish_new_option_navi_locations_case_zhanwangjiao": "湛望角釣點",
-    "task_fish_new_option_navi_locations_case_xiangyangdao": "向陽島"
+    "task_fish_new_option_navi_locations_case_xiangyangdao": "向陽島",
+    "task_auto_volleyball_label": "自動排球",
+    "task_auto_volleyball_desc": "自動完成排球挑戰，每 0.6 秒按一次 J 鍵並處理劇情、結算與難度切換。",
+    "task_auto_volleyball_option_difficulty": "起始難度",
+    "task_auto_volleyball_option_difficulty_desc": "選擇開始挑戰的難度，完成後繼續後續難度。",
+    "task_auto_volleyball_difficulty_1": "難度 1",
+    "task_auto_volleyball_difficulty_2": "難度 2",
+    "task_auto_volleyball_difficulty_3": "難度 3",
+    "task_auto_volleyball_difficulty_4": "難度 4",
+    "task_auto_volleyball_option_continue_non_three_star": "非三星勝利繼續下一關",
+    "task_auto_volleyball_option_continue_non_three_star_desc": "開啟後，勝利但未達三星時也會繼續下一關；關閉時僅三星勝利會繼續，其他勝利重新挑戰。"
 }

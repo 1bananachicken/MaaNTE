@@ -239,5 +239,15 @@
     "task_fish_new_option_navi_locations_case_xingzhuyouting": "Stellar Marina Fishing Spot",
     "task_fish_new_option_navi_locations_case_haijiaoguangchang": "Cape Square Fishing Spot",
     "task_fish_new_option_navi_locations_case_zhanwangjiao": "Azure Vista Fishing Spot",
-    "task_fish_new_option_navi_locations_case_xiangyangdao": "Sunni Island"
+    "task_fish_new_option_navi_locations_case_xiangyangdao": "Sunni Island",
+    "task_auto_volleyball_label": "Auto Volleyball",
+    "task_auto_volleyball_desc": "Automatically complete volleyball challenges by pressing J every 0.6 seconds, including story, results, and difficulty transitions.",
+    "task_auto_volleyball_option_difficulty": "Starting Difficulty",
+    "task_auto_volleyball_option_difficulty_desc": "Choose the first difficulty to play; later difficulties continue automatically.",
+    "task_auto_volleyball_difficulty_1": "Difficulty 1",
+    "task_auto_volleyball_difficulty_2": "Difficulty 2",
+    "task_auto_volleyball_difficulty_3": "Difficulty 3",
+    "task_auto_volleyball_difficulty_4": "Difficulty 4",
+    "task_auto_volleyball_option_continue_non_three_star": "Continue After Non-Three-Star Win",
+    "task_auto_volleyball_option_continue_non_three_star_desc": "When enabled, continue to the next level after any win, even without three stars. When disabled, only three-star wins continue; other wins retry the level."
 }

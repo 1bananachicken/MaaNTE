@@ -239,5 +239,15 @@
     "task_fish_new_option_navi_locations_case_xingzhuyouting": "釣場-星渚ヨットハーバー",
     "task_fish_new_option_navi_locations_case_haijiaoguangchang": "釣場-ケープ広場",
     "task_fish_new_option_navi_locations_case_zhanwangjiao": "釣場-クリアビュー丘",
-    "task_fish_new_option_navi_locations_case_xiangyangdao": "ヒナタ島"
+    "task_fish_new_option_navi_locations_case_xiangyangdao": "ヒナタ島",
+    "task_auto_volleyball_label": "自動バレーボール",
+    "task_auto_volleyball_desc": "0.6秒間隔でJキーを押してバレーボールチャレンジを自動進行し、ストーリー、結果、難易度切り替えを処理します。",
+    "task_auto_volleyball_option_difficulty": "開始難易度",
+    "task_auto_volleyball_option_difficulty_desc": "最初に挑戦する難易度を選択します。完了後は次の難易度へ進みます。",
+    "task_auto_volleyball_difficulty_1": "難易度 1",
+    "task_auto_volleyball_difficulty_2": "難易度 2",
+    "task_auto_volleyball_difficulty_3": "難易度 3",
+    "task_auto_volleyball_difficulty_4": "難易度 4",
+    "task_auto_volleyball_option_continue_non_three_star": "3つ星未満の勝利でも次へ進む",
+    "task_auto_volleyball_option_continue_non_three_star_desc": "有効にすると、3つ星未満の勝利でも次のステージへ進みます。無効時は3つ星の勝利のみ進み、それ以外は再挑戦します。"
 }

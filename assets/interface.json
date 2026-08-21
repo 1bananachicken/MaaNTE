@@ -131,6 +131,7 @@
         "resource/tasks/MakeCoffeeLite.json",
         "resource/tasks/Rhythm.json",
         "resource/tasks/Tetris.json",
+        "resource/tasks/Volleyball.json",
         "resource/tasks/BagelSpam.json",
         // group:RealTimeAssist
         "resource/tasks/RealTime.json",

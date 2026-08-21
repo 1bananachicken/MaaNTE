@@ -87,5 +87,11 @@
     "tetris.task_failed": "[テトリス] タスク異常終了",
     "tetris.progress": "[テトリス] 進捗: %d/%d",
     "tetris.task_done": "[テトリス] タスク完了",
-    "tetris.vitality_exhausted": "[テトリス] スタミナ切れ、タスク完了"
+    "tetris.vitality_exhausted": "[テトリス] スタミナ切れ、タスク完了",
+    "volleyball.started": "[バレーボール] 難易度 %d から開始",
+    "volleyball.selecting_difficulty": "[バレーボール] 難易度 %d を選択",
+    "volleyball.teammates_selected": "[バレーボール] チームメイトを選択済み",
+    "volleyball.playing": "[バレーボール] 難易度 %d に挑戦中",
+    "volleyball.difficulty_done": "[バレーボール] 難易度 %d 完了",
+    "volleyball.task_done": "[バレーボール] 全難易度完了"
 }
