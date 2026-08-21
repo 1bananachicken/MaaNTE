@@ -244,7 +244,6 @@ navigator.close()
 ```
 
 每个点可填写 `map: [pixelX, pixelY]`，也可直接填写在线地图坐标 `world: [lat, lng]`。启动时会自动选择原始三维坐标中的运动平面并拟合旋转、缩放和平移。建议使用 4～8 个覆盖路线区域的点；日志中的 `error` 是拟合后的地图像素均方根误差。
-- 坐标抓取核心源码位于 `agent/custom/action/temp/nte_coordinate_api.py`，加密产物放在项目根目录 `thirdparty/`，并提供可导入的 `nte_coordinate_api` 模块。模块公开 `CoordinateCapture` 类及其 `start()`、`read(max_age=1.0)`、`close()` 方法。`CoordinateCapture(refresh_rate=30.0, capture_backend="pcap")` 可设置每秒发布的最大样本数和抓包后端，`capture_backend` 支持 `"pcap"` / `"scapy"` 和 `"pktmon"`，`refresh_rate` 设为 `0` 时不限速。1.1 起 `read()` 返回同一数据包解析出的 `(x, y, z, pitch, heading)` 或 `None`，其中 `pitch` 为原始俯仰角，`heading` 为映射后的水平摄像机罗盘角（正北为 `0°`，范围 `[0, 360)`）；该返回值不兼容 1.0 的三元坐标。MXU 组装时会原样复制该目录。
-- PyArmor 的 `pyarmor_runtime.pyd` 与 Python ABI 绑定，必须使用最终运行环境相同的 Python 主次版本和架构生成。当前发布环境目标为 Python 3.12 x64，不能使用 Python 3.10、3.13 或 3.14 生成的 runtime。
+- 坐标抓取核心源码位于 `agent/custom/action/Navi/nte_coordinate_api.py`，直接随 MaaNTE 安装包发布，不再依赖第三方仓库或 `.pyd` 文件。模块公开 `CoordinateCapture` 类及其 `start()`、`read(max_age=1.0)`、`close()` 方法。`CoordinateCapture(refresh_rate=30.0, capture_backend="pcap")` 可设置每秒发布的最大样本数和抓包后端，`capture_backend` 支持 `"pcap"` / `"scapy"` 和 `"pktmon"`，`refresh_rate` 设为 `0` 时不限速。1.3 起 `read()` 返回同一数据包解析出的 `(x, y, z, pitch, heading)` 或 `None`，其中 `pitch` 为原始俯仰角，`heading` 为映射后的水平摄像机罗盘角（正北为 `0°`，范围 `[0, 360)`）；该返回值不兼容旧版三元坐标。
 - `debug=true` 会打开 OpenCV 调试窗口，只用于本地调试。
 - 路线执行依赖实时截图、地图定位和方向模型，不能在没有 Maa `Context` 和控制器的普通单元测试里完整运行。

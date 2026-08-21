@@ -8,9 +8,8 @@ from pathlib import Path
 from typing import Any
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-THIRDPARTY_DIR = PROJECT_ROOT / "thirdparty"
+SOURCE_PATH = PROJECT_ROOT / "agent" / "custom" / "action" / "Navi" / "nte_coordinate_api.py"
 MODULE_NAME = "nte_coordinate_api"
-MODULE_FILENAME = "nte_coordinate_api.cp312-win_amd64.pyd"
 CALIBRATION_AXES = (0, 1)
 CALIBRATION_A = 0.016394586684750773
 CALIBRATION_B = 5.693519256055879e-08
@@ -19,7 +18,7 @@ CALIBRATION_TY = 3472.664390686138
 
 
 def _ensure_project_paths() -> None:
-    for path in (THIRDPARTY_DIR,):
+    for path in (SOURCE_PATH.parent,):
         text = str(path)
         if text not in sys.path:
             sys.path.insert(0, text)
@@ -27,7 +26,7 @@ def _ensure_project_paths() -> None:
 
 def load_coordinate_module() -> Any:
     _ensure_project_paths()
-    candidate = THIRDPARTY_DIR / MODULE_FILENAME
+    candidate = SOURCE_PATH
     loaded_module = sys.modules.get(MODULE_NAME)
     if (
         loaded_module is not None
@@ -82,9 +81,9 @@ def main(argv: list[str] | None = None) -> int:
     args = parse_args(sys.argv[1:] if argv is None else argv)
     module = load_coordinate_module()
     api_version = getattr(module, "API_VERSION", None)
-    if api_version != "1.1.0":
+    if api_version != "1.3.0":
         print(
-            "coordinate core API 1.1.0 is required, got %s"
+            "coordinate core API 1.3.0 is required, got %s"
             % (api_version or "<unknown>")
         )
         return 1
