@@ -1,0 +1,58 @@
+{
+    "task": [
+        {
+            "name": "LacrimosaPro",
+            "label": "$task_lacrimosa_pro_label",
+            "desc": "$task_lacrimosa_pro_desc",
+            "entry": "LacrimosaProEntry",
+            "option": [
+                "LacrimosaProMaxServices",
+                "LacrimosaProMaxLoopSeconds"
+            ],
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ]
+        }
+    ],
+    "option": {
+        "LacrimosaProMaxServices": {
+            "label": "$task_lacrimosa_pro_option_max_services",
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "MaxServices",
+                    "default": "10",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "LacrimosaProRun": {
+                    "custom_action_param": {
+                        "max_services": "{MaxServices}"
+                    }
+                }
+            }
+        },
+        "LacrimosaProMaxLoopSeconds": {
+            "label": "$task_lacrimosa_pro_option_max_loop_seconds",
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "MaxLoopSeconds",
+                    "default": "300",
+                    "pipeline_type": "float"
+                }
+            ],
+            "pipeline_override": {
+                "LacrimosaProRun": {
+                    "custom_action_param": {
+                        "max_loop_seconds": "{MaxLoopSeconds}"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,58 @@
+{
+    "task": [
+        {
+            "name": "NanallyPro",
+            "label": "$task_nanally_pro_label",
+            "desc": "$task_nanally_pro_desc",
+            "entry": "NanallyProEntry",
+            "option": [
+                "NanallyProLoopTime",
+                "NanallyProMaxLoopSeconds"
+            ],
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ]
+        }
+    ],
+    "option": {
+        "NanallyProLoopTime": {
+            "label": "$task_nanally_pro_option_loop_interval",
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "LoopInterval",
+                    "default": "0.2",
+                    "pipeline_type": "float"
+                }
+            ],
+            "pipeline_override": {
+                "NanallyProRun": {
+                    "custom_action_param": {
+                        "loop_interval": "{LoopInterval}"
+                    }
+                }
+            }
+        },
+        "NanallyProMaxLoopSeconds": {
+            "label": "$task_nanally_pro_option_max_loop_seconds",
+            "type": "input",
+            "inputs": [
+                {
+                    "name": "MaxLoopSeconds",
+                    "default": "300",
+                    "pipeline_type": "float"
+                }
+            ],
+            "pipeline_override": {
+                "NanallyProRun": {
+                    "custom_action_param": {
+                        "max_loop_seconds": "{MaxLoopSeconds}"
+                    }
+                }
+            }
+        }
+    }
+}
