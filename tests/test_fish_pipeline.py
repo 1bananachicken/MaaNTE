@@ -30,6 +30,32 @@ class FishPipelineTests(unittest.TestCase):
         )
         self.assertIn("FishNewGaming", self.pipeline["FishNewGaming"]["next"])
 
+    def test_bait_purchase_continues_after_selecting_maximum(self):
+        self.assertEqual(
+            self.pipeline["FishNewStoreChooseGeneralBait"]["next"],
+            ["FishNewStoreChooseMax"],
+        )
+        self.assertEqual(
+            self.pipeline["FishNewStoreChooseMax"]["next"],
+            ["FishNewStoreChooseMaxSuccess"],
+        )
+        self.assertEqual(
+            self.pipeline["FishNewStoreChooseMaxSuccess"]["next"],
+            ["FishNewStoreBuyBait"],
+        )
+        self.assertIn(
+            "FishNewExitStore",
+            self.pipeline["FishNewStoreBuyBait"]["next"],
+        )
+        self.assertIn(
+            "FishNewExitStore",
+            self.pipeline["FishNewConfirmBuyBait"]["next"],
+        )
+        self.assertEqual(
+            self.pipeline["FishNewExitStore"]["next"],
+            ["[Anchor]FishNewRestart"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
