@@ -171,12 +171,6 @@ def _packet_direction(source: str, destination: str) -> str:
     return "unknown"
 
 
-def _is_c2s(source: str, destination: str) -> bool:
-    # Preserve the previous fail-open behavior for ambiguous captures, but drop
-    # packets that are clearly server-to-client.
-    return _packet_direction(source, destination) != "s2c"
-
-
 def _is_windows_admin() -> bool:
     if sys.platform != "win32":
         return False
