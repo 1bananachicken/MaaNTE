@@ -9,11 +9,10 @@ from maa.pipeline import JRecognitionType, JTemplateMatch
 from utils.logger import logger
 from utils.maafocus import PrintT
 
-
 _J_KEY = 0x4A
 _KEY_PRESS_INTERVAL_SECONDS = 0.6
 _RESULT_CHECK_INTERVAL_SECONDS = 5.0
-_MAX_GAME_SECONDS = 180.0
+_MAX_GAME_SECONDS = 600.0
 _TEAMMATE_SELECTION_TIMEOUT_SECONDS = 30.0
 _TEAMMATE_CONFIRM_TIMEOUT_SECONDS = 2.0
 _TEAMMATE_FAILURE_LIMIT = 5

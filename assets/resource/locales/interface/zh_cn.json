@@ -247,7 +247,7 @@
     "task_fish_new_option_navi_locations_case_zhanwangjiao": "湛望角钓点",
     "task_fish_new_option_navi_locations_case_xiangyangdao": "向阳岛",
     "task_auto_volleyball_label": "自动排球",
-    "task_auto_volleyball_desc": "自动完成排球挑战，每隔 0.6 秒按一次 J 键，并处理剧情、结算和难度切换。",
+    "task_auto_volleyball_desc": "在难度选择界面开始任务",
     "task_auto_volleyball_option_difficulty": "起始难度",
     "task_auto_volleyball_option_difficulty_desc": "选择开始挑战的难度，完成后继续后续难度。",
     "task_auto_volleyball_difficulty_1": "难度 1",
