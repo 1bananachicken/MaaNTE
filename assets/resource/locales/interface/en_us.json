@@ -1,7 +1,7 @@
 {
     "description": "NTE Assistant, powered by MaaFramework!",
     "scene_check_osd_failed_focus": "<span style=\"color: red; font-weight: bold;\">Screen obstructed, please disable FPS overlay</span>",
-    "contact": "QQ Group: 1103323319",
+    "contact": "GitHub Repo: [1bananachicken/MaaNTE](https://github.com/1bananachicken/MaaNTE/)<br>Official Website: https://maante.org/<br>QQ Group: [Get info from official site](https://maante.org/zh_cn/qq-group/) or 1103323319<br>Discord: https://discord.com/invite/e6mPMRYQpR",
     "welcome.file": "resource/locales/interface/WELCOME/WELCOME_en_us.md",
     "controller_default_label": "Win32 - Default",
     "controller_front_label": "Win32 - Front",
