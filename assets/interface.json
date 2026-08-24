@@ -3,7 +3,7 @@
     "name": "MaaNTE",
     "description": "$description",
     "contact": "$contact",
-    "license": "[GNU Affero General Public License v3.0 (AGPL-3.0)](https://github.com/MaaEnd/MaaEnd/blob/v2/LICENSE)",
+    "license": "[GNU Affero General Public License v3.0 (AGPL-3.0)](https://github.com/1bananachicken/MaaNTE/blob/dev/LICENSE)",
     "welcome": "$welcome.file",
     "github": "https://github.com/1bananachicken/MaaNTE",
     "icon": "logo.ico",
@@ -131,6 +131,7 @@
         "resource/tasks/MakeCoffeeLite.json",
         "resource/tasks/Rhythm.json",
         "resource/tasks/Tetris.json",
+        "resource/tasks/Volleyball.json",
         "resource/tasks/BagelSpam.json",
         // group:RealTimeAssist
         "resource/tasks/RealTime.json",

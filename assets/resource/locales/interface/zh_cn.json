@@ -1,7 +1,7 @@
 {
     "description": "异环小助手，由MAAFramework强力驱动！",
     "scene_check_osd_failed_focus": "<span style=\"color: red; font-weight: bold;\">屏幕存在遮挡，请尝试关闭帧率显示</span>",
-    "contact": "QQ群: 1103323319",
+    "contact": "GitHub 仓库: [1bananachicken/MaaNTE](https://github.com/1bananachicken/MaaNTE/)<br>官方网站: https://maante.org/<br>QQ群: [点击前往官网获取](https://maante.org/zh_cn/qq-group/)或1103323319",
     "welcome.file": "resource/locales/interface/WELCOME/WELCOME_zh_cn.md",
     "controller_default_label": "桌面端-默认",
     "controller_front_label": "桌面端-前台",
@@ -245,5 +245,15 @@
     "task_fish_new_option_navi_locations_case_xingzhuyouting": "星渚游艇码头钓点",
     "task_fish_new_option_navi_locations_case_haijiaoguangchang": "海角广场钓点",
     "task_fish_new_option_navi_locations_case_zhanwangjiao": "湛望角钓点",
-    "task_fish_new_option_navi_locations_case_xiangyangdao": "向阳岛"
+    "task_fish_new_option_navi_locations_case_xiangyangdao": "向阳岛",
+    "task_auto_volleyball_label": "自动排球",
+    "task_auto_volleyball_desc": "在难度选择界面开始任务",
+    "task_auto_volleyball_option_difficulty": "起始难度",
+    "task_auto_volleyball_option_difficulty_desc": "选择开始挑战的难度，完成后继续后续难度。",
+    "task_auto_volleyball_difficulty_1": "难度 1",
+    "task_auto_volleyball_difficulty_2": "难度 2",
+    "task_auto_volleyball_difficulty_3": "难度 3",
+    "task_auto_volleyball_difficulty_4": "难度 4",
+    "task_auto_volleyball_option_continue_non_three_star": "非三星胜利继续下一关",
+    "task_auto_volleyball_option_continue_non_three_star_desc": "开启后，胜利但不足三星时也继续下一关；关闭时仅三星胜利继续，其他胜利重新挑战。"
 }

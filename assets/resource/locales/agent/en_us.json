@@ -87,5 +87,11 @@
     "tetris.task_failed": "[Tetris] Task aborted",
     "tetris.progress": "[Tetris] Progress: %d/%d",
     "tetris.task_done": "[Tetris] Task complete",
-    "tetris.vitality_exhausted": "[Tetris] Vitality exhausted, task complete"
+    "tetris.vitality_exhausted": "[Tetris] Vitality exhausted, task complete",
+    "volleyball.started": "[Volleyball] Starting at difficulty %d",
+    "volleyball.selecting_difficulty": "[Volleyball] Selecting difficulty %d",
+    "volleyball.teammates_selected": "[Volleyball] Teammates selected",
+    "volleyball.playing": "[Volleyball] Playing difficulty %d",
+    "volleyball.difficulty_done": "[Volleyball] Difficulty %d complete",
+    "volleyball.task_done": "[Volleyball] All difficulties complete"
 }

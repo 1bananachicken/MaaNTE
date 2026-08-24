@@ -85,5 +85,11 @@
     "tetris.task_failed": "[泯除方块] 任务异常结束",
     "tetris.progress": "[泯除方块] 进度: %d/%d",
     "tetris.task_done": "[泯除方块] 任务完成",
-    "tetris.vitality_exhausted": "[泯除方块] 活力耗尽，任务完成"
+    "tetris.vitality_exhausted": "[泯除方块] 活力耗尽，任务完成",
+    "volleyball.started": "[自动排球] 从难度 %d 开始",
+    "volleyball.selecting_difficulty": "[自动排球] 选择难度 %d",
+    "volleyball.teammates_selected": "[自动排球] 队友选择完成",
+    "volleyball.playing": "[自动排球] 正在挑战难度 %d",
+    "volleyball.difficulty_done": "[自动排球] 难度 %d 已完成",
+    "volleyball.task_done": "[自动排球] 全部难度已完成"
 }

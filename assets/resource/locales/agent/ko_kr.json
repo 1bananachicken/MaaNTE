@@ -87,5 +87,11 @@
     "tetris.task_failed": "[테트리스] 작업 비정상 종료",
     "tetris.progress": "[테트리스] 진행률: %d/%d",
     "tetris.task_done": "[테트리스] 작업 완료",
-    "tetris.vitality_exhausted": "[테트리스] 활력 소진, 작업 완료"
+    "tetris.vitality_exhausted": "[테트리스] 활력 소진, 작업 완료",
+    "volleyball.started": "[배구] 난이도 %d부터 시작",
+    "volleyball.selecting_difficulty": "[배구] 난이도 %d 선택",
+    "volleyball.teammates_selected": "[배구] 팀원 선택 완료",
+    "volleyball.playing": "[배구] 난이도 %d 도전 중",
+    "volleyball.difficulty_done": "[배구] 난이도 %d 완료",
+    "volleyball.task_done": "[배구] 모든 난이도 완료"
 }

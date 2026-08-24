@@ -1,0 +1,114 @@
+{
+    "task": [
+        {
+            "name": "AutoVolleyball",
+            "label": "$task_auto_volleyball_label",
+            "entry": "VolleyballEntrance",
+            "description": "$task_auto_volleyball_desc",
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ],
+            "option": [
+                "VolleyballStartDifficulty",
+                "VolleyballContinueOnWin"
+            ]
+        }
+    ],
+    "option": {
+        "VolleyballStartDifficulty": {
+            "type": "select",
+            "label": "$task_auto_volleyball_option_difficulty",
+            "description": "$task_auto_volleyball_option_difficulty_desc",
+            "default_case": "Difficulty1",
+            "cases": [
+                {
+                    "name": "Difficulty1",
+                    "label": "$task_auto_volleyball_difficulty_1",
+                    "pipeline_override": {
+                        "VolleyballEntrance": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "start_difficulty": 1
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Difficulty2",
+                    "label": "$task_auto_volleyball_difficulty_2",
+                    "pipeline_override": {
+                        "VolleyballEntrance": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "start_difficulty": 2
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Difficulty3",
+                    "label": "$task_auto_volleyball_difficulty_3",
+                    "pipeline_override": {
+                        "VolleyballEntrance": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "start_difficulty": 3
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Difficulty4",
+                    "label": "$task_auto_volleyball_difficulty_4",
+                    "pipeline_override": {
+                        "VolleyballEntrance": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "start_difficulty": 4
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "VolleyballContinueOnWin": {
+            "type": "switch",
+            "label": "$task_auto_volleyball_option_continue_non_three_star",
+            "description": "$task_auto_volleyball_option_continue_non_three_star_desc",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "VolleyballWin": {
+                            "next": [
+                                "VolleyballNextButton",
+                                "VolleyballExitButton"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no"
+                }
+            ]
+        }
+    }
+}
