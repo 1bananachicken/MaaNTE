@@ -36,9 +36,16 @@ def _largest_component_box(
 def _all_points_box(
     mask: np.ndarray, offset_x: int, offset_y: int, min_count: int
 ) -> Optional[Box]:
-    if int(cv2.countNonZero(mask)) < min_count:
+    component_count, labels, stats, _ = cv2.connectedComponentsWithStats(
+        mask, connectivity=8
+    )
+    filtered_mask = np.zeros_like(mask)
+    for index in range(1, component_count):
+        if int(stats[index, cv2.CC_STAT_AREA]) >= min_count:
+            filtered_mask[labels == index] = 255
+    if int(cv2.countNonZero(filtered_mask)) < min_count:
         return None
-    points = cv2.findNonZero(mask)
+    points = cv2.findNonZero(filtered_mask)
     if points is None:
         return None
     x, y, width, height = cv2.boundingRect(points)
@@ -60,6 +67,6 @@ def detect_control_boxes(image: np.ndarray) -> tuple[Optional[Box], Optional[Box
     cursor_mask = cv2.inRange(hsv, CURSOR_LOWER, CURSOR_UPPER)
 
     # 光标会覆盖绿条中间的像素，绿条必须合并所有匹配点。
-    green_box = _all_points_box(green_mask, roi_x, roi_y, min_count=1)
+    green_box = _all_points_box(green_mask, roi_x, roi_y, min_count=4)
     cursor_box = _largest_component_box(cursor_mask, roi_x, roi_y, min_count=20)
     return green_box, cursor_box

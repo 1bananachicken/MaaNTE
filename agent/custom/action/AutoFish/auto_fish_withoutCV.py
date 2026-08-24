@@ -16,7 +16,7 @@ from .fish_control import (
     predict_tracking_interval,
     should_finish_control,
 )
-from .fish_params import load_custom_action_params
+from .fish_params import load_fish_control_params
 from .fish_vision import detect_control_boxes
 
 
@@ -25,28 +25,22 @@ class AutoFishWithoutCV(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        params = load_custom_action_params(argv.custom_action_param)
-        safe_margin = max(0.0, float(params.get("safe_margin", 6)))
-        center_band_ratio = max(
-            0.0, min(1.0, float(params.get("center_band_ratio", 0.4)))
-        )
-        prediction_ms = max(0.0, float(params.get("prediction_ms", 140)))
-        velocity_alpha = float(params.get("velocity_alpha", 0.5))
-        green_velocity_alpha = float(params.get("green_velocity_alpha", 0.5))
-        green_center_alpha = max(
-            0.0, min(1.0, float(params.get("green_center_alpha", 0.85)))
-        )
-        pulse_min_ms = max(0.0, float(params.get("pulse_min_ms", 18)))
-        pulse_max_ms = max(pulse_min_ms, float(params.get("pulse_max_ms", 36)))
-        pulse_ms_per_px = max(0.0, float(params.get("pulse_ms_per_px", 0.45)))
-        width_change_threshold = max(
-            0.1, float(params.get("width_change_threshold", 8))
-        )
-        width_confirm_frames = max(1, int(params.get("width_confirm_frames", 2)))
-        control_end_grace_ms = max(0.0, float(params.get("control_end_grace_ms", 300)))
-        lost_timeout_ms = max(0.0, float(params.get("lost_timeout_ms", 120)))
-        lost_abort_ms = max(0.0, float(params.get("lost_abort_ms", 1500)))
-        loop_interval_ms = max(0.0, float(params.get("loop_interval_ms", 0)))
+        params = load_fish_control_params(argv.custom_action_param)
+        safe_margin = params["safe_margin"]
+        center_band_ratio = params["center_band_ratio"]
+        prediction_ms = params["prediction_ms"]
+        velocity_alpha = params["velocity_alpha"]
+        green_velocity_alpha = params["green_velocity_alpha"]
+        green_center_alpha = params["green_center_alpha"]
+        pulse_min_ms = params["pulse_min_ms"]
+        pulse_max_ms = params["pulse_max_ms"]
+        pulse_ms_per_px = params["pulse_ms_per_px"]
+        width_change_threshold = params["width_change_threshold"]
+        width_confirm_frames = params["width_confirm_frames"]
+        control_end_grace_ms = params["control_end_grace_ms"]
+        lost_timeout_ms = params["lost_timeout_ms"]
+        lost_abort_ms = params["lost_abort_ms"]
+        loop_interval_ms = params["loop_interval_ms"]
 
         controller = context.tasker.controller
         last_cursor_center = None

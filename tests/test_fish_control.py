@@ -14,7 +14,11 @@ from fish_control import (
     estimate_error_velocity,
     should_finish_control,
 )
-from fish_params import load_custom_action_params
+from fish_params import (
+    FISH_CONTROL_DEFAULTS,
+    load_custom_action_params,
+    load_fish_control_params,
+)
 
 
 class FishControlTests(unittest.TestCase):
@@ -27,6 +31,18 @@ class FishControlTests(unittest.TestCase):
         )
         self.assertEqual(load_custom_action_params("invalid"), {})
         self.assertEqual(load_custom_action_params("[]"), {})
+
+    def test_invalid_control_params_fall_back_individually(self):
+        invalid_values = (None, "", "not-a-number", float("nan"), float("inf"), True)
+        for name, default in FISH_CONTROL_DEFAULTS.items():
+            for invalid_value in invalid_values:
+                with self.subTest(name=name, invalid_value=invalid_value):
+                    raw_params = {"prediction_ms": 250}
+                    raw_params[name] = invalid_value
+                    params = load_fish_control_params(raw_params)
+                    self.assertEqual(params[name], default)
+                    if name != "prediction_ms":
+                        self.assertEqual(params["prediction_ms"], 250)
 
     def test_hysteresis_holds_and_releases_a(self):
         self.assertEqual(choose_control_key(None, 20), KEY_A)

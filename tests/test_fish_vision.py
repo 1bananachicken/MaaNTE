@@ -36,6 +36,17 @@ class FishVisionTests(unittest.TestCase):
 
         self.assertIsNone(cursor_box)
 
+    def test_ignores_isolated_green_noise_pixel(self):
+        image = np.zeros((720, 1280, 3), dtype=np.uint8)
+        roi_x, roi_y, _, _ = CONTROL_ROI
+        green_bgr = cv2.cvtColor(np.uint8([[[82, 180, 210]]]), cv2.COLOR_HSV2BGR)[0, 0]
+        image[roi_y + 2 : roi_y + 10, roi_x + 120 : roi_x + 215] = green_bgr
+        image[roi_y + 1, roi_x + 400] = green_bgr
+
+        green_box, _ = detect_control_boxes(image)
+
+        self.assertEqual(green_box, (roi_x + 120, roi_y + 2, 95, 8))
+
 
 if __name__ == "__main__":
     unittest.main()
