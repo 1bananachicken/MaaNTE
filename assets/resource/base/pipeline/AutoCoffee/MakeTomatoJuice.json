@@ -1,0 +1,141 @@
+{
+    "AutoMakeTomatoJuice": {
+        "desc": "自动做咖啡（安魂曲）入口",
+        "next": [
+            "MakeTomatoJuiceWaitStart",
+            "[JumpBack]MakeCoffeeEnterShop",
+            "[JumpBack]MakeCoffeeEnterShopTemplate"
+        ]
+    },
+    "MakeTomatoJuiceWaitStart": {
+        "desc": "等待开始营业按钮出现",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1057,
+                    648,
+                    178,
+                    44
+                ],
+                "expected": [
+                    "开始营业",
+                    "開始營業",
+                    "(?i)Open\\s*Shop",
+                    "営業開始",
+                    "영업 개시"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "next": [
+            "MakeTomatoJuiceRun"
+        ]
+    },
+    "MakeTomatoJuiceRun": {
+        "desc": "执行做番茄汁逻辑",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "auto_make_tomato_juice",
+                "custom_action_param": {
+                    "count": 1,
+                    "freq": 2
+                }
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "on_error": [
+            "MakeTomatoJuiceErrorScreencap"
+        ]
+    },
+    "MakeTomatoJuiceBusinessReady": {
+        "desc": "识别营业倒计时，确认操作台已经可以交互",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    610,
+                    40,
+                    100,
+                    32
+                ],
+                "expected": [
+                    "\\d+\\s*分\\s*\\d+\\s*秒", // @i18n-skip
+                    "(?i)\\d+\\s*m(?:in)?\\s*\\d+\\s*s(?:ec)?", // @i18n-skip
+                    "\\d+\\s*:\\s*\\d+", // @i18n-skip
+                    "\\d+\\s*분\\s*\\d+\\s*초" // @i18n-skip
+                ],
+                "threshold": 0.3,
+                "only_rec": true
+            }
+        }
+    },
+    "MakeTomatoJuiceSelectGlass": {
+        "desc": "选择空玻璃杯",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1198,
+                    535
+                ]
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "post_wait_freezes": {
+            "time": 200,
+            "target": [
+                1145,
+                475,
+                125,
+                120
+            ],
+            "rate_limit": 50,
+            "timeout": 2000
+        }
+    },
+    "MakeTomatoJuiceAddTomato": {
+        "desc": "向玻璃杯加入番茄汁",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1135,
+                    430
+                ]
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "post_wait_freezes": {
+            "time": 300,
+            "target": [
+                1095,
+                380,
+                90,
+                105
+            ],
+            "rate_limit": 50,
+            "timeout": 2000
+        }
+    },
+    "MakeTomatoJuiceErrorScreencap": {
+        "desc": "做咖啡失败时截图",
+        "action": "Screencap"
+    }
+}

@@ -3,6 +3,7 @@ from .AutoFish.auto_buy_fish_bait import *
 from .AutoFish.auto_sell_fish import *
 from .AutoCoffee.auto_make_coffee import *
 from .AutoCoffee.auto_make_coffee_lite import *
+from .AutoCoffee.auto_make_tomato_juice import *
 from .rhythm.feats.play import *
 from .rhythm.feats.repeat_decision import *
 from .rhythm.feats.select_song import *
@@ -37,6 +38,7 @@ from .auto_volleyball import *
 __all__ = [
     "AutoMakeCoffee",
     "AutoMakeCoffeeLite",
+    "AutoMakeTomatoJuice",
     "AutoFish",
     "AutoBuyFishBait",
     "AutoSellFish",

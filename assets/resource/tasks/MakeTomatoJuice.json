@@ -1,0 +1,46 @@
+{
+    "task": [
+        {
+            "name": "MakeTomatoJuice",
+            "label": "$task_make_tomato_juice_label",
+            "description": "$task_make_tomato_juice_desc",
+            "entry": "AutoMakeTomatoJuice",
+            "option": [
+                "MakeTomatoJuiceSettings"
+            ],
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ]
+        }
+    ],
+    "option": {
+        "MakeTomatoJuiceSettings": {
+            "type": "input",
+            "label": "$task_make_tomato_juice_option",
+            "inputs": [
+                {
+                    "name": "LoopTime",
+                    "default": "10",
+                    "description": "$task_make_tomato_juice_option_loop_time_desc",
+                    "label": "$task_make_tomato_juice_option_loop_time",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9]\\d{0,2}$"
+                }
+            ],
+            "pipeline_override": {
+                "MakeTomatoJuiceRun": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "count": "{LoopTime}"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
