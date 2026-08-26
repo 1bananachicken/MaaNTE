@@ -126,9 +126,12 @@
             "閉じる",
             "빈 곳을 터치해 닫기"
         ],
-        "action": "ClickKey",
-        "key": [
-            27 // Esc
+        "action": "Click",
+        "target": [
+            80,
+            520,
+            300,
+            100
         ],
         "next": [
             "[Anchor]FishNewRestart"
