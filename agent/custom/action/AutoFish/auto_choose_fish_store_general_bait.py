@@ -10,6 +10,7 @@ from maa.pipeline import JOCR, JRecognitionType, JTemplateMatch
 
 from utils.logger import logger
 
+from ..Common.utils import click_rect, get_image
 from .fish_params import load_custom_action_params
 
 STORE_ROI = (26, 81, 418, 585)
@@ -22,10 +23,6 @@ BAIT_NAMES = [
     "万能釣り餌",
     "만능 미끼",
 ]
-
-
-def _screencap(controller):
-    return controller.post_screencap().wait().get()
 
 
 def _candidate_box(context: Context, image, index: int, threshold: float):
@@ -71,15 +68,6 @@ def _collect_candidates(
     return candidates
 
 
-def _click_box(controller, box):
-    x, y, w, h = box
-    cx = x + w // 2
-    cy = y + h // 2
-    controller.post_touch_move(cx, cy).wait()
-    controller.post_touch_down(cx, cy).wait()
-    controller.post_touch_up().wait()
-
-
 def _is_general_bait(context: Context, image) -> bool:
     result = context.run_recognition_direct(
         JRecognitionType.OCR,
@@ -100,7 +88,7 @@ class AutoChooseFishStoreGeneralBait(CustomAction):
         detail_timeout_ms = max(200, int(params.get("detail_timeout_ms", 1200)))
 
         controller = context.tasker.controller
-        image = _screencap(controller)
+        image = get_image(controller)
         candidates = _collect_candidates(context, image, threshold, max_candidates)
         if not candidates:
             logger.warning("商店中未找到万能鱼饵候选")
@@ -110,12 +98,12 @@ class AutoChooseFishStoreGeneralBait(CustomAction):
         for index, box in enumerate(candidates, start=1):
             if context.tasker.stopping:
                 return CustomAction.RunResult(success=False)
-            _click_box(controller, box)
+            click_rect(controller, box)
             deadline = time.monotonic() + detail_timeout_ms / 1000.0
             while time.monotonic() < deadline:
                 if context.tasker.stopping:
                     return CustomAction.RunResult(success=False)
-                image = _screencap(controller)
+                image = get_image(controller)
                 if _is_general_bait(context, image):
                     logger.debug("第 %d 个候选通过万能鱼饵名称确认", index)
                     return CustomAction.RunResult(success=True)
