@@ -254,5 +254,16 @@
     "task_auto_volleyball_difficulty_3": "難度 3",
     "task_auto_volleyball_difficulty_4": "難度 4",
     "task_auto_volleyball_option_continue_non_three_star": "非三星勝利繼續下一關",
-    "task_auto_volleyball_option_continue_non_three_star_desc": "開啟後，勝利但未達三星時也會繼續下一關；關閉時僅三星勝利會繼續，其他勝利重新挑戰。"
+    "task_auto_volleyball_option_continue_non_three_star_desc": "開啟後，勝利但未達三星時也會繼續下一關；關閉時僅三星勝利會繼續，其他勝利重新挑戰。",
+    "task_auto_volleyball_option_first_character": "主控角色",
+    "task_auto_volleyball_option_first_character_desc": "選擇排球挑戰的主控角色。",
+    "task_auto_volleyball_option_second_character": "隊友角色",
+    "task_auto_volleyball_option_second_character_desc": "選擇排球挑戰的隊友角色。",
+    "task_auto_volleyball_character_1": "薄荷",
+    "task_auto_volleyball_character_2": "零",
+    "task_auto_volleyball_character_3": "娜娜莉",
+    "task_auto_volleyball_character_4": "殘虹",
+    "task_auto_volleyball_character_5": "卡厄斯",
+    "task_auto_volleyball_character_6": "真紅",
+    "task_auto_volleyball_character_7": "伊洛伊"
 }

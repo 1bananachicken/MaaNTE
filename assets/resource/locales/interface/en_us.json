@@ -254,5 +254,16 @@
     "task_auto_volleyball_difficulty_3": "Difficulty 3",
     "task_auto_volleyball_difficulty_4": "Difficulty 4",
     "task_auto_volleyball_option_continue_non_three_star": "Continue After Non-Three-Star Win",
-    "task_auto_volleyball_option_continue_non_three_star_desc": "When enabled, continue to the next level after any win, even without three stars. When disabled, only three-star wins continue; other wins retry the level."
+    "task_auto_volleyball_option_continue_non_three_star_desc": "When enabled, continue to the next level after any win, even without three stars. When disabled, only three-star wins continue; other wins retry the level.",
+    "task_auto_volleyball_option_first_character": "Main Character",
+    "task_auto_volleyball_option_first_character_desc": "Choose the main character for volleyball challenges.",
+    "task_auto_volleyball_option_second_character": "Teammate",
+    "task_auto_volleyball_option_second_character_desc": "Choose the teammate for volleyball challenges.",
+    "task_auto_volleyball_character_1": "Mint",
+    "task_auto_volleyball_character_2": "Zero",
+    "task_auto_volleyball_character_3": "Nanally",
+    "task_auto_volleyball_character_4": "Canhong",
+    "task_auto_volleyball_character_5": "Chaos",
+    "task_auto_volleyball_character_6": "Zhenhong",
+    "task_auto_volleyball_character_7": "Yiluoyi"
 }

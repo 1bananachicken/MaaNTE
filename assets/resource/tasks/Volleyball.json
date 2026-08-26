@@ -13,6 +13,8 @@
             ],
             "option": [
                 "VolleyballStartDifficulty",
+                "VolleyballFirstCharacter",
+                "VolleyballSecondCharacter",
                 "VolleyballContinueOnWin"
             ]
         }
@@ -107,6 +109,176 @@
                 {
                     "name": "No",
                     "label": "$option_switch_case_no"
+                }
+            ]
+        },
+        "VolleyballFirstCharacter": {
+            "type": "select",
+            "label": "$task_auto_volleyball_option_first_character",
+            "description": "$task_auto_volleyball_option_first_character_desc",
+            "default_case": "Character1",
+            "cases": [
+                {
+                    "name": "Character1",
+                    "label": "$task_auto_volleyball_character_1",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "first": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character2",
+                    "label": "$task_auto_volleyball_character_2",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "first": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character3",
+                    "label": "$task_auto_volleyball_character_3",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "first": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character4",
+                    "label": "$task_auto_volleyball_character_4",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "first": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character5",
+                    "label": "$task_auto_volleyball_character_5",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "first": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character6",
+                    "label": "$task_auto_volleyball_character_6",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "first": 6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character7",
+                    "label": "$task_auto_volleyball_character_7",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "first": 7
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "VolleyballSecondCharacter": {
+            "type": "select",
+            "label": "$task_auto_volleyball_option_second_character",
+            "description": "$task_auto_volleyball_option_second_character_desc",
+            "default_case": "Character2",
+            "cases": [
+                {
+                    "name": "Character1",
+                    "label": "$task_auto_volleyball_character_1",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "second": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character2",
+                    "label": "$task_auto_volleyball_character_2",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "second": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character3",
+                    "label": "$task_auto_volleyball_character_3",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "second": 3
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character4",
+                    "label": "$task_auto_volleyball_character_4",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "second": 4
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character5",
+                    "label": "$task_auto_volleyball_character_5",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "second": 5
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character6",
+                    "label": "$task_auto_volleyball_character_6",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "second": 6
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character7",
+                    "label": "$task_auto_volleyball_character_7",
+                    "pipeline_override": {
+                        "VolleyballSelectTeammates": {
+                            "attach": {
+                                "second": 7
+                            }
+                        }
+                    }
                 }
             ]
         }
