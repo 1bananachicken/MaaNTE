@@ -20,6 +20,7 @@ from .pinkpaw.pinkpaw_entrance_recovery import *
 from .pinkpaw.pinkpaw_reward_logger import *
 from .auto_tetris import *
 from .AutoFish.auto_fish_withoutCV import *
+from .AutoFish.auto_choose_fish_store_general_bait import *
 from .SoundTrigger.SoundDodgeAction import *
 from .auto_f_scroll import *
 from .Movement.mouse_move import *
@@ -66,6 +67,7 @@ __all__ = [
     "PinkPawHeistReturnToEntranceAction",
     "PinkPawRewardSummary",
     "AutoFishWithoutCV",
+    "AutoChooseFishStoreGeneralBait",
     "SoundDodgeAction",
     "AutoFScroll",
     "AltClick",
