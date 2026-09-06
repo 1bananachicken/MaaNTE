@@ -88,10 +88,12 @@
     "tetris.progress": "[테트리스] 진행률: %d/%d",
     "tetris.task_done": "[테트리스] 작업 완료",
     "tetris.vitality_exhausted": "[테트리스] 활력 소진, 작업 완료",
-    "volleyball.started": "[배구] 난이도 %d부터 시작",
-    "volleyball.selecting_difficulty": "[배구] 난이도 %d 선택",
+    "volleyball.started": "[배구] %d경기 준비 중",
+    "volleyball.selecting_difficulty": "[배구] 워밍업 선택",
     "volleyball.teammates_selected": "[배구] 팀원 선택 완료",
-    "volleyball.playing": "[배구] 난이도 %d 도전 중",
+    "volleyball.playing": "[배구] %d/%d경기 진행 중",
+    "volleyball.loop_progress": "[배구] %d/%d경기 완료",
+    "volleyball.loop_task_done": "[배구] 설정한 %d경기 완료",
     "volleyball.difficulty_done": "[배구] 난이도 %d 완료",
     "volleyball.task_done": "[배구] 모든 난이도 완료"
 }
