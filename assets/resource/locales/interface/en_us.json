@@ -259,6 +259,8 @@
     "task_auto_volleyball_option_first_character_desc": "Choose the main character for volleyball challenges.",
     "task_auto_volleyball_option_second_character": "Teammate",
     "task_auto_volleyball_option_second_character_desc": "Choose the teammate for volleyball challenges.",
+    "task_auto_volleyball_option_skip_to_play": "Start directly in the match",
+    "task_auto_volleyball_option_skip_to_play_desc": "Skip difficulty and teammate selection and start right away from the ongoing match. Set the start difficulty to match your current one.",
     "task_auto_volleyball_character_1": "Mint",
     "task_auto_volleyball_character_2": "Zero",
     "task_auto_volleyball_character_3": "Nanally",

@@ -265,6 +265,8 @@
     "task_auto_volleyball_option_first_character_desc": "选择排球挑战的主控角色。",
     "task_auto_volleyball_option_second_character": "队友角色",
     "task_auto_volleyball_option_second_character_desc": "选择排球挑战的队友角色。",
+    "task_auto_volleyball_option_skip_to_play": "直接在打球界面开始",
+    "task_auto_volleyball_option_skip_to_play_desc": "开启后跳过难度选择、队友选择等前置步骤，直接从当前比赛的打球阶段开始；起始难度需与当前实际难度保持一致。",
     "task_auto_volleyball_character_1": "薄荷",
     "task_auto_volleyball_character_2": "零",
     "task_auto_volleyball_character_3": "娜娜莉",

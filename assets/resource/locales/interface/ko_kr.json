@@ -259,6 +259,8 @@
     "task_auto_volleyball_option_first_character_desc": "배구 챌린지의 메인 캐릭터를 선택합니다.",
     "task_auto_volleyball_option_second_character": "팀원",
     "task_auto_volleyball_option_second_character_desc": "배구 챌린지의 팀원을 선택합니다.",
+    "task_auto_volleyball_option_skip_to_play": "경기 중 직접 시작",
+    "task_auto_volleyball_option_skip_to_play_desc": "난이도 선택 및 팀원 선택 등 사전 단계를 건너뛰고 진행 중인 경기에서 바로 시작합니다. 시작 난이도는 현재 난이도에 맞춰 주세요.",
     "task_auto_volleyball_character_1": "민트",
     "task_auto_volleyball_character_2": "제로",
     "task_auto_volleyball_character_3": "나나리",

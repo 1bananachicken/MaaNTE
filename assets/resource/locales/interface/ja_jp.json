@@ -259,6 +259,8 @@
     "task_auto_volleyball_option_first_character_desc": "バレーボールチャレンジのメインキャラクターを選択します。",
     "task_auto_volleyball_option_second_character": "チームメイト",
     "task_auto_volleyball_option_second_character_desc": "バレーボールチャレンジのチームメイトを選択します。",
+    "task_auto_volleyball_option_skip_to_play": "試合中から直接開始",
+    "task_auto_volleyball_option_skip_to_play_desc": "難易度選択やチームメイト選択などの前置きをスキップし、進行中の試合から直接開始します。開始難易度は現在の難易度に合わせてください。",
     "task_auto_volleyball_character_1": "ミント",
     "task_auto_volleyball_character_2": "ゼロ",
     "task_auto_volleyball_character_3": "ナナリー",
