@@ -18,6 +18,96 @@
         "post_delay": 0,
         "timeout": 5000,
         "next": [
+            "VolleyballWaitDifficultySelection",
+            "VolleyballSelectWarmupStage02",
+            "VolleyballConfirmStartMenuItem",
+            "VolleyballSelectStartMenuItem"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballSelectStartMenuItem": {
+        "desc": "仅当 F 图标位于下方排球之星一行时，滚轮切换到开始比赛",
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    738,
+                    404,
+                    20,
+                    20
+                ],
+                "method": 4,
+                "lower": [
+                    190,
+                    190,
+                    190
+                ],
+                "upper": [
+                    255,
+                    255,
+                    255
+                ],
+                "count": 3,
+                "connected": true
+            }
+        },
+        "action": {
+            "type": "Scroll",
+            "param": {
+                "target": true,
+                "dy": 120
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 500,
+        "timeout": 15000,
+        "next": [
+            "VolleyballConfirmStartMenuItem"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballConfirmStartMenuItem": {
+        "desc": "仅当 F 图标位于上方开始比赛一行时按 F",
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    738,
+                    354,
+                    20,
+                    20
+                ],
+                "method": 4,
+                "lower": [
+                    190,
+                    190,
+                    190
+                ],
+                "upper": [
+                    255,
+                    255,
+                    255
+                ],
+                "count": 3,
+                "connected": true
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 70
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
             "VolleyballWaitDifficultySelection"
         ],
         "on_error": [
@@ -48,6 +138,37 @@
         "rate_limit": 0,
         "pre_delay": 0,
         "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballSelectWarmupStage02"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballSelectWarmupStage02": {
+        "desc": "在关卡列表中识别并选择热身时间02；星数和历史比分不参与识别",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    25,
+                    295,
+                    310,
+                    65
+                ],
+                "expected": [
+                    "热身时间02"
+                ],
+                "threshold": 0.3
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 500,
         "timeout": 15000,
         "next": [
             "VolleyballStartButton"
@@ -160,7 +281,9 @@
         "timeout": 15000,
         "next": [
             "VolleyballSkipStory",
-            "VolleyballStartButtonAfterTeammates"
+            "VolleyballStartRacing",
+            "VolleyballStartButtonAfterTeammates",
+            "VolleyballPlay"
         ],
         "on_error": [
             "VolleyballTaskStop"
@@ -196,7 +319,7 @@
         ]
     },
     "VolleyballPlay": {
-        "desc": "每 0.6 秒按一次 J 键，每 5 秒检测剧情或结算",
+        "desc": "每 0.6 秒按一次 J 键，每 5 秒检测剧情或结算；单局最长等待 10 分钟",
         "recognition": {
             "type": "DirectHit"
         },
@@ -209,7 +332,7 @@
         "rate_limit": 0,
         "pre_delay": 0,
         "post_delay": 0,
-        "timeout": 190000,
+        "timeout": 610000,
         "next": [
             "VolleyballSkipStory",
             "VolleyballWin",
@@ -318,7 +441,7 @@
         ]
     },
     "VolleyballWin": {
-        "desc": "识别胜利结算并判断三星",
+        "desc": "识别胜利结算并重新开始本关",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -340,9 +463,7 @@
         "post_delay": 0,
         "timeout": 30000,
         "next": [
-            "VolleyballThreeStars",
-            "VolleyballRestartButton",
-            "VolleyballSkipStory"
+            "VolleyballCountCompletedLoop"
         ],
         "on_error": [
             "VolleyballTaskStop"
@@ -371,6 +492,28 @@
         "post_delay": 0,
         "timeout": 30000,
         "next": [
+            "VolleyballCountCompletedLoop"
+        ],
+        "on_error": [
+            "VolleyballTaskStop"
+        ]
+    },
+    "VolleyballCountCompletedLoop": {
+        "desc": "记录已完成局数；达到设定次数后停在结算页，否则重新开始",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_count_completed_loop"
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 5000,
+        "next": [
             "VolleyballRestartButton"
         ],
         "on_error": [
@@ -378,7 +521,7 @@
         ]
     },
     "VolleyballRestartButton": {
-        "desc": "失败或未三星时点击重新挑战",
+        "desc": "胜负结算时点击重新开始",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -553,7 +696,7 @@
         ]
     },
     "VolleyballTaskComplete": {
-        "desc": "难度四最后一关已三星，结束任务",
+        "desc": "已达到设定循环次数，结束任务并停留在结算页",
         "recognition": {
             "type": "DirectHit"
         },

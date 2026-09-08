@@ -5,6 +5,7 @@
             "label": "$task_auto_volleyball_label",
             "entry": "VolleyballEntrance",
             "description": "$task_auto_volleyball_desc",
+            "default_check": false,
             "controller": [
                 "Win32-Front"
             ],
@@ -12,14 +13,38 @@
                 "HethereauHobbies"
             ],
             "option": [
-                "VolleyballStartDifficulty",
+                "VolleyballLoopCount",
                 "VolleyballFirstCharacter",
-                "VolleyballSecondCharacter",
-                "VolleyballContinueOnWin"
+                "VolleyballSecondCharacter"
             ]
         }
     ],
     "option": {
+        "VolleyballLoopCount": {
+            "type": "input",
+            "label": "$task_auto_volleyball_option_loop_count",
+            "description": "$task_auto_volleyball_option_loop_count_desc",
+            "inputs": [
+                {
+                    "name": "count",
+                    "label": "$task_auto_volleyball_option_loop_count_input",
+                    "default": "99",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9]\\d{0,3}$"
+                }
+            ],
+            "pipeline_override": {
+                "VolleyballEntrance": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "loop_count": "{count}"
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "VolleyballStartDifficulty": {
             "type": "select",
             "label": "$task_auto_volleyball_option_difficulty",

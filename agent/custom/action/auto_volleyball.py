@@ -10,7 +10,7 @@ from utils.logger import logger
 from utils.maafocus import PrintT
 from .Common.utils import get_image
 
-_K_KEY = 0x4B
+_J_KEY = 0x4A
 _KEY_PRESS_INTERVAL_SECONDS = 0.6
 _RESULT_CHECK_INTERVAL_SECONDS = 5.0
 _MAX_GAME_SECONDS = 600.0
@@ -18,6 +18,10 @@ _TEAMMATE_SELECTION_TIMEOUT_SECONDS = 30.0
 _TEAMMATE_CONFIRM_TIMEOUT_SECONDS = 2.0
 _TEAMMATE_FAILURE_LIMIT = 5
 _TEMPLATE_THRESHOLD = 0.8
+_CHARACTER_TEMPLATE_THRESHOLD = 0.72
+_CHARACTER_SEARCH_ROI = (320, 95, 365, 335)
+_DEFAULT_LOOP_COUNT = 99
+_MAX_LOOP_COUNT = 9999
 
 _DIFFICULTY_ROIS = {
     1: (158, 254, 91, 86),
@@ -36,18 +40,32 @@ _FIRST_TEAMMATE_CONFIRMED_TEMPLATE = "Volleyball/FirstTeammateConfirmed.png"
 _SECOND_TEAMMATE_CONFIRMED_TEMPLATE = "Volleyball/SecondTeammateConfirmed.png"
 
 # 1-7 与 task 选项中 first/second 的数值一致。
-# 每个角色：(显示名, 已选中确认 ROI, 头像点击 ROI)
+# 头像顺序会变化，因此用角色头像模板定位，不把格位当作角色身份。
 _CHARACTERS = {
-    1: ("薄荷", (323, 94, 103, 76), (407, 166, 1, 1)),
-    2: ("零", (443, 98, 89, 70), (519, 167, 1, 1)),
-    3: ("娜娜莉", (554, 98, 89, 70), (633, 170, 1, 1)),
-    4: ("残虹", (332, 208, 89, 69), (407, 276, 1, 1)),
-    5: ("卡厄斯", (444, 209, 88, 68), (516, 279, 1, 1)),
-    6: ("真红", (556, 208, 88, 70), (630, 278, 1, 1)),
-    7: ("伊洛伊", (332, 318, 89, 70), (410, 386, 1, 1)),
+    1: ("薄荷", "Volleyball/Character/Mint.png"),
+    2: ("零", "Volleyball/Character/Zero.png"),
+    3: ("真红", "Volleyball/Character/Zhenhong.png"),
+    4: ("娜娜莉", "Volleyball/Character/Nanally.png"),
+    5: ("残虹", "Volleyball/Character/Canhong.png"),
+    6: ("卡厄斯", "Volleyball/Character/Chaos.png"),
+    7: ("伊洛伊", "Volleyball/Character/Yiluoyi.png"),
 }
 
+# 格位只用于确定主控/队友标签的局部确认区域，角色与格位没有绑定关系。
+_CHARACTER_SLOTS = (
+    ((407, 166), (323, 94, 103, 76)),
+    ((519, 167), (443, 98, 89, 70)),
+    ((633, 170), (554, 98, 89, 70)),
+    ((407, 276), (332, 208, 89, 69)),
+    ((516, 279), (444, 209, 88, 68)),
+    ((630, 278), (556, 208, 88, 70)),
+    ((410, 386), (332, 318, 89, 70)),
+)
+_MAX_SLOT_DISTANCE_SQUARED = 45 * 45
+
 _current_difficulty = 1
+_target_loop_count = _DEFAULT_LOOP_COUNT
+_completed_loop_count = 0
 
 
 def _load_params(custom_action_param) -> dict:
@@ -96,19 +114,80 @@ def _template_hit(context: Context, frame, template: str, roi: tuple) -> bool:
     return result is not None and result.hit
 
 
+def _locate_character(
+    context: Context, frame, name: str, template: str
+) -> tuple[tuple, tuple] | None:
+    """Locate a character portrait, then map it to the nearest visible grid slot."""
+    if frame is None or getattr(frame, "size", 0) == 0:
+        return None
+
+    result = context.run_recognition_direct(
+        JRecognitionType.TemplateMatch,
+        JTemplateMatch(
+            template=[template],
+            roi=_CHARACTER_SEARCH_ROI,
+            threshold=[_CHARACTER_TEMPLATE_THRESHOLD],
+        ),
+        frame,
+    )
+    best = result.best_result if result is not None and result.hit else None
+    if best is None:
+        logger.debug("AutoVolleyball: portrait not found for %s", name)
+        return None
+
+    x, y, width, height = tuple(best.box)
+    center = (x + width // 2, y + height // 2)
+    slot_center, confirmed_roi = min(
+        _CHARACTER_SLOTS,
+        key=lambda slot: (center[0] - slot[0][0]) ** 2 + (center[1] - slot[0][1]) ** 2,
+    )
+    distance_squared = (center[0] - slot_center[0]) ** 2 + (
+        center[1] - slot_center[1]
+    ) ** 2
+    if distance_squared > _MAX_SLOT_DISTANCE_SQUARED:
+        logger.warning(
+            "AutoVolleyball: %s portrait matched outside known slots at %s",
+            name,
+            center,
+        )
+        return None
+
+    logger.debug(
+        "AutoVolleyball: located %s at %s score=%.3f",
+        name,
+        center,
+        getattr(best, "score", 0.0),
+    )
+    return confirmed_roi, (center[0], center[1], 1, 1)
+
+
 def _select_teammate(
     context: Context,
     controller,
     name: str,
+    portrait_template: str,
     confirmed_template: str,
-    confirmed_roi: tuple,
-    click_roi: tuple,
     deadline: float,
     failures: list[int],
 ) -> bool:
     """Check selection before each click and verify it after the click."""
     while time.monotonic() < deadline and not context.tasker.stopping:
         frame = get_image(controller)
+        location = _locate_character(context, frame, name, portrait_template)
+        if location is None:
+            failures[0] += 1
+            logger.warning(
+                "AutoVolleyball: %s portrait detection failed %d/%d",
+                name,
+                failures[0],
+                _TEAMMATE_FAILURE_LIMIT,
+            )
+            if failures[0] >= _TEAMMATE_FAILURE_LIMIT:
+                return False
+            time.sleep(0.2)
+            continue
+
+        confirmed_roi, click_roi = location
         if _template_hit(context, frame, confirmed_template, confirmed_roi):
             logger.info("AutoVolleyball: %s already selected", name)
             return True
@@ -160,7 +239,7 @@ class VolleyballReset(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        global _current_difficulty
+        global _completed_loop_count, _current_difficulty, _target_loop_count
 
         params = _load_params(argv.custom_action_param)
         try:
@@ -169,8 +248,21 @@ class VolleyballReset(CustomAction):
             start_difficulty = 1
 
         _current_difficulty = min(4, max(1, start_difficulty))
-        PrintT(context, "volleyball.started", _current_difficulty)
-        logger.info("AutoVolleyball: start difficulty=%d", _current_difficulty)
+        try:
+            loop_count = int(params.get("loop_count", _DEFAULT_LOOP_COUNT))
+        except (TypeError, ValueError):
+            loop_count = _DEFAULT_LOOP_COUNT
+        _target_loop_count = min(_MAX_LOOP_COUNT, max(1, loop_count))
+        _completed_loop_count = 0
+        context.override_next(
+            "VolleyballCountCompletedLoop", ["VolleyballRestartButton"]
+        )
+        PrintT(context, "volleyball.started", _target_loop_count)
+        logger.info(
+            "AutoVolleyball: start difficulty=%d loop_count=%d",
+            _current_difficulty,
+            _target_loop_count,
+        )
         return CustomAction.RunResult(success=True)
 
 
@@ -188,7 +280,7 @@ class VolleyballSelectDifficulty(CustomAction):
 
         x, y, width, height = roi
         context.tasker.controller.post_click(x + width // 2, y + height // 2).wait()
-        PrintT(context, "volleyball.selecting_difficulty", _current_difficulty)
+        PrintT(context, "volleyball.selecting_difficulty")
         return CustomAction.RunResult(success=True)
 
 
@@ -226,14 +318,13 @@ class VolleyballSelectTeammates(CustomAction):
             (second_id, _SECOND_TEAMMATE_CONFIRMED_TEMPLATE),
         )
         for character_id, confirmed_template in selections:
-            name, confirmed_roi, click_roi = _CHARACTERS[character_id]
+            name, portrait_template = _CHARACTERS[character_id]
             if not _select_teammate(
                 context,
                 controller,
                 name,
+                portrait_template,
                 confirmed_template,
-                confirmed_roi,
-                click_roi,
                 deadline,
                 failures,
             ):
@@ -259,7 +350,12 @@ class VolleyballPlay(CustomAction):
         next_key_at = time.monotonic()
         next_check_at = next_key_at + _RESULT_CHECK_INTERVAL_SECONDS
 
-        PrintT(context, "volleyball.playing", _current_difficulty)
+        PrintT(
+            context,
+            "volleyball.playing",
+            _completed_loop_count + 1,
+            _target_loop_count,
+        )
 
         try:
             while not tasker.stopping:
@@ -273,7 +369,7 @@ class VolleyballPlay(CustomAction):
                     return CustomAction.RunResult(success=False)
 
                 if now >= next_key_at:
-                    controller.post_click_key(_K_KEY).wait()
+                    controller.post_click_key(_J_KEY).wait()
                     next_key_at = now + _KEY_PRESS_INTERVAL_SECONDS
 
                 if now >= next_check_at:
@@ -295,6 +391,39 @@ class VolleyballPlay(CustomAction):
             return CustomAction.RunResult(success=False)
 
         return CustomAction.RunResult(success=False)
+
+
+@AgentServer.custom_action("volleyball_count_completed_loop")
+class VolleyballCountCompletedLoop(CustomAction):
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
+        global _completed_loop_count
+
+        _completed_loop_count += 1
+        PrintT(
+            context,
+            "volleyball.loop_progress",
+            _completed_loop_count,
+            _target_loop_count,
+        )
+        logger.info(
+            "AutoVolleyball: completed loop %d/%d",
+            _completed_loop_count,
+            _target_loop_count,
+        )
+
+        if _completed_loop_count >= _target_loop_count:
+            context.override_next(
+                "VolleyballCountCompletedLoop", ["VolleyballTaskComplete"]
+            )
+            PrintT(context, "volleyball.loop_task_done", _completed_loop_count)
+        else:
+            context.override_next(
+                "VolleyballCountCompletedLoop", ["VolleyballRestartButton"]
+            )
+
+        return CustomAction.RunResult(success=True)
 
 
 @AgentServer.custom_action("volleyball_advance_difficulty")

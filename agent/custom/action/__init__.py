@@ -83,5 +83,6 @@ __all__ = [
     "VolleyballSelectDifficulty",
     "VolleyballSelectTeammates",
     "VolleyballPlay",
+    "VolleyballCountCompletedLoop",
     "VolleyballAdvanceDifficulty",
 ]

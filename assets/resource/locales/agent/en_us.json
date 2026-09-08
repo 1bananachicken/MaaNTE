@@ -88,10 +88,12 @@
     "tetris.progress": "[Tetris] Progress: %d/%d",
     "tetris.task_done": "[Tetris] Task complete",
     "tetris.vitality_exhausted": "[Tetris] Vitality exhausted, task complete",
-    "volleyball.started": "[Volleyball] Starting at difficulty %d",
-    "volleyball.selecting_difficulty": "[Volleyball] Selecting difficulty %d",
+    "volleyball.started": "[Volleyball] Preparing to play %d matches",
+    "volleyball.selecting_difficulty": "[Volleyball] Selecting Warm-up",
     "volleyball.teammates_selected": "[Volleyball] Teammates selected",
-    "volleyball.playing": "[Volleyball] Playing difficulty %d",
+    "volleyball.playing": "[Volleyball] Playing match %d/%d",
+    "volleyball.loop_progress": "[Volleyball] Completed %d/%d matches",
+    "volleyball.loop_task_done": "[Volleyball] Completed the configured %d matches",
     "volleyball.difficulty_done": "[Volleyball] Difficulty %d complete",
     "volleyball.task_done": "[Volleyball] All difficulties complete"
 }
