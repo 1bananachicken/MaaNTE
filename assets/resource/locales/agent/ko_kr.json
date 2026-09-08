@@ -93,5 +93,8 @@
     "volleyball.teammates_selected": "[배구] 팀원 선택 완료",
     "volleyball.playing": "[배구] 난이도 %d 도전 중",
     "volleyball.difficulty_done": "[배구] 난이도 %d 완료",
-    "volleyball.task_done": "[배구] 모든 난이도 완료"
+    "volleyball.task_done": "[배구] 모든 난이도 완료",
+    "volleyball_weekly.started": "[배구 (주간)] 작업 시작",
+    "volleyball_weekly.playing": "[배구 (주간)] 경기 진행 중",
+    "volleyball_weekly.teammates_selected": "[배구 (주간)] 팀원 선택 완료"
 }

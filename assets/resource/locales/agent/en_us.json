@@ -93,5 +93,8 @@
     "volleyball.teammates_selected": "[Volleyball] Teammates selected",
     "volleyball.playing": "[Volleyball] Playing difficulty %d",
     "volleyball.difficulty_done": "[Volleyball] Difficulty %d complete",
-    "volleyball.task_done": "[Volleyball] All difficulties complete"
+    "volleyball.task_done": "[Volleyball] All difficulties complete",
+    "volleyball_weekly.started": "[Volleyball Weekly] Task started",
+    "volleyball_weekly.playing": "[Volleyball Weekly] Match in progress",
+    "volleyball_weekly.teammates_selected": "[Volleyball Weekly] Teammates selected"
 }
