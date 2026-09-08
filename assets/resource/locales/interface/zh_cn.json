@@ -271,5 +271,16 @@
     "task_auto_volleyball_character_4": "残虹",
     "task_auto_volleyball_character_5": "卡厄斯",
     "task_auto_volleyball_character_6": "真红",
-    "task_auto_volleyball_character_7": "伊洛伊"
+    "task_auto_volleyball_character_7": "伊洛伊",
+    "task_auto_volleyball_weekly_label": "自动排球（周常）",
+    "task_auto_volleyball_weekly_desc": "自动挑战周常联赛，共五场（小组赛两场、冠军赛三场），需要从联赛界面启动。",
+    "task_auto_volleyball_weekly_option_skip_to_play": "直接在打球界面开始",
+    "task_auto_volleyball_weekly_option_skip_to_play_desc": "开启后跳过签表与选人等前置步骤，直接从当前比赛的打球阶段开始。",
+    "task_auto_volleyball_weekly_option_first_character": "主控角色",
+    "task_auto_volleyball_weekly_option_first_character_desc": "选择排球挑战的主控角色（面板第一行从左到右）。",
+    "task_auto_volleyball_weekly_option_second_character": "队友角色",
+    "task_auto_volleyball_weekly_option_second_character_desc": "选择排球挑战的队友角色（面板第一行从左到右）。",
+    "task_auto_volleyball_weekly_character_1": "角色 1",
+    "task_auto_volleyball_weekly_character_2": "角色 2",
+    "task_auto_volleyball_weekly_character_3": "角色 3"
 }

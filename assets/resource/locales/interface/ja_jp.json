@@ -265,5 +265,16 @@
     "task_auto_volleyball_character_4": "残虹",
     "task_auto_volleyball_character_5": "カオス",
     "task_auto_volleyball_character_6": "真紅",
-    "task_auto_volleyball_character_7": "イロイ"
+    "task_auto_volleyball_character_7": "イロイ",
+    "task_auto_volleyball_weekly_label": "自動バレーボール（週常）",
+    "task_auto_volleyball_weekly_desc": "ウィークリーリーグを自動消化します。合計5試合（グループステージ2試合、選手権3試合）。リーグ画面から開始してください。",
+    "task_auto_volleyball_weekly_option_skip_to_play": "試合中から直接開始",
+    "task_auto_volleyball_weekly_option_skip_to_play_desc": "トーナメントやチームメイト選択などをスキップし、進行中の試合から直接開始します。",
+    "task_auto_volleyball_weekly_option_first_character": "メインキャラクター",
+    "task_auto_volleyball_weekly_option_first_character_desc": "バレーボールチャレンジのメインキャラクターを選択します（パネルの上段を左から右）。",
+    "task_auto_volleyball_weekly_option_second_character": "チームメイト",
+    "task_auto_volleyball_weekly_option_second_character_desc": "バレーボールチャレンジのチームメイトを選択します（パネルの上段を左から右）。",
+    "task_auto_volleyball_weekly_character_1": "キャラクター1",
+    "task_auto_volleyball_weekly_character_2": "キャラクター2",
+    "task_auto_volleyball_weekly_character_3": "キャラクター3"
 }

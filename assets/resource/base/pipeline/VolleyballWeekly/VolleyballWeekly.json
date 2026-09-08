@@ -1,0 +1,409 @@
+{
+    "VolleyballWeeklyEntrance": {
+        "desc": "周常排球入口，重置任务状态",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_weekly_reset"
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 5000,
+        "next": [
+            "VolleyballWeeklyStartMatch"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklyStartMatch": {
+        "desc": "识别开始比赛按钮确认在大厅界面，不点击（空队伍时点开始会被游戏拦下），按空位状态路由：有空位去选人，没空位直接开始",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "VolleyballWeekly/StartMatch.png",
+                "roi": [
+                    440,
+                    615,
+                    420,
+                    80
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 15000,
+        "next": [
+            "VolleyballWeeklySelectSlot",
+            "VolleyballWeeklyStartMatchAfterTeammates"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklySelectSlot": {
+        "desc": "点击一个选择球员空位，打开选人面板",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "VolleyballWeekly/SelectSlot.png",
+                "roi": [
+                    260,
+                    380,
+                    300,
+                    185
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballWeeklySelectTeammates"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklySelectTeammates": {
+        "desc": "在选人面板依次点击选项指定的两个角色，一个角色填一个空位",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_weekly_select_teammates"
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 500,
+        "timeout": 30000,
+        "next": [
+            "VolleyballWeeklyStartMatchAfterTeammates"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklyStartMatchAfterTeammates": {
+        "desc": "队友确定后点击开始比赛进入打球",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "VolleyballWeekly/StartMatch.png",
+                "roi": [
+                    440,
+                    615,
+                    420,
+                    80
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballWeeklySkipStory",
+            "VolleyballWeeklyPlay"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklyPlay": {
+        "desc": "每 0.6 秒按一次 K 键，每 5 秒检测剧情或结算",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_weekly_play"
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 620000,
+        "next": [
+            "VolleyballWeeklySkipStory",
+            "VolleyballWeeklyWin",
+            "VolleyballWeeklyLoss"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklySkipStory": {
+        "desc": "剧情动画出现后延迟 1 秒按 Esc 跳过",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/SkipButton.png",
+                "roi": [
+                    1223,
+                    29,
+                    28,
+                    26
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 27
+            }
+        },
+        "rate_limit": 500,
+        "pre_delay": 1000,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballWeeklySkipCheckbox",
+            "VolleyballWeeklySkipConfirm",
+            "VolleyballWeeklyPlay",
+            "VolleyballWeeklyWin",
+            "VolleyballWeeklyLoss"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklySkipCheckbox": {
+        "desc": "勾选剧情跳过确认框",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/SkipCheckbox.png",
+                "roi": [
+                    566,
+                    361,
+                    23,
+                    24
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 10000,
+        "next": [
+            "VolleyballWeeklySkipConfirm"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklySkipConfirm": {
+        "desc": "确认跳过剧情并继续等待结算",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/SkipConfirmButton.png",
+                "roi": [
+                    734,
+                    426,
+                    173,
+                    37
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 10000,
+        "next": [
+            "VolleyballWeeklyPlay",
+            "VolleyballWeeklyWin",
+            "VolleyballWeeklyLoss"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklyWin": {
+        "desc": "识别胜利结算（复用普通排球模板）",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/Win.png",
+                "roi": [
+                    937,
+                    71,
+                    308,
+                    110
+                ],
+                "threshold": 0.85
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 5000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 30000,
+        "next": [
+            "VolleyballWeeklyAfterMatch"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklyLoss": {
+        "desc": "识别失败结算（复用普通排球模板）",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Volleyball/Lose.png",
+                "roi": [
+                    879,
+                    72,
+                    363,
+                    105
+                ],
+                "threshold": 0.85
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 5000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 30000,
+        "next": [
+            "VolleyballWeeklyAfterMatch"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklyAfterMatch": {
+        "desc": "胜负结算后进入继续比赛；既没有继续比赛也没有后续比赛时结束任务",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 15000,
+        "next": [
+            "VolleyballWeeklyContinueMatch",
+            "VolleyballWeeklyTaskComplete"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklyContinueMatch": {
+        "desc": "点击结算界面左下角的继续比赛进入下一场（固定坐标盲点，不依赖模板）",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    40,
+                    572,
+                    145,
+                    52
+                ]
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 15000,
+        "next": [
+            "VolleyballWeeklySkipStory",
+            "VolleyballWeeklyStartMatch",
+            "VolleyballWeeklyLeagueOver",
+            "VolleyballWeeklyPlay"
+        ],
+        "on_error": [
+            "VolleyballWeeklyTaskStop"
+        ]
+    },
+    "VolleyballWeeklyLeagueOver": {
+        "desc": "联赛终局（止步小组赛等），识别结算页大排球图案，直接结束任务",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "VolleyballWeekly/LeagueOver.png",
+                "roi": [
+                    700,
+                    120,
+                    340,
+                    340
+                ],
+                "threshold": 0.6
+            }
+        },
+        "action": {
+            "type": "StopTask"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "VolleyballWeeklyTaskComplete": {
+        "desc": "周常排球任务完成",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "StopTask"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0
+    },
+    "VolleyballWeeklyTaskStop": {
+        "desc": "节点异常时停止任务",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "StopTask"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0
+    }
+}
