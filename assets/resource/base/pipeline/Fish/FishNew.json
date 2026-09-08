@@ -124,7 +124,12 @@
             "關閉",
             "(?i)Close",
             "閉じる",
-            "빈 곳을 터치해 닫기"
+            "빈 곳을 터치해 닫기",
+            "获得的鱼经验",
+            "獲得的魚經驗",
+            "(?i)Fishing\\s*experience\\s*gained",
+            "釣り経験値を獲得",
+            "낚시 경험치 획득"
         ],
         "action": "ClickKey",
         "key": [
@@ -427,7 +432,8 @@
             }
         },
         "next": [
-            "FishNewStoreChooseGeneralBait"
+            "FishNewStoreChooseGeneralBait",
+            "FishNewStoreScrollUpAfterMiss"
             // "[JumpBack]FishNewStoreScrollMouse"
         ],
         "on_error": [
@@ -481,7 +487,99 @@
             "detail_timeout_ms": 1200
         },
         "next": [
-            "FishNewStoreChooseMax"
+            "FishNewStoreManualScrollWait",
+            "FishNewStoreScrollUp"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
+        ]
+    },
+    "FishNewStoreManualScrollWait": {
+        "desc": "点击鱼饵后短暂等待，再执行点击复核",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "FishNewOnStore"
+                ]
+            }
+        },
+        "action": "DoNothing",
+        "post_delay": 500,
+        "next": [
+            "FishNewStoreChooseGeneralBaitVerify",
+            "FishNewStoreScrollUp"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
+        ]
+    },
+    "FishNewStoreChooseGeneralBaitVerify": {
+        "desc": "点击万能鱼饵后再次识别，确认点击没有被识别为滑动",
+        "recognition": "TemplateMatch",
+        "roi": [
+            26,
+            81,
+            418,
+            585
+        ],
+        "template": [
+            "Fish/FishStoreGeneralBait.png"
+        ],
+        "green_mask": true,
+        "order_by": "Score",
+        "action": "DoNothing",
+        "next": [
+            "FishNewStoreChooseMaxSuccess",
+            "[JumpBack]FishNewStoreChooseMax"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
+        ]
+    },
+    "FishNewStoreScrollUp": {
+        "desc": "万能鱼饵点击失败，向上滚动后重新识别",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "FishNewOnStore"
+                ]
+            }
+        },
+        "action": "Scroll",
+        "target": [
+            220,
+            350
+        ],
+        "dy": 1200,
+        "next": [
+            "FishNewStoreChooseGeneralBait",
+            "FishNewStoreScrollUpAfterMiss"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
+        ]
+    },
+    "FishNewStoreScrollUpAfterMiss": {
+        "desc": "鱼饵仍未识别到，继续向上滚动",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "FishNewOnStore"
+                ]
+            }
+        },
+        "action": "Scroll",
+        "target": [
+            220,
+            350
+        ],
+        "dy": 1200,
+        "next": [
+            "FishNewStoreChooseGeneralBait",
+            "FishNewStoreScrollUp"
         ],
         "on_error": [
             "[Anchor]FishNewErrorRestart"
