@@ -80,13 +80,27 @@
         "action": "Custom",
         "custom_action": "auto_fish_without_cv",
         "custom_action_param": {
-            "floor_ms": 80,
-            "factor": 1.4
+            "safe_margin": 6,
+            "center_band_ratio": 0.4,
+            "prediction_ms": 140,
+            "velocity_alpha": 0.5,
+            "green_velocity_alpha": 0.5,
+            "green_center_alpha": 0.85,
+            "pulse_min_ms": 18,
+            "pulse_max_ms": 36,
+            "pulse_ms_per_px": 0.45,
+            "width_change_threshold": 8,
+            "width_confirm_frames": 2,
+            "control_end_grace_ms": 300,
+            "lost_timeout_ms": 120,
+            "lost_abort_ms": 1500
         },
         "pre_delay": 0,
         "next": [
-            "[Anchor]FishNewRestart",
-            "[JumpBack]SceneClickBlankToExit"
+            "FishNewGameResult",
+            "FishNewEscapeResult",
+            "FishNewStart",
+            "FishNewGaming"
         ],
         "on_error": [
             "[Anchor]FishNewErrorRestart"
@@ -110,15 +124,33 @@
             "關閉",
             "(?i)Close",
             "閉じる",
-            "빈 곳을 터치해 닫기"
+            "빈 곳을 터치해 닫기",
+            "获得的鱼经验",
+            "獲得的魚經驗",
+            "(?i)Fishing\\s*experience\\s*gained",
+            "釣り経験値を獲得",
+            "낚시 경험치 획득"
         ],
         "action": "ClickKey",
         "key": [
             27 // Esc
         ],
+        "next": [
+            "[Anchor]FishNewRestart"
+        ],
         "focus": {
             "Node.Action.Succeeded": "钓到鱼了！"
         }
+    },
+    "FishNewEscapeResult": {
+        "desc": "识别到鱼逃走后继续钓鱼",
+        "recognition": "And",
+        "all_of": [
+            "FishEscape"
+        ],
+        "next": [
+            "[Anchor]FishNewRestart"
+        ]
     },
     "FishNewTaskExit": {
         "desc": "钓鱼任务完成",
@@ -442,7 +474,48 @@
         ]
     },
     "FishNewStoreChooseGeneralBait": {
-        "desc": "商店界面选择万能鱼饵",
+        "desc": "扫描候选并通过详情名称确认万能鱼饵",
+        "recognition": "And",
+        "all_of": [
+            "FishNewOnStore"
+        ],
+        "action": "Custom",
+        "custom_action": "auto_choose_fish_store_general_bait",
+        "custom_action_param": {
+            "candidate_threshold": 0.6,
+            "max_candidates": 8,
+            "detail_timeout_ms": 1200
+        },
+        "next": [
+            "FishNewStoreManualScrollWait",
+            "FishNewStoreScrollUp"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
+        ]
+    },
+    "FishNewStoreManualScrollWait": {
+        "desc": "点击鱼饵后短暂等待，再执行点击复核",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "FishNewOnStore"
+                ]
+            }
+        },
+        "action": "DoNothing",
+        "post_delay": 500,
+        "next": [
+            "FishNewStoreChooseGeneralBaitVerify",
+            "FishNewStoreScrollUp"
+        ],
+        "on_error": [
+            "[Anchor]FishNewErrorRestart"
+        ]
+    },
+    "FishNewStoreChooseGeneralBaitVerify": {
+        "desc": "点击万能鱼饵后再次识别，确认点击没有被识别为滑动",
         "recognition": "TemplateMatch",
         "roi": [
             26,
@@ -450,15 +523,12 @@
             418,
             585
         ],
-        // 考虑到刚开始鱼鳞币万能鱼饵可能不在那个位置，放宽ROI
-        // 通过置信度排序的方式滤除方斯鱼饵的选项
         "template": [
             "Fish/FishStoreGeneralBait.png"
         ],
         "green_mask": true,
-        // "threshold": 0.8, // 0.8 有点高了
-        "order_by": "Score", // 默认似乎不是按置信度排的，需要显式声明
-        "action": "Click",
+        "order_by": "Score",
+        "action": "DoNothing",
         "next": [
             "FishNewStoreManualScrollWait",
             "FishNewStoreScrollUp"
@@ -623,7 +693,10 @@
             }
         },
         "action": "Click",
-        "pre_delay": 500 // pre或post都行
+        "pre_delay": 500, // pre或post都行
+        "next": [
+            "FishNewStoreChooseMaxSuccess"
+        ]
         // "post_delay": 200, // 实测必须加上这个，也不知道为什么有些电脑上快速点击没用
         // "action": "Click"
     },
