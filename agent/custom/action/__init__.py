@@ -87,4 +87,5 @@ __all__ = [
     "VolleyballAdvanceDifficulty",
     "VolleyballWeeklyReset",
     "VolleyballWeeklySelectTeammates",
+    "VolleyballWeeklyClickButton",
 ]

@@ -1,12 +1,14 @@
+import random
 import time
 
 from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
+from maa.pipeline import JRecognitionType, JTemplateMatch
 
 from utils.logger import logger
 from utils.maafocus import PrintT
-from .Common.utils import load_params
+from .Common.utils import get_image, load_params
 from .auto_volleyball import (
     _K_KEY,
     _KEY_PRESS_INTERVAL_SECONDS,
@@ -30,6 +32,10 @@ _PRESS_SECONDS = 0.12        # 按下与抬起之间的间隔
 _PICK_INTERVAL_SECONDS = 0.6  # 两次选择之间的间隔
 _DISMISS_SETTLE_SECONDS = 0.8  # 收起面板后的等待
 
+_CLICK_VERIFY_DELAY_SECONDS = 1.5  # 点击后到复查按钮是否消失的等待
+_CLICK_MAX_ATTEMPTS = 5
+_CLICK_JITTER_PX = 6                # 重试时点击坐标的随机偏移幅度
+
 # 面板外空白处（左下角），选完角色后点它收起选人面板
 _PANEL_DISMISS_POINT = (200, 650)
 
@@ -45,6 +51,25 @@ def _click_at(controller, x: int, y: int) -> None:
     controller.post_touch_down(x, y).wait()
     time.sleep(_PRESS_SECONDS)
     controller.post_touch_up().wait()
+
+
+def _locate_template(context: Context, controller, template: str, roi, threshold: float):
+    """在当前画面定位模板，返回命中框；未命中返回 None。"""
+    frame = get_image(controller)
+    if frame is None or getattr(frame, "size", 0) == 0:
+        return None
+    result = context.run_recognition_direct(
+        JRecognitionType.TemplateMatch,
+        JTemplateMatch(
+            template=[template],
+            roi=tuple(roi),
+            threshold=[threshold],
+        ),
+        frame,
+    )
+    if result is not None and result.hit and result.box is not None:
+        return result.box
+    return None
 
 
 def _resolve_character_id(params: dict, key: str, default: int) -> int:
@@ -104,6 +129,54 @@ class VolleyballWeeklySelectTeammates(CustomAction):
 
         PrintT(context, "volleyball_weekly.teammates_selected")
         return CustomAction.RunResult(success=True)
+
+
+@AgentServer.custom_action("volleyball_weekly_click_button")
+class VolleyballWeeklyClickButton(CustomAction):
+    """点击按钮并复查：按钮仍在说明未点中，随机偏移后重点；消失即已进入下一阶段。"""
+
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
+        params = load_params(argv.custom_action_param)
+        template = params.get("template")
+        roi = params.get("roi")
+        if not template or not roi:
+            logger.error(
+                "AutoVolleyballWeekly: click_button missing template/roi"
+            )
+            return CustomAction.RunResult(success=False)
+        threshold = float(params.get("threshold", 0.7))
+
+        controller = context.tasker.controller
+        for attempt in range(_CLICK_MAX_ATTEMPTS):
+            box = _locate_template(context, controller, template, roi, threshold)
+            if box is None:
+                # 找不到按钮＝已进入下一阶段
+                return CustomAction.RunResult(success=True)
+
+            cx = box.x + box.w // 2
+            cy = box.y + box.h // 2
+            if attempt > 0:
+                cx += random.randint(-_CLICK_JITTER_PX, _CLICK_JITTER_PX)
+                cy += random.randint(-_CLICK_JITTER_PX, _CLICK_JITTER_PX)
+                logger.info(
+                    "AutoVolleyballWeekly: %s still visible, retry %d/%d at (%d, %d)",
+                    template,
+                    attempt,
+                    _CLICK_MAX_ATTEMPTS - 1,
+                    cx,
+                    cy,
+                )
+            _click_at(controller, cx, cy)
+            time.sleep(_CLICK_VERIFY_DELAY_SECONDS)
+
+        logger.error(
+            "AutoVolleyballWeekly: %s still visible after %d attempts",
+            template,
+            _CLICK_MAX_ATTEMPTS,
+        )
+        return CustomAction.RunResult(success=False)
 
 
 @AgentServer.custom_action("volleyball_weekly_play")

@@ -103,7 +103,7 @@
         ]
     },
     "VolleyballWeeklyStartMatchAfterTeammates": {
-        "desc": "队友确定后点击开始比赛进入打球",
+        "desc": "识别开始比赛按钮并点击，复查仍在则带偏移重试，按钮消失即进入比赛",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -118,7 +118,20 @@
             }
         },
         "action": {
-            "type": "Click"
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_weekly_click_button",
+                "custom_action_param": {
+                    "template": "VolleyballWeekly/StartMatch.png",
+                    "roi": [
+                        440,
+                        615,
+                        420,
+                        80
+                    ],
+                    "threshold": 0.7
+                }
+            }
         },
         "rate_limit": 0,
         "pre_delay": 0,
