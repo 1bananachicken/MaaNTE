@@ -6,6 +6,7 @@
             "entry": "BidKingEntrance",
             "description": "$task_bid_king_desc",
             "option": [
+                "BidKingStrategy",
                 "BidKingLoopCount"
             ],
             "controller": [
@@ -17,6 +18,74 @@
         }
     ],
     "option": {
+        "BidKingStrategy": {
+            "type": "select",
+            "label": "$task_bid_king_option_strategy",
+            "description": "$task_bid_king_option_strategy_desc",
+            "default_case": "fixed",
+            "cases": [
+                {
+                    "name": "fixed",
+                    "label": "$task_bid_king_strategy_fixed",
+                    "option": [
+                        "BidKingFixedPrice"
+                    ],
+                    "pipeline_override": {
+                        "BidKingSelectOne": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "strategy": "fixed"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "valuation",
+                    "label": "$task_bid_king_strategy_valuation",
+                    "pipeline_override": {
+                        "BidKingSelectOne": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "strategy": "valuation"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "BidKingFixedPrice": {
+            "type": "input",
+            "label": "$task_bid_king_option_fixed_price",
+            "description": "$task_bid_king_option_fixed_price_desc",
+            "inputs": [
+                {
+                    "name": "price",
+                    "label": "$task_bid_king_option_fixed_price",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9]\\d*$"
+                }
+            ],
+            "pipeline_override": {
+                "BidKingSelectOne": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "strategy_param": {
+                                    "price": "{price}"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "BidKingLoopCount": {
             "type": "input",
             "label": "$task_bid_king_option_loop_count",
