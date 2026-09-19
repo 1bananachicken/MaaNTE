@@ -135,7 +135,7 @@ class PlaceBid(CustomAction):
                     logger.warning(f"⚠️ 策略返回非正数 {target}，按放弃本轮处理")
                 logger.info("🛑 本轮不出价，面板交由 Pipeline 的 BidKingClosePanel 收起")
                 PrintT(context, "bidking.skip_round", strategy_name)
-                return CustomAction.RunResult(success=True)
+                return CustomAction.RunResult(success=False)
 
             logger.info(f"🎯 本轮出价额: {target}（策略={strategy_name}）")
 
