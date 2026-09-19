@@ -59,7 +59,7 @@ def verify_readback(
     target: int,
     debug: bool,
     retried: bool = False,
-) -> bool:
+) -> Optional[bool]:
     """
     回读输入框并校验；不一致时清空重输一次。
 
@@ -74,7 +74,7 @@ def verify_readback(
     if actual is None:
         logger.warning("⚠️ 回读读不到数字，按已输入内容继续")
         PrintT(context, "bidking.readback_unreadable")
-        return False
+        return None
 
     if actual == target:
         return True
@@ -141,7 +141,11 @@ class PlaceBid(CustomAction):
 
             # ---------- 3. 公共输入层：清空 + 逐位输入 + 回读校验 ----------
             clear_and_type(controller, clear_btn, target)
-            verify_readback(context, controller, input_roi, clear_btn, target, debug)
+            IsConsistent = verify_readback(context, controller, input_roi, clear_btn, target, debug)
+            if IsConsistent is False:
+                    logger.warning("⚠️ 回读不一致且重试无效，放弃本轮，交由 Pipeline 自愈")
+                    PrintT(context, "bidking.readback_mismatch_give_up", target)
+                    return CustomAction.RunResult(success=False)
 
             PrintT(context, "bidking.bid_done", strategy_name, target)
             return CustomAction.RunResult(success=True)
