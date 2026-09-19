@@ -196,7 +196,7 @@
         ]
     },
     "VolleyballPlay": {
-        "desc": "每 0.6 秒按一次 J 键，每 5 秒检测剧情或结算",
+        "desc": "每 0.6 秒按一次 K 键，每 5 秒检测剧情或结算",
         "recognition": {
             "type": "DirectHit"
         },

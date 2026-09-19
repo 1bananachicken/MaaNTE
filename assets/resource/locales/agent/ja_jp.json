@@ -93,5 +93,8 @@
     "volleyball.teammates_selected": "[バレーボール] チームメイトを選択済み",
     "volleyball.playing": "[バレーボール] 難易度 %d に挑戦中",
     "volleyball.difficulty_done": "[バレーボール] 難易度 %d 完了",
-    "volleyball.task_done": "[バレーボール] 全難易度完了"
+    "volleyball.task_done": "[バレーボール] 全難易度完了",
+    "volleyball_weekly.started": "[バレーボール（週常）] タスク開始",
+    "volleyball_weekly.playing": "[バレーボール（週常）] 試合進行中",
+    "volleyball_weekly.teammates_selected": "[バレーボール（週常）] チームメイトを選択済み"
 }

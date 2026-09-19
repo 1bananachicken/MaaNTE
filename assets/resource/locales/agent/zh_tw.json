@@ -93,5 +93,8 @@
     "volleyball.teammates_selected": "[自動排球] 隊友選擇完成",
     "volleyball.playing": "[自動排球] 正在挑戰難度 %d",
     "volleyball.difficulty_done": "[自動排球] 難度 %d 已完成",
-    "volleyball.task_done": "[自動排球] 全部難度已完成"
+    "volleyball.task_done": "[自動排球] 全部難度已完成",
+    "volleyball_weekly.started": "[自動排球（週常）] 任務開始",
+    "volleyball_weekly.playing": "[自動排球（週常）] 比賽進行中",
+    "volleyball_weekly.teammates_selected": "[自動排球（週常）] 隊友選擇完成"
 }
