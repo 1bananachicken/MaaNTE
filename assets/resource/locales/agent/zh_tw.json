@@ -93,5 +93,18 @@
     "volleyball.teammates_selected": "[自動排球] 隊友選擇完成",
     "volleyball.playing": "[自動排球] 正在挑戰難度 %d",
     "volleyball.difficulty_done": "[自動排球] 難度 %d 已完成",
-    "volleyball.task_done": "[自動排球] 全部難度已完成"
+    "volleyball.task_done": "[自動排球] 全部難度已完成",
+    "bidking.bid_done": "[拍賣之王] 按「%s」策略出價 %d",
+    "bidking.strategy_unknown": "[拍賣之王] 未知策略「%s」，已回落到「%s」",
+    "bidking.skip_round": "[拍賣之王] 「%s」策略本輪不出價",
+    "bidking.valuation_zero": "[拍賣之王] 等待畫面穩定後估價仍為 0，本輪出 %d",
+    "bidking.valuation_unreadable": "[拍賣之王] 讀不到系統估價",
+    "bidking.fallback_last_bid": "[拍賣之王] 沿用上一輪出價 %d",
+    "bidking.fallback_one": "[拍賣之王] 無法確定出價，本輪出 %d",
+    "bidking.readback_mismatch": "[拍賣之王] 回讀不一致（目標 %d，實際 %d），已重輸一次",
+    "bidking.readback_unreadable": "[拍賣之王] 輸入框回讀不到數字，按已輸入內容繼續",
+    "bidking.failed": "[拍賣之王] 出價失敗（%s）"
+    "volleyball_weekly.started": "[自動排球（週常）] 任務開始",
+    "volleyball_weekly.playing": "[自動排球（週常）] 比賽進行中",
+    "volleyball_weekly.teammates_selected": "[自動排球（週常）] 隊友選擇完成"
 }

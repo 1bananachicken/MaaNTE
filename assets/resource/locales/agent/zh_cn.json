@@ -91,5 +91,18 @@
     "volleyball.teammates_selected": "[自动排球] 队友选择完成",
     "volleyball.playing": "[自动排球] 正在挑战难度 %d",
     "volleyball.difficulty_done": "[自动排球] 难度 %d 已完成",
-    "volleyball.task_done": "[自动排球] 全部难度已完成"
+    "volleyball.task_done": "[自动排球] 全部难度已完成",
+    "bidking.bid_done": "[拍卖之王] 按「%s」策略出价 %d",
+    "bidking.strategy_unknown": "[拍卖之王] 未知策略「%s」，已回落到「%s」",
+    "bidking.skip_round": "[拍卖之王] 「%s」策略本轮不出价",
+    "bidking.valuation_zero": "[拍卖之王] 等待画面稳定后估价仍为 0，本轮出 %d",
+    "bidking.valuation_unreadable": "[拍卖之王] 读不到系统估价",
+    "bidking.fallback_last_bid": "[拍卖之王] 沿用上一轮出价 %d",
+    "bidking.fallback_one": "[拍卖之王] 无法确定出价，本轮出 %d",
+    "bidking.readback_mismatch": "[拍卖之王] 回读不一致（目标 %d，实际 %d），已重输一次",
+    "bidking.readback_unreadable": "[拍卖之王] 输入框回读不到数字，按已输入内容继续",
+    "bidking.failed": "[拍卖之王] 出价失败（%s）"
+    "volleyball_weekly.started": "[自动排球（周常）] 任务开始",
+    "volleyball_weekly.playing": "[自动排球（周常）] 比赛进行中",
+    "volleyball_weekly.teammates_selected": "[自动排球（周常）] 队友选择完成"
 }

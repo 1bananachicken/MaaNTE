@@ -93,5 +93,18 @@
     "volleyball.teammates_selected": "[Volleyball] Teammates selected",
     "volleyball.playing": "[Volleyball] Playing difficulty %d",
     "volleyball.difficulty_done": "[Volleyball] Difficulty %d complete",
-    "volleyball.task_done": "[Volleyball] All difficulties complete"
+    "volleyball.task_done": "[Volleyball] All difficulties complete",
+    "bidking.bid_done": "[BidKing] %s strategy: bidding %d",
+    "bidking.strategy_unknown": "[BidKing] Unknown strategy '%s', falling back to '%s'",
+    "bidking.skip_round": "[BidKing] Strategy '%s' skipped this round",
+    "bidking.valuation_zero": "[BidKing] Valuation is still 0 after waiting for the screen to settle, bidding %d",
+    "bidking.valuation_unreadable": "[BidKing] Cannot read the system valuation",
+    "bidking.fallback_last_bid": "[BidKing] Reusing last round's bid %d",
+    "bidking.fallback_one": "[BidKing] Cannot determine the bid, bidding %d",
+    "bidking.readback_mismatch": "[BidKing] Readback mismatch (target %d, actual %d), retyped once",
+    "bidking.readback_unreadable": "[BidKing] Cannot read back the input box, continuing with what was typed",
+    "bidking.failed": "[BidKing] Bidding failed (%s)"
+    "volleyball_weekly.started": "[Volleyball Weekly] Task started",
+    "volleyball_weekly.playing": "[Volleyball Weekly] Match in progress",
+    "volleyball_weekly.teammates_selected": "[Volleyball Weekly] Teammates selected"
 }

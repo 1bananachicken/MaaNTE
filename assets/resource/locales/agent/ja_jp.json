@@ -93,5 +93,18 @@
     "volleyball.teammates_selected": "[バレーボール] チームメイトを選択済み",
     "volleyball.playing": "[バレーボール] 難易度 %d に挑戦中",
     "volleyball.difficulty_done": "[バレーボール] 難易度 %d 完了",
-    "volleyball.task_done": "[バレーボール] 全難易度完了"
+    "volleyball.task_done": "[バレーボール] 全難易度完了",
+    "bidking.bid_done": "[オークションの王] 「%s」戦略で %d を入札",
+    "bidking.strategy_unknown": "[オークションの王] 不明な戦略「%s」。「%s」にフォールバックしました",
+    "bidking.skip_round": "[オークションの王] 「%s」戦略では今回のラウンドは入札しません",
+    "bidking.valuation_zero": "[オークションの王] 画面安定後も評価額が 0 のため、今回のラウンドは %d を入札",
+    "bidking.valuation_unreadable": "[オークションの王] システム評価額を読み取れません",
+    "bidking.fallback_last_bid": "[オークションの王] 前回ラウンドの入札額 %d をそのまま使用",
+    "bidking.fallback_one": "[オークションの王] 入札額を確定できないため、今回のラウンドは %d を入札",
+    "bidking.readback_mismatch": "[オークションの王] 読み戻しが不一致（目標 %d、実際 %d）。再入力しました",
+    "bidking.readback_unreadable": "[オークションの王] 入力欄から数値を読み戻せないため、入力済みの内容で続行します",
+    "bidking.failed": "[オークションの王] 入札失敗（%s）"
+    "volleyball_weekly.started": "[バレーボール（週常）] タスク開始",
+    "volleyball_weekly.playing": "[バレーボール（週常）] 試合進行中",
+    "volleyball_weekly.teammates_selected": "[バレーボール（週常）] チームメイトを選択済み"
 }
