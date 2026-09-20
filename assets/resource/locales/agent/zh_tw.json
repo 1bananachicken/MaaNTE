@@ -104,4 +104,7 @@
     "bidking.readback_mismatch": "[拍賣之王] 回讀不一致（目標 %d，實際 %d），已重輸一次",
     "bidking.readback_unreadable": "[拍賣之王] 輸入框回讀不到數字，按已輸入內容繼續",
     "bidking.failed": "[拍賣之王] 出價失敗（%s）"
+    "volleyball_weekly.started": "[自動排球（週常）] 任務開始",
+    "volleyball_weekly.playing": "[自動排球（週常）] 比賽進行中",
+    "volleyball_weekly.teammates_selected": "[自動排球（週常）] 隊友選擇完成"
 }

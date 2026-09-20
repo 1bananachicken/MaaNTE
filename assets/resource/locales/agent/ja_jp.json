@@ -104,4 +104,7 @@
     "bidking.readback_mismatch": "[オークションの王] 読み戻しが不一致（目標 %d、実際 %d）。再入力しました",
     "bidking.readback_unreadable": "[オークションの王] 入力欄から数値を読み戻せないため、入力済みの内容で続行します",
     "bidking.failed": "[オークションの王] 入札失敗（%s）"
+    "volleyball_weekly.started": "[バレーボール（週常）] タスク開始",
+    "volleyball_weekly.playing": "[バレーボール（週常）] 試合進行中",
+    "volleyball_weekly.teammates_selected": "[バレーボール（週常）] チームメイトを選択済み"
 }

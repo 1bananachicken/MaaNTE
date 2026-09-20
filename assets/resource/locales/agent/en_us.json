@@ -104,4 +104,7 @@
     "bidking.readback_mismatch": "[BidKing] Readback mismatch (target %d, actual %d), retyped once",
     "bidking.readback_unreadable": "[BidKing] Cannot read back the input box, continuing with what was typed",
     "bidking.failed": "[BidKing] Bidding failed (%s)"
+    "volleyball_weekly.started": "[Volleyball Weekly] Task started",
+    "volleyball_weekly.playing": "[Volleyball Weekly] Match in progress",
+    "volleyball_weekly.teammates_selected": "[Volleyball Weekly] Teammates selected"
 }

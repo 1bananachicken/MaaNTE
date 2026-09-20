@@ -1,0 +1,128 @@
+{
+    "task": [
+        {
+            "name": "AutoVolleyballWeekly",
+            "label": "$task_auto_volleyball_weekly_label",
+            "entry": "VolleyballWeeklyEntrance",
+            "description": "$task_auto_volleyball_weekly_desc",
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ],
+            "option": [
+                "VolleyballWeeklySkipToPlay",
+                "VolleyballWeeklyFirstCharacter",
+                "VolleyballWeeklySecondCharacter"
+            ]
+        }
+    ],
+    "option": {
+        "VolleyballWeeklySkipToPlay": {
+            "type": "switch",
+            "label": "$task_auto_volleyball_weekly_option_skip_to_play",
+            "description": "$task_auto_volleyball_weekly_option_skip_to_play_desc",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "VolleyballWeeklyEntrance": {
+                            "next": [
+                                "VolleyballWeeklyPlay"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no"
+                }
+            ]
+        },
+        "VolleyballWeeklyFirstCharacter": {
+            "type": "select",
+            "label": "$task_auto_volleyball_weekly_option_first_character",
+            "description": "$task_auto_volleyball_weekly_option_first_character_desc",
+            "default_case": "Character1",
+            "cases": [
+                {
+                    "name": "Character1",
+                    "label": "$task_auto_volleyball_weekly_character_1",
+                    "pipeline_override": {
+                        "VolleyballWeeklySelectTeammates": {
+                            "attach": {
+                                "first": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character2",
+                    "label": "$task_auto_volleyball_weekly_character_2",
+                    "pipeline_override": {
+                        "VolleyballWeeklySelectTeammates": {
+                            "attach": {
+                                "first": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character3",
+                    "label": "$task_auto_volleyball_weekly_character_3",
+                    "pipeline_override": {
+                        "VolleyballWeeklySelectTeammates": {
+                            "attach": {
+                                "first": 3
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "VolleyballWeeklySecondCharacter": {
+            "type": "select",
+            "label": "$task_auto_volleyball_weekly_option_second_character",
+            "description": "$task_auto_volleyball_weekly_option_second_character_desc",
+            "default_case": "Character2",
+            "cases": [
+                {
+                    "name": "Character1",
+                    "label": "$task_auto_volleyball_weekly_character_1",
+                    "pipeline_override": {
+                        "VolleyballWeeklySelectTeammates": {
+                            "attach": {
+                                "second": 1
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character2",
+                    "label": "$task_auto_volleyball_weekly_character_2",
+                    "pipeline_override": {
+                        "VolleyballWeeklySelectTeammates": {
+                            "attach": {
+                                "second": 2
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "Character3",
+                    "label": "$task_auto_volleyball_weekly_character_3",
+                    "pipeline_override": {
+                        "VolleyballWeeklySelectTeammates": {
+                            "attach": {
+                                "second": 3
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

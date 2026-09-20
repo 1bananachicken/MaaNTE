@@ -13,6 +13,7 @@
             ],
             "option": [
                 "VolleyballStartDifficulty",
+                "VolleyballSkipToPlay",
                 "VolleyballFirstCharacter",
                 "VolleyballSecondCharacter",
                 "VolleyballContinueOnWin"
@@ -85,6 +86,30 @@
                             }
                         }
                     }
+                }
+            ]
+        },
+        "VolleyballSkipToPlay": {
+            "type": "switch",
+            "label": "$task_auto_volleyball_option_skip_to_play",
+            "description": "$task_auto_volleyball_option_skip_to_play_desc",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "VolleyballEntrance": {
+                            "next": [
+                                "VolleyballStartRacing",
+                                "VolleyballPlay"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no"
                 }
             ]
         },

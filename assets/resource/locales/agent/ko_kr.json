@@ -104,4 +104,7 @@
     "bidking.readback_mismatch": "[경매의 왕] 읽기 값 불일치(목표 %d, 실제 %d), 한 번 다시 입력했습니다",
     "bidking.readback_unreadable": "[경매의 왕] 입력란에서 숫자를 읽을 수 없어 입력된 내용으로 계속 진행합니다",
     "bidking.failed": "[경매의 왕] 입찰 실패（%s）"
+    "volleyball_weekly.started": "[배구 (주간)] 작업 시작",
+    "volleyball_weekly.playing": "[배구 (주간)] 경기 진행 중",
+    "volleyball_weekly.teammates_selected": "[배구 (주간)] 팀원 선택 완료"
 }

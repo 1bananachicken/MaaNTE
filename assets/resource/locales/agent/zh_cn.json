@@ -102,4 +102,7 @@
     "bidking.readback_mismatch": "[拍卖之王] 回读不一致（目标 %d，实际 %d），已重输一次",
     "bidking.readback_unreadable": "[拍卖之王] 输入框回读不到数字，按已输入内容继续",
     "bidking.failed": "[拍卖之王] 出价失败（%s）"
+    "volleyball_weekly.started": "[自动排球（周常）] 任务开始",
+    "volleyball_weekly.playing": "[自动排球（周常）] 比赛进行中",
+    "volleyball_weekly.teammates_selected": "[自动排球（周常）] 队友选择完成"
 }
