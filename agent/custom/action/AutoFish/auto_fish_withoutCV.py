@@ -1,23 +1,17 @@
-from __future__ import annotations
+from maa.agent.agent_server import AgentServer
+from maa.custom_action import CustomAction
+from maa.context import Context
 
 import time
-
-from maa.agent.agent_server import AgentServer
-from maa.context import Context
-from maa.custom_action import CustomAction
+import json
 
 from utils.logger import logger
+from utils.maafocus import Print, PrintT
 
-from .fish_control import (
-    KEY_A,
-    KEY_D,
-    choose_tracking_key,
-    estimate_error_velocity,
-    predict_tracking_interval,
-    should_finish_control,
+# 长按左/右键时，光标在进度条上水平移动约 200 像素/秒，用于将偏移（像素）换算为 LongPress 时长
+CURSOR_PX_PER_SEC = (
+    168  # 用到的时候自己会再乘scale，这里仍然以1280的base resolution作为参照
 )
-from .fish_params import load_fish_control_params
-from .fish_vision import detect_control_boxes
 
 
 @AgentServer.custom_action("auto_fish_without_cv")
@@ -25,240 +19,102 @@ class AutoFishWithoutCV(CustomAction):
     def run(
         self, context: Context, argv: CustomAction.RunArg
     ) -> CustomAction.RunResult:
-        params = load_fish_control_params(argv.custom_action_param)
-        safe_margin = params["safe_margin"]
-        center_band_ratio = params["center_band_ratio"]
-        prediction_ms = params["prediction_ms"]
-        velocity_alpha = params["velocity_alpha"]
-        green_velocity_alpha = params["green_velocity_alpha"]
-        green_center_alpha = params["green_center_alpha"]
-        pulse_min_ms = params["pulse_min_ms"]
-        pulse_max_ms = params["pulse_max_ms"]
-        pulse_ms_per_px = params["pulse_ms_per_px"]
-        width_change_threshold = params["width_change_threshold"]
-        width_confirm_frames = params["width_confirm_frames"]
-        control_end_grace_ms = params["control_end_grace_ms"]
-        lost_timeout_ms = params["lost_timeout_ms"]
-        lost_abort_ms = params["lost_abort_ms"]
-        loop_interval_ms = params["loop_interval_ms"]
-
-        controller = context.tasker.controller
-        last_cursor_center = None
-        last_sample_time = None
-        cursor_velocity = 0.0
-        green_center = None
-        green_width = None
-        green_velocity = 0.0
-        last_detected_green_center = None
-        last_green_sample_time = None
-        width_candidate = None
-        width_candidate_hits = 0
-        lost_since = None
-        last_cursor_seen = None
-        has_seen_control = False
-        last_status_log = 0.0
-        frame_count = 0
-
-        def tap_control_key(key, duration_ms):
-            controller.post_key_down(key).wait()
+        deadzone = 15  # 光标与绿条中心的距离在 deadzone（像素）以内时不操作，避免过度频繁地轻微调整导致的抖动
+        factor = 1.5  # 控条时长的调整因子，实际时长 = 基础时长 * factor，基础时长 = (光标与绿条中心的像素偏移 / CURSOR_PX_PER_SEC) * 1000ms，增加 factor 可以适当补偿识别误差和按键响应延迟
+        cap_ms = (
+            1500  # 控条时长的上限（毫秒），避免因识别到较大偏移时按键过久，导致过度补偿
+        )
+        floor_ms = (
+            50  # 控条时长的下限（毫秒），避免因识别到较小偏移时按键过短，导致补偿不足
+        )
+        if argv.custom_action_param:
             try:
-                time.sleep(max(0.0, duration_ms) / 1000.0)
-            finally:
-                controller.post_key_up(key).wait()
+                params = json.loads(argv.custom_action_param)
+                deadzone = params.get("deadzone", deadzone)
+                factor = params.get("factor", factor)
+                cap_ms = params.get("cap_ms", cap_ms)
+                floor_ms = params.get("floor_ms", floor_ms)
+            except Exception:
+                pass
 
-        def release_control_keys():
-            for key in (KEY_A, KEY_D):
-                try:
-                    controller.post_key_up(key).wait()
-                except Exception as exc:
-                    logger.warning("释放钓鱼按键失败: key=%s error=%s", key, exc)
+        logger.debug("钓鱼开始：进入控条阶段（绿条/光标对齐）")
+        # 钓鱼阶段
+        while not context.tasker.stopping:
+            image = (
+                context.tasker.controller.post_screencap().wait().get()
+            )  # (720, 1280, 3)，自动缩放至框架规定的标准res
+            green_bar = context.run_recognition("FishGreenBar", image)
+            cursor = context.run_recognition("FishCursor", image)
 
-        def update_green_bar(box, sample_time):
-            nonlocal green_center, green_width, green_velocity
-            nonlocal last_detected_green_center, last_green_sample_time
-            nonlocal width_candidate, width_candidate_hits
-
-            box_x, _, box_w, _ = box
-            detected_center = float(box_x + box_w / 2)
-            detected_width = float(box_w)
-            if green_center is None or green_width is None:
-                green_center = detected_center
-                green_width = detected_width
-                last_detected_green_center = detected_center
-                last_green_sample_time = sample_time
-                width_candidate = None
-                width_candidate_hits = 0
-                logger.debug(
-                    "钓鱼绿条边界初始化: left=%.1f right=%.1f",
-                    green_center - green_width / 2,
-                    green_center + green_width / 2,
-                )
-                return
-
-            if last_green_sample_time is not None:
-                green_velocity = estimate_error_velocity(
-                    last_detected_green_center,
-                    detected_center,
-                    sample_time - last_green_sample_time,
-                    green_velocity,
-                    green_velocity_alpha,
-                )
-            last_detected_green_center = detected_center
-            last_green_sample_time = sample_time
-            green_center += (detected_center - green_center) * green_center_alpha
-
-            if abs(detected_width - green_width) < width_change_threshold:
-                green_width += (detected_width - green_width) * 0.2
-                width_candidate = None
-                width_candidate_hits = 0
-            elif (
-                width_candidate is not None
-                and abs(detected_width - width_candidate) < width_change_threshold / 2
+            while not (
+                green_bar
+                and green_bar.hit
+                and green_bar.box
+                is not None  # 这个是为了消除pylance的warning，实际运行时不应该有None的情况
+                and cursor
+                and cursor.hit
+                and cursor.box
+                is not None  # 这个是为了消除pylance的warning，实际运行时不应该有None的情况
             ):
-                width_candidate_hits += 1
-            else:
-                width_candidate = detected_width
-                width_candidate_hits = 1
-
-            if width_candidate_hits >= width_confirm_frames:
-                green_width = width_candidate
-                logger.debug("钓鱼绿条宽度更新: width=%.1f", green_width)
-                width_candidate = None
-                width_candidate_hits = 0
-
-        logger.debug("钓鱼开始：进入实时控条阶段")
-        try:
-            while not context.tasker.stopping:
-                frame_started = time.monotonic()
-                image = controller.post_screencap().wait().get()
-                green_box, cursor_box = detect_control_boxes(image)
-                now = time.monotonic()
-                frame_count += 1
-
-                if green_box is not None:
-                    update_green_bar(green_box, now)
-                if cursor_box is not None:
-                    last_cursor_seen = now
-                if green_box is not None and cursor_box is not None:
-                    has_seen_control = True
-
-                if should_finish_control(
-                    has_seen_control,
-                    last_cursor_seen,
-                    now,
-                    control_end_grace_ms,
-                ):
-                    logger.debug("钓鱼光标持续消失，进入结果处理")
+                time.sleep(0.5)
+                image = context.tasker.controller.post_screencap().wait().get()
+                click_blank = context.run_recognition("SceneClickBlankToExit", image)
+                if click_blank and click_blank.hit:
+                    PrintT(context, "autofish.fish_caught")
+                    logger.debug("识别到钓上鱼, 钓鱼退出")
                     return CustomAction.RunResult(success=True)
 
-                valid = bool(
-                    green_center is not None
-                    and green_width is not None
-                    and cursor_box is not None
+                fish_escape = context.run_recognition("FishEscape", image)
+                if fish_escape and fish_escape.hit:
+                    PrintT(context, "autofish.fish_escape")
+                    logger.debug("识别到鱼溜走，钓鱼退出")
+                    return CustomAction.RunResult(success=True)
+                fish_on_gaming = context.run_recognition("FishSceneOnFishGame", image)
+                if fish_on_gaming and fish_on_gaming.hit:
+                    Print(
+                        context, "钓鱼异常结束（可能是鱼溜走），继续钓鱼"
+                    )  # 通常不会执行这一步
+                    return CustomAction.RunResult(success=True)
+                green_bar = context.run_recognition("FishGreenBar", image)
+                cursor = context.run_recognition("FishCursor", image)
+
+            green_bar_x, green_bar_y, green_bar_w, green_bar_h = green_bar.box
+            cursor_x, cursor_y, cursor_w, cursor_h = cursor.box
+
+            green_bar_center_x = green_bar_x + green_bar_w / 2
+            cursor_center_x = cursor_x + cursor_w / 2
+
+            # 与 auto_fish.py 一致：offset = 滑块 x - 目标中心 x（此处用识别框中心对应 slider / target）
+            offset = cursor_center_x - green_bar_center_x
+
+            abs_offset = abs(offset)
+            scaled_px_per_sec = max(1.0, CURSOR_PX_PER_SEC)
+            base_ms = (abs_offset / scaled_px_per_sec) * 1000.0
+            duration_ms = min(cap_ms, max(floor_ms, int(base_ms * factor)))
+
+            # 键码与 LongPressKey 定义见资源 pipeline FishKey（FishLeft / FishRight），此处只覆盖时长
+            param_override = {"duration": duration_ms}
+
+            if offset > deadzone:
+                logger.debug(
+                    f"控条: offset={offset:.1f}px, 时长={duration_ms}ms → FishLeft"
+                )
+                context.run_action(
+                    "FishLeft",
+                    pipeline_override={
+                        "FishLeft": {"action": {"param": param_override}},
+                    },
+                )
+            elif offset < -deadzone:
+                logger.debug(
+                    f"控条: offset={offset:.1f}px, 时长={duration_ms}ms → FishRight"
+                )
+                context.run_action(
+                    "FishRight",
+                    pipeline_override={
+                        "FishRight": {"action": {"param": param_override}},
+                    },
                 )
 
-                if not valid:
-                    if lost_since is None:
-                        lost_since = now
-                    lost_ms = (now - lost_since) * 1000
-                    if lost_ms > lost_timeout_ms:
-                        last_cursor_center = None
-                        last_sample_time = None
-                        cursor_velocity = 0.0
-                    if lost_ms > lost_abort_ms:
-                        logger.warning("钓鱼控条识别超时，交给 Pipeline 恢复")
-                        return CustomAction.RunResult(success=False)
-                    time.sleep(0.02)
-                    continue
-
-                lost_since = None
-                cursor_x, _, cursor_w, _ = cursor_box
-                cursor_center_x = cursor_x + cursor_w / 2
-
-                if last_sample_time is not None:
-                    sample_seconds = now - last_sample_time
-                    cursor_velocity = estimate_error_velocity(
-                        last_cursor_center,
-                        cursor_center_x,
-                        sample_seconds,
-                        cursor_velocity,
-                        velocity_alpha,
-                    )
-                else:
-                    sample_seconds = 0.0
-                last_cursor_center = cursor_center_x
-                last_sample_time = now
-                green_left = green_center - green_width / 2
-                green_right = green_center + green_width / 2
-
-                lookahead_seconds = max(
-                    prediction_ms / 1000.0,
-                    min(0.25, sample_seconds * 1.25),
-                )
-                next_key = choose_tracking_key(
-                    None,
-                    cursor_center_x,
-                    cursor_velocity,
-                    green_left,
-                    green_right,
-                    green_velocity=green_velocity,
-                    lookahead_seconds=lookahead_seconds,
-                    safe_margin=safe_margin,
-                    center_band_ratio=center_band_ratio,
-                )
-
-                pulse_ms = 0.0
-                if next_key is not None:
-                    predicted_cursor = (
-                        cursor_center_x + cursor_velocity * lookahead_seconds
-                    )
-                    safe_left, safe_right = predict_tracking_interval(
-                        green_left,
-                        green_right,
-                        green_velocity,
-                        lookahead_seconds,
-                        safe_margin,
-                        center_band_ratio,
-                    )
-                    if next_key == KEY_A:
-                        outside_distance = max(0.0, predicted_cursor - safe_right)
-                    else:
-                        outside_distance = max(0.0, safe_left - predicted_cursor)
-                    pulse_ms = min(
-                        pulse_max_ms,
-                        max(
-                            pulse_min_ms,
-                            pulse_min_ms + outside_distance * pulse_ms_per_px,
-                        ),
-                    )
-                    tap_control_key(next_key, pulse_ms)
-
-                if now - last_status_log >= 0.5:
-                    last_status_log = now
-                    frame_ms = (time.monotonic() - frame_started) * 1000
-                    logger.debug(
-                        "钓鱼控条状态: frame=%d frame_ms=%.1f bar=[%.1f, %.1f] "
-                        "bar_velocity=%.1f cursor=%.1f cursor_velocity=%.1f "
-                        "lookahead_ms=%.1f key=%s pulse_ms=%.1f",
-                        frame_count,
-                        frame_ms,
-                        green_left,
-                        green_right,
-                        green_velocity,
-                        cursor_center_x,
-                        cursor_velocity,
-                        lookahead_seconds * 1000,
-                        next_key,
-                        pulse_ms,
-                    )
-
-                if loop_interval_ms > 0:
-                    time.sleep(loop_interval_ms / 1000.0)
-
-            logger.debug("钓鱼控条因任务停止退出")
-            return CustomAction.RunResult(success=False)
-        except Exception:
-            logger.exception("钓鱼控条异常")
-            return CustomAction.RunResult(success=False)
-        finally:
-            release_control_keys()
+        logger.debug("任务中止")
+        return CustomAction.RunResult(success=True)
