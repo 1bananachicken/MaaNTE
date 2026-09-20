@@ -34,6 +34,7 @@ from .SyncCharacterAbilityCityAbility import *
 from .DatasetCollection.autonomous_driving_dataset_recorder import *
 from .BagelSpam import *
 from .auto_volleyball import *
+from .BidKing.place_bid import PlaceBid
 from .auto_volleyball_weekly import *
 
 __all__ = [
@@ -85,6 +86,7 @@ __all__ = [
     "VolleyballSelectTeammates",
     "VolleyballPlay",
     "VolleyballAdvanceDifficulty",
+    "PlaceBid",
     "VolleyballWeeklyReset",
     "VolleyballWeeklySelectTeammates",
     "VolleyballWeeklyClickButton",

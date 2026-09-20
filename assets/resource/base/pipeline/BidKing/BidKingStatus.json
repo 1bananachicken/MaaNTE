@@ -1,0 +1,54 @@
+{
+    "BidKingPopupConfirm": {
+        "desc": "出价额 >100万 的二次确认提示框：点击“确认”使出价生效。注意：该按钮与开始匹配的 BidKingConfirm 共用 BidKing/confirm.png 且坐标相同，两者只能靠 next 链上下文区分，禁止放进同一个候选列表",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "BidKing/confirm.png",
+                "roi": [
+                    738,
+                    455,
+                    71,
+                    39
+                ],
+                "threshold": 0.9
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": -1,
+        "next": [
+            "BidKingWaitBidOrSkip"
+        ]
+    },
+    "BidKingClosePanel": {
+        "desc": "出价面板残留自愈：识别面板右上角 X 并关闭。X 只在面板打开时可见，因此它本身就是“面板已打开”的判据；轮询时命中它说明上一次确认未生效，必须收面板而不能去点“出价”",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "Common/Button/CloseButtonType1.png",
+                "roi": [
+                    985,
+                    348,
+                    40,
+                    40
+                ],
+                "threshold": 0.85
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": -1,
+        "next": [
+            "BidKingWaitBidOrSkip"
+        ]
+    }
+}

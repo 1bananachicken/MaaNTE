@@ -16,7 +16,7 @@
     },
     "BidKingRound": {
         "desc": "单个完整拍卖轮次；max_hit 为总体拍卖轮数",
-        "max_hit": 1,
+        "max_hit": 20,
         "recognition": {
             "type": "DirectHit"
         },
@@ -110,7 +110,7 @@
         ]
     },
     "BidKingWaitBidOrSkip": {
-        "desc": "拍卖中优先检测跳过，其次检测出价",
+        "desc": "拍卖中按优先级轮询：高价二次确认弹窗 > 跳过动画 > 面板残留自愈 > 出价",
         "recognition": {
             "type": "DirectHit"
         },
@@ -122,7 +122,9 @@
         "post_delay": 0,
         "timeout": -1,
         "next": [
+            "BidKingPopupConfirm",
             "BidKingSkip",
+            "BidKingClosePanel",
             "BidKingBid"
         ]
     },
@@ -153,33 +155,42 @@
         ]
     },
     "BidKingSelectOne": {
-        "desc": "选择出价数量 1",
+        "desc": "按所选出价策略算出本轮出价额并逐位输入（不点确认，确认交由 BidKingConfirmBid）",
         "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "BidKing/1.png",
-                "roi": [
-                    271,
-                    355,
-                    71,
-                    57
-                ],
-                "threshold": 0.7
-            }
+            "type": "DirectHit"
         },
         "action": {
-            "type": "Click"
+            "type": "Custom",
+            "param": {
+                "custom_action": "place_bid",
+                "custom_action_param": {
+                    // 出价策略：fixed=固定价格（默认，等价于改造前的每轮出 1）｜valuation=保底出价
+                    // 前端"出价策略"选项会覆盖这里；策略实现见 agent/custom/action/BidKing/strategies/
+                    "strategy": "fixed",
+                    "strategy_param": {
+                        // 固定价格策略：每轮出价额（前端"固定出价额"输入框会覆盖这里）
+                        // 屏幕区域一律内置在 agent/custom/action/BidKing/layout.py，
+                        // 不走 JSON 参数，避免被前端选项覆盖时丢失
+                        "price": 1
+                    },
+                    "debug": false
+                }
+            }
         },
         "rate_limit": 0,
         "pre_delay": 0,
-        "post_delay": 1000,
+        "post_delay": 0,
         "timeout": -1,
+        // 动作失败时回到轮询，由“面板残留 → 关闭面板”自愈，不让整个任务失败
+        "on_error": [
+            "BidKingWaitBidOrSkip"
+        ],
         "next": [
-            "BidKingConfirmBid"
+            "BidKingConfirmBid" // 输入完成后去确认
         ]
     },
     "BidKingConfirmBid": {
-        "desc": "确认本次出价",
+        "desc": "确认本次出价（等面板关闭动画落定后再交回轮询判定）",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -198,8 +209,21 @@
         },
         "rate_limit": 0,
         "pre_delay": 0,
+        "post_wait_freezes": {
+            "time": 200,
+            "target": [
+                0,
+                0,
+                0,
+                0
+            ]
+        },
         "post_delay": 1000,
         "timeout": -1,
+        // 动作失败时回到轮询自愈
+        "on_error": [
+            "BidKingWaitBidOrSkip"
+        ],
         "next": [
             "BidKingWaitBidOrSkip"
         ]
