@@ -284,5 +284,13 @@
     "task_auto_volleyball_weekly_option_second_character_desc": "Choose the teammate (first row of the panel, left to right).",
     "task_auto_volleyball_weekly_character_1": "Character 1",
     "task_auto_volleyball_weekly_character_2": "Character 2",
-    "task_auto_volleyball_weekly_character_3": "Character 3"
+    "task_auto_volleyball_weekly_character_3": "Character 3",
+    "task_pukaland_lucky_star_label": "Auto Lucky Star",
+    "task_pukaland_lucky_star_desc": "Requires the <span style='color:red'>front-end controller</span>. Start the task on the Start Game screen.",
+    "task_pukaland_lucky_star_option_repeat_count": "Repeat count",
+    "task_pukaland_lucky_star_option_repeat_count_desc": "How many times to click \"Try Again\" and repeat. The task ends after that.",
+    "task_pukaland_lucky_star_option_repeat_count_input": "Count",
+    "task_pukaland_lucky_star_option_start_delay": "Delay after starting (ms)",
+    "task_pukaland_lucky_star_option_start_delay_desc": "How long to wait after clicking \"Start Game\" before spamming Space, used to skip the intro animation.",
+    "task_pukaland_lucky_star_option_start_delay_input": "Milliseconds"
 }

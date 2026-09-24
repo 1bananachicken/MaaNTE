@@ -135,6 +135,7 @@
         "resource/tasks/Volleyball.json",
         "resource/tasks/VolleyballWeekly.json",
         "resource/tasks/BagelSpam.json",
+        "resource/tasks/PukaLand.json",
         // group:RealTimeAssist
         "resource/tasks/RealTime.json",
         "resource/tasks/OnlineMapNavigation.json",

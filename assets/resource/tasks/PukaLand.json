@@ -1,0 +1,60 @@
+{
+    "task": [
+        {
+            "name": "PukaLandLuckyStar",
+            "label": "$task_pukaland_lucky_star_label",
+            "entry": "PukaLandLuckyStarEntrance",
+            "description": "$task_pukaland_lucky_star_desc",
+            "option": [
+                "PukaLandLuckyStarRepeatCount",
+                "PukaLandLuckyStarStartDelay"
+            ],
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ]
+        }
+    ],
+    "option": {
+        "PukaLandLuckyStarRepeatCount": {
+            "type": "input",
+            "label": "$task_pukaland_lucky_star_option_repeat_count",
+            "description": "$task_pukaland_lucky_star_option_repeat_count_desc",
+            "inputs": [
+                {
+                    "name": "repeat_count",
+                    "label": "$task_pukaland_lucky_star_option_repeat_count_input",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9]\\d*$"
+                }
+            ],
+            "pipeline_override": {
+                "PukaLandLuckyStarRetry": {
+                    "max_hit": "{repeat_count}"
+                }
+            }
+        },
+        "PukaLandLuckyStarStartDelay": {
+            "type": "input",
+            "label": "$task_pukaland_lucky_star_option_start_delay",
+            "description": "$task_pukaland_lucky_star_option_start_delay_desc",
+            "inputs": [
+                {
+                    "name": "start_delay",
+                    "label": "$task_pukaland_lucky_star_option_start_delay_input",
+                    "default": "3000",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "PukaLandLuckyStarStart": {
+                    "post_delay": "{start_delay}"
+                }
+            }
+        }
+    }
+}

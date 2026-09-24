@@ -284,5 +284,13 @@
     "task_auto_volleyball_weekly_option_second_character_desc": "배구 챌린지의 팀원을 선택합니다(패널 첫 행 왼쪽부터).",
     "task_auto_volleyball_weekly_character_1": "캐릭터 1",
     "task_auto_volleyball_weekly_character_2": "캐릭터 2",
-    "task_auto_volleyball_weekly_character_3": "캐릭터 3"
+    "task_auto_volleyball_weekly_character_3": "캐릭터 3",
+    "task_pukaland_lucky_star_label": "럭키 스타 자동 명중",
+    "task_pukaland_lucky_star_desc": "<span style='color:red'>전면 컨트롤러</span>가 필요합니다. 게임 시작 화면에서 작업을 시작해 주세요.",
+    "task_pukaland_lucky_star_option_repeat_count": "반복 횟수",
+    "task_pukaland_lucky_star_option_repeat_count_desc": "「다시 시도」를 클릭해 반복하는 횟수입니다. 도달하면 작업이 종료됩니다.",
+    "task_pukaland_lucky_star_option_repeat_count_input": "횟수",
+    "task_pukaland_lucky_star_option_start_delay": "시작 후 대기 시간(밀리초)",
+    "task_pukaland_lucky_star_option_start_delay_desc": "「게임 시작」을 클릭한 뒤 스페이스 연타를 시작하기까지의 대기 시간입니다. 오프닝 연출을 건너뛰는 데 사용합니다.",
+    "task_pukaland_lucky_star_option_start_delay_input": "밀리초"
 }
