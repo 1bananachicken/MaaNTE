@@ -1,0 +1,230 @@
+{
+    "PukaLandLuckyStarEntrance": {
+        "desc": "幸运星入口 — 只认「开始游戏」按钮，未进入界面时不盲敲空格",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "timeout": 30000, // 等待加载结束 / 用户停留在幸运星界面上的总预算
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "幸运星：开始自动命中，请确保游戏窗口停在幸运星界面",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            }
+        },
+        "next": [
+            "PukaLandLuckyStarStart",
+            "[JumpBack]SceneLoadingType1",
+            "[JumpBack]SceneLoadingType2"
+        ],
+        "on_error": [
+            "PukaLandLuckyStarNotInPage"
+        ]
+    },
+    "PukaLandLuckyStarStart": {
+        "desc": "点击「开始游戏」",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "PukaLand/StartGameButton.png",
+                "roi": [
+                    918,
+                    638,
+                    96,
+                    30
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 3000, // 开场动画期间不敲空格，由任务选项 PukaLandLuckyStarStartDelay 注入
+        "next": [
+            "PukaLandLuckyStarPlay"
+        ]
+    },
+    "PukaLandLuckyStarPlay": {
+        "desc": "对局中 — 每 0.2s 敲一次空格，一旦认出「再试一次」立即停手",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "PukaLand/RetryButton.png",
+                "roi": [
+                    727,
+                    601,
+                    92,
+                    38
+                ],
+                "threshold": 0.7
+            }
+        },
+        "inverse": true, // 反向识别：没看到「再试一次」= 还在局中
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                // VK_SPACE
+                "key": [
+                    32
+                ]
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 100, // 空格间隔 0.1s（实际节奏还需叠加一次截图+识别耗时）
+        "timeout": 2000, // 正常情况下每次敲击后都会立刻自循环；只有「再试一次」达上限时才会走到超时
+        "max_hit": 20000, // 保险丝：万一停在完全无法识别的画面上，避免无限敲空格（0.2s × 20000 ≈ 66 分钟）
+        // 次数耗尽后游戏会退回准备界面，因此这里也挂上「开始游戏」
+        "next": [
+            "PukaLandLuckyStarRetry",
+            "PukaLandLuckyStarStart",
+            "PukaLandLuckyStarPlay"
+        ],
+        "on_error": [
+            "PukaLandLuckyStarFinished"
+        ]
+    },
+    "PukaLandLuckyStarRetry": {
+        "desc": "结算界面 — 点击「再试一次」（max_hit 即重复次数）",
+        "max_hit": 5, // 由任务选项 PukaLandLuckyStarRepeatCount 注入
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "PukaLand/RetryButton.png",
+                "roi": [
+                    727,
+                    601,
+                    92,
+                    38
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 500, // 结算按钮刚出现时画面仍在动，等 500ms 再点，避免点太快
+        "post_delay": 0,
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "幸运星：识别到「再试一次」，开启下一局",
+                "display": [
+                    "log"
+                ]
+            }
+        },
+        "next": [
+            "PukaLandLuckyStarRestarted"
+        ]
+    },
+    "PukaLandLuckyStarRestarted": {
+        "desc": "确认已离开结算界面（「再试一次」已消失），避免重复点击",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "PukaLand/RetryButton.png",
+                "roi": [
+                    727,
+                    601,
+                    92,
+                    38
+                ],
+                "threshold": 0.7
+            }
+        },
+        "inverse": true,
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        // 回准备界面则重新「开始游戏」，否则直接回到对局
+        "next": [
+            "PukaLandLuckyStarStart",
+            "[JumpBack]SceneLoadingType1",
+            "[JumpBack]SceneLoadingType2",
+            "PukaLandLuckyStarPlay"
+        ],
+        "on_error": [
+            "PukaLandLuckyStarExit"
+        ]
+    },
+    "PukaLandLuckyStarFinished": {
+        "desc": "达到设定次数 — 正常结束",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "幸运星：已完成设定的对局次数，任务结束",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            }
+        },
+        "next": []
+    },
+    "PukaLandLuckyStarNotInPage": {
+        "desc": "未在幸运星界面 — 拒绝在未知画面上敲空格，直接退出并提示",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "幸运星：未找到「开始游戏」按钮，请先手动进入幸运星界面再运行本任务",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            }
+        },
+        "next": []
+    },
+    "PukaLandLuckyStarExit": {
+        "desc": "界面状态异常 — 点了「再试一次」后画面没有变化，结束任务",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "focus": {
+            "Node.Action.Starting": {
+                "content": "幸运星：点击「再试一次」后界面未变化，任务已结束，请检查游戏画面",
+                "display": [
+                    "log",
+                    "toast"
+                ]
+            }
+        },
+        "next": []
+    }
+}

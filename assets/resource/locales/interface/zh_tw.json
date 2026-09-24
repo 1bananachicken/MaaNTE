@@ -284,5 +284,13 @@
     "task_auto_volleyball_weekly_option_second_character_desc": "選擇排球挑戰的隊友角色（面板第一行從左到右）。",
     "task_auto_volleyball_weekly_character_1": "角色 1",
     "task_auto_volleyball_weekly_character_2": "角色 2",
-    "task_auto_volleyball_weekly_character_3": "角色 3"
+    "task_auto_volleyball_weekly_character_3": "角色 3",
+    "task_pukaland_lucky_star_label": "自動命中幸運星",
+    "task_pukaland_lucky_star_desc": "需要<span style='color:red'>前台控制器</span>，在開始遊戲介面開始任務。",
+    "task_pukaland_lucky_star_option_repeat_count": "重複次數",
+    "task_pukaland_lucky_star_option_repeat_count_desc": "點擊「再試一次」重複進行的次數，達到後任務結束。",
+    "task_pukaland_lucky_star_option_repeat_count_input": "次數",
+    "task_pukaland_lucky_star_option_start_delay": "開始後等待時間（毫秒）",
+    "task_pukaland_lucky_star_option_start_delay_desc": "點擊「開始遊戲」後等待多久再開始敲空白鍵，用於跳過開場動畫。",
+    "task_pukaland_lucky_star_option_start_delay_input": "毫秒"
 }

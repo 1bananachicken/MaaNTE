@@ -284,5 +284,13 @@
     "task_auto_volleyball_weekly_option_second_character_desc": "バレーボールチャレンジのチームメイトを選択します（パネルの上段を左から右）。",
     "task_auto_volleyball_weekly_character_1": "キャラクター1",
     "task_auto_volleyball_weekly_character_2": "キャラクター2",
-    "task_auto_volleyball_weekly_character_3": "キャラクター3"
+    "task_auto_volleyball_weekly_character_3": "キャラクター3",
+    "task_pukaland_lucky_star_label": "ラッキースター自動命中",
+    "task_pukaland_lucky_star_desc": "<span style='color:red'>前台コントローラー</span>が必要です。「ゲーム開始」画面でタスクを開始してください。",
+    "task_pukaland_lucky_star_option_repeat_count": "繰り返し回数",
+    "task_pukaland_lucky_star_option_repeat_count_desc": "「もう一度」をクリックして繰り返す回数。到達するとタスクは終了します。",
+    "task_pukaland_lucky_star_option_repeat_count_input": "回数",
+    "task_pukaland_lucky_star_option_start_delay": "開始後の待機時間（ミリ秒）",
+    "task_pukaland_lucky_star_option_start_delay_desc": "「ゲーム開始」をクリックしてからスペース連打を始めるまでの待機時間。オープニング演出を飛ばすために使用します。",
+    "task_pukaland_lucky_star_option_start_delay_input": "ミリ秒"
 }
