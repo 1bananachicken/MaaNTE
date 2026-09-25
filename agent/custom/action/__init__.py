@@ -37,6 +37,7 @@ from .BagelSpam import *
 from .auto_volleyball import *
 from .BidKing.place_bid import PlaceBid
 from .auto_volleyball_weekly import *
+from .lucky_star_round import *
 
 __all__ = [
     "AutoMakeCoffee",
@@ -92,4 +93,7 @@ __all__ = [
     "VolleyballWeeklyReset",
     "VolleyballWeeklySelectTeammates",
     "VolleyballWeeklyClickButton",
+    "LuckyStarReset",
+    "LuckyStarRoundGate",
+    "LuckyStarRetryOrFinish",
 ]
