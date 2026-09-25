@@ -1,4 +1,4 @@
-import json
+﻿import json
 import math
 
 import cv2
@@ -27,14 +27,20 @@ class VolleyballLandingDetect(CustomRecognition):
     def analyze(
         self, context: Context, argv: CustomRecognition.AnalyzeArg
     ) -> CustomRecognition.AnalyzeResult | None:
-        # 解析参数
+        # 解析参数（兼容对象和字符串两种格式）
         params = {}
-        if argv.custom_recognition_param:
-            try:
-                params = json.loads(argv.custom_recognition_param)
-            except json.JSONDecodeError as e:
-                logger.error("VolleyballLandingDetect: param parse failed: %s", e)
-                return None
+        raw = argv.custom_recognition_param
+        if raw:
+            if isinstance(raw, dict):
+                params = raw
+            else:
+                try:
+                    parsed = json.loads(raw)
+                    if isinstance(parsed, dict):
+                        params = parsed
+                except (json.JSONDecodeError, TypeError):
+                    logger.error("VolleyballLandingDetect: param parse failed")
+                    return None
 
         roi = params.get("roi")
         if not roi or len(roi) != 4:

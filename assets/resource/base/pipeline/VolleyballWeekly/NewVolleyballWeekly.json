@@ -83,22 +83,19 @@
         "next": [
             "NewVolleyballResultScreenDetect",
             "NewVolleyballTransitionDetect",
-            "NewVolleyballMoveToLanding",
             "NewVolleyballSpikeJump",
+            "NewVolleyballMoveToLanding",
             "NewVolleyballReceiveLoop"
         ]
     },
     "NewVolleyballResultScreenDetect": {
-        "desc": "检测结算画面（左下角离开按钮），命中后点击对应按钮",
+        "desc": "检测结算画面（左下角离开按钮模板匹配），命中后点击对应按钮",
         "recognition": {
-            "type": "ColorMatch",
+            "type": "TemplateMatch",
             "param": {
-                "roi": [20, 630, 130, 70],
-                "method": 40,
-                "lower": [10, 10, 10],
-                "upper": [60, 60, 70],
-                "count": 500,
-                "connected": true
+                "template": "VolleyballWeekly/LeaveButton.png",
+                "roi": [0, 600, 300, 120],
+                "threshold": 0.9
             }
         },
         "action": {
@@ -123,9 +120,9 @@
             "param": {
                 "roi": [400, 200, 480, 320],
                 "method": 40,
-                "lower": [100, 50, 20],
-                "upper": [255, 200, 100],
-                "count": 10000,
+                "lower": [90, 30, 100],
+                "upper": [130, 255, 255],
+                "count": 100000,
                 "connected": false
             }
         },
@@ -180,9 +177,13 @@
         ]
     },
     "NewVolleyballMoveToLanding": {
-        "desc": "闭环移动：持续检测落点，长按方向键移动，到位后按左键传球",
+        "desc": "闭环移动：检测到落点后持续移动，到位后按左键传球",
         "recognition": {
-            "type": "DirectHit"
+            "type": "Custom",
+            "custom_recognition": "volleyball_landing_detect",
+            "custom_recognition_param": {
+                "roi": [470, 190, 340, 340]
+            }
         },
         "action": "Custom",
         "custom_action": "volleyball_move_to_landing",
@@ -200,16 +201,13 @@
         ]
     },
     "NewVolleyballSpikeJump": {
-        "desc": "检测右下角space绿色高亮按钮，命中则按空格起跳",
+        "desc": "检测右下角space高亮按钮（模板匹配），命中则按空格起跳",
         "recognition": {
-            "type": "ColorMatch",
+            "type": "TemplateMatch",
             "param": {
+                "template": "VolleyballWeekly/SpaceHighlight.png",
                 "roi": [1060, 610, 100, 100],
-                "method": 40,
-                "lower": [20, 130, 40],
-                "upper": [100, 230, 140],
-                "count": 30,
-                "connected": true
+                "threshold": 0.5
             }
         },
         "action": {
@@ -237,7 +235,7 @@
                 "key": 2
             }
         },
-        "pre_delay": 1950,
+        "pre_delay": 1200,
         "post_delay": 0,
         "rate_limit": 0,
         "timeout": 5000,
