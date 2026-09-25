@@ -42,6 +42,7 @@ from .auto_volleyball_landing import *
 from .auto_volleyball_move import *
 from .auto_volleyball_serve import *
 from .auto_volleyball_round import *
+from .auto_volleyball_spike import *
 
 __all__ = [
     "AutoMakeCoffee",
@@ -102,4 +103,5 @@ __all__ = [
     "VolleyballMoveToLanding",
     "VolleyballServeDetect",
     "VolleyballRoundWait",
+    "VolleyballSpikeJumpDetect",
 ]

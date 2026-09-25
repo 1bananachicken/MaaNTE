@@ -154,6 +154,7 @@
         "rate_limit": 0,
         "timeout": 15000,
         "next": [
+            "NewVolleyballResultScreenDetect",
             "NewVolleyballServeCheck",
             "NewVolleyballReceiveLoop"
         ]
@@ -188,7 +189,7 @@
         "action": "Custom",
         "custom_action": "volleyball_move_to_landing",
         "custom_action_param": {
-            "move_duration": 0.15,
+            "move_duration": 0.3,
             "wait_after_move": 0.1,
             "timeout": 3.0
         },
@@ -201,13 +202,12 @@
         ]
     },
     "NewVolleyballSpikeJump": {
-        "desc": "检测右下角space高亮按钮（模板匹配），命中则按空格起跳",
+        "desc": "检测右下角space高亮（HSV+连通块面积筛选），命中则按空格起跳",
         "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "VolleyballWeekly/SpaceHighlight.png",
-                "roi": [1060, 610, 100, 100],
-                "threshold": 0.5
+            "type": "Custom",
+            "custom_recognition": "volleyball_spike_jump_detect",
+            "custom_recognition_param": {
+                "roi": [1060, 610, 100, 100]
             }
         },
         "action": {
