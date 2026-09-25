@@ -1,0 +1,181 @@
+{
+    "task": [
+        {
+            "name": "NewVolleyballWeekly",
+            "label": "$task_new_volleyball_weekly_label",
+            "entry": "NewVolleyballWeeklyEntrance",
+            "description": "$task_new_volleyball_weekly_desc",
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ],
+            "option": [
+                "NewVolleyballEnableJumpServe",
+                "NewVolleyballWaitMs",
+                "NewVolleyballEnableReceive",
+                "NewVolleyballViewParams",
+                "NewVolleyballReceiveWaitMs",
+                "NewVolleyballAfterMatch"
+            ]
+        }
+    ],
+    "option": {
+        "NewVolleyballEnableJumpServe": {
+            "type": "switch",
+            "label": "$task_new_volleyball_enable_jump_serve",
+            "description": "$task_new_volleyball_enable_jump_serve_desc",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "NewVolleyballServeToss": { "enabled": true },
+                        "NewVolleyballSpike": { "enabled": true }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "NewVolleyballServeToss": { "enabled": false },
+                        "NewVolleyballSpike": { "enabled": false }
+                    }
+                }
+            ]
+        },
+        "NewVolleyballWaitMs": {
+            "type": "input",
+            "label": "$task_new_volleyball_wait_ms",
+            "description": "$task_new_volleyball_wait_ms_desc",
+            "inputs": [
+                {
+                    "name": "wait_ms",
+                    "label": "$task_new_volleyball_wait_ms_input",
+                    "default": "2900",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "NewVolleyballServeToss": {
+                    "post_delay": "{wait_ms}"
+                }
+            }
+        },
+        "NewVolleyballEnableReceive": {
+            "type": "switch",
+            "label": "$task_new_volleyball_enable_receive",
+            "description": "$task_new_volleyball_enable_receive_desc",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "NewVolleyballReceiveLoop": { "enabled": true },
+                        "NewVolleyballMoveToLanding": { "enabled": true },
+                        "NewVolleyballSpikeJump": { "enabled": true },
+                        "NewVolleyballSpikeWait": { "enabled": true }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "NewVolleyballReceiveLoop": { "enabled": false },
+                        "NewVolleyballMoveToLanding": { "enabled": false },
+                        "NewVolleyballSpikeJump": { "enabled": false },
+                        "NewVolleyballSpikeWait": { "enabled": false }
+                    }
+                }
+            ]
+        },
+        "NewVolleyballViewParams": {
+            "type": "input",
+            "label": "$task_new_volleyball_view_params",
+            "description": "$task_new_volleyball_view_params_desc",
+            "inputs": [
+                {
+                    "name": "view_dy",
+                    "label": "$task_new_volleyball_view_dy_input",
+                    "default": "200",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "NewVolleyballWeeklyEntrance": {
+                    "custom_action_param": {
+                        "dy": "{view_dy}"
+                    }
+                }
+            }
+        },
+        "NewVolleyballReceiveWaitMs": {
+            "type": "input",
+            "label": "$task_new_volleyball_receive_wait_ms",
+            "description": "$task_new_volleyball_receive_wait_ms_desc",
+            "inputs": [
+                {
+                    "name": "receive_wait_ms",
+                    "label": "$task_new_volleyball_receive_wait_ms_input",
+                    "default": "1950",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "NewVolleyballSpikeWait": {
+                    "pre_delay": "{receive_wait_ms}"
+                }
+            }
+        },
+        "NewVolleyballAfterMatch": {
+            "type": "select",
+            "label": "$task_new_volleyball_after_match",
+            "description": "$task_new_volleyball_after_match_desc",
+            "default_case": "restart",
+            "cases": [
+                {
+                    "name": "restart",
+                    "label": "$task_new_volleyball_after_match_restart",
+                    "pipeline_override": {
+                        "NewVolleyballResultScreenDetect": {
+                            "action": {
+                                "type": "Click",
+                                "param": {
+                                    "x": 80,
+                                    "y": 600
+                                }
+                            },
+                            "next": [
+                                "NewVolleyballReceiveLoop"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "leave",
+                    "label": "$task_new_volleyball_after_match_leave",
+                    "pipeline_override": {
+                        "NewVolleyballResultScreenDetect": {
+                            "action": {
+                                "type": "Click",
+                                "param": {
+                                    "x": 80,
+                                    "y": 670
+                                }
+                            },
+                            "next": [
+                                "NewVolleyballDone"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

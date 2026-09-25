@@ -1,0 +1,248 @@
+{
+    "NewVolleyballWeeklyEntrance": {
+        "desc": "入口：视角初始化，完成后进入接球循环",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": "Custom",
+        "custom_action": "volleyball_view_setup",
+        "custom_action_param": {
+            "dy": 200
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "timeout": 10000,
+        "next": [
+            "NewVolleyballReceiveLoop",
+            "NewVolleyballDone"
+        ]
+    },
+    "NewVolleyballDone": {
+        "desc": "接球功能关闭或流程结束，停止任务",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "StopTask"
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "NewVolleyballServeToss": {
+        "desc": "发球：左键抛球，等待后进入重扣",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 1
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 2900,
+        "rate_limit": 0,
+        "timeout": 5000,
+        "next": [
+            "NewVolleyballSpike"
+        ]
+    },
+    "NewVolleyballSpike": {
+        "desc": "发球重扣：右键重扣",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 2
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "timeout": 3000,
+        "next": [
+            "NewVolleyballReceiveLoop"
+        ]
+    },
+    "NewVolleyballReceiveLoop": {
+        "desc": "接球循环：检测结算→过场→闭环移动→space重扣",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "timeout": 5000,
+        "next": [
+            "NewVolleyballResultScreenDetect",
+            "NewVolleyballTransitionDetect",
+            "NewVolleyballMoveToLanding",
+            "NewVolleyballSpikeJump",
+            "NewVolleyballReceiveLoop"
+        ]
+    },
+    "NewVolleyballResultScreenDetect": {
+        "desc": "检测结算画面（左下角离开按钮），命中后点击对应按钮",
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [20, 630, 130, 70],
+                "method": 40,
+                "lower": [10, 10, 10],
+                "upper": [60, 60, 70],
+                "count": 500,
+                "connected": true
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "x": 80,
+                "y": 670
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 500,
+        "rate_limit": 0,
+        "timeout": 3000,
+        "next": [
+            "NewVolleyballDone"
+        ]
+    },
+    "NewVolleyballTransitionDetect": {
+        "desc": "检测过场动画（全屏蓝色），命中则进入回合间等待",
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [400, 200, 480, 320],
+                "method": 40,
+                "lower": [100, 50, 20],
+                "upper": [255, 200, 100],
+                "count": 10000,
+                "connected": false
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "timeout": 3000,
+        "next": [
+            "NewVolleyballRoundWait"
+        ]
+    },
+    "NewVolleyballRoundWait": {
+        "desc": "回合间等待：过场动画出现→消失→角色回位",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": "Custom",
+        "custom_action": "volleyball_round_wait",
+        "custom_action_param": {
+            "blue_ratio": 0.3,
+            "wait_after": 1.5,
+            "timeout": 10.0
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "timeout": 15000,
+        "next": [
+            "NewVolleyballServeCheck",
+            "NewVolleyballReceiveLoop"
+        ]
+    },
+    "NewVolleyballServeCheck": {
+        "desc": "检测主控是否站在底线上（主控发球），命中则进入发球流程",
+        "recognition": {
+            "type": "Custom",
+            "custom_recognition": "volleyball_serve_detect"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "timeout": 3000,
+        "next": [
+            "NewVolleyballServeToss",
+            "NewVolleyballReceiveLoop"
+        ]
+    },
+    "NewVolleyballMoveToLanding": {
+        "desc": "闭环移动：持续检测落点，长按方向键移动，到位后按左键传球",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": "Custom",
+        "custom_action": "volleyball_move_to_landing",
+        "custom_action_param": {
+            "move_duration": 0.15,
+            "wait_after_move": 0.1,
+            "timeout": 3.0
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "timeout": 5000,
+        "next": [
+            "NewVolleyballReceiveLoop"
+        ]
+    },
+    "NewVolleyballSpikeJump": {
+        "desc": "检测右下角space绿色高亮按钮，命中则按空格起跳",
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [1060, 610, 100, 100],
+                "method": 40,
+                "lower": [20, 130, 40],
+                "upper": [100, 230, 140],
+                "count": 30,
+                "connected": true
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 32
+            }
+        },
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "timeout": 3000,
+        "next": [
+            "NewVolleyballSpikeWait"
+        ]
+    },
+    "NewVolleyballSpikeWait": {
+        "desc": "按空格后等待进入重扣窗口，按右键重扣，然后回到接球循环",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 2
+            }
+        },
+        "pre_delay": 1950,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "timeout": 5000,
+        "next": [
+            "NewVolleyballReceiveLoop"
+        ]
+    }
+}
