@@ -1,9 +1,9 @@
 {
     "task": [
         {
-            "name": "NewVolleyballWeekly",
+            "name": "NewVolleyball",
             "label": "$task_new_volleyball_weekly_label",
-            "entry": "NewVolleyballWeeklyEntrance",
+            "entry": "NewVolleyballSkipIntro",
             "description": "$task_new_volleyball_weekly_desc",
             "controller": [
                 "Win32-Front"
@@ -107,7 +107,7 @@
                 }
             ],
             "pipeline_override": {
-                "NewVolleyballWeeklyEntrance": {
+                "NewVolleyballEntrance": {
                     "custom_action_param": {
                         "dy": "{view_dy}"
                     }
@@ -144,15 +144,12 @@
                     "label": "$task_new_volleyball_after_match_restart",
                     "pipeline_override": {
                         "NewVolleyballResultScreenDetect": {
-                            "action": {
-                                "type": "Click",
-                                "param": {
-                                    "x": 80,
-                                    "y": 615
-                                }
+                            "custom_action_param": {
+                                "x": 46,
+                                "y": 614
                             },
                             "next": [
-                                "NewVolleyballReceiveLoop"
+                                "NewVolleyballSkipIntro"
                             ]
                         }
                     }
@@ -162,12 +159,9 @@
                     "label": "$task_new_volleyball_after_match_leave",
                     "pipeline_override": {
                         "NewVolleyballResultScreenDetect": {
-                            "action": {
-                                "type": "Click",
-                                "param": {
-                                    "x": 80,
-                                    "y": 670
-                                }
+                            "custom_action_param": {
+                                "x": 46,
+                                "y": 674
                             },
                             "next": [
                                 "NewVolleyballDone"

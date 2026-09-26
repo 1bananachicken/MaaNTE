@@ -1,5 +1,21 @@
 {
-    "NewVolleyballWeeklyEntrance": {
+    "NewVolleyballSkipIntro": {
+        "desc": "入口前置：检测右上角跳过按钮并点击，等黑屏结束后进入视角初始化",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": "Custom",
+        "custom_action": "volleyball_skip_intro",
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0,
+        "timeout": 60000,
+        "next": [
+            "NewVolleyballEntrance",
+            "NewVolleyballDone"
+        ]
+    },
+    "NewVolleyballEntrance": {
         "desc": "入口：视角初始化，完成后进入接球循环",
         "recognition": {
             "type": "DirectHit"
@@ -98,12 +114,11 @@
                 "threshold": 0.9
             }
         },
-        "action": {
-            "type": "Click",
-            "param": {
-                "x": 80,
-                "y": 670
-            }
+        "action": "Custom",
+        "custom_action": "volleyball_click_result",
+        "custom_action_param": {
+            "x": 46,
+            "y": 674
         },
         "pre_delay": 0,
         "post_delay": 500,
@@ -122,7 +137,7 @@
                 "method": 40,
                 "lower": [90, 30, 100],
                 "upper": [130, 255, 255],
-                "count": 100000,
+                "count": 50000,
                 "connected": false
             }
         },
@@ -154,7 +169,6 @@
         "rate_limit": 0,
         "timeout": 15000,
         "next": [
-            "NewVolleyballResultScreenDetect",
             "NewVolleyballServeCheck",
             "NewVolleyballReceiveLoop"
         ]

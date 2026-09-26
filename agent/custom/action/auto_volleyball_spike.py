@@ -1,5 +1,5 @@
 """
-排球周常 - space 高亮检测（HSV + 连通块面积筛选）
+自动排球 - space 高亮检测（HSV + 连通块面积筛选）
 用于 NewVolleyballSpikeJump 节点，替代纯 ColorMatch，
 防止场地蓝色边框进入 ROI 时误判。
 """
