@@ -21,12 +21,49 @@
             }
         },
         "next": [
-            "PukaLandLuckyStarStart",
+            "PukaLandLuckyStarReset",
             "[JumpBack]SceneLoadingType1",
             "[JumpBack]SceneLoadingType2"
-        ],
-        "on_error": [
-            "PukaLandLuckyStarNotInPage"
+        ]
+    },
+    "PukaLandLuckyStarReset": {
+        "desc": "重置幸运星回合计数",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "lucky_star_reset"
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "PukaLandLuckyStarRound"
+        ]
+    },
+    "PukaLandLuckyStarRound": {
+        "desc": "新一局入口，按设定对局次数限制循环",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "lucky_star_round_gate",
+                "custom_action_param": {
+                    "repeat_count": 3 // default
+                }
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "next": [
+            "PukaLandLuckyStarStart",
+            "PukaLandLuckyStarCountdown"
         ]
     },
     "PukaLandLuckyStarStart": {
@@ -49,54 +86,253 @@
         },
         "rate_limit": 0,
         "pre_delay": 0,
-        "post_delay": 3000, // 开场动画期间不敲空格，由任务选项 PukaLandLuckyStarStartDelay 注入
+        "post_delay": 3000,
+        "next": [
+            "PukaLandLuckyStarCountdown"
+        ]
+    },
+    "PukaLandLuckyStarCountdown": {
+        "desc": "等待游戏开局倒计时结束，避免错过前几发",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 3000, // 开局倒计时等待，单位毫秒；由任务选项 PukaLandLuckyStarStartDelay 注入
         "next": [
             "PukaLandLuckyStarPlay"
         ]
     },
     "PukaLandLuckyStarPlay": {
-        "desc": "对局中 — 每 0.2s 敲一次空格，一旦认出「再试一次」立即停手",
+        "desc": "对局中 — 第 1 次投掷，不做识别",
         "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "PukaLand/RetryButton.png",
-                "roi": [
-                    727,
-                    601,
-                    92,
-                    38
-                ],
-                "threshold": 0.7
-            }
+            "type": "DirectHit"
         },
-        "inverse": true, // 反向识别：没看到「再试一次」= 还在局中
         "action": {
-            "type": "ClickKey",
+            "type": "LongPressKey",
             "param": {
                 // VK_SPACE
                 "key": [
                     32
-                ]
+                ],
+                "duration": 500 // 按住时长，单位毫秒；首轮和补投节点需保持一致，可按实际情况调整
             }
         },
         "rate_limit": 0,
         "pre_delay": 0,
-        "post_delay": 100, // 空格间隔 0.1s（实际节奏还需叠加一次截图+识别耗时）
-        "timeout": 2000, // 正常情况下每次敲击后都会立刻自循环；只有「再试一次」达上限时才会走到超时
-        "max_hit": 20000, // 保险丝：万一停在完全无法识别的画面上，避免无限敲空格（0.2s × 20000 ≈ 66 分钟）
-        // 次数耗尽后游戏会退回准备界面，因此这里也挂上「开始游戏」
+        "post_delay": 250,
         "next": [
-            "PukaLandLuckyStarRetry",
-            "PukaLandLuckyStarStart",
-            "PukaLandLuckyStarPlay"
-        ],
-        "on_error": [
-            "PukaLandLuckyStarFinished"
+            "PukaLandLuckyStarPlay2"
         ]
     },
-    "PukaLandLuckyStarRetry": {
-        "desc": "结算界面 — 点击「再试一次」（max_hit 即重复次数）",
-        "max_hit": 5, // 由任务选项 PukaLandLuckyStarRepeatCount 注入
+    "PukaLandLuckyStarPlay2": {
+        "desc": "对局中 — 第 2 次投掷，不做识别",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                // VK_SPACE
+                "key": [
+                    32
+                ],
+                "duration": 500 // 按住时长，单位毫秒；可按实际情况调整
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 250,
+        "next": [
+            "PukaLandLuckyStarPlay3"
+        ]
+    },
+    "PukaLandLuckyStarPlay3": {
+        "desc": "对局中 — 第 3 次投掷，不做识别",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                // VK_SPACE
+                "key": [
+                    32
+                ],
+                "duration": 500 // 按住时长，单位毫秒；可按实际情况调整
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 250,
+        "next": [
+            "PukaLandLuckyStarPlay4"
+        ]
+    },
+    "PukaLandLuckyStarPlay4": {
+        "desc": "对局中 — 第 4 次投掷，不做识别",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                // VK_SPACE
+                "key": [
+                    32
+                ],
+                "duration": 500 // 按住时长，单位毫秒；可按实际情况调整
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 250,
+        "next": [
+            "PukaLandLuckyStarPlay5"
+        ]
+    },
+    "PukaLandLuckyStarPlay5": {
+        "desc": "对局中 — 第 5 次投掷，之后检查结算按钮",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                // VK_SPACE
+                "key": [
+                    32
+                ],
+                "duration": 500 // 按住时长，单位毫秒；可按实际情况调整
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 4000, // 第五发结束后等待结算按钮出现，单位毫秒；可按实际情况调整
+        "next": [
+            "PukaLandLuckyStarResultGate",
+            "PukaLandLuckyStarPlayFallback"
+        ]
+    },
+    "PukaLandLuckyStarPlayFallback": {
+        "desc": "结算按钮未识别 — 第 1 次补投，不做识别",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                // VK_SPACE
+                "key": [
+                    32
+                ],
+                "duration": 850 // 按住时长，单位毫秒；可按实际情况调整
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 250,
+        "next": [
+            "PukaLandLuckyStarResultGate",
+            "PukaLandLuckyStarPlayFallback2"
+        ]
+    },
+    "PukaLandLuckyStarPlayFallback2": {
+        "desc": "结算按钮未识别 — 第 2 次补投，不做识别",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                // VK_SPACE
+                "key": [
+                    32
+                ],
+                "duration": 850 // 按住时长，单位毫秒；可按实际情况调整
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 250,
+        "next": [
+            "PukaLandLuckyStarResultGate",
+            "PukaLandLuckyStarPlayFallback3"
+        ]
+    },
+    "PukaLandLuckyStarPlayFallback3": {
+        "desc": "结算按钮未识别 — 第 3 次补投，不做识别",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                // VK_SPACE
+                "key": [
+                    32
+                ],
+                "duration": 850 // 按住时长，单位毫秒；可按实际情况调整
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 250,
+        "next": [
+            "PukaLandLuckyStarResultGate",
+            "PukaLandLuckyStarPlayFallback4"
+        ]
+    },
+    "PukaLandLuckyStarPlayFallback4": {
+        "desc": "结算按钮未识别 — 第 4 次补投，不做识别",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                // VK_SPACE
+                "key": [
+                    32
+                ],
+                "duration": 850 // 按住时长，单位毫秒；可按实际情况调整
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 250,
+        "next": [
+            "PukaLandLuckyStarResultGate",
+            "PukaLandLuckyStarPlayFallback5"
+        ]
+    },
+    "PukaLandLuckyStarPlayFallback5": {
+        "desc": "结算按钮未识别 — 第 5 次补投，之后再次检查",
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "LongPressKey",
+            "param": {
+                // VK_SPACE
+                "key": [
+                    32
+                ],
+                "duration": 850 // 按住时长，单位毫秒；可按实际情况调整
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 4000,
+        "next": [
+            "PukaLandLuckyStarResultGate"
+        ]
+    },
+    "PukaLandLuckyStarResultGate": {
+        "desc": "结算按钮识别后判断是否还需要点击再试一次",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -111,19 +347,14 @@
             }
         },
         "action": {
-            "type": "Click"
-        },
-        "rate_limit": 0,
-        "pre_delay": 500, // 结算按钮刚出现时画面仍在动，等 500ms 再点，避免点太快
-        "post_delay": 0,
-        "focus": {
-            "Node.Action.Starting": {
-                "content": "幸运星：识别到「再试一次」，开启下一局",
-                "display": [
-                    "log"
-                ]
+            "type": "Custom",
+            "param": {
+                "custom_action": "lucky_star_retry_or_finish"
             }
         },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 0,
         "next": [
             "PukaLandLuckyStarRestarted"
         ]
@@ -147,84 +378,14 @@
         "action": {
             "type": "DoNothing"
         },
-        "rate_limit": 0,
+        "rate_limit": 1000,
         "pre_delay": 0,
-        "post_delay": 0,
+        "post_delay": 1500,
         // 回准备界面则重新「开始游戏」，否则直接回到对局
         "next": [
-            "PukaLandLuckyStarStart",
+            "PukaLandLuckyStarRound",
             "[JumpBack]SceneLoadingType1",
-            "[JumpBack]SceneLoadingType2",
-            "PukaLandLuckyStarPlay"
-        ],
-        "on_error": [
-            "PukaLandLuckyStarExit"
+            "[JumpBack]SceneLoadingType2"
         ]
-    },
-    "PukaLandLuckyStarFinished": {
-        "desc": "达到设定次数 — 正常结束",
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "DoNothing"
-        },
-        "rate_limit": 0,
-        "pre_delay": 0,
-        "post_delay": 0,
-        "focus": {
-            "Node.Action.Starting": {
-                "content": "幸运星：已完成设定的对局次数，任务结束",
-                "display": [
-                    "log",
-                    "toast"
-                ]
-            }
-        },
-        "next": []
-    },
-    "PukaLandLuckyStarNotInPage": {
-        "desc": "未在幸运星界面 — 拒绝在未知画面上敲空格，直接退出并提示",
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "DoNothing"
-        },
-        "rate_limit": 0,
-        "pre_delay": 0,
-        "post_delay": 0,
-        "focus": {
-            "Node.Action.Starting": {
-                "content": "幸运星：未找到「开始游戏」按钮，请先手动进入幸运星界面再运行本任务",
-                "display": [
-                    "log",
-                    "toast"
-                ]
-            }
-        },
-        "next": []
-    },
-    "PukaLandLuckyStarExit": {
-        "desc": "界面状态异常 — 点了「再试一次」后画面没有变化，结束任务",
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "DoNothing"
-        },
-        "rate_limit": 0,
-        "pre_delay": 0,
-        "post_delay": 0,
-        "focus": {
-            "Node.Action.Starting": {
-                "content": "幸运星：点击「再试一次」后界面未变化，任务已结束，请检查游戏画面",
-                "display": [
-                    "log",
-                    "toast"
-                ]
-            }
-        },
-        "next": []
     }
 }
