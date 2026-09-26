@@ -11,12 +11,39 @@
             "group": [
                 "HethereauHobbies"
             ],
+            "pipeline_override": {
+                "VolleyballCoreSkipIntro": {
+                    "next": [
+                        "VolleyballStartRacing",
+                        "VolleyballCoreViewSetup",
+                        "VolleyballPlay"
+                    ]
+                },
+                "VolleyballCoreMatchEnd": {
+                    "next": [
+                        "VolleyballThreeStars",
+                        "VolleyballRestartButton",
+                        "VolleyballExitButton"
+                    ]
+                },
+                "VolleyballNextButton": {
+                    "next": [
+                        "VolleyballCoreSkipIntro"
+                    ]
+                },
+                "VolleyballRestartButton": {
+                    "next": [
+                        "VolleyballCoreSkipIntro"
+                    ]
+                }
+            },
             "option": [
                 "VolleyballStartDifficulty",
                 "VolleyballSkipToPlay",
                 "VolleyballFirstCharacter",
                 "VolleyballSecondCharacter",
-                "VolleyballContinueOnWin"
+                "VolleyballContinueOnWin",
+                "VolleyballUseLegacyMash"
             ]
         }
     ],
@@ -102,6 +129,8 @@
                         "VolleyballEntrance": {
                             "next": [
                                 "VolleyballStartRacing",
+                                "VolleyballCoreSkipIntro",
+                                "VolleyballCoreViewSetup",
                                 "VolleyballPlay"
                             ]
                         }
@@ -123,6 +152,13 @@
                     "name": "Yes",
                     "label": "$option_switch_case_yes",
                     "pipeline_override": {
+                        "VolleyballCoreMatchEnd": {
+                            "next": [
+                                "VolleyballNextButton",
+                                "VolleyballRestartButton",
+                                "VolleyballExitButton"
+                            ]
+                        },
                         "VolleyballWin": {
                             "next": [
                                 "VolleyballNextButton",
@@ -134,6 +170,44 @@
                 {
                     "name": "No",
                     "label": "$option_switch_case_no"
+                }
+            ]
+        },
+        "VolleyballUseLegacyMash": {
+            "type": "switch",
+            "label": "$task_auto_volleyball_option_use_legacy_mash",
+            "description": "$task_auto_volleyball_option_use_legacy_mash_desc",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "VolleyballCoreSkipIntro": {
+                            "enabled": false
+                        },
+                        "VolleyballCoreViewSetup": {
+                            "enabled": false
+                        },
+                        "VolleyballPlay": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "VolleyballCoreSkipIntro": {
+                            "enabled": true
+                        },
+                        "VolleyballCoreViewSetup": {
+                            "enabled": true
+                        },
+                        "VolleyballPlay": {
+                            "enabled": false
+                        }
+                    }
                 }
             ]
         },

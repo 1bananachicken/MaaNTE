@@ -1,0 +1,171 @@
+{
+    "task": [
+        {
+            "name": "NewVolleyball",
+            "label": "$task_new_volleyball_label",
+            "entry": "VolleyballCoreSkipIntro",
+            "description": "$task_new_volleyball_desc",
+            "controller": [
+                "Win32-Front"
+            ],
+            "group": [
+                "HethereauHobbies"
+            ],
+            "option": [
+                "NewVolleyballEnableJumpServe",
+                "NewVolleyballWaitMs",
+                "NewVolleyballEnableReceive",
+                "NewVolleyballViewParams",
+                "NewVolleyballReceiveWaitMs",
+                "NewVolleyballAfterMatch"
+            ]
+        }
+    ],
+    "option": {
+        "NewVolleyballEnableJumpServe": {
+            "type": "switch",
+            "label": "$task_new_volleyball_enable_jump_serve",
+            "description": "$task_new_volleyball_enable_jump_serve_desc",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "VolleyballCoreServeToss": { "enabled": true },
+                        "VolleyballCoreSpike": { "enabled": true }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "VolleyballCoreServeToss": { "enabled": false },
+                        "VolleyballCoreSpike": { "enabled": false }
+                    }
+                }
+            ]
+        },
+        "NewVolleyballWaitMs": {
+            "type": "input",
+            "label": "$task_new_volleyball_wait_ms",
+            "description": "$task_new_volleyball_wait_ms_desc",
+            "inputs": [
+                {
+                    "name": "wait_ms",
+                    "label": "$task_new_volleyball_wait_ms_input",
+                    "default": "2900",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "VolleyballCoreServeToss": {
+                    "post_delay": "{wait_ms}"
+                }
+            }
+        },
+        "NewVolleyballEnableReceive": {
+            "type": "switch",
+            "label": "$task_new_volleyball_enable_receive",
+            "description": "$task_new_volleyball_enable_receive_desc",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "VolleyballCoreLoop": { "enabled": true },
+                        "VolleyballCoreLanding": { "enabled": true },
+                        "VolleyballCoreSpikeJump": { "enabled": true },
+                        "VolleyballCoreSpikeWait": { "enabled": true }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "VolleyballCoreLoop": { "enabled": false },
+                        "VolleyballCoreLanding": { "enabled": false },
+                        "VolleyballCoreSpikeJump": { "enabled": false },
+                        "VolleyballCoreSpikeWait": { "enabled": false }
+                    }
+                }
+            ]
+        },
+        "NewVolleyballViewParams": {
+            "type": "input",
+            "label": "$task_new_volleyball_view_params",
+            "description": "$task_new_volleyball_view_params_desc",
+            "inputs": [
+                {
+                    "name": "view_dy",
+                    "label": "$task_new_volleyball_view_dy_input",
+                    "default": "5500",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "VolleyballCoreViewSetup": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "dy": "{view_dy}"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "NewVolleyballReceiveWaitMs": {
+            "type": "input",
+            "label": "$task_new_volleyball_receive_wait_ms",
+            "description": "$task_new_volleyball_receive_wait_ms_desc",
+            "inputs": [
+                {
+                    "name": "receive_wait_ms",
+                    "label": "$task_new_volleyball_receive_wait_ms_input",
+                    "default": "1100",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "VolleyballCoreSpikeWait": {
+                    "pre_delay": "{receive_wait_ms}"
+                }
+            }
+        },
+        "NewVolleyballAfterMatch": {
+            "type": "select",
+            "label": "$task_new_volleyball_after_match",
+            "description": "$task_new_volleyball_after_match_desc",
+            "default_case": "restart",
+            "cases": [
+                {
+                    "name": "restart",
+                    "label": "$task_new_volleyball_after_match_restart",
+                    "pipeline_override": {
+                        "VolleyballCoreMatchEnd": {
+                            "next": [
+                                "VolleyballCoreRestart"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "leave",
+                    "label": "$task_new_volleyball_after_match_leave",
+                    "pipeline_override": {
+                        "VolleyballCoreMatchEnd": {
+                            "next": [
+                                "VolleyballCoreExit"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
