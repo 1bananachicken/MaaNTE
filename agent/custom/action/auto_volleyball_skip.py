@@ -87,7 +87,7 @@ class VolleyballSkipIntro(CustomAction):
             return self._run_impl(context, argv)
         except Exception as e:
             logger.exception("SkipIntro: exception: %s", e)
-            return CustomAction.RunResult(success=True)
+            return CustomAction.RunResult(success=False)
 
     def _run_impl(self, context, argv):
         controller = context.tasker.controller
@@ -97,7 +97,7 @@ class VolleyballSkipIntro(CustomAction):
         black_timeout = BLACK_TIMEOUT
         if argv.custom_action_param:
             try:
-                p = json.loads(argv.custom_action_param)
+                p = json.loads(argv.custom_action_param) if isinstance(argv.custom_action_param, str) else argv.custom_action_param
                 detect_timeout = float(p.get("detect_timeout", detect_timeout))
                 black_timeout = float(p.get("black_timeout", black_timeout))
             except Exception:

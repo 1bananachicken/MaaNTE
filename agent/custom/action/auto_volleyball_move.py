@@ -113,8 +113,10 @@ def _classify_direction(cx, cy):
 def _press_key(controller, key, duration=0.15):
     """长按方向键 duration 秒。"""
     controller.post_key_down(key).wait()
-    time.sleep(duration)
-    controller.post_key_up(key).wait()
+    try:
+        time.sleep(duration)
+    finally:
+        controller.post_key_up(key).wait()
 
 
 @AgentServer.custom_action("volleyball_move_to_landing")
@@ -137,7 +139,7 @@ class VolleyballMoveToLanding(CustomAction):
         timeout = 3.0
         if argv.custom_action_param:
             try:
-                p = json.loads(argv.custom_action_param)
+                p = json.loads(argv.custom_action_param) if isinstance(argv.custom_action_param, str) else argv.custom_action_param
                 move_duration = float(p.get("move_duration", move_duration))
                 wait_after_move = float(p.get("wait_after_move", wait_after_move))
                 timeout = float(p.get("timeout", timeout))

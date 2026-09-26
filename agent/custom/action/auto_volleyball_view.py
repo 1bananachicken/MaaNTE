@@ -20,7 +20,7 @@ class VolleyballViewSetup(CustomAction):
         if argv.custom_action_param:
             import json
             try:
-                p = json.loads(argv.custom_action_param)
+                p = json.loads(argv.custom_action_param) if isinstance(argv.custom_action_param, str) else argv.custom_action_param
                 dy = int(p.get("dy", dy))
             except Exception:
                 pass

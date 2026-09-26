@@ -96,7 +96,7 @@ class VolleyballRoundWait(CustomAction):
         poll_interval = 0.1
         if argv.custom_action_param:
             try:
-                p = json.loads(argv.custom_action_param)
+                p = json.loads(argv.custom_action_param) if isinstance(argv.custom_action_param, str) else argv.custom_action_param
                 blue_threshold = float(p.get("blue_ratio", blue_threshold))
                 wait_after = float(p.get("wait_after", wait_after))
                 timeout = float(p.get("timeout", timeout))
@@ -152,4 +152,4 @@ class VolleyballRoundWait(CustomAction):
             return CustomAction.RunResult(success=True)
         except Exception:
             logger.exception("RoundWait: failed")
-            return CustomAction.RunResult(success=True)
+            return CustomAction.RunResult(success=False)
