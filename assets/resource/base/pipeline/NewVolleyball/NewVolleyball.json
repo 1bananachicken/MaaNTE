@@ -23,7 +23,7 @@
         "action": "Custom",
         "custom_action": "volleyball_view_setup",
         "custom_action_param": {
-            "dy": 200
+            "dy": 5500
         },
         "pre_delay": 0,
         "post_delay": 0,
@@ -85,7 +85,7 @@
         ]
     },
     "NewVolleyballReceiveLoop": {
-        "desc": "接球循环：检测结算→过场→闭环移动→space重扣",
+        "desc": "接球循环：检测结算→过场→开环移动→space重扣",
         "recognition": {
             "type": "DirectHit"
         },
@@ -192,7 +192,7 @@
         ]
     },
     "NewVolleyballMoveToLanding": {
-        "desc": "闭环移动：检测到落点后持续移动，到位后按左键传球",
+        "desc": "开环八向移动：检测落点坐标，计算向量距离与时延，一次移动到位后传球",
         "recognition": {
             "type": "Custom",
             "custom_recognition": "volleyball_landing_detect",
@@ -203,9 +203,10 @@
         "action": "Custom",
         "custom_action": "volleyball_move_to_landing",
         "custom_action_param": {
-            "move_duration": 0.3,
-            "wait_after_move": 0.1,
-            "timeout": 3.0
+            "speed": 325,
+            "center_radius": 50,
+            "min_hold": 0.05,
+            "max_hold": 1.0
         },
         "pre_delay": 0,
         "post_delay": 0,
@@ -249,7 +250,7 @@
                 "key": 2
             }
         },
-        "pre_delay": 1200,
+        "pre_delay": 1100,
         "post_delay": 0,
         "rate_limit": 0,
         "timeout": 5000,

@@ -101,7 +101,7 @@
                 {
                     "name": "view_dy",
                     "label": "$task_new_volleyball_view_dy_input",
-                    "default": "200",
+                    "default": "5500",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
                 }
@@ -122,7 +122,7 @@
                 {
                     "name": "receive_wait_ms",
                     "label": "$task_new_volleyball_receive_wait_ms_input",
-                    "default": "1950",
+                    "default": "1100",
                     "pipeline_type": "int",
                     "verify": "^\\d+$"
                 }

@@ -18,8 +18,12 @@ KEY_S = 83
 KEY_D = 68
 KEY_LBUTTON = 1
 
-# 区域划分（基于1280x720）
-CENTER_X1, CENTER_Y1, CENTER_X2, CENTER_Y2 = 580, 300, 700, 420
+_KEY_NAMES = {KEY_W: "W", KEY_A: "A", KEY_S: "S", KEY_D: "D"}
+
+# 屏幕中心（1280x720）
+SCREEN_CENTER_X = 640
+SCREEN_CENTER_Y = 360
+
 # 大检测ROI：覆盖所有方向
 DETECT_ROI = [470, 190, 340, 340]
 
@@ -97,36 +101,52 @@ def _detect_landing(image):
     return best
 
 
-def _classify_direction(cx, cy):
-    """根据落点中心坐标判断方向。"""
-    if CENTER_X1 <= cx <= CENTER_X2 and CENTER_Y1 <= cy <= CENTER_Y2:
-        return "center"
-    if cx < CENTER_X1:
-        return "left"
-    if cx > CENTER_X2:
-        return "right"
-    if cy < CENTER_Y1:
-        return "up"
-    return "down"
+def _direction_to_keys(dx, dy):
+    """根据向量(dx, dy)计算八向按键列表。
+
+    扇区划分（每45°一个）：
+      0=右(D)  1=右下(S+D)  2=下(S)  3=左下(A+S)
+      4=左(A)  5=左上(W+A)  6=上(W)  7=右上(W+D)
+    """
+    angle = math.atan2(dy, dx)
+    if angle < 0:
+        angle += 2 * math.pi
+    sector = int((angle + math.pi / 8) / (math.pi / 4)) % 8
+    key_map = [
+        [KEY_D],
+        [KEY_S, KEY_D],
+        [KEY_S],
+        [KEY_A, KEY_S],
+        [KEY_A],
+        [KEY_W, KEY_A],
+        [KEY_W],
+        [KEY_W, KEY_D],
+    ]
+    return key_map[sector]
 
 
-def _press_key(controller, key, duration=0.15):
-    """长按方向键 duration 秒。"""
-    controller.post_key_down(key).wait()
+def _press_keys(controller, keys, duration):
+    """同时长按多个方向键 duration 秒。"""
+    for key in keys:
+        controller.post_key_down(key).wait()
     try:
         time.sleep(duration)
     finally:
-        controller.post_key_up(key).wait()
+        for key in keys:
+            controller.post_key_up(key).wait()
 
 
 @AgentServer.custom_action("volleyball_move_to_landing")
 class VolleyballMoveToLanding(CustomAction):
-    """闭环移动：持续检测落点位置，长按方向键移动，直到落点进入中心区域后按左键传球。
+    """开环八向移动：检测落点坐标，以屏幕中心为基准计算向量距离，
+    按移动速度推算按键时延，一次移动到位后按左键传球。
 
     custom_action_param (JSON):
-      move_duration: float  单次方向键长按秒数，默认 0.15
-      wait_after_move: float  移动后等待秒数，默认 0.1
-      timeout: float  总超时秒数，默认 3.0
+      speed: float          移动速度 px/s，默认 325
+      center_radius: float  到位判定半径（像素），默认 50
+      min_hold: float       最小按键时延秒，默认 0.05
+      max_hold: float       最大按键时延秒，默认 1.0
+      auto_pass: bool       移动到位后是否自动按左键传球，默认 true
     """
 
     def run(
@@ -134,21 +154,27 @@ class VolleyballMoveToLanding(CustomAction):
     ) -> CustomAction.RunResult:
         controller = context.tasker.controller
 
-        move_duration = 0.15
-        wait_after_move = 0.1
-        timeout = 3.0
+        speed = 325.0
+        center_radius = 50.0
+        min_hold = 0.05
+        max_hold = 1.0
+        auto_pass = True
         if argv.custom_action_param:
             try:
-                p = json.loads(argv.custom_action_param) if isinstance(argv.custom_action_param, str) else argv.custom_action_param
-                move_duration = float(p.get("move_duration", move_duration))
-                wait_after_move = float(p.get("wait_after_move", wait_after_move))
-                timeout = float(p.get("timeout", timeout))
+                p = (
+                    json.loads(argv.custom_action_param)
+                    if isinstance(argv.custom_action_param, str)
+                    else argv.custom_action_param
+                )
+                speed = float(p.get("speed", speed))
+                center_radius = float(p.get("center_radius", center_radius))
+                min_hold = float(p.get("min_hold", min_hold))
+                max_hold = float(p.get("max_hold", max_hold))
+                auto_pass = bool(p.get("auto_pass", auto_pass))
             except Exception:
                 pass
 
-        start = time.time()
         try:
-            # 第一次检测：没有落点说明球在对方半场，直接返回不移动
             controller.post_screencap().wait()
             image = controller.cached_image
             if image is None:
@@ -163,45 +189,39 @@ class VolleyballMoveToLanding(CustomAction):
             if landing is None:
                 return CustomAction.RunResult(success=True)
 
-            # 检测到落点，进入闭环移动
-            while time.time() - start < timeout:
-                if context.tasker.stopping:
-                    return CustomAction.RunResult(success=False)
+            cx, cy = landing
+            dx = cx - SCREEN_CENTER_X
+            dy = cy - SCREEN_CENTER_Y
+            distance = math.hypot(dx, dy)
 
-                cx, cy = landing
-                direction = _classify_direction(cx, cy)
+            logger.debug(
+                "MoveToLanding: landing=(%.0f,%.0f) vector=(%.0f,%.0f) dist=%.1f",
+                cx,
+                cy,
+                dx,
+                dy,
+                distance,
+            )
+
+            # 落点在中心半径内，直接传球
+            if distance <= center_radius:
+                logger.debug("MoveToLanding: already in center radius, pass directly")
+            else:
+                keys = _direction_to_keys(dx, dy)
+                hold_time = max(min_hold, min(max_hold, distance / speed))
                 logger.debug(
-                    "MoveToLanding: landing=(%.0f,%.0f) dir=%s", cx, cy, direction
+                    "MoveToLanding: keys=%s hold=%.3fs",
+                    [_KEY_NAMES.get(k, str(k)) for k in keys],
+                    hold_time,
                 )
+                _press_keys(controller, keys, hold_time)
 
-                if direction == "center":
-                    controller.post_key_down(KEY_LBUTTON).wait()
-                    time.sleep(0.05)
-                    controller.post_key_up(KEY_LBUTTON).wait()
-                    time.sleep(0.3)
-                    return CustomAction.RunResult(success=True)
+            if auto_pass:
+                controller.post_key_down(KEY_LBUTTON).wait()
+                time.sleep(0.05)
+                controller.post_key_up(KEY_LBUTTON).wait()
+                time.sleep(0.3)
 
-                key_map = {
-                    "left": KEY_A,
-                    "right": KEY_D,
-                    "up": KEY_W,
-                    "down": KEY_S,
-                }
-                _press_key(controller, key_map[direction], move_duration)
-                time.sleep(wait_after_move)
-
-                controller.post_screencap().wait()
-                image = controller.cached_image
-                if image is not None:
-                    # 过场动画出现，立即返回
-                    if _is_transition(image):
-                        logger.debug("MoveToLanding: transition during move, skip")
-                        return CustomAction.RunResult(success=True)
-                    landing = _detect_landing(image)
-                    if landing is None:
-                        return CustomAction.RunResult(success=True)
-
-            logger.warning("MoveToLanding: timeout after %.1fs", timeout)
             return CustomAction.RunResult(success=True)
         except Exception:
             logger.exception("MoveToLanding: failed")
