@@ -24,7 +24,11 @@ class VolleyballClickResult(CustomAction):
         if argv.custom_action_param:
             try:
                 import json
-                p = json.loads(argv.custom_action_param)
+                p = (
+                    json.loads(argv.custom_action_param)
+                    if isinstance(argv.custom_action_param, str)
+                    else argv.custom_action_param
+                )
                 x = int(p.get("x", x))
                 y = int(p.get("y", y))
             except Exception:
