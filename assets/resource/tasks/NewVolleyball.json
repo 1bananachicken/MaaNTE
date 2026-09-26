@@ -2,9 +2,9 @@
     "task": [
         {
             "name": "NewVolleyball",
-            "label": "$task_new_volleyball_weekly_label",
-            "entry": "NewVolleyballSkipIntro",
-            "description": "$task_new_volleyball_weekly_desc",
+            "label": "$task_new_volleyball_label",
+            "entry": "VolleyballCoreSkipIntro",
+            "description": "$task_new_volleyball_desc",
             "controller": [
                 "Win32-Front"
             ],
@@ -32,16 +32,16 @@
                     "name": "Yes",
                     "label": "$option_switch_case_yes",
                     "pipeline_override": {
-                        "NewVolleyballServeToss": { "enabled": true },
-                        "NewVolleyballSpike": { "enabled": true }
+                        "VolleyballCoreServeToss": { "enabled": true },
+                        "VolleyballCoreSpike": { "enabled": true }
                     }
                 },
                 {
                     "name": "No",
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
-                        "NewVolleyballServeToss": { "enabled": false },
-                        "NewVolleyballSpike": { "enabled": false }
+                        "VolleyballCoreServeToss": { "enabled": false },
+                        "VolleyballCoreSpike": { "enabled": false }
                     }
                 }
             ]
@@ -60,7 +60,7 @@
                 }
             ],
             "pipeline_override": {
-                "NewVolleyballServeToss": {
+                "VolleyballCoreServeToss": {
                     "post_delay": "{wait_ms}"
                 }
             }
@@ -75,20 +75,20 @@
                     "name": "Yes",
                     "label": "$option_switch_case_yes",
                     "pipeline_override": {
-                        "NewVolleyballReceiveLoop": { "enabled": true },
-                        "NewVolleyballMoveToLanding": { "enabled": true },
-                        "NewVolleyballSpikeJump": { "enabled": true },
-                        "NewVolleyballSpikeWait": { "enabled": true }
+                        "VolleyballCoreLoop": { "enabled": true },
+                        "VolleyballCoreLanding": { "enabled": true },
+                        "VolleyballCoreSpikeJump": { "enabled": true },
+                        "VolleyballCoreSpikeWait": { "enabled": true }
                     }
                 },
                 {
                     "name": "No",
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
-                        "NewVolleyballReceiveLoop": { "enabled": false },
-                        "NewVolleyballMoveToLanding": { "enabled": false },
-                        "NewVolleyballSpikeJump": { "enabled": false },
-                        "NewVolleyballSpikeWait": { "enabled": false }
+                        "VolleyballCoreLoop": { "enabled": false },
+                        "VolleyballCoreLanding": { "enabled": false },
+                        "VolleyballCoreSpikeJump": { "enabled": false },
+                        "VolleyballCoreSpikeWait": { "enabled": false }
                     }
                 }
             ]
@@ -107,9 +107,13 @@
                 }
             ],
             "pipeline_override": {
-                "NewVolleyballEntrance": {
-                    "custom_action_param": {
-                        "dy": "{view_dy}"
+                "VolleyballCoreViewSetup": {
+                    "action": {
+                        "param": {
+                            "custom_action_param": {
+                                "dy": "{view_dy}"
+                            }
+                        }
                     }
                 }
             }
@@ -128,7 +132,7 @@
                 }
             ],
             "pipeline_override": {
-                "NewVolleyballSpikeWait": {
+                "VolleyballCoreSpikeWait": {
                     "pre_delay": "{receive_wait_ms}"
                 }
             }
@@ -143,13 +147,9 @@
                     "name": "restart",
                     "label": "$task_new_volleyball_after_match_restart",
                     "pipeline_override": {
-                        "NewVolleyballResultScreenDetect": {
-                            "custom_action_param": {
-                                "x": 46,
-                                "y": 614
-                            },
+                        "VolleyballCoreMatchEnd": {
                             "next": [
-                                "NewVolleyballSkipIntro"
+                                "VolleyballCoreRestart"
                             ]
                         }
                     }
@@ -158,13 +158,9 @@
                     "name": "leave",
                     "label": "$task_new_volleyball_after_match_leave",
                     "pipeline_override": {
-                        "NewVolleyballResultScreenDetect": {
-                            "custom_action_param": {
-                                "x": 46,
-                                "y": 674
-                            },
+                        "VolleyballCoreMatchEnd": {
                             "next": [
-                                "NewVolleyballDone"
+                                "VolleyballCoreExit"
                             ]
                         }
                     }

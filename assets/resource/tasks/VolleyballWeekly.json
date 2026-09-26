@@ -11,10 +11,19 @@
             "group": [
                 "HethereauHobbies"
             ],
+            "pipeline_override": {
+                "VolleyballCoreMatchEnd": {
+                    "next": [
+                        "VolleyballWeeklyWin",
+                        "VolleyballWeeklyLoss"
+                    ]
+                }
+            },
             "option": [
                 "VolleyballWeeklySkipToPlay",
                 "VolleyballWeeklyFirstCharacter",
-                "VolleyballWeeklySecondCharacter"
+                "VolleyballWeeklySecondCharacter",
+                "VolleyballWeeklyUseLegacyMash"
             ]
         }
     ],
@@ -31,6 +40,7 @@
                     "pipeline_override": {
                         "VolleyballWeeklyEntrance": {
                             "next": [
+                                "VolleyballCoreViewSetup",
                                 "VolleyballWeeklyPlay"
                             ]
                         }
@@ -39,6 +49,44 @@
                 {
                     "name": "No",
                     "label": "$option_switch_case_no"
+                }
+            ]
+        },
+        "VolleyballWeeklyUseLegacyMash": {
+            "type": "switch",
+            "label": "$task_auto_volleyball_weekly_option_use_legacy_mash",
+            "description": "$task_auto_volleyball_weekly_option_use_legacy_mash_desc",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "VolleyballCoreSkipIntro": {
+                            "enabled": false
+                        },
+                        "VolleyballCoreViewSetup": {
+                            "enabled": false
+                        },
+                        "VolleyballWeeklyPlay": {
+                            "enabled": true
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "VolleyballCoreSkipIntro": {
+                            "enabled": true
+                        },
+                        "VolleyballCoreViewSetup": {
+                            "enabled": true
+                        },
+                        "VolleyballWeeklyPlay": {
+                            "enabled": false
+                        }
+                    }
                 }
             ]
         },

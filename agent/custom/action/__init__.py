@@ -37,14 +37,7 @@ from .BagelSpam import *
 from .auto_volleyball import *
 from .BidKing.place_bid import PlaceBid
 from .auto_volleyball_weekly import *
-from .auto_volleyball_view import *
-from .auto_volleyball_landing import *
-from .auto_volleyball_move import *
-from .auto_volleyball_serve import *
-from .auto_volleyball_round import *
-from .auto_volleyball_spike import *
-from .auto_volleyball_result import *
-from .auto_volleyball_skip import *
+from .auto_volleyball_play import *
 from .lucky_star_round import *
 
 __all__ = [
