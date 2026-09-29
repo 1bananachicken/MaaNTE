@@ -220,8 +220,10 @@ class VolleyballViewSetup(CustomAction):
         try:
             # 前置等待：上一步可能点了跳过键触发黑屏，黑屏未结束前鼠标操作无效
             time.sleep(0.5)
+            logger.info("VolleyballViewSetup: relative move dy=%d", dy)
             controller.post_relative_move(0, dy).wait()
             time.sleep(0.5)
+            logger.info("VolleyballViewSetup: done")
             return CustomAction.RunResult(success=True)
         except Exception:
             logger.exception("VolleyballViewSetup: failed")
@@ -262,6 +264,11 @@ class VolleyballSpikeJumpDetect(CustomRecognition):
             x, y, w, h = [int(v) for v in roi]
             image = image[y:y + h, x:x + w]
 
+        # 全屏蓝过场 / 结算页里不存在 space 高亮（蓝色同为 HSV 蓝，会被误判）
+        if _is_gap_frame(argv.image):
+            logger.debug("VolleyballSpikeJumpDetect: gap frame (transition/result), ignore")
+            return None
+
         # HSV 筛选
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, self.LOWER, self.UPPER)
@@ -295,6 +302,14 @@ class VolleyballLandingDetect(CustomRecognition):
       min_area: int           最小面积，默认 20
       max_area: int           最大面积，默认 300
       min_circ: float         最小圆形度，默认 0.3
+      verify: bool          是否二次采样确认落点（防过渡动画误命中），默认 true
+      verify_delay: float   二次采样间隔（秒），默认 0.10
+      verify_tolerance: float 二次采样中心容差（像素），默认 40
+      max_growth: float     二次采样面积放大上限（倍数），默认 2.0
+
+    被否决时会打 DEBUG 日志 "rejected by verify (<原因>)"，原因形如
+    gap-frame / no-blob / drift=NN.N / growth=N.NN / sample-missing，
+    可据此判断是真动画还是真标记被误否决。
     """
 
     def analyze(
@@ -326,72 +341,59 @@ class VolleyballLandingDetect(CustomRecognition):
         max_area = int(params.get("max_area", 300))
         min_circ = float(params.get("min_circ", 0.3))
 
-        rx, ry, rw, rh = roi
         image = argv.image  # BGR numpy array
 
+        verify = bool(params.get("verify", True))
+        verify_delay = params.get("verify_delay")
+        verify_tolerance = params.get("verify_tolerance")
+        max_growth = params.get("max_growth")
+
+        # 全屏蓝过场 / 结算页里不可能有落点提示，直接不识别
+        if _is_gap_frame(image):
+            logger.debug("VolleyballLandingDetect: gap frame (transition/result), ignore")
+            return None
+
         try:
-            # 裁剪ROI
-            h, w = image.shape[:2]
-            x1 = max(0, int(rx))
-            y1 = max(0, int(ry))
-            x2 = min(w, int(rx + rw))
-            y2 = min(h, int(ry + rh))
-            if x2 <= x1 or y2 <= y1:
-                return None
-            roi_img = image[y1:y2, x1:x2]
-
-            # HSV筛选
-            hsv = cv2.cvtColor(roi_img, cv2.COLOR_BGR2HSV)
-            mask = cv2.inRange(hsv, hsv_lower, hsv_upper)
-
-            # 连通块分析
-            num, labels, stats, centroids = cv2.connectedComponentsWithStats(
-                mask, connectivity=8
+            blob = _landing_blob(
+                image, roi, hsv_lower, hsv_upper, min_area, max_area, min_circ
             )
-
-            best = None
-            best_area = 0
-            for i in range(1, num):
-                area = stats[i, cv2.CC_STAT_AREA]
-                if area < min_area or area > max_area:
-                    continue
-
-                # 圆形度
-                blob_mask = (labels == i).astype(np.uint8)
-                contours, _ = cv2.findContours(
-                    blob_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-                )
-                if not contours:
-                    continue
-                perimeter = cv2.arcLength(contours[0], True)
-                if perimeter <= 0:
-                    continue
-                circ = 4 * math.pi * area / (perimeter * perimeter)
-                if circ < min_circ:
-                    continue
-
-                # 选面积最大的符合条件的连通块
-                if area > best_area:
-                    bx = stats[i, cv2.CC_STAT_LEFT]
-                    by = stats[i, cv2.CC_STAT_TOP]
-                    bw = stats[i, cv2.CC_STAT_WIDTH]
-                    bh = stats[i, cv2.CC_STAT_HEIGHT]
-                    best = (bx, by, bw, bh, area, circ)
-                    best_area = area
-
-            if best is None:
+            if blob is None:
                 return None
 
-            bx, by, bw, bh, area, circ = best
-            # 坐标映射回全图
-            box = [x1 + bx, y1 + by, bw, bh]
+            cx, cy, area, box, circ = blob
+
+            # 二次确认：单帧命中的蓝块可能是过渡动画膨胀到一半的残片，
+            # 真落点是稳定的小蓝块（位置不漂、面积不涨）。
+            verify_reason = "no-verify"
+            if verify:
+                ok, verify_reason = _verify_landing(
+                    context.tasker.controller,
+                    blob,
+                    verify_delay,
+                    verify_tolerance,
+                    max_growth,
+                )
+                if not ok:
+                    logger.debug(
+                        "VolleyballLandingDetect: rejected by verify (%s) area=%d box=%s",
+                        verify_reason,
+                        area,
+                        box,
+                    )
+                    return None
+
             logger.debug(
                 "VolleyballLandingDetect: found area=%d circ=%.3f box=%s",
                 area, circ, box,
             )
             return CustomRecognition.AnalyzeResult(
                 box=box,
-                detail={"area": int(area), "circularity": round(circ, 3)},
+                detail={
+                    "area": int(area),
+                    "circularity": circ,
+                    "verified": bool(verify),
+                    "verify_reason": verify_reason,
+                },
             )
         except Exception:
             logger.exception("VolleyballLandingDetect: failed")
@@ -421,6 +423,14 @@ MIN_AREA = 20
 MAX_AREA = 300
 MIN_CIRC = 0.3
 
+# 落点二次确认（防"得分过渡页初始帧"误命中）：
+# 全屏蓝过场是一块不断膨胀的蓝色，膨胀途中某个瞬间在 ROI 内的大小恰好落进
+# [MIN_AREA, MAX_AREA] 且近似圆形，会被单帧检测当成落点。真落点标记是"静止的
+# 小蓝点"——隔一小段时间再采一帧，位置基本不动、面积不会明显变大。
+LANDING_VERIFY_DELAY = 0.10  # 二次采样间隔（秒）
+LANDING_VERIFY_TOLERANCE = 40.0  # 两次采样中心允许漂移（像素）
+LANDING_VERIFY_MAX_GROWTH = 2.0  # 面积放大倍数上限，超过视为动画膨胀
+
 # 过场动画检测
 TRANSITION_ROI = [400, 200, 480, 320]
 TRANSITION_BLUE_RATIO = 0.3
@@ -448,27 +458,46 @@ def _is_transition(image):
     return ratio >= TRANSITION_BLUE_RATIO
 
 
-def _detect_landing(image):
-    """在大ROI内检测落点，返回落点中心坐标(cx, cy)或None。"""
+def _is_gap_frame(image):
+    """比赛间隙画面（全屏蓝过场 / 结算页）——此时场上不可能有落点提示。"""
+    if image is None:
+        return True
+    return _is_transition(image) or _is_result_screen(image)
+
+
+def _landing_blobs(image, roi=None, hsv_lower=None, hsv_upper=None,
+                   min_area=None, max_area=None, min_circ=None):
+    """在 ROI 内找出全部候选落点标记，按面积从大到小返回。
+
+    每项为 (cx, cy, area, box, circ)：中心坐标、面积、全图坐标 box=[x,y,w,h]、圆形度。
+    ROI 里同时可能有球（面积通常更大、移动很快），所以二次确认不能只比"最大块"。
+    """
+    if image is None:
+        return []
+    roi = DETECT_ROI if roi is None else roi
+    hsv_lower = MOVE_HSV_LOWER if hsv_lower is None else hsv_lower
+    hsv_upper = MOVE_HSV_UPPER if hsv_upper is None else hsv_upper
+    min_area = MIN_AREA if min_area is None else int(min_area)
+    max_area = MAX_AREA if max_area is None else int(max_area)
+    min_circ = MIN_CIRC if min_circ is None else float(min_circ)
+
     h, w = image.shape[:2]
-    rx, ry, rw, rh = DETECT_ROI
-    x1 = max(0, rx)
-    y1 = max(0, ry)
-    x2 = min(w, rx + rw)
-    y2 = min(h, ry + rh)
+    x1 = max(0, int(roi[0]))
+    y1 = max(0, int(roi[1]))
+    x2 = min(w, int(roi[0] + roi[2]))
+    y2 = min(h, int(roi[1] + roi[3]))
     if x2 <= x1 or y2 <= y1:
-        return None
+        return []
     roi_img = image[y1:y2, x1:x2]
 
     hsv = cv2.cvtColor(roi_img, cv2.COLOR_BGR2HSV)
-    mask = cv2.inRange(hsv, MOVE_HSV_LOWER, MOVE_HSV_UPPER)
-    num, labels, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
+    mask = cv2.inRange(hsv, hsv_lower, hsv_upper)
+    num, labels, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
 
-    best = None
-    best_area = 0
+    blobs = []
     for i in range(1, num):
-        area = stats[i, cv2.CC_STAT_AREA]
-        if area < MIN_AREA or area > MAX_AREA:
+        area = int(stats[i, cv2.CC_STAT_AREA])
+        if area < min_area or area > max_area:
             continue
         blob_mask = (labels == i).astype(np.uint8)
         contours, _ = cv2.findContours(blob_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -478,14 +507,144 @@ def _detect_landing(image):
         if perimeter <= 0:
             continue
         circ = 4 * math.pi * area / (perimeter * perimeter)
-        if circ < MIN_CIRC:
+        if circ < min_circ:
             continue
-        if area > best_area:
-            best_area = area
-            cx = stats[i, cv2.CC_STAT_LEFT] + stats[i, cv2.CC_STAT_WIDTH] / 2
-            cy = stats[i, cv2.CC_STAT_TOP] + stats[i, cv2.CC_STAT_HEIGHT] / 2
-            best = (x1 + cx, y1 + cy)
-    return best
+        bx = int(stats[i, cv2.CC_STAT_LEFT])
+        by = int(stats[i, cv2.CC_STAT_TOP])
+        bw = int(stats[i, cv2.CC_STAT_WIDTH])
+        bh = int(stats[i, cv2.CC_STAT_HEIGHT])
+        blobs.append((
+            x1 + bx + bw / 2.0,
+            y1 + by + bh / 2.0,
+            area,
+            [x1 + bx, y1 + by, bw, bh],
+            round(circ, 3),
+        ))
+    blobs.sort(key=lambda b: b[2], reverse=True)
+    return blobs
+
+
+def _landing_blob(image, roi=None, hsv_lower=None, hsv_upper=None,
+                  min_area=None, max_area=None, min_circ=None):
+    """单帧判定：取 ROI 内最像落点标记的蓝色连通块（面积最大者），没有则 None。"""
+    blobs = _landing_blobs(image, roi, hsv_lower, hsv_upper, min_area, max_area, min_circ)
+    return blobs[0] if blobs else None
+
+
+def _detect_landing(image):
+    """单帧检测落点，返回落点中心坐标(cx, cy)或None（不做二次确认）。"""
+    blob = _landing_blob(image)
+    if blob is None:
+        return None
+    return (blob[0], blob[1])
+
+
+def _landing_sample_matches(first, sample, tolerance, max_growth):
+    """二次采样是否仍指向同一个落点标记（位置没漂、面积没膨胀）。"""
+    if sample is None:
+        return False
+    if math.hypot(sample[0] - first[0], sample[1] - first[1]) > tolerance:
+        return False
+    return sample[2] <= first[2] * max_growth
+
+
+def _verify_landing(controller, first, delay=None, tolerance=None, max_growth=None,
+                    roi=None, hsv_lower=None, hsv_upper=None,
+                    min_area=None, max_area=None, min_circ=None):
+    """二次确认：真落点标记是"稳定的小蓝块"，得分过渡动画的蓝块会迅速膨胀。
+
+    首帧命中后再隔 delay 秒采一帧，只要该帧里存在**任意**一个候选块满足
+    「中心漂移 ≤ tolerance 且面积 ≤ max_growth × 首帧」就确认落点稳定。
+    之所以比对"任意块"而不是"最大块"：ROI 里常常还有球（面积更大、移动极快），
+    只比最大块会被球抢走位置，把真标记误否决掉。
+
+    该帧已是过场/结算页 → 直接否定（动画已经把 ROI 染蓝）；允许补采第三帧，
+    容忍标记闪烁造成的单帧丢失。
+
+    返回 (是否确认, 原因)。原因是给实测排查看的短字符串：
+      ok / no-first / gap-frame / no-blob / drift=NN.N / growth=N.NN / sample-missing
+    """
+    if first is None:
+        return False, "no-first"
+    delay = LANDING_VERIFY_DELAY if delay is None else float(delay)
+    tolerance = LANDING_VERIFY_TOLERANCE if tolerance is None else float(tolerance)
+    max_growth = LANDING_VERIFY_MAX_GROWTH if max_growth is None else float(max_growth)
+
+    reason = "sample-missing"
+    for _ in range(2):
+        time.sleep(delay)
+        image = _screencap(controller)
+        if image is None:
+            continue
+        if _is_gap_frame(image):
+            return False, "gap-frame"
+        blobs = _landing_blobs(
+            image, roi, hsv_lower, hsv_upper, min_area, max_area, min_circ
+        )
+        if not blobs:
+            reason = "no-blob"
+            continue
+        nearest = None  # (drift, growth) —— 离首帧最近的候选，仅用于诊断原因
+        for cand in blobs:
+            drift = math.hypot(cand[0] - first[0], cand[1] - first[1])
+            growth = cand[2] / max(1.0, float(first[2]))
+            if nearest is None or drift < nearest[0]:
+                nearest = (drift, growth)
+            if drift <= tolerance and cand[2] <= first[2] * max_growth:
+                return True, "ok"
+        reason = ("drift=%.1f" % nearest[0] if nearest[0] > tolerance
+                  else "growth=%.2f" % nearest[1])
+    return False, reason
+
+
+def _detect_landing_verified_ex(controller, image, roi=None, hsv_lower=None, hsv_upper=None,
+                                min_area=None, max_area=None, min_circ=None,
+                                verify=True, verify_delay=None, verify_tolerance=None,
+                                max_growth=None):
+    """同 _detect_landing_verified，但额外返回判定原因（实测定位误否决用）。
+
+    返回 ((cx, cy) 或 None, 原因字符串)：
+      no-image / gap-frame / no-blob / ok / no-verify，或 _verify_landing 的原因
+      （gap-frame / no-blob / drift=NN.N / growth=N.NN / sample-missing）
+
+    首帧可能有多个候选块（落点标记 + 球），这里逐个做二次确认，返回第一个
+    「原地不动」的候选——球的移动速度快，通常只有真标记能通过。
+    """
+    if image is None:
+        return None, "no-image"
+    if _is_gap_frame(image):
+        return None, "gap-frame"
+    candidates = _landing_blobs(
+        image, roi, hsv_lower, hsv_upper, min_area, max_area, min_circ
+    )
+    if not candidates:
+        return None, "no-blob"
+    if not verify:
+        first = candidates[0]
+        return (first[0], first[1]), "no-verify"
+    reason = "no-blob"
+    for first in candidates:
+        ok, reason = _verify_landing(
+            controller, first, verify_delay, verify_tolerance, max_growth,
+            roi, hsv_lower, hsv_upper, min_area, max_area, min_circ,
+        )
+        if ok:
+            return (first[0], first[1]), "ok"
+        if reason == "gap-frame":
+            break
+    return None, reason
+
+
+def _detect_landing_verified(controller, image, roi=None, hsv_lower=None, hsv_upper=None,
+                             min_area=None, max_area=None, min_circ=None,
+                             verify=True, verify_delay=None, verify_tolerance=None,
+                             max_growth=None):
+    """带过场/结算页防护 + 二次确认的落点检测，返回 (cx, cy) 或 None。"""
+    coords, _ = _detect_landing_verified_ex(
+        controller, image, roi, hsv_lower, hsv_upper, min_area, max_area, min_circ,
+        verify, verify_delay, verify_tolerance, max_growth
+    )
+    return coords
 
 
 def _direction_to_keys(dx, dy):
@@ -534,6 +693,9 @@ class VolleyballMoveToLanding(CustomAction):
       min_hold: float       最小按键时延秒，默认 0.05
       max_hold: float       最大按键时延秒，默认 1.0
       auto_pass: bool       移动到位后是否自动按左键传球，默认 true
+      verify: bool          动作层是否再做一次二次采样确认，默认 false
+                            （识别节点 volleyball_landing_detect 已经确认过；
+                             动作层再采样要多花 0.1~0.2s，实测会明显降低命中率）
     """
 
     def run(
@@ -546,6 +708,7 @@ class VolleyballMoveToLanding(CustomAction):
         min_hold = 0.05
         max_hold = 1.0
         auto_pass = True
+        verify = False
         if argv.custom_action_param:
             try:
                 p = (
@@ -558,6 +721,7 @@ class VolleyballMoveToLanding(CustomAction):
                 min_hold = float(p.get("min_hold", min_hold))
                 max_hold = float(p.get("max_hold", max_hold))
                 auto_pass = bool(p.get("auto_pass", auto_pass))
+                verify = bool(p.get("verify", verify))
             except Exception:
                 pass
 
@@ -567,13 +731,16 @@ class VolleyballMoveToLanding(CustomAction):
             if image is None:
                 return CustomAction.RunResult(success=True)
 
-            # 过场动画出现，立即返回
-            if _is_transition(image):
-                logger.debug("MoveToLanding: transition detected, skip")
+            # 过场动画 / 结算页出现，立即返回
+            if _is_gap_frame(image):
+                logger.debug("MoveToLanding: gap frame (transition/result), skip")
                 return CustomAction.RunResult(success=True)
 
-            landing = _detect_landing(image)
+            # 识别节点已做过二次确认，动作层默认只保留便宜的间隙帧守卫；
+            # 需要时可给动作传 verify: true 打开它自己的二次采样确认。
+            landing, reason = _detect_landing_verified_ex(controller, image, verify=verify)
             if landing is None:
+                logger.debug("MoveToLanding: no landing (%s)", reason)
                 return CustomAction.RunResult(success=True)
 
             cx, cy = landing
@@ -615,25 +782,32 @@ class VolleyballMoveToLanding(CustomAction):
             return CustomAction.RunResult(success=False)
 
 
-# 主控腰部 ROI（检测蓝色底线）
+# 主控腰部 ROI（检测底线；内核默认按蓝色底线标定）
 SERVE_ROI = [380, 335, 520, 50]
 # HSV 蓝色范围（V下限100，覆盖底线蓝色）
 SERVE_HSV_LOWER = np.array([90, 30, 100])
 SERVE_HSV_UPPER = np.array([130, 255, 255])
+# HSV 黄色范围（周常场地边框为黄色：实测底线 hue 15~24 / S≈203 / V≈254，
+# 而同一帧场地地板 S≈30 不会被选中；阈值放宽到 hue 12~40 / S≥120 / V≥150）
+SERVE_HSV_YELLOW_LOWER = np.array([12, 120, 150])
+SERVE_HSV_YELLOW_UPPER = np.array([40, 255, 255])
 # 底线连通块最小宽度（衣物花纹最大约34px，底线115~221px）
 MIN_LINE_WIDTH = 80
 
 
 @AgentServer.custom_recognition("volleyball_serve_detect")
 class VolleyballServeDetect(CustomRecognition):
-    """检测主控是否站在蓝色底线上（即主控发球状态）。
+    """检测主控是否站在底线上（即主控发球状态）。
 
-    在主控腰部ROI内做HSV蓝色筛选+连通块分析，若存在宽度>MIN_LINE_WIDTH的
-    水平连通块，则判定为蓝色底线穿过主控身体 → 主控发球。
+    在主控腰部ROI内做HSV颜色筛选+连通块分析，若存在宽度>MIN_LINE_WIDTH的
+    水平连通块，则判定为底线穿过主控身体 → 主控发球。
+    底线颜色默认按蓝色（普通场地）筛选，周常场地边框为黄色，可通过参数切换。
 
     custom_recognition_param (JSON, 可选):
       roi: [x,y,w,h]         覆盖默认ROI
       min_line_width: int    覆盖默认最小宽度
+      line_color: str        "blue"(默认)/"yellow"/"both"，选择底线颜色预设
+      hsv_lower / hsv_upper: [h,s,v]  显式覆盖HSV范围（两者同时给出时优先于 line_color）
     """
 
     def analyze(
@@ -641,15 +815,41 @@ class VolleyballServeDetect(CustomRecognition):
     ) -> CustomRecognition.AnalyzeResult | None:
         roi = SERVE_ROI
         min_width = MIN_LINE_WIDTH
-        if argv.custom_recognition_param:
-            try:
-                p = json.loads(argv.custom_recognition_param)
-                if "roi" in p:
-                    roi = p["roi"]
-                if "min_line_width" in p:
-                    min_width = int(p["min_line_width"])
-            except Exception:
-                pass
+        # 默认：蓝色底线（保持内核在普通场地的既有行为）
+        color_ranges = [(SERVE_HSV_LOWER, SERVE_HSV_UPPER)]
+        # 参数来源可能是 JSON 字符串、已是 dict，或未传参时的 None/"null"——
+        # 全部容错，任一种情况都不允许抛出异常（否则识别恒为未命中）
+        params = argv.custom_recognition_param
+        try:
+            if isinstance(params, str):
+                params = json.loads(params)
+            if not isinstance(params, dict):
+                params = {}
+        except Exception:
+            logger.exception("ServeDetect: bad custom_recognition_param")
+            params = {}
+
+        if params:
+            if "roi" in params:
+                roi = params["roi"]
+            if "min_line_width" in params:
+                min_width = int(params["min_line_width"])
+            if "hsv_lower" in params and "hsv_upper" in params:
+                color_ranges = [(
+                    np.array(params["hsv_lower"], dtype=np.uint8),
+                    np.array(params["hsv_upper"], dtype=np.uint8),
+                )]
+            else:
+                color = str(params.get("line_color", "blue")).strip().lower()
+                if color == "yellow":
+                    color_ranges = [(SERVE_HSV_YELLOW_LOWER, SERVE_HSV_YELLOW_UPPER)]
+                elif color == "both":
+                    color_ranges = [
+                        (SERVE_HSV_LOWER, SERVE_HSV_UPPER),
+                        (SERVE_HSV_YELLOW_LOWER, SERVE_HSV_YELLOW_UPPER),
+                    ]
+                elif color != "blue":
+                    logger.warning("ServeDetect: unknown line_color=%r, fallback to blue", color)
 
         image = argv.image
         h, w = image.shape[:2]
@@ -664,7 +864,10 @@ class VolleyballServeDetect(CustomRecognition):
         try:
             roi_img = image[y1:y2, x1:x2]
             hsv = cv2.cvtColor(roi_img, cv2.COLOR_BGR2HSV)
-            mask = cv2.inRange(hsv, SERVE_HSV_LOWER, SERVE_HSV_UPPER)
+            mask = None
+            for lo, hi in color_ranges:
+                m = cv2.inRange(hsv, lo, hi)
+                mask = m if mask is None else cv2.bitwise_or(mask, m)
             num, labels, stats, _ = cv2.connectedComponentsWithStats(mask, connectivity=8)
 
             best = None
