@@ -13,17 +13,47 @@
             ],
             "pipeline_override": {
                 "VolleyballCoreMatchEnd": {
+                    "recognition": {
+                        "type": "TemplateMatch",
+                        "param": {
+                            "template": [
+                                "VolleyballWeekly/continue.png",
+                                "Volleyball/ExitButton.png",
+                                "Volleyball/NextButton.png",
+                                "Volleyball/RestartButton.png"
+                            ],
+                            "roi": [
+                                40,
+                                525,
+                                50,
+                                150
+                            ],
+                            "threshold": 0.7
+                        }
+                    },
                     "next": [
-                        "VolleyballWeeklyWin",
-                        "VolleyballWeeklyLoss"
+                        "VolleyballWeeklyContinueMatch",
+                        "VolleyballWeeklyLeagueOver"
                     ]
+                },
+                "VolleyballCoreServeCheck": {
+                    "desc": "周常场地边框为黄色，发球底线检测同时接受蓝色与黄色（VolleyballServeDetect 的 line_color 参数）。参数必须嵌在 custom_recognition_param 下：写在 param 同级时框架会把 custom_recognition_param 传成字符串 \"null\"，识别每次抛 TypeError 导致发球检测恒不命中",
+                    "recognition": {
+                        "param": {
+                            "custom_recognition": "volleyball_serve_detect",
+                            "custom_recognition_param": {
+                                "line_color": "both"
+                            }
+                        }
+                    }
                 }
             },
             "option": [
                 "VolleyballWeeklySkipToPlay",
                 "VolleyballWeeklyFirstCharacter",
                 "VolleyballWeeklySecondCharacter",
-                "VolleyballWeeklyUseLegacyMash"
+                "VolleyballWeeklyUseLegacyMash",
+                "VolleyballWeeklyStartFromChampion"
             ]
         }
     ],
@@ -40,8 +70,42 @@
                     "pipeline_override": {
                         "VolleyballWeeklyEntrance": {
                             "next": [
-                                "VolleyballCoreViewSetup",
-                                "VolleyballWeeklyPlay"
+                                "VolleyballWeeklyIntroGate",
+                                "VolleyballWeeklyPlay",
+                                "VolleyballCoreViewSetup"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no"
+                }
+            ]
+        },
+        "VolleyballWeeklyStartFromChampion": {
+            "type": "switch",
+            "label": "$task_auto_volleyball_weekly_option_start_from_champion",
+            "description": "$task_auto_volleyball_weekly_option_start_from_champion_desc",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "VolleyballWeeklyEntrance": {
+                            "next": [
+                                "VolleyballWeeklyChampionTree",
+                                "VolleyballWeeklyStartMatch",
+                                "VolleyballWeeklyChampionPromotion"
+                            ]
+                        },
+                        "VolleyballWeeklyStartMatchAfterTeammates": {
+                            "next": [
+                                "VolleyballWeeklyIntroGate"
+                            ],
+                            "on_error": [
+                                "VolleyballCoreViewSetup"
                             ]
                         }
                     }
@@ -62,9 +126,6 @@
                     "name": "Yes",
                     "label": "$option_switch_case_yes",
                     "pipeline_override": {
-                        "VolleyballCoreSkipIntro": {
-                            "enabled": false
-                        },
                         "VolleyballCoreViewSetup": {
                             "enabled": false
                         },
@@ -77,9 +138,6 @@
                     "name": "No",
                     "label": "$option_switch_case_no",
                     "pipeline_override": {
-                        "VolleyballCoreSkipIntro": {
-                            "enabled": true
-                        },
                         "VolleyballCoreViewSetup": {
                             "enabled": true
                         },

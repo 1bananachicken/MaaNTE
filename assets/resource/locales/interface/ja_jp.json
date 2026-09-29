@@ -297,6 +297,8 @@
     "task_auto_volleyball_weekly_desc": "ウィークリーリーグを自動消化します。合計5試合（グループステージ2試合、選手権3試合）。リーグ画面から開始してください。",
     "task_auto_volleyball_weekly_option_skip_to_play": "試合中から直接開始",
     "task_auto_volleyball_weekly_option_skip_to_play_desc": "トーナメントやチームメイト選択などをスキップし、進行中の試合から直接開始します。",
+    "task_auto_volleyball_weekly_option_start_from_champion": "チャンピオン大会から開始",
+    "task_auto_volleyball_weekly_option_start_from_champion_desc": "グループ予選2試合と予選→決勝の移行画面（昇格通知・イベントツリー）をスキップし、チャンピオン大会の第1試合から開始します。開始前にゲームをチャンピオン大会のブラケット画面で止めておいてください。すでに勝ち上がっていて決勝トーナメントの流れだけを繰り返し確認したい場合に便利です。",
     "task_auto_volleyball_weekly_option_use_legacy_mash": "旧版の連打プレイを使用",
     "task_auto_volleyball_weekly_option_use_legacy_mash_desc": "オンにすると、0.6 秒ごとに K キーを連打する旧方式でプレイします。オフにすると新しい着地点追跡コアを使用します。",
     "task_auto_volleyball_weekly_option_first_character": "メインキャラクター",

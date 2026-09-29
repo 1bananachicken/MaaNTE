@@ -303,6 +303,8 @@
     "task_auto_volleyball_weekly_desc": "自动挑战周常联赛，共五场（小组赛两场、冠军赛三场），需要从联赛界面启动。",
     "task_auto_volleyball_weekly_option_skip_to_play": "直接在打球界面开始",
     "task_auto_volleyball_weekly_option_skip_to_play_desc": "开启后跳过签表与选人等前置步骤，直接从当前比赛的打球阶段开始。",
+    "task_auto_volleyball_weekly_option_start_from_champion": "从冠军赛开始",
+    "task_auto_volleyball_weekly_option_start_from_champion_desc": "开启后跳过前两轮小组赛循环与小组赛→冠军赛过渡页（晋级通知、赛事树），直接开始冠军赛第一场：请先把游戏停在冠军赛签表页再启动任务。适合已经晋级、只想反复测试冠军赛流程时使用。",
     "task_auto_volleyball_weekly_option_use_legacy_mash": "沿用旧版连打打法",
     "task_auto_volleyball_weekly_option_use_legacy_mash_desc": "开启后改用旧版每 0.6 秒连按 K 键的打法；关闭后使用新的落点追踪内核。",
     "task_auto_volleyball_weekly_option_first_character": "主控角色",

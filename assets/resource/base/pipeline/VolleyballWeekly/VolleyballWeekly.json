@@ -1,6 +1,6 @@
 {
     "VolleyballWeeklyEntrance": {
-        "desc": "周常排球入口，重置任务状态",
+        "desc": "周常排球入口，重置任务状态。完整链路：Entrance → StartMatch(签表识别) → [SelectSlot → SelectTeammates] → StartMatchAfterTeammates(点开赛) → IntroGate(有跳过按钮才跳剧情) → CoreViewSetup(视角初始化) → 内核 VolleyballCoreLoop 打球 → 内核 VolleyballCoreMatchEnd(结算触发) → 由任务级 pipeline_override(assets/resource/tasks/VolleyballWeekly.json)把 CoreMatchEnd.next 接回 VolleyballWeeklyContinueMatch → 回签表循环。小组赛 2 场全胜后，结算页点继续会出现「联赛排名页 → 晋级通知(chp_trans，按 ESC 关掉) → 冠军赛赛事树(ChampionTree) → 冠军赛签表」这段过渡，冠军赛 3 场只在第一场选人；五场打完（含 12 秒结算动画）的最终赢与任意阶段的最终输，结算页右下角都会出现感叹号按钮，由 LeagueOver 命中即停机，晋级通知页没有该按钮、由 ChampionPromotion 用大排球图案确认后按 ESC 继续。另：任务选项「从冠军赛开始」会把本节点 next 改写成 [ChampionTree, StartMatch, ChampionPromotion]，跳过小组赛直接进冠军赛",
         "recognition": {
             "type": "DirectHit"
         },
@@ -18,20 +18,20 @@
             "VolleyballWeeklyStartMatch"
         ],
         "on_error": [
-            "VolleyballWeeklyTaskStop"
+            "VolleyballCoreLeave"
         ]
     },
     "VolleyballWeeklyStartMatch": {
-        "desc": "识别开始比赛按钮确认在大厅界面，不点击（空队伍时点开始会被游戏拦下），按空位状态路由：有空位去选人，没空位直接开始",
+        "desc": "识别签表页的继续比赛按钮（VolleyballWeekly/StartMatch.png）确认在联赛界面，不点击（空队伍时点开始会被游戏拦下），按空位状态路由：有空位去选人，没空位直接开赛",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "template": "VolleyballWeekly/StartMatch.png",
                 "roi": [
                     440,
-                    615,
+                    585,
                     420,
-                    80
+                    110
                 ],
                 "threshold": 0.7
             }
@@ -48,11 +48,11 @@
             "VolleyballWeeklyStartMatchAfterTeammates"
         ],
         "on_error": [
-            "VolleyballWeeklyTaskStop"
+            "VolleyballCoreLeave"
         ]
     },
     "VolleyballWeeklySelectSlot": {
-        "desc": "点击一个选择球员空位，打开选人面板",
+        "desc": "点击一个选择球员空位，打开选人面板。冠军赛第二场起空位已被上一场占用、不需要再选人，本节点识别超时（timeout 收紧到 5 秒，避免每场白等）会由 on_error 回落到 StartMatchAfterTeammates 直接点继续比赛 —— 这里绝不能用 VolleyballCoreLeave，否则第二、三场会直接停机",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -72,12 +72,12 @@
         "rate_limit": 0,
         "pre_delay": 0,
         "post_delay": 1000,
-        "timeout": 15000,
+        "timeout": 5000,
         "next": [
             "VolleyballWeeklySelectTeammates"
         ],
         "on_error": [
-            "VolleyballWeeklyTaskStop"
+            "VolleyballWeeklyStartMatchAfterTeammates"
         ]
     },
     "VolleyballWeeklySelectTeammates": {
@@ -99,20 +99,20 @@
             "VolleyballWeeklyStartMatchAfterTeammates"
         ],
         "on_error": [
-            "VolleyballWeeklyTaskStop"
+            "VolleyballCoreLeave"
         ]
     },
     "VolleyballWeeklyStartMatchAfterTeammates": {
-        "desc": "识别开始比赛按钮并点击，复查仍在则带偏移重试，按钮消失即进入比赛",
+        "desc": "识别签表页继续比赛按钮并点击（联赛排名页上的同一个「继续比赛」图标也由本节点点击，这就是用户说的「点继续复用开始」），复查仍在则带偏移重试，按钮消失即进入比赛。点击后按序等待三个候选：①剧情跳过门 IntroGate（跳过按钮一出现就执行跳过，正常场次立刻命中）②右下角感叹号按钮 LeagueOver（命中＝联赛终局：最终输的 failed 页与最终赢的 get1st 页都有这个按钮，直接停机）③ChampionPromotion（用大排球图案 LeagueOver.png 确认「是终局样式页但没有感叹号」＝小组赛全胜后的晋级通知页，按 ESC 关掉）。感叹号必须排在晋级页之前：failed 页同时有感叹号(1.000)与大排球图案(0.990)，顺序反了会对着终局页按 ESC。三者都不命中时由本节点 on_error 回到 VolleyballCoreViewSetup 正常开打。注意：绝不能再把 VolleyballCoreViewSetup（DirectHit）放进 next —— 它第一轮轮询就命中，会把跳过门与过渡页一起短路（2026-09-29 实测「skipintro 没触发、直接进接球 loop」即此原因）",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "template": "VolleyballWeekly/StartMatch.png",
                 "roi": [
                     440,
-                    615,
+                    585,
                     420,
-                    80
+                    110
                 ],
                 "threshold": 0.7
             }
@@ -125,9 +125,9 @@
                     "template": "VolleyballWeekly/StartMatch.png",
                     "roi": [
                         440,
-                        615,
+                        585,
                         420,
-                        80
+                        110
                     ],
                     "threshold": 0.7
                 }
@@ -138,41 +138,16 @@
         "post_delay": 1000,
         "timeout": 15000,
         "next": [
-            "VolleyballCoreSkipIntro",
-            "VolleyballWeeklySkipStory",
-            "VolleyballCoreViewSetup",
-            "VolleyballWeeklyPlay"
+            "VolleyballWeeklyIntroGate",
+            "VolleyballWeeklyLeagueOver",
+            "VolleyballWeeklyChampionPromotion"
         ],
         "on_error": [
-            "VolleyballWeeklyTaskStop"
+            "VolleyballCoreViewSetup"
         ]
     },
-    "VolleyballWeeklyPlay": {
-        "desc": "每 0.6 秒按一次 K 键，每 5 秒检测剧情或结算",
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "Custom",
-            "param": {
-                "custom_action": "volleyball_weekly_play"
-            }
-        },
-        "rate_limit": 0,
-        "pre_delay": 0,
-        "post_delay": 0,
-        "timeout": 620000,
-        "next": [
-            "VolleyballWeeklySkipStory",
-            "VolleyballWeeklyWin",
-            "VolleyballWeeklyLoss"
-        ],
-        "on_error": [
-            "VolleyballWeeklyTaskStop"
-        ]
-    },
-    "VolleyballWeeklySkipStory": {
-        "desc": "剧情动画出现后延迟 1 秒按 Esc 跳过",
+    "VolleyballWeeklyIntroGate": {
+        "desc": "周常剧情跳过门：仅当跳过按钮出现在场上时才进入，动作直接复用内核的 volleyball_skip_intro（Esc→勾选框→确认→等黑屏），跳过按钮不在场时本节点识别超时，由 on_error 回到 VolleyballCoreViewSetup 正常开打（不再落回内核停机节点），避免无条件跳过把签表画面吞进内核循环",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -187,207 +162,150 @@
             }
         },
         "action": {
-            "type": "ClickKey",
+            "type": "Custom",
             "param": {
-                "key": 27
+                "custom_action": "volleyball_skip_intro"
             }
         },
         "rate_limit": 500,
-        "pre_delay": 1000,
-        "post_delay": 1000,
+        "pre_delay": 0,
+        "post_delay": 0,
         "timeout": 15000,
         "next": [
-            "VolleyballWeeklySkipCheckbox",
-            "VolleyballWeeklySkipConfirm",
             "VolleyballWeeklyPlay",
-            "VolleyballWeeklyWin",
-            "VolleyballWeeklyLoss"
+            "VolleyballCoreViewSetup"
         ],
         "on_error": [
-            "VolleyballWeeklyTaskStop"
+            "VolleyballCoreViewSetup"
         ]
     },
-    "VolleyballWeeklySkipCheckbox": {
-        "desc": "勾选剧情跳过确认框",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "Volleyball/SkipCheckbox.png",
-                "roi": [
-                    566,
-                    361,
-                    23,
-                    24
-                ],
-                "threshold": 0.7
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "rate_limit": 0,
-        "pre_delay": 0,
-        "post_delay": 1000,
-        "timeout": 10000,
-        "next": [
-            "VolleyballWeeklySkipConfirm"
-        ],
-        "on_error": [
-            "VolleyballWeeklyTaskStop"
-        ]
-    },
-    "VolleyballWeeklySkipConfirm": {
-        "desc": "确认跳过剧情并继续等待结算",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "Volleyball/SkipConfirmButton.png",
-                "roi": [
-                    734,
-                    426,
-                    173,
-                    37
-                ],
-                "threshold": 0.7
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "rate_limit": 0,
-        "pre_delay": 0,
-        "post_delay": 1000,
-        "timeout": 10000,
-        "next": [
-            "VolleyballWeeklyPlay",
-            "VolleyballWeeklyWin",
-            "VolleyballWeeklyLoss"
-        ],
-        "on_error": [
-            "VolleyballWeeklyTaskStop"
-        ]
-    },
-    "VolleyballWeeklyWin": {
-        "desc": "识别胜利结算（复用普通排球模板）",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "Volleyball/Win.png",
-                "roi": [
-                    937,
-                    71,
-                    308,
-                    110
-                ],
-                "threshold": 0.85
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
-        "rate_limit": 5000,
-        "pre_delay": 0,
-        "post_delay": 0,
-        "timeout": 30000,
-        "next": [
-            "VolleyballWeeklyAfterMatch"
-        ],
-        "on_error": [
-            "VolleyballWeeklyTaskStop"
-        ]
-    },
-    "VolleyballWeeklyLoss": {
-        "desc": "识别失败结算（复用普通排球模板）",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "Volleyball/Lose.png",
-                "roi": [
-                    879,
-                    72,
-                    363,
-                    105
-                ],
-                "threshold": 0.85
-            }
-        },
-        "action": {
-            "type": "DoNothing"
-        },
-        "rate_limit": 5000,
-        "pre_delay": 0,
-        "post_delay": 0,
-        "timeout": 30000,
-        "next": [
-            "VolleyballWeeklyAfterMatch"
-        ],
-        "on_error": [
-            "VolleyballWeeklyTaskStop"
-        ]
-    },
-    "VolleyballWeeklyAfterMatch": {
-        "desc": "胜负结算后进入继续比赛；既没有继续比赛也没有后续比赛时结束任务",
+    "VolleyballWeeklyPlay": {
+        "desc": "旧版连打：每 0.6 秒按一次 K 键，每 5 秒检测剧情或结算；enabled 由「沿用旧版连打打法」选项切换——No 档（默认）disabled，本节点在 next 列表中被直接跳过，后面的 VolleyballCoreViewSetup 才会执行；Yes 档 enabled 且排在 ViewSetup 前面，用于走旧打法。结算统一交给内核 VolleyballCoreMatchEnd",
         "recognition": {
             "type": "DirectHit"
         },
         "action": {
-            "type": "DoNothing"
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_weekly_play"
+            }
         },
         "rate_limit": 0,
         "pre_delay": 0,
         "post_delay": 0,
-        "timeout": 15000,
+        "timeout": 620000,
         "next": [
-            "VolleyballWeeklyContinueMatch",
-            "VolleyballWeeklyTaskComplete"
+            "VolleyballCoreMatchEnd"
         ],
         "on_error": [
-            "VolleyballWeeklyTaskStop"
+            "VolleyballCoreLeave"
         ]
     },
     "VolleyballWeeklyContinueMatch": {
-        "desc": "点击结算界面左下角的继续比赛进入下一场（固定坐标盲点，不依赖模板）",
+        "desc": "单场结算页点击继续比赛图标（VolleyballWeekly/continue.png，与离开按钮同一列，位置对应普通排球的重新挑战位）；点击后按画面路由：回签表/联赛排名页继续下一场 → StartMatch，最终结算会先播 12 秒动画，动画结束的 get1st 页与最终输的 failed 页右下角都有感叹号按钮 → LeagueOver 停机（本节点 timeout 20000 且 rate_limit 0，每轮都会把两个候选重新识别一遍，所以 12 秒动画播完、感叹号一出现就会被抓到；StartMatch 在动画期间不会匹配，rank2 之外的页面它都够不到 0.7）。两者都不命中时由 LeagueOver 的 on_error 落到 ChampionPromotion（终局样式页但没有感叹号＝晋级通知页，按 ESC）。注意：本节点在 pipeline 内部没有任何 next 指向它，入口是任务级 pipeline_override 对 VolleyballCoreMatchEnd.next 的重写（见 assets/resource/tasks/VolleyballWeekly.json），因此只读本文件时会显得像孤立节点。",
         "recognition": {
-            "type": "DirectHit"
+            "type": "TemplateMatch",
+            "param": {
+                "template": "VolleyballWeekly/continue.png",
+                "roi": [
+                    40,
+                    570,
+                    45,
+                    50
+                ],
+                "threshold": 0.7
+            }
         },
         "action": {
-            "type": "Click",
-            "param": {
-                "target": [
-                    40,
-                    572,
-                    145,
-                    52
-                ]
-            }
+            "type": "Click"
         },
         "rate_limit": 0,
         "pre_delay": 0,
         "post_delay": 1000,
-        "timeout": 15000,
+        "timeout": 20000,
         "next": [
-            "VolleyballWeeklySkipStory",
             "VolleyballWeeklyStartMatch",
-            "VolleyballWeeklyLeagueOver",
-            "VolleyballWeeklyPlay"
+            "VolleyballWeeklyLeagueOver"
         ],
         "on_error": [
-            "VolleyballWeeklyTaskStop"
+            "VolleyballCoreLeave"
         ]
     },
-    "VolleyballWeeklyLeagueOver": {
-        "desc": "联赛终局（止步小组赛等），识别结算页大排球图案，直接结束任务",
+    "VolleyballWeeklyChampionPromotion": {
+        "desc": "小组赛→冠军赛过渡的晋级通知页(chp_trans)：小组赛两场全胜后，在联赛排名页(rank2)点掉继续比赛会弹出本页。它与最终输球的 failed 页美术几乎一样（大排球图案在两页都能匹配到 0.98 以上），唯一硬区分是右下角感叹号按钮（failed 1.000、get1st 0.985、chp_trans 只有 0.513），所以固定由父节点按「IntroGate → LeagueOver(感叹号) → 本节点」的顺序轮询：感叹号先判＝终局停机，不命中才落到本节点判晋级，顺序反了会对着终局页按 ESC。本节点已弃用「裁自整页截图的晋级横幅」模板（横幅里含账号信息，换账号就失配，素材已删除），改用游戏原生的大排球图案 VolleyballWeekly/LeagueOver.png 当守卫（实测 chp_trans 0.984、failed 0.990；get1st 0.309、rank2 0.221、chp_tree 0.191、12 张实战帧 ≤0.356），图案出现才按 ESC 关掉通知。ESC 之后可能是冠军赛赛事树页（箭头低 26px，交给 ChampionTree）也可能直接是冠军赛签表页（交给 StartMatch），两者都留在本节点 next；图案始终不出现＝本场没有过渡页、流程正常开打，由 on_error 回到 VolleyballCoreViewSetup 继续打球，绝不误按 ESC 也不停机",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "template": "VolleyballWeekly/LeagueOver.png",
                 "roi": [
                     700,
-                    120,
+                    130,
                     340,
-                    340
+                    310
                 ],
-                "threshold": 0.6
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 27
+            }
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 500,
+        "timeout": 3000,
+        "next": [
+            "VolleyballWeeklyChampionTree",
+            "VolleyballWeeklyStartMatch"
+        ],
+        "on_error": [
+            "VolleyballCoreViewSetup"
+        ]
+    },
+    "VolleyballWeeklyChampionTree": {
+        "desc": "小组赛→冠军赛过渡②：冠军赛赛事树页(chp_tree)。本页的继续比赛箭头比普通签表页低约 26px（树页 y≈636，签表/排名页 y≈610），因此复用 VolleyballWeekly/StartMatch.png 但把 roi 收紧到 [700,630,140,90]：树页命中 0.982，签表页、排名页与其它帧最高只有 0.430，区分度足够。命中即点击，进入冠军赛签表页；点完箭头后等签表页（本节点 timeout 6 秒），超时同样由 on_error 回退到 StartMatch 重试，避免被停机节点兜走",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "VolleyballWeekly/StartMatch.png",
+                "roi": [
+                    700,
+                    630,
+                    140,
+                    90
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "rate_limit": 0,
+        "pre_delay": 0,
+        "post_delay": 1000,
+        "timeout": 6000,
+        "next": [
+            "VolleyballWeeklyStartMatch"
+        ],
+        "on_error": [
+            "VolleyballWeeklyStartMatch"
+        ]
+    },
+    "VolleyballWeeklyLeagueOver": {
+        "desc": "联赛终局判定：识别右下角感叹号按钮（VolleyballWeekly/LeagueOverButton.png）。它是「最终输(failed)」与「最终赢(get1st)」的共同标志（实测两页右下角都有该按钮：failed 1.000、get1st 0.985），而晋级通知页 chp_trans 没有（0.513）、rank2/chp_tree 与 12 张实战帧都 ≤0.512，所以命中即结束任务，不必再区分输赢。识别超时（＝当前不是终局页）时由 on_error 落到 ChampionPromotion：那里再用大排球图案确认是「终局样式页但没有感叹号」＝晋级通知页，然后按 ESC 继续冠军赛。注：旧的 LeagueOver.png 大排球图案在晋级页也能匹配到 0.984，不能用来判输赢，只当 ChampionPromotion 的守卫",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "VolleyballWeekly/LeagueOverButton.png",
+                "roi": [
+                    1180,
+                    620,
+                    100,
+                    100
+                ],
+                "threshold": 0.7
             }
         },
         "action": {
@@ -395,30 +313,10 @@
         },
         "rate_limit": 0,
         "pre_delay": 0,
-        "post_delay": 0
-    },
-    "VolleyballWeeklyTaskComplete": {
-        "desc": "周常排球任务完成",
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "StopTask"
-        },
-        "rate_limit": 0,
-        "pre_delay": 0,
-        "post_delay": 0
-    },
-    "VolleyballWeeklyTaskStop": {
-        "desc": "节点异常时停止任务",
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "action": {
-            "type": "StopTask"
-        },
-        "rate_limit": 0,
-        "pre_delay": 0,
-        "post_delay": 0
+        "post_delay": 0,
+        "timeout": 5000,
+        "on_error": [
+            "VolleyballWeeklyChampionPromotion"
+        ]
     }
 }

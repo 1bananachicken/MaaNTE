@@ -297,6 +297,8 @@
     "task_auto_volleyball_weekly_desc": "自動挑戰週常聯賽，共五場（小組賽兩場、冠軍賽三場），需要從聯賽介面啟動。",
     "task_auto_volleyball_weekly_option_skip_to_play": "直接在打球介面開始",
     "task_auto_volleyball_weekly_option_skip_to_play_desc": "開啟後跳過簽表與選人等前置步驟，直接從目前比賽的打球階段開始。",
+    "task_auto_volleyball_weekly_option_start_from_champion": "從冠軍賽開始",
+    "task_auto_volleyball_weekly_option_start_from_champion_desc": "開啟後跳過前兩輪小組賽循環與小組賽→冠軍賽的過渡頁面（晉級通知、賽事樹），直接開始冠軍賽第一場：請先把遊戲停在冠軍賽籤表頁再啟動任務。適合已經晉級、只想反覆測試冠軍賽流程時使用。",
     "task_auto_volleyball_weekly_option_use_legacy_mash": "沿用舊版連打打法",
     "task_auto_volleyball_weekly_option_use_legacy_mash_desc": "開啟後改用舊版每 0.6 秒連按 K 鍵的打法；關閉後使用新的落點追蹤內核。",
     "task_auto_volleyball_weekly_option_first_character": "主控角色",

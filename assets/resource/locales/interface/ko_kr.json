@@ -297,6 +297,8 @@
     "task_auto_volleyball_weekly_desc": "주간 리그를 자동으로 진행합니다. 총 5경기(조별 리그 2경기, 챔피언십 3경기). 리그 화면에서 시작해 주세요.",
     "task_auto_volleyball_weekly_option_skip_to_play": "경기 중 직접 시작",
     "task_auto_volleyball_weekly_option_skip_to_play_desc": "대진표 및 팀원 선택 등 사전 단계를 건너뛰고 진행 중인 경기에서 바로 시작합니다.",
+    "task_auto_volleyball_weekly_option_start_from_champion": "챔피언십부터 시작",
+    "task_auto_volleyball_weekly_option_start_from_champion_desc": "조별 리그 2경기와 조별→챔피언십 전환 화면(진출 알림, 대회 트리)을 건너뛰고 챔피언십 1차전부터 시작합니다. 시작 전에 게임을 챔피언십 대진표 화면에 두세요. 이미 진출한 상태에서 챔피언십 흐름만 반복 테스트할 때 유용합니다.",
     "task_auto_volleyball_weekly_option_use_legacy_mash": "구버전 연타 플레이 사용",
     "task_auto_volleyball_weekly_option_use_legacy_mash_desc": "켜면 0.6초마다 K 키를 연타하는 구버전 방식으로 플레이하고, 끄면 새로운 착지점 추적 코어를 사용합니다.",
     "task_auto_volleyball_weekly_option_first_character": "메인 캐릭터",

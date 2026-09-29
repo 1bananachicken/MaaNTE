@@ -297,6 +297,8 @@
     "task_auto_volleyball_weekly_desc": "Runs the weekly volleyball league — 5 matches in total (2 group stage, 3 championship). Start from the league screen.",
     "task_auto_volleyball_weekly_option_skip_to_play": "Start directly in the match",
     "task_auto_volleyball_weekly_option_skip_to_play_desc": "Skip the bracket and teammate selection and start right away from the ongoing match.",
+    "task_auto_volleyball_weekly_option_start_from_champion": "Start from the champion stage",
+    "task_auto_volleyball_weekly_option_start_from_champion_desc": "Skip the two group-stage matches and the group-to-champion transition pages (promotion notice, event tree) and start straight from the first champion-stage match: leave the game on the champion bracket screen before starting the task. Useful when you already qualified and only want to re-test the champion flow.",
     "task_auto_volleyball_weekly_option_use_legacy_mash": "Use legacy tap-spam play",
     "task_auto_volleyball_weekly_option_use_legacy_mash_desc": "When on, play falls back to the old approach of pressing K every 0.6s; when off, the new landing-tracking core is used.",
     "task_auto_volleyball_weekly_option_first_character": "Main Character",
