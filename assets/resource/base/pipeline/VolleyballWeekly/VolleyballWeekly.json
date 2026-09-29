@@ -147,7 +147,7 @@
         ]
     },
     "VolleyballWeeklyIntroGate": {
-        "desc": "周常剧情跳过门：仅当跳过按钮出现在场上时才进入，动作直接复用内核的 volleyball_skip_intro（Esc→勾选框→确认→等黑屏），跳过按钮不在场时本节点识别超时，由 on_error 回到 VolleyballCoreViewSetup 正常开打（不再落回内核停机节点），避免无条件跳过把签表画面吞进内核循环",
+        "desc": "周常剧情跳过门：仅当跳过按钮出现在场上时才进入，动作直接复用内核的 volleyball_skip_intro（Esc→勾选框→确认→等黑屏），跳过按钮不在场时本节点识别超时；next 里已放了 VolleyballCoreViewSetup（DirectHit），认不出跳过按钮就直接回到视角设置正常开打，因此不再单独写 on_error（同一目标同时出现在 next 与 on_error 属于重复路由），避免无条件跳过把签表画面吞进内核循环",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -173,9 +173,6 @@
         "timeout": 15000,
         "next": [
             "VolleyballWeeklyPlay",
-            "VolleyballCoreViewSetup"
-        ],
-        "on_error": [
             "VolleyballCoreViewSetup"
         ]
     },
@@ -265,7 +262,7 @@
         ]
     },
     "VolleyballWeeklyChampionTree": {
-        "desc": "小组赛→冠军赛过渡②：冠军赛赛事树页(chp_tree)。本页的继续比赛箭头比普通签表页低约 26px（树页 y≈636，签表/排名页 y≈610），因此复用 VolleyballWeekly/StartMatch.png 但把 roi 收紧到 [700,630,140,90]：树页命中 0.982，签表页、排名页与其它帧最高只有 0.430，区分度足够。命中即点击，进入冠军赛签表页；点完箭头后等签表页（本节点 timeout 6 秒），超时同样由 on_error 回退到 StartMatch 重试，避免被停机节点兜走",
+        "desc": "小组赛→冠军赛过渡②：冠军赛赛事树页(chp_tree)。本页的继续比赛箭头比普通签表页低约 26px（树页 y≈636，签表/排名页 y≈610），因此复用 VolleyballWeekly/StartMatch.png 但把 roi 收紧到 [700,630,140,90]：树页命中 0.982，签表页、排名页与其它帧最高只有 0.430，区分度足够。命中即点击，进入冠军赛签表页；点完箭头后等签表页（本节点 timeout 6 秒）。若这一下点击没生效，树页上残留的箭头本身也落在 StartMatch 的 roi 内，会被 next 里的 VolleyballWeeklyStartMatch 命中，从而回到正常开始链重新点一次，所以不需要把 StartMatch 同时写进 on_error（同一目标同时出现在 next 与 on_error 属于重复路由）；真正连残留箭头都匹配不到的异常情况由 on_error 交内核停机节点兜底，避免无限空转",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -290,7 +287,7 @@
             "VolleyballWeeklyStartMatch"
         ],
         "on_error": [
-            "VolleyballWeeklyStartMatch"
+            "VolleyballCoreLeave"
         ]
     },
     "VolleyballWeeklyLeagueOver": {
