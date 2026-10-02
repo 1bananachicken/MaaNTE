@@ -43,7 +43,8 @@
                 "VolleyballFirstCharacter",
                 "VolleyballSecondCharacter",
                 "VolleyballContinueOnWin",
-                "VolleyballUseLegacyMash"
+                "VolleyballUseLegacyMash",
+                "VolleyballViewZrPrep"
             ]
         }
     ],
@@ -206,6 +207,44 @@
                         },
                         "VolleyballPlay": {
                             "enabled": false
+                        }
+                    }
+                }
+            ]
+        },
+        "VolleyballViewZrPrep": {
+            "type": "switch",
+            "label": "$task_auto_volleyball_option_zr_prep",
+            "description": "$task_auto_volleyball_option_zr_prep_desc",
+            "default_case": "Yes",
+            "cases": [
+                {
+                    "name": "Yes",
+                    "label": "$option_switch_case_yes",
+                    "pipeline_override": {
+                        "VolleyballCoreViewSetup": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "zr_prep": true
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "No",
+                    "label": "$option_switch_case_no",
+                    "pipeline_override": {
+                        "VolleyballCoreViewSetup": {
+                            "action": {
+                                "param": {
+                                    "custom_action_param": {
+                                        "zr_prep": false
+                                    }
+                                }
+                            }
                         }
                     }
                 }
