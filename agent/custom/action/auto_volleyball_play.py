@@ -441,7 +441,7 @@ _KEY_NAMES = {KEY_W: "W", KEY_A: "A", KEY_S: "S", KEY_D: "D"}
 # 视角初始化预处理：鼠标下移前依次点按 Z、Z、R
 # （每键按压时长 / 相邻两键间隔 / 发完到鼠标下移之间的静置，单位秒）
 VIEW_PREP_KEYS = (KEY_Z, KEY_Z, KEY_R)
-VIEW_PREP_TAP = 0.05
+VIEW_PREP_TAP = 0.10
 VIEW_PREP_GAP = 0.15
 VIEW_PREP_SETTLE = 0.30
 
