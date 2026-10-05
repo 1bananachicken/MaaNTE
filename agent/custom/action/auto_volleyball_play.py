@@ -807,10 +807,14 @@ class VolleyballMoveToLanding(CustomAction):
                 _press_keys(controller, keys, hold_time)
 
             if auto_pass:
-                controller.post_key_down(KEY_LBUTTON).wait()
-                time.sleep(0.05)
-                controller.post_key_up(KEY_LBUTTON).wait()
-                time.sleep(0.3)
+                # 连续点三次左键（每次按下保持0.05s），相邻两次间隔0.2s
+                for click_index in range(3):
+                    controller.post_key_down(KEY_LBUTTON).wait()
+                    time.sleep(0.05)
+                    controller.post_key_up(KEY_LBUTTON).wait()
+                    if click_index < 2:
+                        time.sleep(0.2)
+                time.sleep(0.1)
 
             return CustomAction.RunResult(success=True)
         except Exception:

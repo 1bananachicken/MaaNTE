@@ -224,3 +224,47 @@ class VolleyballWeeklyPlay(CustomAction):
             return CustomAction.RunResult(success=False)
 
         return CustomAction.RunResult(success=False)
+
+
+@AgentServer.custom_action("volleyball_weekly_repeat_click")
+class VolleyballWeeklyRepeatClick(CustomAction):
+    """在指定位置（默认屏幕中心）连续点击若干次左键。
+
+    用于点掉不适合用 ESC 关闭的弹窗：晋级通知页用 ESC 会误触其它返回逻辑，
+    改为在屏幕中点点三次左键确认。
+
+    custom_action_param (JSON, 可选):
+      x, y: int        点击坐标，默认屏幕中心 (640, 360)
+      count: int       点击次数，默认 3
+      interval: float  两次点击之间的间隔秒，默认 0.1
+    """
+
+    def run(
+        self, context: Context, argv: CustomAction.RunArg
+    ) -> CustomAction.RunResult:
+        params = load_params(argv.custom_action_param)
+        x = int(params.get("x", 640))
+        y = int(params.get("y", 360))
+        count = max(1, int(params.get("count", 3)))
+        interval = max(0.0, float(params.get("interval", 0.1)))
+
+        controller = context.tasker.controller
+        try:
+            # Win32-Front 上 post_click 走窗口消息、游戏不响应（实测卡弹窗），
+            # 改用 post_touch：框架在 Win32 上映射为系统级鼠标输入，等同物理点击。
+            controller.post_touch_move(x, y).wait()
+            time.sleep(_MOVE_SETTLE_SECONDS)
+            for i in range(count):
+                controller.post_touch_down(x, y).wait()
+                time.sleep(_PRESS_SECONDS)
+                controller.post_touch_up().wait()
+                if i < count - 1:
+                    time.sleep(interval)
+        except Exception:
+            logger.exception("AutoVolleyballWeekly: repeat click failed")
+            return CustomAction.RunResult(success=False)
+
+        logger.info(
+            "AutoVolleyballWeekly: repeat click %d times at (%d,%d)", count, x, y
+        )
+        return CustomAction.RunResult(success=True)

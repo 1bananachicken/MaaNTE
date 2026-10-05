@@ -205,10 +205,10 @@
             "param": {
                 "template": "VolleyballWeekly/continue.png",
                 "roi": [
-                    40,
+                    32,
                     570,
-                    45,
-                    50
+                    56,
+                    56
                 ],
                 "threshold": 0.7
             }
@@ -229,7 +229,7 @@
         ]
     },
     "VolleyballWeeklyChampionPromotion": {
-        "desc": "小组赛→冠军赛过渡的晋级通知页(chp_trans)：小组赛两场全胜后，在联赛排名页(rank2)点掉继续比赛会弹出本页。它与最终输球的 failed 页美术几乎一样（大排球图案在两页都能匹配到 0.98 以上），唯一硬区分是右下角感叹号按钮（failed 1.000、get1st 0.985、chp_trans 只有 0.513），所以固定由父节点按「IntroGate → LeagueOver(感叹号) → 本节点」的顺序轮询：感叹号先判＝终局停机，不命中才落到本节点判晋级，顺序反了会对着终局页按 ESC。本节点已弃用「裁自整页截图的晋级横幅」模板（横幅里含账号信息，换账号就失配，素材已删除），改用游戏原生的大排球图案 VolleyballWeekly/LeagueOver.png 当守卫（实测 chp_trans 0.984、failed 0.990；get1st 0.309、rank2 0.221、chp_tree 0.191、12 张实战帧 ≤0.356），图案出现才按 ESC 关掉通知。ESC 之后可能是冠军赛赛事树页（箭头低 26px，交给 ChampionTree）也可能直接是冠军赛签表页（交给 StartMatch），两者都留在本节点 next；图案始终不出现＝本场没有过渡页、流程正常开打，由 on_error 回到 VolleyballCoreViewSetup 继续打球，绝不误按 ESC 也不停机",
+        "desc": "小组赛→冠军赛过渡的晋级通知页(chp_trans)：小组赛两场全胜后，在联赛排名页(rank2)点掉继续比赛会弹出本页。它与最终输球的 failed 页美术几乎一样（大排球图案在两页都能匹配到 0.98 以上），唯一硬区分是右下角感叹号按钮（failed 1.000、get1st 0.985、chp_trans 只有 0.513），所以固定由父节点按「IntroGate → LeagueOver(感叹号) → 本节点」的顺序轮询：感叹号先判＝终局停机，不命中才落到本节点判晋级，顺序反了会对着终局页确认点击。本节点已弃用「裁自整页截图的晋级横幅」模板（横幅里含账号信息，换账号就失配，素材已删除），改用游戏原生的大排球图案 VolleyballWeekly/LeagueOver.png 当守卫（实测 chp_trans 0.984、failed 0.990；get1st 0.309、rank2 0.221、chp_tree 0.191、12 张实战帧 ≤0.356），图案出现才在屏幕中点点三次左键确认关掉通知（该通知用 ESC 会误触返回逻辑，故改用 volleyball_weekly_repeat_click：屏幕中心 640,360 连点三次、间隔 0.1s）。点击之后可能是冠军赛赛事树页（箭头低 26px，交给 ChampionTree）也可能直接是冠军赛签表页（交给 StartMatch），两者都留在本节点 next；图案始终不出现＝本场没有过渡页、流程正常开打，由 on_error 回到 VolleyballCoreViewSetup 继续打球，绝不误点也不停机",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -244,9 +244,9 @@
             }
         },
         "action": {
-            "type": "ClickKey",
+            "type": "Custom",
             "param": {
-                "key": 27
+                "custom_action": "volleyball_weekly_repeat_click"
             }
         },
         "rate_limit": 0,
