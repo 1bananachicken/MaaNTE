@@ -1,0 +1,351 @@
+{
+    "VolleyballCoreSkipIntro": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_skip_intro"
+            }
+        },
+        "next": [
+            "VolleyballCoreViewSetup",
+            "VolleyballCoreLeave"
+        ],
+        "timeout": 60000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "VolleyballCoreViewSetup": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_view_setup",
+                "custom_action_param": {
+                    "dy": 5500
+                }
+            }
+        },
+        "next": [
+            "VolleyballCoreLoop",
+            "VolleyballCoreLeave"
+        ],
+        "timeout": 10000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "VolleyballCoreLeave": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "StopTask"
+        }
+    },
+    "VolleyballCoreLoop": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "VolleyballCoreMatchEnd",
+            "VolleyballCoreTransition",
+            "VolleyballCoreSpikeJump",
+            "VolleyballCoreLanding",
+            "VolleyballCoreLoop"
+        ],
+        "timeout": 5000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "VolleyballCoreMatchEnd": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Volleyball/NextButton.png",
+                    "Volleyball/RestartButton.png",
+                    "Volleyball/ExitButton.png"
+                ],
+                "roi": [
+                    43,
+                    525,
+                    36,
+                    145
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "VolleyballCoreRestart",
+            "VolleyballCoreExit"
+        ],
+        "timeout": 3000,
+        "pre_delay": 0,
+        "post_delay": 500,
+        "rate_limit": 0
+    },
+    "VolleyballCoreRestart": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Volleyball/RestartButton.png"
+                ],
+                "roi": [
+                    45,
+                    582,
+                    33,
+                    32
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "VolleyballCoreSkipIntro"
+        ],
+        "timeout": 3000,
+        "pre_delay": 0,
+        "post_delay": 500,
+        "rate_limit": 0
+    },
+    "VolleyballCoreExit": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Volleyball/ExitButton.png"
+                ],
+                "roi": [
+                    43,
+                    635,
+                    36,
+                    35
+                ],
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "VolleyballCoreLeave"
+        ],
+        "timeout": 3000,
+        "pre_delay": 0,
+        "post_delay": 500,
+        "rate_limit": 0
+    },
+    "VolleyballCoreTransition": {
+        "recognition": {
+            "type": "ColorMatch",
+            "param": {
+                "roi": [
+                    400,
+                    200,
+                    480,
+                    320
+                ],
+                "method": 40,
+                "lower": [
+                    90,
+                    30,
+                    100
+                ],
+                "upper": [
+                    130,
+                    255,
+                    255
+                ],
+                "count": 50000,
+                "connected": false
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "VolleyballCoreRoundWait"
+        ],
+        "timeout": 3000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "VolleyballCoreRoundWait": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_round_wait",
+                "custom_action_param": {
+                    "blue_ratio": 0.3,
+                    "wait_after": 1.5,
+                    "timeout": 10.0
+                }
+            }
+        },
+        "next": [
+            "VolleyballCoreServeCheck",
+            "VolleyballCoreLoop"
+        ],
+        "timeout": 15000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "VolleyballCoreServeCheck": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "volleyball_serve_detect"
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [
+            "VolleyballCoreServeToss",
+            "VolleyballCoreLoop"
+        ],
+        "timeout": 3000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "VolleyballCoreServeToss": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 1
+            }
+        },
+        "next": [
+            "VolleyballCoreSpike"
+        ],
+        "timeout": 5000,
+        "pre_delay": 0,
+        "post_delay": 2900,
+        "rate_limit": 0
+    },
+    "VolleyballCoreSpike": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 2
+            }
+        },
+        "next": [
+            "VolleyballCoreLoop"
+        ],
+        "timeout": 3000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "VolleyballCoreSpikeJump": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "volleyball_spike_jump_detect",
+                "custom_recognition_param": {
+                    "roi": [
+                        1060,
+                        610,
+                        100,
+                        100
+                    ]
+                }
+            }
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 32
+            }
+        },
+        "next": [
+            "VolleyballCoreSpikeWait"
+        ],
+        "timeout": 3000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "VolleyballCoreSpikeWait": {
+        "recognition": {
+            "type": "DirectHit"
+        },
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": 2
+            }
+        },
+        "next": [
+            "VolleyballCoreLoop"
+        ],
+        "timeout": 5000,
+        "pre_delay": 1100,
+        "post_delay": 0,
+        "rate_limit": 0
+    },
+    "VolleyballCoreLanding": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "volleyball_landing_detect",
+                "custom_recognition_param": {
+                    "roi": [
+                        470,
+                        190,
+                        340,
+                        340
+                    ]
+                }
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "volleyball_move_to_landing",
+                "custom_action_param": {
+                    "speed": 325,
+                    "center_radius": 50,
+                    "min_hold": 0.05,
+                    "max_hold": 1.0
+                }
+            }
+        },
+        "next": [
+            "VolleyballCoreLoop"
+        ],
+        "timeout": 5000,
+        "pre_delay": 0,
+        "post_delay": 0,
+        "rate_limit": 0
+    }
+}

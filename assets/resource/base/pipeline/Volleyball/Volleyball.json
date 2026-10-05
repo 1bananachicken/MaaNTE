@@ -159,6 +159,7 @@
         "post_delay": 1000,
         "timeout": 15000,
         "next": [
+            "VolleyballCoreSkipIntro",
             "VolleyballSkipStory",
             "VolleyballStartButtonAfterTeammates"
         ],
@@ -189,6 +190,7 @@
         "post_delay": 1000,
         "timeout": 15000,
         "next": [
+            "VolleyballCoreViewSetup",
             "VolleyballPlay"
         ],
         "on_error": [
